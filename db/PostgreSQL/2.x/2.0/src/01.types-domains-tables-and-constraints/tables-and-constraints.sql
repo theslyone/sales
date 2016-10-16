@@ -34,7 +34,10 @@ CREATE TABLE sales.item_selling_prices
     customer_type_id                        integer REFERENCES inventory.customer_types,
     price_type_id                           integer REFERENCES sales.price_types,
     includes_tax                            boolean NOT NULL DEFAULT(false),
-    price                                   public.money_strict NOT NULL
+    price                                   public.money_strict NOT NULL,
+    audit_user_id                           integer REFERENCES account.users,
+    audit_ts                                TIMESTAMP WITH TIME ZONE NULL DEFAULT(NOW()),
+	deleted									boolean DEFAULT(false)
 );
 
 CREATE TABLE sales.payment_terms
@@ -91,6 +94,7 @@ CREATE TABLE sales.sales
     checkout_id                             bigint NOT NULL REFERENCES inventory.checkouts,
     counter_id                              integer NOT NULL REFERENCES inventory.counters,
     customer_id                             integer REFERENCES inventory.customers,
+	salesperson_id							integer REFERENCES account.users,
     is_credit                               boolean NOT NULL DEFAULT(false),
     payment_term_id                         integer REFERENCES sales.payment_terms,
     tender                                  decimal(24, 4) NOT NULL CHECK(tender > 0),

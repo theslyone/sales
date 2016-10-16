@@ -43,6 +43,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Frapid.ApplicationState, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\Frapid.ApplicationState.dll</HintPath>
+    </Reference>
     <Reference Include="Frapid.Areas, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\Frapid.Areas.dll</HintPath>
@@ -84,6 +88,9 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MixERP.Finance">
+      <HintPath>..\..\bin\MixERP.Finance.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -126,6 +133,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AreaRegistration.cs" />
+    <Compile Include="Controllers\SalesDashboardController.cs" />
+    <Compile Include="Controllers\Backend\Setups\CashierController.cs" />
+    <Compile Include="Controllers\Backend\Setups\LateFeeController.cs" />
+    <Compile Include="Controllers\Backend\Setups\PaymentTermController.cs" />
+    <Compile Include="Controllers\Backend\Setups\PriceTypeController.cs" />
+    <Compile Include="Controllers\Backend\Setups\SellingPriceController.cs" />
+    <Compile Include="Controllers\Backend\Tasks\EntryController.cs" />
+    <Compile Include="Controllers\Backend\Tasks\EntryVerificationController.cs" />
+    <Compile Include="Controllers\Backend\Tasks\ItemController.cs" />
+    <Compile Include="Controllers\Backend\Tasks\ReturnController.cs" />
+    <Compile Include="DAL\Backend\Service\Items.cs" />
+    <Compile Include="DTO\ItemView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -136,6 +155,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="web.config" />
+    <Content Include="Views\Layout.cshtml" />
+    <Content Include="Views\Setup\PriceTypes.cshtml" />
+    <Content Include="Views\Setup\PaymentTerms.cshtml" />
+    <Content Include="Views\Setup\SellingPrices.cshtml" />
+    <Content Include="Views\Setup\LateFee.cshtml" />
+    <Content Include="Views\Setup\Cashiers.cshtml" />
+    <Content Include="Views\Tasks\Entry\Index.cshtml" />
+    <Content Include="Views\Tasks\Return\Index.cshtml" />
+    <Content Include="Views\Tasks\Entry\New.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -144,9 +172,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="DAL\" />
-    <Folder Include="DTO\" />
     <Folder Include="Models\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
