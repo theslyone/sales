@@ -7,76 +7,67 @@
     var meta = AppUsers.GetCurrent();
 }
 <style>
-#dashboard-container {
-    padding: 0 !important;
-}
+    #dashboard-container {
+        padding: 0 !important;
+    }
 
-#pos-container{
-	background-color: #555;
-	height: 100%;
-}
-
-.sales.layout.container, #dashboard-container{
-	height: 100%!important;
-}
-
-.pos.tabs{
-	display: flex;
-	padding:0;
-}
+    #pos-container {
+        background-color: #555;
+    }
 
 
-.pos.tabs .item{
-	display: inline-flex;
-	flex-direction: column;
-	background: #777;
-	margin:0 0.25em 0 0;
-	font-weight:bold;
-	font-size: 1.3em;
-	padding:0.75em 1em;
-	border-radius:0.5em 0.5em 0 0;
-	cursor: pointer;
-	text-shadow: 2px 2px 20px #222;
-}
+    .pos.tabs {
+        display: flex;
+        padding: 0;
+    }
 
-.pos.tabs .selected.item,
-.pos.tabs .active.item,
-.pos.tabs .item:hover{
-	background: #F5CA47;
-	color:#222;
-}
-#pos-items{
-	background-color: #666;
-	height: 100%;
-	padding:1em;
-}
 
-.tabs .actions{
-	background:#555;
-	width:100%;
-	text-align: right;
-	margin:0!important;
-}
+        .pos.tabs .item {
+            display: inline-flex;
+            flex-direction: column;
+            background: #444;
+            margin: 0 0.5em 0 0;
+            font-weight: bold;
+            font-size: 1.3em;
+            padding: 0.75em 1em;
+            border-radius: 0.5em 0.5em 0 0;
+            cursor: pointer;
+            text-shadow: 2px 2px 20px #222;
+        }
 
-.tabs .actions .icon{
-	cursor:pointer;
-    text-shadow: 1px 1px 20px red;
-}
+            .pos.tabs .selected.item,
+            .pos.tabs .active.item,
+            .pos.tabs .item:hover {
+                background: #C6A13D;
+                color: #eee;
+            }
+
+    #pos-items {
+        background-color: #3a3a3a;
+        height: 100%;
+        padding: 1em;
+    }
+
+    .tabs .actions {
+        background: #555;
+        width: 100%;
+        text-align: right;
+        margin: 0 !important;
+    }
+
+        .tabs .actions .icon {
+            cursor: pointer;
+        }
 </style>
 <script src="/Scripts/frapid/utilities/form.js"></script>
 <link rel="stylesheet" href="/Areas/MixERP.Purchases/Styles/purchase.css"></link>
 
 <div id="pos-container" class="ui attached inverted segment">
     <div class="pos tabs">
-        <div class="selected item">
+        <div class="new item">+</div>
+        <div id="tab-item-1" class="selected item">
             1
         </div>
-        <div class="item">2</div>
-        <div class="item">3</div>
-        <div class="item">4</div>
-        <div class="item">5</div>
-        <div class="item">6</div>
-        <div class="item">New</div>
         <div class="actions">
             <div class="remove">
                 <i class="delete icon"></i>
@@ -144,10 +135,10 @@
                         </div>
                     </div>
                     <div class="one summary items">
-                        <div class="supplier item">
-                            <div class="description">Supplier</div>
+                        <div class="customer item">
+                            <div class="description">Customer</div>
                             <div class="control">
-                                <select id="SupplierSelect"></select>
+                                <select id="CustomerSelect"></select>
                             </div>
                         </div>
                     </div>
@@ -213,19 +204,201 @@
     </div>
 </div>
 
-
 <script>
-    $(".pos.tabs .item")
-        .unbind("click")
-        .bind("click",
-            function() {
-                $(".pos.tabs .item").removeClass("selected");
-                var el = $(this);
-                el.addClass("selected");
-            });
+    window.addEventListener("beforeunload", function (e) {
+        var confirmationMessage = "\o/";
+
+        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+        return confirmationMessage;                            //Webkit, Safari, Chrome
+    });
 </script>
-
 <script>
+
+    function getModel() {
+        function getDetails() {
+            var items = $("#PurchaseItems .item");
+            var model = [];
+
+            $.each(items, function () {
+                var el = $(this);
+                var itemId = parseInt(el.attr("data-item-id"));
+                var quantity = parseInt(el.find("input.quantity").val());
+                var unitId = parseInt(el.find("select.unit").val());
+                var price = parseFloat(el.find("input.price").val() || 0);
+                var discount = parseFloat(el.find("input.discount").val() || 0);
+
+                model.push({
+                    StoreId: $("#StoreSelect").val(),
+                    ItemId: itemId,
+                    Quantity: quantity,
+                    UnitId: unitId,
+                    Price: price,
+                    Discount: discount
+                });
+            });
+
+            return model;
+        };
+
+        var valueDate = $("#ValueDateInputDate").datepicker("getDate");
+        var bookDate = $("#BookDateInputDate").datepicker("getDate");
+        var costCenterId = $("#CostCenterSelect").val();
+        var referenceNumber = $("#ReferenceNumberInputText").val();
+        var statementReference = $("#StatementReferenceInputText").val();
+        var customerId = $("#CustomerSelect").val();
+        var priceTypeId = $("#PriceTypeSelect").val();
+        var shipperId = $("#ShipperSelect").val();
+        var storeId = $("#StoreSelect").val();
+        var details = getDetails();
+
+        return {
+            ValueDate: valueDate,
+            BookDate: bookDate,
+            CostCenterId: costCenterId,
+            ReferenceNumber: referenceNumber,
+            StatementReference: statementReference,
+            CustomerId: customerId,
+            PriceTypeId: priceTypeId,
+            ShipperId: shipperId,
+            StoreId: storeId,
+            Details: details
+        };
+    };
+
+    function clearState() {
+        $.each(localStorage, function (key) {
+            if (key.substr(0, 6) === "posTab") {
+                localStorage.removeItem(key);
+            };
+        });
+    };
+
+    clearState();
+
+    function getSelectedTabId() {
+        var id = parseInt($(".tabs .selected.item:not(.new)").html());
+        return id;
+    };
+
+    function getLocalStorageKey(id) {
+        return "posTab" + id;
+    };
+
+    function getModelById(id) {
+        var key = getLocalStorageKey(id);
+        var item = localStorage.getItem(key);
+
+        if (item) {
+            return JSON.parse(item);
+        };
+
+        return null;
+    };
+
+    function removeModelById(id) {
+        var key = getLocalStorageKey(id);
+        localStorage.removeItem(key);
+    };
+
+    function saveState() {
+        var id = getSelectedTabId();
+
+        if (!id) {
+            window.displayMessage("Please select a tab");
+            return;
+        };
+
+        var model = getModel();
+        var key = getLocalStorageKey(id);
+        localStorage.setItem(key, JSON.stringify(model));
+    };
+
+
+    function removeState() {
+        var id = getSelectedTabId();
+
+        if (id) {
+            removeModelById(id);
+        };
+    };
+
+    $(document).unbind("itemAdded").bind("itemAdded", function (e, tabId, itemId) {
+        var model = getModelById(tabId);
+
+        var item = window.Enumerable.From(model.Details).Where(function (x) { return x.ItemId.toString() === itemId.toString(); }).FirstOrDefault();
+
+
+        if (!item) {
+            return;
+        };
+
+        var el = $("#pos-" + itemId);
+        var unitSelect = el.find("select.unit");
+
+        if (unitSelect.length) {
+            unitSelect.val(item.UnitId);
+        };
+
+        var quantityInput = el.find("input.quantity");
+
+        if (quantityInput.length) {
+            quantityInput.val(item.Quantity);
+        };
+
+        var priceInput = el.find("input.price");
+
+        if (priceInput.length) {
+            priceInput.val(item.Price);
+        };
+
+        var discountInput = el.find("input.discount");
+
+        if (discountInput.length) {
+            discountInput.val(item.Discount);
+        };
+
+        discountInput.trigger("keyup");
+
+    });
+
+    function loadModelById(id) {
+        var model = getModelById(id);
+        if (!model) {
+            return;
+        };
+
+        //alert("loading -->" + id);
+        clearScreen();
+
+        $("#ValueDateInputDate").datepicker("setDate", new Date(model.ValueDate));
+        $("#BookDateInputDate").datepicker("setDate", new Date(model.BookDate));
+        $("#CostCenterSelect").val(model.CostCenterId);
+        $("#ReferenceNumberInputText").val(model.ReferenceNumber);
+        $("#StatementReferenceInputText").val(model.StatementReference);
+        $("#CustomerSelect").val(model.CustomerId);
+        $("#PriceTypeSelect").dropdown("set selected", model.PriceTypeId);
+        $("#ShipperSelect").val(model.ShipperId);
+        $("#StoreSelect").val(model.StoreId);
+
+        $.each(model.Details, function () {
+            var lineItem = this;
+
+            var itemId = lineItem.ItemId;
+            var selector = "#POSItemList .item[data-item-id=" + itemId + "]";
+            $(selector).trigger("click");
+        });
+    };
+
+    function loadState() {
+        var id = getSelectedTabId();
+
+        if (id) {
+            loadModelById(id);
+        };
+    };
+
+
+
     $("#PurchaseItems .item")
         .on("contextmenu",
             function (e) {
@@ -518,21 +691,21 @@
             });
 
             function getPrice(el) {
-                function request(itemId, supplierId, unitId) {
-                    var url = "/dashboard/purchase/tasks/cost-price/{itemId}/{supplierId}/{unitId}";
+                function request(itemId, customerId, unitId) {
+                    var url = "/dashboard/purchase/tasks/cost-price/{itemId}/{customerId}/{unitId}";
                     url = url.replace("{itemId}", itemId);
-                    url = url.replace("{supplierId}", supplierId);
+                    url = url.replace("{customerId}", customerId);
                     url = url.replace("{unitId}", unitId);
 
                     return window.getAjaxRequest(url);
                 };
 
                 var itemId = el.attr("data-item-id");
-                var supplierId = parseInt($("#SupplierSelect").val() || 0);
+                var customerId = parseInt($("#CustomerSelect").val() || 0);
                 var unitId = el.val();
 
                 $(".pos.purchase.segment").addClass("loading");
-                var ajax = request(itemId, supplierId, unitId);
+                var ajax = request(itemId, customerId, unitId);
 
                 ajax.success(function (response) {
                     $(".pos.purchase.segment").removeClass("loading");
@@ -563,13 +736,18 @@
             item.appendTo(targetEl);
             quantityInput.trigger("keyup");
             window.updateTotal();
+
+            var tabId = getSelectedTabId();
+            var triggerName = "itemAdded";
+
+            $(document).trigger(triggerName, [tabId, itemId]);
         });
     };
 
     $("#SummaryItems div.discount .money input, " +
         "#ReceiptSummary div.tender .money input").keyup(function () {
-            window.updateTotal();
-        });
+        window.updateTotal();
+    });
 
     function updateTotal() {
         var candidates = $("#PurchaseItems div.item");
@@ -731,56 +909,6 @@
             return window.getAjaxRequest(url, "POST", data);
         };
 
-        function getModel() {
-            function getDetails() {
-                var items = $("#PurchaseItems .item");
-                var model = [];
-
-                $.each(items, function () {
-                    var el = $(this);
-                    var itemId = parseInt(el.attr("data-item-id"));
-                    var quantity = parseInt(el.find("input.quantity").val());
-                    var unitId = parseInt(el.find("select.unit").val());
-                    var price = parseFloat(el.find("input.price").val() || 0);
-                    var discount = parseFloat(el.find("input.discount").val() || 0);
-
-                    model.push({
-                        StoreId: $("#StoreSelect").val(),
-                        ItemId: itemId,
-                        Quantity: quantity,
-                        UnitId: unitId,
-                        Price: price,
-                        Discount: discount
-                    });
-                });
-
-                return model;
-            };
-
-            var valueDate = $("#ValueDateInputDate").datepicker("getDate");
-            var bookDate = $("#BookDateInputDate").datepicker("getDate");
-            var costCenterId = $("#CostCenterSelect").val();
-            var referenceNumber = $("#ReferenceNumberInputText").val();
-            var statementReference = $("#StatementReferenceInputText").val();
-            var supplierId = $("#SupplierSelect").val();
-            var priceTypeId = $("#PriceTypeSelect").val();
-            var shipperId = $("#ShipperSelect").val();
-            var storeId = $("#StoreSelect").val();
-            var details = getDetails();
-
-            return {
-                ValueDate: valueDate,
-                BookDate: bookDate,
-                CostCenterId: costCenterId,
-                ReferenceNumber: referenceNumber,
-                StatementReference: statementReference,
-                SupplierId: supplierId,
-                PriceTypeId: priceTypeId,
-                ShipperId: shipperId,
-                StoreId: storeId,
-                Details: details
-            };
-        };
 
         var model = getModel();
 
@@ -827,60 +955,108 @@
 </script>
 
 <script>
-    function displayFieldBinder(el, url) {
-        function request() {
-            return window.getAjaxRequest(url);
-        };
-
-        var ajax = request();
-
-        ajax.success(function (response) {
-            var options = "";
-
-            $.each(response, function () {
-                var option = "<option value='{key}'>{value}</option>";
-                option = option.replace("{key}", this.Key);
-                option = option.replace("{value}", this.Value);
-
-                options += option;
-            });
-
-            el.html(options);
-        });
-    };
-
     function loadStores() {
-        displayFieldBinder($("#StoreSelect"), "/api/forms/inventory/stores/display-fields");
+        window.displayFieldBinder($("#StoreSelect"), "/api/forms/inventory/stores/display-fields");
     };
 
     function loadShippers() {
-        displayFieldBinder($("#ShipperSelect"), "/api/forms/inventory/shippers/display-fields");
+        window.displayFieldBinder($("#ShipperSelect"), "/api/forms/inventory/shippers/display-fields");
     };
 
     function loadCostCenters() {
-        displayFieldBinder($("#CostCenterSelect"), "/api/forms/finance/cost-centers/display-fields");
+        window.displayFieldBinder($("#CostCenterSelect"), "/api/forms/finance/cost-centers/display-fields");
     };
 
     function loadPriceTypes() {
-        displayFieldBinder($("#PriceTypeSelect"), "/api/forms/purchase/price-types/display-fields");
+        window.displayFieldBinder($("#PriceTypeSelect"), "/api/forms/purchase/price-types/display-fields");
     };
 
-    function loadSuppliers() {
-        displayFieldBinder($("#SupplierSelect"), "/api/forms/inventory/suppliers/display-fields");
+    function loadCustomers() {
+        window.displayFieldBinder($("#CustomerSelect"), "/api/forms/inventory/customers/display-fields", false);
     };
 
     loadStores();
     loadPriceTypes();
-    loadSuppliers();
+    loadCustomers();
     loadCostCenters();
     loadShippers();
 </script>
 
+<script>
+    function initializeTabs() {
+        $(".pos.tabs .item:not(.new)").unbind("click").bind("click", function () {
+            saveState();
+            $(".pos.tabs .item").removeClass("selected");
+            var el = $(this);
+            el.addClass("selected");
+            loadState();
+        });
+    };
+
+    $(".tabs .new.item").unbind("click").bind("click", function () {
+        var el = $(this);
+        saveState();
+
+        function createTab(id) {
+            var item = $("<div class='item' />");
+            item.attr("id", "tab-item-" + id);
+            item.html(id);
+
+            el.siblings(".actions").before(item);
+        };
+
+        var items = [];
+        var candidates = $(".tabs .item:not(.new)");
+
+        $.each(candidates, function () {
+            var el = $(this);
+            var id = parseInt(el.text());
+            items.push(id);
+        });
+
+        var max = window.Enumerable.From(items).Max(function (x) { return x; });
+        var nextValue = 1;
+
+        if (max) {
+            nextValue = max + 1;
+        };
+
+        createTab(nextValue);
+
+
+        initializeTabs();
+        $(".tabs .item").removeClass("selected");
+        $("#tab-item-" + nextValue).addClass("selected");
+        clearScreen();
+    });
+
+    $(".tabs .actions .delete.icon").unbind("click").bind("click", function () {
+        var activeEl = $(".tabs .selected.item");
+        var id = parseInt(activeEl.text());
+
+        if (activeEl.length && id > 1) {
+            var confirmed = window.confirm("Are you sure you want to delete this tab?");
+
+            if (!confirmed) {
+                return;
+            };
+
+            removeState();
+
+            var previousEl = activeEl.prev(".item");
+            previousEl.addClass("selected");
+            activeEl.remove();
+            loadState();
+        };
+    });
+
+    initializeTabs();
+</script>
 <script>
     setTimeout(function () {
         $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
     }, 100);
 
 
-    window.overridePath = "/dashboard/purchase/tasks/entry";
+    window.overridePath = "/dashboard/sales/tasks/entry";
 </script>

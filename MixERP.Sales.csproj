@@ -133,6 +133,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AreaRegistration.cs" />
+    <Compile Include="Controllers\Backend\Setups\CustomerController.cs" />
+    <Compile Include="Controllers\Backend\Setups\CustomerTypeController.cs" />
     <Compile Include="Controllers\SalesDashboardController.cs" />
     <Compile Include="Controllers\Backend\Setups\CashierController.cs" />
     <Compile Include="Controllers\Backend\Setups\LateFeeController.cs" />
@@ -164,6 +166,8 @@
     <Content Include="Views\Tasks\Entry\Index.cshtml" />
     <Content Include="Views\Tasks\Return\Index.cshtml" />
     <Content Include="Views\Tasks\Entry\New.cshtml" />
+    <Content Include="Views\Setup\Customers.cshtml" />
+    <Content Include="Views\Setup\CustomerTypes.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

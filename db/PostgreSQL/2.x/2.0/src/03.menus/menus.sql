@@ -16,7 +16,7 @@ DELETE FROM core.menus
 WHERE app_name = 'Sales';
 
 
-SELECT * FROM core.create_app('Sales', 'Sales', '1.0', 'MixERP Inc.', 'December 1, 2015', 'newspaper yellow', '/dashboard/sales/tasks/entry', NULL::text[]);
+SELECT * FROM core.create_app('Sales', 'Sales', '1.0', 'MixERP Inc.', 'December 1, 2015', 'shipping blue', '/dashboard/sales/tasks/entry', NULL::text[]);
 
 SELECT * FROM core.create_menu('Sales', 'Tasks', '', 'lightning', '');
 SELECT * FROM core.create_menu('Sales', 'Sales Entry', '/dashboard/sales/tasks/entry', 'user', 'Tasks');
@@ -27,6 +27,8 @@ SELECT * FROM core.create_menu('Sales', 'Sales Entry Verification', '/dashboard/
 SELECT * FROM core.create_menu('Sales', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'keyboard', 'Tasks');
 
 SELECT * FROM core.create_menu('Sales', 'Setup', 'square outline', 'configure', '');
+SELECT * FROM core.create_menu('Sales', 'Customer Types', '/dashboard/sales/setup/customer-types', 'users', 'Setup');
+SELECT * FROM core.create_menu('Sales', 'Customers', '/dashboard/sales/setup/customers', 'users', 'Setup');
 SELECT * FROM core.create_menu('Sales', 'Price Types', '/dashboard/sales/setup/price-types', 'users', 'Setup');
 SELECT * FROM core.create_menu('Sales', 'Selling Prices', '/dashboard/sales/setup/selling-prices', 'users', 'Setup');
 SELECT * FROM core.create_menu('Sales', 'Late Fee', '/dashboard/sales/setup/late-fee', 'users', 'Setup');
