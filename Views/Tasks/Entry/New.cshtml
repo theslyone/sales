@@ -11,6 +11,404 @@
         padding: 0 !important;
     }
 
+    iframe {
+        background-color: white;
+        width: 100%;
+        height: 500px;
+        border: none;
+        display: none;
+    }
+
+    .inverted.header, .inverted.form {
+        background: transparent !important;
+    }
+
+    input.invoice.number.for.reprint {
+        background: transparent !important;
+        border: 1px solid #555 !important;
+        color: #eee !important;
+    }
+
+    .inverted.info.message {
+        background-color: #B3A12E !important;
+        border: 1px solid #B3A12E !important;
+        color: #fff !important;
+    }
+
+    .info {
+        padding: 0.25em 0.5em;
+        display: inline-block;
+        margin: 1px;
+        -ms-border-radius: 4px;
+        border-radius: 4px;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.92em;
+    }
+
+    .office.info {
+        background-color: #D65302;
+    }
+
+    .user.info {
+        background-color: #68A800;
+    }
+
+    .area.info {
+        background-color: #02B3D6;
+    }
+
+    .counter.info {
+        background-color: #AC02D6;
+    }
+
+
+
+    .status.head {
+        background-color: #444;
+        padding: 1em;
+        cursor: pointer;
+    }
+
+    .inline.blocks > .item {
+        display: inline-block !important;
+        padding: 2px;
+    }
+
+    .two.inline.blocks > .item {
+        width: 50%;
+    }
+
+    .three.inline.blocks > .item {
+        width: 33%;
+    }
+
+    .four.inline.blocks > .item {
+        width: 25%;
+    }
+
+    .status.head .left {
+        display: inline-block;
+        width: 50%;
+    }
+
+    .status.head .right {
+        display: inline-block;
+        text-align: right;
+        width: 50%;
+    }
+
+    .item.list {
+        background-color: #333;
+        cursor: pointer;
+        text-align: center;
+    }
+
+        .item.list .item {
+            display: inline-flex;
+            background-color: #333;
+            margin: 4px;
+            height: 310px;
+            padding: 0.5em;
+            width: 242px;
+            cursor: pointer;
+        }
+
+            .item.list .item:hover {
+                background-color: #444;
+            }
+
+            .item.list .item .info {
+                overflow: hidden;
+            }
+
+            .item.list .item .photo {
+                position: relative;
+                top: -16px;
+                left: -2px;
+                width: 212px;
+                height: 300px;
+            }
+
+
+            .item.list .item:hover img {
+                filter: grayscale(0%) !important;
+            }
+
+            .item.list .item .info .photo img {
+                height: 390px;
+                filter: grayscale(70%);
+            }
+
+            .item.list .item .info .name {
+                font-size: 1.4em;
+                font-weight: 100;
+                position: relative;
+                z-index: 1;
+                top: -5.5em;
+                line-height: 1.2em;
+                text-align: center;
+                text-shadow: 2px 2px 10px black;
+            }
+
+            .item.list .item .info .price {
+                font-size: 3em;
+                font-weight: 100 !important;
+                text-align: right;
+                position: relative;
+                z-index: 1;
+                top: 0.7em;
+                text-shadow: -2px 3px 10px #000;
+                color: #eee;
+            }
+
+
+    .category.list {
+        padding: 4px;
+        text-align: center;
+        background-color: #555;
+    }
+
+        .category.list .filter {
+            text-align: right;
+            display: inline-block;
+        }
+
+        .category.list .category, .cat.filter {
+            display: inline-block;
+            background-color: #555;
+            color: white;
+            padding: 4px 12px;
+            margin: 2px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-shadow: 0 0 2px white;
+        }
+
+        .category.list .cat.filter {
+            background-color: #444;
+        }
+
+        .category.list .category.selected, .category.list .category:hover {
+            background-color: #78AD05;
+        }
+
+        .category.list .cat.filter:hover {
+            background-color: #FA6400 !important;
+        }
+
+    .search.panel {
+        background-color: #666;
+        padding: 1em;
+        text-align: center;
+    }
+
+        .search.panel input {
+            text-align: center;
+            font-size: 1.1em;
+            background-color: transparent;
+            border: 1px solid #999;
+            border-radius: 2em;
+            text-transform: uppercase;
+            height: 2em;
+            width: 20em;
+        }
+
+
+    .sales.items .item {
+        background-color: #333;
+        padding: 3px 9px;
+        border-bottom: 1px dotted #444;
+        cursor: pointer;
+        -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+        -moz-user-select: none; /* mozilla browsers */
+        -khtml-user-select: none; /* webkit (konqueror) browsers */
+        -ms-user-select: none; /* IE10+ */
+    }
+
+        .sales.items .item:nth-child(even) {
+            background-color: #373737 !important;
+        }
+
+        .sales.items .item:hover {
+            background-color: #3a3a3a !important;
+        }
+
+        .sales.items .item .block {
+            display: inline-block;
+            height: 112px;
+            overflow: hidden;
+        }
+
+            .sales.items .item .block img {
+                height: 112px;
+            }
+
+        .sales.items .item .photo.block {
+            width: 90px;
+            overflow: hidden;
+        }
+
+        .sales.items .item .number.block {
+            width: 120px;
+        }
+
+
+            .sales.items .item .number.block button {
+                height: 100%;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-weight: 100;
+            }
+
+        .sales.items .item input {
+            font-size: 1.3em;
+            margin: 0 0 0.3em 0;
+            background-color: #333;
+            border: 1px solid #555;
+            width: 100%;
+            padding: 4px 16px;
+            text-align: right;
+            border-radius: 0.5em;
+        }
+
+        .sales.items .item .info.block {
+            width: calc(100% - 220px);
+            padding: 1em;
+        }
+
+            .sales.items .item .info.block .price.info,
+            .sales.items .item .info.block .discount.info,
+            .sales.items .item .info.block .header {
+                display: block;
+            }
+
+            .sales.items .item .info.block .header {
+                font-size: 1.5em;
+                font-weight: 100;
+                text-transform: uppercase;
+            }
+
+            .sales.items .item .info.block .price.info {
+                padding-top: 4px;
+            }
+
+            .sales.items .item .info.block .price.info,
+            .sales.items .item .info.block .discount.info {
+                font-size: 1.1em;
+                text-align: left;
+                padding: 0;
+                text-transform: none;
+                color: #fbd842;
+            }
+
+
+    .tender.info {
+        background-color: #333;
+        width: 100%;
+        cursor: pointer;
+        margin: 0 0 8px 0;
+        padding: 6px 0;
+    }
+
+
+        .tender.info:hover {
+            background-color: #3f3f3f;
+        }
+
+
+    .summary.items {
+        padding: 0.5em 1em;
+        display: flex;
+    }
+
+        .summary.items > .item {
+            display: inline-flex;
+            flex-direction: column;
+            padding: 2px;
+        }
+
+    .two.summary.items > .item {
+        width: 48%;
+    }
+
+    .one.summary.items > .item {
+        width: 96%;
+    }
+
+    .summary.items > .item > .description {
+        padding-bottom: 0.5em;
+        font-size: 0.9em;
+        text-align: left;
+    }
+
+    .summary.items > .item > .money {
+        padding-top: 0.1em;
+        font-size: 3em;
+    }
+
+
+    input.pan.number,
+    input.customer.name,
+    input.customer.address {
+        font-size: 12px !important;
+        padding: 8px !important;
+    }
+
+    .customer.name.item {
+        width: 40% !important;
+    }
+
+    .customer.address.item {
+        width: 30% !important;
+    }
+
+    .pan.number.item {
+        width: 25% !important;
+    }
+
+    .inverted.dropdown,
+    .inverted.dropdown input.search,
+    .inverted.dropdown .menu,
+    .inverted.dropdown .item,
+    .inverted.dropdown .message {
+        background-color: #555 !important;
+        color: #eee !important;
+        border: 1px solid #666 !important;
+    }
+
+        .inverted.dropdown .item.selected,
+        .inverted.dropdown .item:hover {
+            background-color: #666 !important;
+        }
+
+    .summary.items input,
+    .summary.items select {
+        background-color: #555 !important;
+        color: #eee !important;
+        border: 1px solid #666 !important;
+        padding: .87em;
+        border-radius: 0.4em;
+        width: 100%;
+        -moz-appearance: none; /* Firefox */
+    }
+
+    select.inverted {
+        background-color: #333;
+        border: 1px solid #555;
+        width: 100%;
+        padding: 0.55em 1em;
+        border-radius: 0.5em;
+        -moz-appearance: none; /* Firefox */
+    }
+
+    #dashboard-container {
+        padding: 0 !important;
+    }
+
     #pos-container {
         background-color: #555;
     }
@@ -42,6 +440,10 @@
                 color: #eee;
             }
 
+    .circular.button {
+        padding: 0.9em 2em !important;
+    }
+
     #pos-items {
         background-color: #3a3a3a;
         height: 100%;
@@ -58,11 +460,72 @@
         .tabs .actions .icon {
             cursor: pointer;
         }
+
+    .action.panel .toolbar {
+        display: flex;
+        background-color: #2f2f2f;
+        background: linear-gradient(to top, #222, #444);
+        text-align: right;
+    }
+
+        .action.panel .toolbar > .item {
+            text-align: center;
+            display: inline-flex;
+            flex-direction: column-reverse;
+            background: #3f3f3f;
+            background: linear-gradient(to top, #222, #444); /* Standard syntax */
+            padding: 1em 0.6em;
+            border-right: 1px solid #333;
+            height: 3em;
+            width: 2.5em;
+            font-size: 1.4em;
+            cursor: pointer;
+        }
+
+
+            .action.panel .toolbar > .item:hover {
+                background: #C4A03D;
+                background: linear-gradient(to bottom, #C4A03D, #C4343D); /* Standard syntax */
+            }
+
+    .summary.items > .item > .description {
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+
+    .header.items {
+        background-color: #3f3f3f;
+        background: linear-gradient(to top, #292929, #444); /* Standard syntax */
+        padding: 1em 1em 1.5em;
+    }
+
+
+
+        .header.items .count.item,
+        .header.items .count.item .description {
+            text-align: right !important;
+        }
+
+            .header.items .count.item .money {
+                color: #FBD840;
+            }
+
+    .footer.items {
+        background-color: #3f3f3f;
+        background: linear-gradient(to top, #292929, #3a3a3a); /* Standard syntax */
+        padding: 1em;
+        text-align: right;
+    }
+
+    .action.panel.segment {
+        padding: 0;
+        border: 0;
+        margin: 0;
+    }
 </style>
 <script src="/Scripts/frapid/utilities/form.js"></script>
-<link rel="stylesheet" href="/Areas/MixERP.Purchases/Styles/purchase.css"></link>
 
-<div id="pos-container" class="ui attached inverted segment">
+<div id="pos-container" class="ui attached pos sales inverted segment">
     <div class="pos tabs">
         <div class="new item">+</div>
         <div id="tab-item-1" class="selected item">
@@ -119,85 +582,131 @@
                 </div>
             </div>
             <div class="five wide column">
-                <div class="tender info">
-                    <div id="SummaryItems" class="two summary items">
-                        <div class="amount item">
-                            <div class="description">Amount</div>
-                            <div class="money">
-                                <span></span>
-                            </div>
+                <div class="ui action panel inverted segment">
+                    <div class="toolbar">
+                        <div class="toggle view item" title="Toggle View">
+                            <i class="toggle off icon"></i>
                         </div>
-                        <div class="store item">
-                            <div class="description">Store</div>
-                            <div class="control">
-                                <select id="StoreSelect"></select>
-                            </div>
+                        <div class="item" title="Split Ticket">
+                            <i class="star icon"></i>
                         </div>
-                    </div>
-                    <div class="one summary items">
-                        <div class="customer item">
-                            <div class="description">Customer</div>
-                            <div class="control">
-                                <select id="CustomerSelect"></select>
-                            </div>
+                        <div class="item" title="Reprint Ticket">
+                            <i class="print icon"></i>
+                        </div>
+                        <div class="item" title="Sign Out of POS">
+                            <i class="sign out icon"></i>
                         </div>
                     </div>
-                    <div class="two summary items">
-                        <div class="value date item">
-                            <div class="description">Value Date</div>
-                            <div class="control">
-                                <input type="text" class="date" id="ValueDateInputDate" />
+                    <div class="action container">
+                        <div class="header items" style="display: none;">
+                            <div class="two summary items">
+                                <div class="amount item">
+                                    <div class="description">Amount</div>
+                                    <div class="money">
+                                        <span></span>
+                                    </div>
+                                </div>
+                                <div class="count item">
+                                    <div class="description">Count</div>
+                                    <div class="money">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="book date item">
-                            <div class="description">Book Date</div>
-                            <div class="control">
-                                <input type="text" class="date" id="BookDateInputDate" />
+                        <div class="tender info items">
+                            <div id="SummaryItems" class="two summary items">
+                                <div class="amount item">
+                                    <div class="description">Amount</div>
+                                    <div class="money">
+                                        <span></span>
+                                    </div>
+                                </div>
+                                <div class="store item">
+                                    <div class="description">Store</div>
+                                    <div class="control">
+                                        <select id="StoreSelect"></select>
+                                    </div>
+                                </div>
                             </div>
+                            <div class="one summary items">
+                                <div class="customer item">
+                                    <div class="description">Customer</div>
+                                    <div class="control">
+                                        <select id="CustomerSelect"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="two summary items">
+                                <div class="value date item">
+                                    <div class="description">Value Date</div>
+                                    <div class="control">
+                                        <input type="text" class="date" id="ValueDateInputDate" />
+                                    </div>
+                                </div>
+                                <div class="book date item">
+                                    <div class="description">Book Date</div>
+                                    <div class="control">
+                                        <input type="text" class="date" id="BookDateInputDate" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="two summary items">
+                                <div class="cost center item">
+                                    <div class="description">Cost Center</div>
+                                    <div class="control">
+                                        <select id="CostCenterSelect"></select>
+                                    </div>
+                                </div>
+                                <div class="shipping company item">
+                                    <div class="description">Shipper</div>
+                                    <div class="control">
+                                        <select id="ShipperSelect"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="two summary items">
+                                <div class="reference number item">
+                                    <div class="description">Ref#</div>
+                                    <div class="control">
+                                        <input type="text" id="ReferenceNumberInputText"/>
+                                    </div>
+                                </div>
+                                <div class="memo item">
+                                    <div class="description">Memo</div>
+                                    <div class="control">
+                                        <input type="text" id="MemoInputText"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui one column padded grid">
+                                <div class="column">
+                                    <div class="ui checkout basic inverted big circuluar yellow buttons">
+                                        <button class="ui cash button">
+                                            Cash
+                                        </button>
+                                        <button class="ui check button">
+                                            Check
+                                        </button>
+                                        <button class="ui gift-card button">
+                                            Gift Card
+                                        </button>
+                                        <button class="ui credit-card button">
+                                            Credit Card
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="SalesItems" class="sales items">
+                        </div>
+                        <div class="footer items" style="display: none;">
+                            <div class="ui clear big negative circular button" id="ClearScreenButton">
+                                Clear Screen
+                            </div>
+                            <div class="ui next big positive circular button">Next</div>
                         </div>
                     </div>
-                    <div class="two summary items">
-                        <div class="cost center item">
-                            <div class="description">Cost Center</div>
-                            <div class="control">
-                                <select id="CostCenterSelect"></select>
-                            </div>
-                        </div>
-                        <div class="shipping company item">
-                            <div class="description">Shipper</div>
-                            <div class="control">
-                                <select id="ShipperSelect"></select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="two summary items">
-                        <div class="reference number item">
-                            <div class="description">Ref#</div>
-                            <div class="control">
-                                <input type="text" id="ReferenceNumberInputText" />
-                            </div>
-                        </div>
-                        <div class="memo item">
-                            <div class="description">Memo</div>
-                            <div class="control">
-                                <input type="text" id="MemoInputText" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ui one column padded grid">
-                        <div class="column">
-                            <button id="CheckoutButton" class="ui green icon big button">
-                                <i class="cart icon"></i>
-                                CHECKOUT
-                            </button>
-                            <button id="ClearScreenButton" class="ui red icon big button">
-                                <i class="delete icon"></i>
-                                CLS
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div id="PurchaseItems" class="purchase items">
                 </div>
             </div>
         </div>
@@ -216,7 +725,7 @@
 
     function getModel() {
         function getDetails() {
-            var items = $("#PurchaseItems .item");
+            var items = $("#SalesItems .item");
             var model = [];
 
             $.each(items, function () {
@@ -399,7 +908,7 @@
 
 
 
-    $("#PurchaseItems .item")
+    $("#SalesItems .item")
         .on("contextmenu",
             function (e) {
                 e.preventDefault();
@@ -465,7 +974,7 @@
 
     function fetchProducts() {
         function request() {
-            var url = "/dashboard/purchase/tasks/items";
+            var url = "/dashboard/sales/tasks/items";
             return window.getAjaxRequest(url);
         };
 
@@ -530,10 +1039,19 @@
         initializeClickAndAction();
     });
 
+    $(".toggle.view.item, .next.button").unbind("click").bind("click", function () {
+        $(".tender.info.items").toggle();
+        $(".header.items").toggle();
+        $(".footer.items").toggle();
+        $(".sales.items").toggle();
+    });
 
     function initializeClickAndAction() {
         $("#POSItemList .item").unbind("click").bind("click", function () {
             var el = $(this);
+            $(".tender.info.items").hide();
+            $(".header.items").show();
+            $(".footer.items").show();
             var costPrice = el.attr("data-cost-price");
             var photo = el.attr("data-photo");
 
@@ -554,7 +1072,7 @@
 
 
 
-            var targetEl = $("#PurchaseItems");
+            var targetEl = $("#SalesItems");
             var selector = "pos-" + itemId;
             var existingEl = $("#" + selector);
 
@@ -691,30 +1209,32 @@
             });
 
             function getPrice(el) {
-                function request(itemId, customerId, unitId) {
-                    var url = "/dashboard/purchase/tasks/cost-price/{itemId}/{customerId}/{unitId}";
+                function request(itemId, customerId, priceTypeId, unitId) {
+                    var url = "/dashboard/sales/tasks/selling-price/{itemId}/{customerId}/{priceTypeId}/{unitId}";
                     url = url.replace("{itemId}", itemId);
                     url = url.replace("{customerId}", customerId);
+                    url = url.replace("{priceTypeId}", priceTypeId);
                     url = url.replace("{unitId}", unitId);
 
                     return window.getAjaxRequest(url);
                 };
 
                 var itemId = el.attr("data-item-id");
-                var customerId = parseInt($("#CustomerSelect").val() || 0);
+                var customerId = parseInt($("#CustomerSelect").val()) || 0;
+                var priceTypeId = parseInt($("#PriceTypeSelect").val()) || 0;
                 var unitId = el.val();
 
-                $(".pos.purchase.segment").addClass("loading");
-                var ajax = request(itemId, customerId, unitId);
+                $(".action.panel.segment").addClass("loading");
+                var ajax = request(itemId, customerId, priceTypeId, unitId);
 
                 ajax.success(function (response) {
-                    $(".pos.purchase.segment").removeClass("loading");
+                    $(".action.panel.segment").removeClass("loading");
                     var priceInput = el.parent().parent().parent().find("input.price");
                     priceInput.val(response).trigger("keyup");
                 });
 
-                ajax.fail(function (xr) {
-                    $(".pos.purchase.segment").removeClass("loading");
+                ajax.fail(function (xhr) {
+                    $(".action.panel.segment").removeClass("loading");
                     console.log(window.getAjaxErrorMessage(xhr));
                 });
             };
@@ -746,15 +1266,16 @@
 
     $("#SummaryItems div.discount .money input, " +
         "#ReceiptSummary div.tender .money input").keyup(function () {
-        window.updateTotal();
-    });
+            window.updateTotal();
+        });
 
     function updateTotal() {
-        var candidates = $("#PurchaseItems div.item");
-        var amountEl = $("#SummaryItems div.amount .money");
+        var candidates = $("#SalesItems div.item");
+        var amountEl = $("div.amount .money");
+        var countEl = $("div.count .money");
 
         var totalPrice = 0;
-        //var totalQuantity = 0;
+        var totalQuantity = 0;
 
         $.each(candidates, function () {
             var el = $(this);
@@ -770,12 +1291,13 @@
             var discountedAmount = amount * ((100 - discountRate) / 100);
 
             totalPrice += (discountedAmount || amount);
-            //totalQuantity += quantity;
+            totalQuantity += quantity;
         });
 
         totalPrice = parseFloat(totalPrice.toFixed(2));
 
         amountEl.html(totalPrice);
+        countEl.html(totalQuantity);
     };
 
     function displayCategories() {
@@ -902,9 +1424,8 @@
 </script>
 <script>
     $("#CheckoutButton").unbind("click").bind("click", function () {
-
         function request(model) {
-            var url = "/dashboard/purchase/tasks/entry/new";
+            var url = "/dashboard/sales/tasks/entry/new";
             var data = JSON.stringify(model);
             return window.getAjaxRequest(url, "POST", data);
         };
@@ -930,7 +1451,7 @@
 
         ajax.success(function (response) {
             var id = response;
-            document.location = "/dashboard/purchase/tasks/entry/checklist/" + id;
+            document.location = "/dashboard/sales/tasks/entry/checklist/" + id;
         });
 
         ajax.fail(function (xhr) {
@@ -949,30 +1470,30 @@
             });
 
     function clearScreen() {
-        $("#PurchaseItems").html("");
+        $("#SalesItems").html("");
         window.updateTotal();
     };
 </script>
 
 <script>
     function loadStores() {
-        window.displayFieldBinder($("#StoreSelect"), "/api/forms/inventory/stores/display-fields");
+        window.displayFieldBinder($("#StoreSelect"), "/api/forms/inventory/stores/display-fields", true);
     };
 
     function loadShippers() {
-        window.displayFieldBinder($("#ShipperSelect"), "/api/forms/inventory/shippers/display-fields");
+        window.displayFieldBinder($("#ShipperSelect"), "/api/forms/inventory/shippers/display-fields", true);
     };
 
     function loadCostCenters() {
-        window.displayFieldBinder($("#CostCenterSelect"), "/api/forms/finance/cost-centers/display-fields");
+        window.displayFieldBinder($("#CostCenterSelect"), "/api/forms/finance/cost-centers/display-fields", true);
     };
 
     function loadPriceTypes() {
-        window.displayFieldBinder($("#PriceTypeSelect"), "/api/forms/purchase/price-types/display-fields");
+        window.displayFieldBinder($("#PriceTypeSelect"), "/api/forms/sales/price-types/display-fields", true);
     };
 
     function loadCustomers() {
-        window.displayFieldBinder($("#CustomerSelect"), "/api/forms/inventory/customers/display-fields", false);
+        window.displayFieldBinder($("#CustomerSelect"), "/api/forms/inventory/customers/display-fields");
     };
 
     loadStores();
@@ -1057,6 +1578,7 @@
         $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
     }, 100);
 
+    $("select:not(.ui)").addClass("inverted fluid").dropdown();
 
     window.overridePath = "/dashboard/sales/tasks/entry";
 </script>

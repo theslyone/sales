@@ -89,5 +89,3 @@ END
 $$
 LANGUAGE plpgsql;
 
-
-SELECT * FROM sales.get_item_selling_price(1, 1, 1, 1);

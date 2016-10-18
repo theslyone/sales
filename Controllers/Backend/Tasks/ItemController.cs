@@ -13,15 +13,15 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
             return this.Ok(model);
         }
 
-        [Route("dashboard/sales/tasks/selling-price/{itemId}/{customerTypeId}/{priceTypeId}/{unitId}")]
-        public async Task<ActionResult> SellingPriceAsync(int itemId, int customerTypeId, int priceTypeId, int unitId)
+        [Route("dashboard/sales/tasks/selling-price/{itemId}/{customerId}/{priceTypeId}/{unitId}")]
+        public async Task<ActionResult> SellingPriceAsync(int itemId, int customerId, int priceTypeId, int unitId)
         {
             if (itemId < 0 || unitId < 0)
             {
                 return this.InvalidModelState();
             }
 
-            decimal model = await Items.GetSellingPriceAsync(this.Tenant, itemId, customerTypeId, priceTypeId, unitId).ConfigureAwait(true);
+            decimal model = await Items.GetSellingPriceAsync(this.Tenant, itemId, customerId, priceTypeId, unitId).ConfigureAwait(true);
             return this.Ok(model);
         }
     }

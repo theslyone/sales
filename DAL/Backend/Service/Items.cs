@@ -17,10 +17,10 @@ namespace MixERP.Sales.DAL.Backend.Service
             }
         }
 
-        public static async Task<decimal> GetSellingPriceAsync(string tenant, int itemId, int customerTypeId, int priceTypeId, int unitId)
+        public static async Task<decimal> GetSellingPriceAsync(string tenant, int itemId, int customerId, int priceTypeId, int unitId)
         {
-            const string sql = "SELECT sales.get_item_selling_price(@0, @1, @2, @3);";
-            return await Factory.ScalarAsync<decimal>(tenant, sql, itemId, customerTypeId, priceTypeId, unitId).ConfigureAwait(false);
+            const string sql = "SELECT sales.get_item_selling_price(@0, inventory.get_customer_type_id_by_customer_id(@1), @2, @3);";
+            return await Factory.ScalarAsync<decimal>(tenant, sql, itemId, customerId, priceTypeId, unitId).ConfigureAwait(false);
         }
     }
 }

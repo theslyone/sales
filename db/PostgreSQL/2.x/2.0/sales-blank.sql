@@ -274,8 +274,6 @@ $$
 LANGUAGE plpgsql;
 
 
-SELECT * FROM sales.get_item_selling_price(1, 1, 1, 1);
-
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/03.menus/menus.sql --<--<--
 DELETE FROM auth.menu_access_policy
