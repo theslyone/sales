@@ -27,7 +27,8 @@ BEGIN
     WHERE item_selling_prices.item_id=_item_id
     AND item_selling_prices.customer_type_id=_customer_type_id
     AND item_selling_prices.price_type_id =_price_type_id
-    AND item_selling_prices.unit_id = _unit_id;
+    AND item_selling_prices.unit_id = _unit_id
+	AND NOT sales.item_selling_prices.deleted;
 
     IF(_costing_unit_id IS NULL) THEN
         --We do not have a selling price of this item for the unit supplied.
@@ -43,7 +44,8 @@ BEGIN
         FROM sales.item_selling_prices
         WHERE item_selling_prices.item_id=_item_id
         AND item_selling_prices.customer_type_id=_customer_type_id
-        AND item_selling_prices.price_type_id =_price_type_id;
+        AND item_selling_prices.price_type_id =_price_type_id
+		AND NOT sales.item_selling_prices.deleted;
     END IF;
 
     IF(_price IS NULL) THEN
@@ -57,7 +59,8 @@ BEGIN
             _includes_tax
         FROM sales.item_selling_prices
         WHERE item_selling_prices.item_id=_item_id
-        AND item_selling_prices.price_type_id =_price_type_id;
+        AND item_selling_prices.price_type_id =_price_type_id
+		AND NOT sales.item_selling_prices.deleted;
     END IF;
 
     
@@ -73,7 +76,8 @@ BEGIN
             _costing_unit_id,
             _includes_tax
         FROM inventory.items
-        WHERE inventory.items.item_id = _item_id;
+        WHERE inventory.items.item_id = _item_id
+		AND NOT inventory.items.deleted;
     END IF;
 
     IF(_includes_tax) THEN
@@ -89,3 +93,5 @@ END
 $$
 LANGUAGE plpgsql;
 
+
+SELECT * FROM sales.get_item_selling_price(1, 1, 1, 1);
