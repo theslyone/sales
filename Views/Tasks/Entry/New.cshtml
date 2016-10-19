@@ -7,6 +7,30 @@
     var meta = AppUsers.GetCurrent();
 }
 <style>
+    html, body {
+        font-smooth: always;
+    }
+
+    .sales.layout, #pos-container {
+        height: 100%;
+    }
+
+        #pos-container .dimmer {
+            font-weight: lighter;
+            letter-spacing: 1px;
+            font-size: 1.5em;
+            text-transform: uppercase;
+            position: relative;
+            top: 50%;
+            -webkit-transform: translateY(-50%);
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
+            text-align: center;
+        }
+
+        #pos-container .dimmer div.spinner {
+            padding: 0.5em;
+        }
     #dashboard-container {
         padding: 0 !important;
     }
@@ -73,18 +97,19 @@
     .inline.blocks > .item {
         display: inline-block !important;
         padding: 2px;
+        width: 200px;
     }
 
     .two.inline.blocks > .item {
-        width: 50%;
+        width: 50% !important;
     }
 
     .three.inline.blocks > .item {
-        width: 33%;
+        width: 33% !important;
     }
 
     .four.inline.blocks > .item {
-        width: 25%;
+        width: 25% !important;
     }
 
     .status.head .left {
@@ -331,6 +356,10 @@
             padding: 2px;
         }
 
+    .three.summary.items > .item {
+        width: 32%;
+    }
+
     .two.summary.items > .item {
         width: 48%;
     }
@@ -461,6 +490,10 @@
             cursor: pointer;
         }
 
+    .ui.action.panel.inverted.segment {
+        background: none !important;
+    }
+
     .action.panel .toolbar {
         display: flex;
         background-color: #2f2f2f;
@@ -522,189 +555,274 @@
         border: 0;
         margin: 0;
     }
+
+    .payment.type.container {
+        padding-bottom: 1em;
+        border-bottom: 1px solid #444;
+    }
+
+    .show.anchor {
+        padding: 1em;
+        color: #C4A03D;
+    }
+</style>
+<style>
+    /*Semantic UI Override*/
+    @@media only screen and (max-width: 500px) {
+        .ui.buttons {
+            display: block !important;
+        }
+
+            .ui.buttons .button {
+                width: 100% !important;
+                margin-bottom: 0.5em !important;
+            }
+    }
 </style>
 <script src="/Scripts/frapid/utilities/form.js"></script>
 
 <div id="pos-container" class="ui attached pos sales inverted segment">
-    <div class="pos tabs">
-        <div class="new item">+</div>
-        <div id="tab-item-1" class="selected item">
-            1
+    <div class="dimmer">
+        <div class="spinner">
+            <i class="ui huge loading spinner icon"></i>
         </div>
-        <div class="actions">
-            <div class="remove">
-                <i class="delete icon"></i>
-            </div>
+        <div>
+            We're loading things
         </div>
     </div>
-    <div id="pos-items">
-        <div class="ui grid">
-            <div class="eleven wide column">
-                <div class="status head">
-                    <div class="left">
-                        <span class="office info" title="Current Branch Office">
-                            @meta.OfficeName
-                        </span>
-                        <span class="user info" title="You">
-                            @meta.Name
-                        </span>
-                        <span class="area info" title="Current Area">
-                            @meta.OfficeCode
-                        </span>
-                        <span class="office info" title="Office Name">
-                            @meta.OfficeName
-                        </span>
-                    </div>
-
-                    <div class="right">
-                        <div class="inline blocks">
-                            <div class="item">
-                                <select class="ui search inverted fluid dropdown" id="PriceTypeSelect"></select>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-
-
-                <div class="category list">
-                    <div class="cat filter" style="display: none;">
-                        Clear
-                        <i class="delete icon"></i>
-                    </div>
-                </div>
-                <div class="search panel">
-                    <input type="search" placeholder="Search ..." />
-
-                </div>
-                <div class="item list" id="POSItemList">
+    <div class="layout" style="display: none;">
+        <div class="pos tabs">
+            <div class="new item">+</div>
+            <div id="tab-item-1" class="selected item">
+                1
+            </div>
+            <div class="actions">
+                <div class="remove">
+                    <i class="delete icon"></i>
                 </div>
             </div>
-            <div class="five wide column">
-                <div class="ui action panel inverted segment">
-                    <div class="toolbar">
-                        <div class="toggle view item" title="Toggle View">
-                            <i class="toggle off icon"></i>
+        </div>
+        <div id="pos-items">
+            <div class="ui stackable grid">
+                <div class="eleven wide column">
+                    <div class="status head">
+                        <div class="left">
+                            <span class="office info" title="Current Branch Office">
+                                @meta.OfficeName
+                            </span>
+                            <span class="user info" title="You">
+                                @meta.Name
+                            </span>
+                            <span class="area info" title="Current Area">
+                                @meta.OfficeCode
+                            </span>
+                            <span class="office info" title="Office Name">
+                                @meta.OfficeName
+                            </span>
                         </div>
-                        <div class="item" title="Split Ticket">
-                            <i class="star icon"></i>
+
+                        <div class="right">
+                            <div class="inline blocks">
+                                <div class="item">
+                                    <select class="ui search inverted fluid dropdown" id="PriceTypeSelect"></select>
+                                </div>
+                                <div class="item">
+                                    <select id="StoreSelect"></select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="item" title="Reprint Ticket">
-                            <i class="print icon"></i>
-                        </div>
-                        <div class="item" title="Sign Out of POS">
-                            <i class="sign out icon"></i>
+
+                    </div>
+
+
+
+                    <div class="category list">
+                        <div class="cat filter" style="display: none;">
+                            Clear
+                            <i class="delete icon"></i>
                         </div>
                     </div>
-                    <div class="action container">
-                        <div class="header items" style="display: none;">
-                            <div class="two summary items">
-                                <div class="amount item">
-                                    <div class="description">Amount</div>
-                                    <div class="money">
-                                        <span></span>
-                                    </div>
-                                </div>
-                                <div class="count item">
-                                    <div class="description">Count</div>
-                                    <div class="money">
+                    <div class="search panel">
+                        <input type="search" placeholder="Search ..." />
 
-                                    </div>
-                                </div>
+                    </div>
+                    <div class="item list" id="POSItemList">
+                    </div>
+                </div>
+                <div class="five wide column">
+                    <div class="ui action panel inverted segment">
+                        <div class="toolbar">
+                            <div class="toggle view item" title="Toggle View">
+                                <i class="toggle off icon"></i>
+                            </div>
+                            <div class="item" data-payment-type="cash" title="Cash">
+                                <i class="money icon"></i>
+                            </div>
+                            <div class="item" data-payment-type="credit" title="Credit">
+                                <i class="tags icon"></i>
+                            </div>
+                            <div class="item" data-payment-type="check" title="Pay by Check">
+                                <i class="newspaper icon"></i>
+                            </div>
+                            <div class="item" data-payment-type="gift-card" title="Pay by Gift Card">
+                                <i class="gift icon"></i>
+                            </div>
+                            <div class="item" title="Pay by Credit Card">
+                                <i class="credit card icon"></i>
+                            </div>
+                            <div class="item" title="Reprint Ticket">
+                                <i class="print icon"></i>
+                            </div>
+                            <div class="item" title="Sign Out of POS">
+                                <i class="sign out icon"></i>
                             </div>
                         </div>
-                        <div class="tender info items">
-                            <div id="SummaryItems" class="two summary items">
-                                <div class="amount item">
-                                    <div class="description">Amount</div>
-                                    <div class="money">
-                                        <span></span>
+                        <div class="action container">
+                            <div class="header items">
+                                <div class="two summary items">
+                                    <div class="amount item">
+                                        <div class="description">Amount</div>
+                                        <div class="money">
+                                            <span></span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="store item">
-                                    <div class="description">Store</div>
-                                    <div class="control">
-                                        <select id="StoreSelect"></select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="one summary items">
-                                <div class="customer item">
-                                    <div class="description">Customer</div>
-                                    <div class="control">
-                                        <select id="CustomerSelect"></select>
+                                    <div class="count item">
+                                        <div class="description">Count</div>
+                                        <div class="money">
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="two summary items">
-                                <div class="value date item">
-                                    <div class="description">Value Date</div>
-                                    <div class="control">
-                                        <input type="text" class="date" id="ValueDateInputDate" />
+                            <div class="tender info items">
+                                <div class="payment type container">
+                                    <div data-payment-type="cash" class="two summary items">
+                                        <div class="tender item">
+                                            <div class="description">Tender</div>
+                                            <div class="control">
+                                                <input type="text" id="TenderInputText" />
+                                            </div>
+                                        </div>
+                                        <div class="change item">
+                                            <div class="description">Change</div>
+                                            <div class="control">
+                                                <input type="text" readonly="readonly" id="ChangeInputText" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div data-payment-type="credit" style="display: none;" class="one summary items">
+                                        <div class="gift-card number item">
+                                            <div class="description">Payment Term</div>
+                                            <div class="control">
+                                                <select id="PaymentTermSelect"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div data-payment-type="check" style="display: none;" class="three summary items">
+                                        <div class="check number item">
+                                            <div class="description">Check Number</div>
+                                            <div class="control">
+                                                <input type="text" id="CheckNumberInputText" />
+                                            </div>
+                                        </div>
+                                        <div class="check date item">
+                                            <div class="description">Check Date</div>
+                                            <div class="control">
+                                                <input type="text" class="date" id="CheckDateInputText" />
+                                            </div>
+                                        </div>
+                                        <div class="check amount item">
+                                            <div class="description">Check Amount</div>
+                                            <div class="control">
+                                                <input type="text" id="CheckAmountInputText" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div data-payment-type="gift-card" style="display: none;" class="two summary items">
+                                        <div class="gift-card number item">
+                                            <div class="description">Gift Card Number</div>
+                                            <div class="control">
+                                                <input type="text" id="GiftCardNumberInputText" />
+                                            </div>
+                                        </div>
+                                        <div class="gift-card balance item">
+                                            <div class="description">Gift Card Balance</div>
+                                            <div class="control">
+                                                <input type="text" readonly="readonly" id="GiftCardNumberBalanceInputText" />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="book date item">
-                                    <div class="description">Book Date</div>
-                                    <div class="control">
-                                        <input type="text" class="date" id="BookDateInputDate" />
+                                <div class="one summary items">
+                                    <div class="customer item">
+                                        <div class="description">Customer</div>
+                                        <div class="control">
+                                            <select id="CustomerSelect"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="two summary items">
+                                    <div class="value date item">
+                                        <div class="description">Value Date</div>
+                                        <div class="control">
+                                            <input type="text" class="date" id="ValueDateInputDate" />
+                                        </div>
+                                    </div>
+                                    <div class="book date item">
+                                        <div class="description">Book Date</div>
+                                        <div class="control">
+                                            <input type="text" class="date" id="BookDateInputDate" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <a class="show more anchor">Show More</a>
+                                <div class="more" style="display: none;">
+                                    <div class="one summary items">
+                                        <div class="cost center item">
+                                            <div class="description">Cost Center</div>
+                                            <div class="control">
+                                                <select id="CostCenterSelect"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="one summary items">
+                                        <div class="shipping company item">
+                                            <div class="description">Shipper</div>
+                                            <div class="control">
+                                                <select id="ShipperSelect"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="two summary items">
+                                        <div class="reference number item">
+                                            <div class="description">Ref#</div>
+                                            <div class="control">
+                                                <input type="text" id="ReferenceNumberInputText" />
+                                            </div>
+                                        </div>
+                                        <div class="memo item">
+                                            <div class="description">Memo</div>
+                                            <div class="control">
+                                                <input type="text" id="MemoInputText" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a class="show less anchor">Show Less</a>
+                                </div>
+                                <div class="ui one column padded grid">
+                                    <div class="column">
+                                        <div class="ui big green button">Checkout</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="two summary items">
-                                <div class="cost center item">
-                                    <div class="description">Cost Center</div>
-                                    <div class="control">
-                                        <select id="CostCenterSelect"></select>
-                                    </div>
-                                </div>
-                                <div class="shipping company item">
-                                    <div class="description">Shipper</div>
-                                    <div class="control">
-                                        <select id="ShipperSelect"></select>
-                                    </div>
-                                </div>
+                            <div id="SalesItems" class="sales items">
                             </div>
-                            <div class="two summary items">
-                                <div class="reference number item">
-                                    <div class="description">Ref#</div>
-                                    <div class="control">
-                                        <input type="text" id="ReferenceNumberInputText"/>
-                                    </div>
+                            <div class="footer items" style="display: none;">
+                                <div class="ui clear big negative circular button" id="ClearScreenButton">
+                                    Clear Screen
                                 </div>
-                                <div class="memo item">
-                                    <div class="description">Memo</div>
-                                    <div class="control">
-                                        <input type="text" id="MemoInputText"/>
-                                    </div>
-                                </div>
+                                <div class="ui next big positive circular button">Next</div>
                             </div>
-                            <div class="ui one column padded grid">
-                                <div class="column">
-                                    <div class="ui checkout basic inverted big circuluar yellow buttons">
-                                        <button class="ui cash button">
-                                            Cash
-                                        </button>
-                                        <button class="ui check button">
-                                            Check
-                                        </button>
-                                        <button class="ui gift-card button">
-                                            Gift Card
-                                        </button>
-                                        <button class="ui credit-card button">
-                                            Credit Card
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="SalesItems" class="sales items">
-                        </div>
-                        <div class="footer items" style="display: none;">
-                            <div class="ui clear big negative circular button" id="ClearScreenButton">
-                                Clear Screen
-                            </div>
-                            <div class="ui next big positive circular button">Next</div>
                         </div>
                     </div>
                 </div>
@@ -722,6 +840,7 @@
     });
 </script>
 <script>
+    var pageLoaded = false;
 
     function getModel() {
         function getDetails() {
@@ -876,18 +995,17 @@
             return;
         };
 
-        //alert("loading -->" + id);
         clearScreen();
 
         $("#ValueDateInputDate").datepicker("setDate", new Date(model.ValueDate));
         $("#BookDateInputDate").datepicker("setDate", new Date(model.BookDate));
-        $("#CostCenterSelect").val(model.CostCenterId);
+        $("#CostCenterSelect").dropdown("set selected", model.CostCenterId);
         $("#ReferenceNumberInputText").val(model.ReferenceNumber);
         $("#StatementReferenceInputText").val(model.StatementReference);
-        $("#CustomerSelect").val(model.CustomerId);
+        $("#CustomerSelect").dropdown("set selected", model.CustomerId);
         $("#PriceTypeSelect").dropdown("set selected", model.PriceTypeId);
-        $("#ShipperSelect").val(model.ShipperId);
-        $("#StoreSelect").val(model.StoreId);
+        $("#ShipperSelect").dropdown("set selected", model.ShipperId);
+        $("#StoreSelect").dropdown("set selected", model.StoreId);
 
         $.each(model.Details, function () {
             var lineItem = this;
@@ -1041,7 +1159,7 @@
 
     $(".toggle.view.item, .next.button").unbind("click").bind("click", function () {
         $(".tender.info.items").toggle();
-        $(".header.items").toggle();
+        //$(".header.items").toggle();
         $(".footer.items").toggle();
         $(".sales.items").toggle();
     });
@@ -1050,7 +1168,7 @@
         $("#POSItemList .item").unbind("click").bind("click", function () {
             var el = $(this);
             $(".tender.info.items").hide();
-            $(".header.items").show();
+            //$(".header.items").show();
             $(".footer.items").show();
             var costPrice = el.attr("data-cost-price");
             var photo = el.attr("data-photo");
@@ -1264,10 +1382,9 @@
         });
     };
 
-    $("#SummaryItems div.discount .money input, " +
-        "#ReceiptSummary div.tender .money input").keyup(function () {
-            window.updateTotal();
-        });
+    $("#ReceiptSummary div.tender .money input").keyup(function () {
+        window.updateTotal();
+    });
 
     function updateTotal() {
         var candidates = $("#SalesItems div.item");
@@ -1480,6 +1597,10 @@
         window.displayFieldBinder($("#StoreSelect"), "/api/forms/inventory/stores/display-fields", true);
     };
 
+    function loadPaymentTerms() {
+        window.displayFieldBinder($("#PaymentTermSelect"), "/api/forms/sales/payment-terms/display-fields", true);
+    };
+
     function loadShippers() {
         window.displayFieldBinder($("#ShipperSelect"), "/api/forms/inventory/shippers/display-fields", true);
     };
@@ -1501,82 +1622,125 @@
     loadCustomers();
     loadCostCenters();
     loadShippers();
+    loadPaymentTerms();
 </script>
 
 <script>
     function initializeTabs() {
-        $(".pos.tabs .item:not(.new)").unbind("click").bind("click", function () {
-            saveState();
-            $(".pos.tabs .item").removeClass("selected");
-            var el = $(this);
-            el.addClass("selected");
-            loadState();
-        });
+        $(".pos.tabs .item:not(.new)")
+            .unbind("click")
+            .bind("click",
+                function () {
+                    saveState();
+                    $(".pos.tabs .item").removeClass("selected");
+                    var el = $(this);
+                    el.addClass("selected");
+                    loadState();
+                });
     };
 
-    $(".tabs .new.item").unbind("click").bind("click", function () {
-        var el = $(this);
-        saveState();
+    $(".tabs .new.item")
+        .unbind("click")
+        .bind("click",
+            function () {
+                var el = $(this);
+                saveState();
 
-        function createTab(id) {
-            var item = $("<div class='item' />");
-            item.attr("id", "tab-item-" + id);
-            item.html(id);
+                function createTab(id) {
+                    var item = $("<div class='item' />");
+                    item.attr("id", "tab-item-" + id);
+                    item.html(id);
 
-            el.siblings(".actions").before(item);
-        };
+                    el.siblings(".actions").before(item);
+                };
 
-        var items = [];
-        var candidates = $(".tabs .item:not(.new)");
+                var items = [];
+                var candidates = $(".tabs .item:not(.new)");
 
-        $.each(candidates, function () {
-            var el = $(this);
-            var id = parseInt(el.text());
-            items.push(id);
-        });
+                $.each(candidates,
+                    function () {
+                        var el = $(this);
+                        var id = parseInt(el.text());
+                        items.push(id);
+                    });
 
-        var max = window.Enumerable.From(items).Max(function (x) { return x; });
-        var nextValue = 1;
+                var max = window.Enumerable.From(items).Max(function (x) { return x; });
+                var nextValue = 1;
 
-        if (max) {
-            nextValue = max + 1;
-        };
+                if (max) {
+                    nextValue = max + 1;
+                };
 
-        createTab(nextValue);
+                createTab(nextValue);
 
 
-        initializeTabs();
-        $(".tabs .item").removeClass("selected");
-        $("#tab-item-" + nextValue).addClass("selected");
-        clearScreen();
-    });
+                initializeTabs();
+                $(".tabs .item").removeClass("selected");
+                $("#tab-item-" + nextValue).addClass("selected");
+                clearScreen();
+            });
 
-    $(".tabs .actions .delete.icon").unbind("click").bind("click", function () {
-        var activeEl = $(".tabs .selected.item");
-        var id = parseInt(activeEl.text());
+    $(".tabs .actions .delete.icon")
+        .unbind("click")
+        .bind("click",
+            function () {
+                var activeEl = $(".tabs .selected.item");
+                var id = parseInt(activeEl.text());
 
-        if (activeEl.length && id > 1) {
-            var confirmed = window.confirm("Are you sure you want to delete this tab?");
+                if (activeEl.length && id > 1) {
+                    var confirmed = window.confirm("Are you sure you want to delete this tab?");
 
-            if (!confirmed) {
-                return;
-            };
+                    if (!confirmed) {
+                        return;
+                    };
 
-            removeState();
+                    removeState();
 
-            var previousEl = activeEl.prev(".item");
-            previousEl.addClass("selected");
-            activeEl.remove();
-            loadState();
-        };
-    });
+                    var previousEl = activeEl.prev(".item");
+                    previousEl.addClass("selected");
+                    activeEl.remove();
+                    loadState();
+                };
+            });
 
     initializeTabs();
+
+    $(".toolbar .item[data-payment-type]").unbind("click").bind("click", function () {
+        var el = $(this);
+        var paymentType = el.attr("data-payment-type");
+        $(".payment.type.container [data-payment-type]").hide();
+        $(".payment.type.container [data-payment-type=" + paymentType + "]").show();
+    });
+
+    $(".show.more.anchor").unbind("click").bind("click", function () {
+        var more = $(".tender.info.items .more");
+
+        more.show();
+        $(this).hide();
+    });
+
+    $(".show.less.anchor").unbind("click").bind("click", function () {
+        var more = $(".tender.info.items .more");
+
+        more.hide();
+        $(".show.more.anchor").show();
+    });
+
+    $(document).ajaxStop(function () {
+        if (!pageLoaded) {
+            $("#pos-container .dimmer").hide();
+            $("#pos-container .layout").fadeIn(500);
+        };
+
+        pageLoaded = true;
+    });
 </script>
+
 <script>
     setTimeout(function () {
         $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
-    }, 100);
+    },
+        100);
 
     $("select:not(.ui)").addClass("inverted fluid").dropdown();
 

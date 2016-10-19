@@ -211,7 +211,8 @@ BEGIN
     WHERE item_selling_prices.item_id=_item_id
     AND item_selling_prices.customer_type_id=_customer_type_id
     AND item_selling_prices.price_type_id =_price_type_id
-    AND item_selling_prices.unit_id = _unit_id;
+    AND item_selling_prices.unit_id = _unit_id
+	AND NOT sales.item_selling_prices.deleted;
 
     IF(_costing_unit_id IS NULL) THEN
         --We do not have a selling price of this item for the unit supplied.
@@ -227,7 +228,8 @@ BEGIN
         FROM sales.item_selling_prices
         WHERE item_selling_prices.item_id=_item_id
         AND item_selling_prices.customer_type_id=_customer_type_id
-        AND item_selling_prices.price_type_id =_price_type_id;
+        AND item_selling_prices.price_type_id =_price_type_id
+		AND NOT sales.item_selling_prices.deleted;
     END IF;
 
     IF(_price IS NULL) THEN
@@ -241,7 +243,8 @@ BEGIN
             _includes_tax
         FROM sales.item_selling_prices
         WHERE item_selling_prices.item_id=_item_id
-        AND item_selling_prices.price_type_id =_price_type_id;
+        AND item_selling_prices.price_type_id =_price_type_id
+		AND NOT sales.item_selling_prices.deleted;
     END IF;
 
     
@@ -257,7 +260,8 @@ BEGIN
             _costing_unit_id,
             _includes_tax
         FROM inventory.items
-        WHERE inventory.items.item_id = _item_id;
+        WHERE inventory.items.item_id = _item_id
+		AND NOT inventory.items.deleted;
     END IF;
 
     IF(_includes_tax) THEN
@@ -273,6 +277,8 @@ END
 $$
 LANGUAGE plpgsql;
 
+
+SELECT * FROM sales.get_item_selling_price(1, 1, 1, 1);
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/03.menus/menus.sql --<--<--
@@ -304,6 +310,11 @@ SELECT * FROM core.create_menu('Sales', 'Sales Orders', '/dashboard/sales/tasks/
 SELECT * FROM core.create_menu('Sales', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'keyboard', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'keyboard', 'Tasks');
 
+SELECT * FROM core.create_menu('Sales', 'Payments', 'square outline', 'configure', '');
+SELECT * FROM core.create_menu('Sales', 'Create Gift Cards', '/dashboard/sales/tasks/gift-cards', 'users', 'Payments');
+SELECT * FROM core.create_menu('Sales', 'Add Funds to Gift Card', '/dashboard/sales/tasks/gift-cards/add-fund', 'keyboard', 'Payments');
+SELECT * FROM core.create_menu('Sales', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'keyboard', 'Payments');
+
 SELECT * FROM core.create_menu('Sales', 'Setup', 'square outline', 'configure', '');
 SELECT * FROM core.create_menu('Sales', 'Customer Types', '/dashboard/sales/setup/customer-types', 'users', 'Setup');
 SELECT * FROM core.create_menu('Sales', 'Customers', '/dashboard/sales/setup/customers', 'users', 'Setup');
@@ -314,6 +325,11 @@ SELECT * FROM core.create_menu('Sales', 'Payment Terms', '/dashboard/sales/setup
 SELECT * FROM core.create_menu('Sales', 'Cashiers', '/dashboard/sales/setup/cashiers', 'users', 'Setup');
 
 SELECT * FROM core.create_menu('Sales', 'Reports', '', 'configure', '');
+SELECT * FROM core.create_menu('Sales', 'Gift Cards', '/dashboard/sales/reports/gift-cards/account-statement', 'money', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Gift Card Usage Statement', '/dashboard/sales/reports/gift-cards/account-statement', 'money', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Customer Account Statement', '/dashboard/sales/reports/customer/account-statement', 'money', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Credit Statement', '/dashboard/sales/reports/credit-statement', 'money', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Credit Statement', '/dashboard/sales/reports/credit-statement', 'money', 'Reports');
 SELECT * FROM core.create_menu('Sales', 'Top Selling Items', '/dashboard/sales/reports/sales-account-statement', 'money', 'Reports');
 SELECT * FROM core.create_menu('Sales', 'Sales by Office', '/dashboard/sales/reports/sales-account-statement', 'money', 'Reports');
 
