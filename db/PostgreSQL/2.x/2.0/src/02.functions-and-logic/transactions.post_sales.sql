@@ -1,0 +1,378 @@
+﻿DROP FUNCTION IF EXISTS sales.post_sales
+(
+    _office_id                              integer,
+    _user_id                                integer,
+    _login_id                               bigint,
+    _counter_id                             integer,
+    _value_date                             date,
+    _book_date                              date,
+    _cost_center_id                         integer,
+    _reference_number                       national character varying(24),
+    _statement_reference                    text,
+    _tender                                 public.money_strict2,
+    _change                                 public.money_strict2,
+    _payment_term_id                        integer,
+    _check_amount                           public.money_strict2,
+    _check_bank_name                        national character varying(1000),
+    _check_number                           national character varying(100),
+    _check_date                             date,
+    _gift_card_number                       national character varying(100),
+    _customer_id                            integer,
+    _price_type_id                          integer,
+    _shipper_id                             integer,
+    _store_id                               integer,
+    _coupon_code                            national character varying(100),
+    _is_flat_discount                       boolean,
+    _discount                               public.money_strict2,
+    _details                                sales.sales_detail_type[],
+    _sales_quotation_id                     bigint,
+    _sales_order_id                         bigint
+);
+
+
+CREATE FUNCTION sales.post_sales
+(
+    _office_id                              integer,
+    _user_id                                integer,
+    _login_id                               bigint,
+    _counter_id                             integer,
+    _value_date                             date,
+    _book_date                              date,
+    _cost_center_id                         integer,
+    _reference_number                       national character varying(24),
+    _statement_reference                    text,
+    _tender                                 public.money_strict2,
+    _change                                 public.money_strict2,
+    _payment_term_id                        integer,
+    _check_amount                           public.money_strict2,
+    _check_bank_name                        national character varying(1000),
+    _check_number                           national character varying(100),
+    _check_date                             date,
+    _gift_card_number                       national character varying(100),
+    _customer_id                            integer,
+    _price_type_id                          integer,
+    _shipper_id                             integer,
+    _store_id                               integer,
+    _coupon_code                            national character varying(100),
+    _is_flat_discount                       boolean,
+    _discount                               public.money_strict2,
+    _details                                sales.sales_detail_type[],
+    _sales_quotation_id                     bigint,
+    _sales_order_id                         bigint
+)
+RETURNS bigint
+AS
+$$
+    DECLARE _book_name                      national character varying(48) = 'Sales';
+    DECLARE _transaction_master_id          bigint;
+    DECLARE _checkout_id                    bigint;
+    DECLARE _checkout_detail_id             bigint;
+    DECLARE _grand_total                    money_strict;
+    DECLARE _discount_total                 money_strict2;
+    DECLARE _receivable                     money_strict2;
+    DECLARE _default_currency_code          national character varying(12);
+    DECLARE _is_periodic                    boolean = inventory.is_periodic_inventory(_office_id);
+    DECLARE _cost_of_goods                  money_strict;
+    DECLARE _tran_counter                   integer;
+    DECLARE _transaction_code               text;
+    DECLARE _shipping_charge                money_strict2;
+    DECLARE this                            RECORD;
+    DECLARE _cash_repository_id             integer;
+    DECLARE _cash_account_id                integer;
+    DECLARE _is_cash                        boolean = false;
+    DECLARE _is_credit                      boolean = false;
+    DECLARE _gift_card_id                   integer;
+    DECLARE _gift_card_balance              decimal(24, 4);
+    DECLARE _coupon_id                      integer;
+    DECLARE _coupon_discount                decimal(24, 4);
+    
+BEGIN        
+    _default_currency_code                  := core.get_currency_code_by_office_id(_office_id);
+    _cash_account_id                        := inventory.get_cash_account_id_by_store_id(_store_id);
+    _cash_repository_id                     := inventory.get_cash_repository_id_by_store_id(_store_id);
+    _is_cash                                := finance.is_cash_account_id(_cash_account_id);    
+
+    _coupon_id                              := sales.get_active_coupon_id_by_coupon_code(_coupon_code);
+    _gift_card_id                           := sales.get_gift_card_id_by_gift_card_number(_gift_card_number);
+    _gift_card_balance                      := sales.get_gift_card_balance(_gift_card_id, _value_date);
+
+
+    IF(COALESCE(_coupon_code, '') != '' AND COALESCE(_discount) > 0) THEN
+        RAISE EXCEPTION 'Please do not specify discount rate when you mention coupon code';
+    END IF;
+
+    IF(NOT _is_credit AND NOT _is_cash) THEN
+        RAISE EXCEPTION 'Cannot post sales. Invalid cash account mapping on store.'
+        USING ERRCODE='P1302';
+    END IF; 
+
+    IF(NOT _is_cash) THEN
+        _cash_repository_id                 := NULL;
+    END IF;
+
+    DROP TABLE IF EXISTS temp_checkout_details CASCADE;
+    CREATE TEMPORARY TABLE temp_checkout_details
+    (
+        id                              SERIAL PRIMARY KEY,
+        checkout_id                 bigint, 
+        tran_type                       national character varying(2), 
+        store_id                        integer,
+        item_id                         integer, 
+        quantity                        integer_strict,        
+        unit_id                         integer,
+        base_quantity                   decimal,
+        base_unit_id                    integer,                
+        price                           money_strict,
+        cost_of_goods_sold              money_strict2 DEFAULT(0),
+        discount                        money_strict2,
+        shipping_charge                 money_strict2,
+        sales_account_id                integer,
+        sales_discount_account_id       integer,
+        inventory_account_id            integer,
+        cost_of_goods_sold_account_id   integer
+    ) ON COMMIT DROP;
+        
+    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount, shipping_charge
+    FROM explode_array(_details);
+
+
+    UPDATE temp_checkout_details 
+    SET
+        tran_type                       = 'Cr',
+        base_quantity                   = inventory.get_base_quantity_by_unit_id(unit_id, quantity),
+        base_unit_id                    = inventory.get_root_unit_id(unit_id);
+
+
+    UPDATE temp_checkout_details
+    SET
+        sales_account_id                = inventory.get_sales_account_id(item_id),
+        sales_discount_account_id       = inventory.get_sales_discount_account_id(item_id),
+        inventory_account_id            = inventory.get_inventory_account_id(item_id),
+        cost_of_goods_sold_account_id   = inventory.get_cost_of_goods_sold_account_id(item_id);
+
+    DROP TABLE IF EXISTS item_quantities_temp;
+    CREATE TEMPORARY TABLE item_quantities_temp
+    (
+        item_id             integer,
+        base_unit_id        integer,
+        store_id            integer,
+        total_sales         numeric,
+        in_stock            numeric,
+        maintain_inventory      boolean
+    ) ON COMMIT DROP;
+
+    INSERT INTO item_quantities_temp(item_id, base_unit_id, store_id, total_sales)
+    SELECT item_id, base_unit_id, store_id, SUM(base_quantity)
+    FROM temp_checkout_details
+    GROUP BY item_id, base_unit_id, store_id;
+
+    UPDATE item_quantities_temp
+    SET maintain_inventory = inventory.items.maintain_inventory
+    FROM inventory.items
+    WHERE item_quantities_temp.item_id = inventory.items.item_id;
+    
+    UPDATE item_quantities_temp
+    SET in_stock = inventory.count_item_in_stock(item_quantities_temp.item_id, item_quantities_temp.base_unit_id, item_quantities_temp.store_id)
+    WHERE maintain_inventory;
+
+
+    IF EXISTS
+    (
+        SELECT 0 FROM item_quantities_temp
+        WHERE total_sales > in_stock
+        AND maintain_inventory
+        LIMIT 1
+    ) THEN
+        RAISE EXCEPTION 'Insufficient item quantity'
+        USING ERRCODE='P5500';
+    END IF;
+    
+    IF EXISTS
+    (
+            SELECT 1 FROM temp_checkout_details AS details
+            WHERE inventory.is_valid_unit_id(details.unit_id, details.item_id) = false
+            LIMIT 1
+    ) THEN
+        RAISE EXCEPTION 'Item/unit mismatch.'
+        USING ERRCODE='P3201';
+    END IF;
+
+    SELECT SUM(COALESCE(discount, 0))                           INTO _discount_total FROM temp_checkout_details;
+    SELECT SUM(COALESCE(price, 0) * COALESCE(quantity, 0))      INTO _grand_total FROM temp_checkout_details;
+    SELECT SUM(COALESCE(shipping_charge, 0))                    INTO _shipping_charge FROM temp_checkout_details;
+
+     
+     _receivable                    := _grand_total - COALESCE(_discount_total, 0)+ COALESCE(_shipping_charge, 0);
+    
+
+    IF(_is_flat_discount AND _discount > _receivable) THEN
+        RAISE EXCEPTION 'The discount amount cannot be greater than total amount.';
+    ELSIF(NOT _is_flat_discount AND _discount > 100) THEN
+        RAISE EXCEPTION 'The discount rate cannot be greater than 100.';    
+    END IF;
+
+    _coupon_discount                := _discount;
+
+    IF(NOT _is_flat_discount AND COALESCE(_discount, 0) > 0) THEN
+        _coupon_discount            := _receivable * (_discount/100);
+    END IF;
+
+    IF(COALESCE(_coupon_discount, 0) > 0) THEN
+        _discount_total             := _discount_total + _coupon_discount;
+        _receivable                 := _receivable - _coupon_discount;
+    END IF;
+
+    
+    DROP TABLE IF EXISTS temp_transaction_details;
+    CREATE TEMPORARY TABLE temp_transaction_details
+    (
+        transaction_master_id       BIGINT, 
+        tran_type                   national character varying(2), 
+        account_id                  integer, 
+        statement_reference         text, 
+        cash_repository_id          integer, 
+        currency_code               national character varying(12), 
+        amount_in_currency          money_strict, 
+        local_currency_code         national character varying(12), 
+        er                          decimal_strict, 
+        amount_in_local_currency    money_strict
+    ) ON COMMIT DROP;
+
+
+    INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
+    SELECT 'Cr', sales_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)), 1, _default_currency_code, SUM(COALESCE(price, 0) * COALESCE(quantity, 0))
+    FROM temp_checkout_details
+    GROUP BY sales_account_id;
+
+    IF(NOT _is_periodic) THEN
+        --Perpetutal Inventory Accounting System
+
+        UPDATE temp_checkout_details SET cost_of_goods_sold = inventory.get_cost_of_goods_sold(item_id, unit_id, store_id, quantity);
+        
+        SELECT SUM(cost_of_goods_sold) INTO _cost_of_goods
+        FROM temp_checkout_details;
+
+        IF(_cost_of_goods > 0) THEN
+            INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
+            SELECT 'Dr', cost_of_goods_sold_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(cost_of_goods_sold, 0)), 1, _default_currency_code, SUM(COALESCE(cost_of_goods_sold, 0))
+            FROM temp_checkout_details
+            GROUP BY cost_of_goods_sold_account_id;
+
+            INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
+            SELECT 'Cr', inventory_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(cost_of_goods_sold, 0)), 1, _default_currency_code, SUM(COALESCE(cost_of_goods_sold, 0))
+            FROM temp_checkout_details
+            GROUP BY inventory_account_id;
+        END IF;
+    END IF;
+
+    IF(COALESCE(_shipping_charge, 0) > 0) THEN
+        INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
+        SELECT 'Cr', inventory.get_account_id_by_shipper_id(_shipper_id), _statement_reference, _default_currency_code, _shipping_charge, 1, _default_currency_code, _shipping_charge;                
+    END IF;
+
+
+    IF(_discount_total > 0) THEN
+        INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
+        SELECT 'Dr', sales_discount_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(discount, 0)), 1, _default_currency_code, SUM(COALESCE(discount, 0))
+        FROM temp_checkout_details
+        GROUP BY sales_discount_account_id;
+    END IF;
+
+    INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
+    SELECT 'Dr', inventory.get_account_id_by_customer_id(_customer_id), _statement_reference, _default_currency_code, _receivable, 1, _default_currency_code, _receivable;
+
+    
+    _transaction_master_id  := nextval(pg_get_serial_sequence('finance.transaction_master', 'transaction_master_id'));
+    _checkout_id        := nextval(pg_get_serial_sequence('inventory.checkouts', 'checkout_id'));    
+    _tran_counter           := finance.get_new_transaction_counter(_value_date);
+    _transaction_code       := finance.get_transaction_code(_value_date, _office_id, _user_id, _login_id);
+
+    UPDATE temp_transaction_details     SET transaction_master_id   = _transaction_master_id;
+    UPDATE temp_checkout_details           SET checkout_id         = _checkout_id;
+    
+    INSERT INTO finance.transaction_master(transaction_master_id, transaction_counter, transaction_code, book, value_date, book_date, user_id, login_id, office_id, cost_center_id, reference_number, statement_reference) 
+    SELECT _transaction_master_id, _tran_counter, _transaction_code, _book_name, _value_date, _book_date, _user_id, _login_id, _office_id, _cost_center_id, _reference_number, _statement_reference;
+
+
+    INSERT INTO finance.transaction_details(value_date, book_date, office_id, transaction_master_id, tran_type, account_id, statement_reference, cash_repository_id, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency)
+    SELECT _value_date, _book_date, _office_id, transaction_master_id, tran_type, account_id, statement_reference, cash_repository_id, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency
+    FROM temp_transaction_details
+    ORDER BY tran_type DESC;
+
+    INSERT INTO inventory.checkouts(transaction_book, value_date, book_date, checkout_id, transaction_master_id, shipper_id, posted_by, office_id, discount)
+    SELECT _book_name, _value_date, _book_date, _checkout_id, _transaction_master_id, _shipper_id, _user_id, _office_id, _coupon_discount;
+
+    FOR this IN SELECT * FROM temp_checkout_details ORDER BY id
+    LOOP
+        _checkout_detail_id        := nextval(pg_get_serial_sequence('inventory.checkout_details', 'checkout_detail_id'));
+
+        INSERT INTO inventory.checkout_details(checkout_detail_id, value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, shipping_charge)
+        SELECT _checkout_detail_id, _value_date, _book_date, this.checkout_id, this.tran_type, this.store_id, this.item_id, this.quantity, this.unit_id, this.base_quantity, this.base_unit_id, this.price, COALESCE(this.cost_of_goods_sold, 0), this.discount, this.shipping_charge 
+        FROM temp_checkout_details
+        WHERE id = this.id;        
+    END LOOP;
+
+
+    INSERT INTO sales.sales(price_type_id, counter_id, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
+    SELECT _price_type_id, _counter_id, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id;
+    
+    
+    PERFORM finance.auto_verify(_transaction_master_id, _office_id);
+
+    IF(NOT _is_credit) THEN
+        PERFORM sales.post_receipt
+        (
+            _user_id, 
+            _office_id, 
+            _login_id,
+            _customer_id,
+            _default_currency_code, 
+            1.0, 
+            1.0,
+            _reference_number, 
+            _statement_reference, 
+            _cost_center_id,
+            _cash_account_id,
+            _cash_repository_id,
+            _value_date,
+            _book_date,
+            _receivable,
+            _tender,
+            _change,
+            _check_amount,
+            _check_bank_name,
+            _check_number,
+            _check_date,
+            _gift_card_number,
+            _store_id,
+            _transaction_master_id
+        );
+
+        
+    ELSE
+        PERFORM sales.settle_customer_due(_customer_id, _office_id);
+    END IF;
+
+    RETURN _transaction_master_id;
+END
+$$
+LANGUAGE plpgsql;
+
+
+
+
+-- SELECT * FROM sales.post_sales
+-- (
+--     1, 1, 1, 1, '1-1-2020', '1-1-2020', 1, 'asdf', 'Test', 
+--     500000,2000, 1, 500000, 'Bank', 'C001', '1-1-2020', '234234234',
+--     inventory.get_customer_id_by_customer_code('DEF'), 1, 1, 1,
+--     '', true, 1000,
+--     ARRAY[
+--     ROW(1, 'Dr', 1, 1, 1,180000, 0, 200)::sales.sales_detail_type,
+--     ROW(1, 'Dr', 2, 1, 7,130000, 300, 30)::sales.sales_detail_type,
+--     ROW(1, 'Dr', 3, 1, 1,110000, 5000, 50)::sales.sales_detail_type],
+--     NULL,
+--     NULL
+-- );
+-- 

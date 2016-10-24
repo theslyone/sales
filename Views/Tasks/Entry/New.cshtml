@@ -28,11 +28,17 @@
             text-align: center;
         }
 
-        #pos-container .dimmer div.spinner {
-            padding: 0.5em;
-        }
+            #pos-container .dimmer div.spinner {
+                padding: 0.5em;
+            }
+
     #dashboard-container {
         padding: 0 !important;
+    }
+
+    #TenderInputText, #ChangeInputText {
+        color: yellow !important;
+        font-size: 1.5em;
     }
 
     iframe {
@@ -43,6 +49,15 @@
         display: none;
     }
 
+.modal {
+	height:100%;
+}
+
+
+.modal iframe{
+	height:1000px;
+	display:block;
+}
     .inverted.header, .inverted.form {
         background: transparent !important;
     }
@@ -131,7 +146,7 @@
 
         .item.list .item {
             display: inline-flex;
-            background-color: #333;
+            background: linear-gradient(to top, #222, #575553);
             margin: 4px;
             height: 310px;
             padding: 0.5em;
@@ -140,7 +155,7 @@
         }
 
             .item.list .item:hover {
-                background-color: #444;
+                background: linear-gradient(to top, #575553, #222);
             }
 
             .item.list .item .info {
@@ -158,11 +173,13 @@
 
             .item.list .item:hover img {
                 filter: grayscale(0%) !important;
+                transition: opacity 1s ease-in-out;
             }
+
 
             .item.list .item .info .photo img {
                 height: 390px;
-                filter: grayscale(70%);
+                filter: grayscale(50%);
             }
 
             .item.list .item .info .name {
@@ -425,6 +442,10 @@
         -moz-appearance: none; /* Firefox */
     }
 
+    .summary.items .dropdown {
+        padding: 1em !important;
+    }
+
     select.inverted {
         background-color: #333;
         border: 1px solid #555;
@@ -667,8 +688,8 @@
                             <div class="item" data-payment-type="gift-card" title="Pay by Gift Card">
                                 <i class="gift icon"></i>
                             </div>
-                            <div class="item" title="Pay by Credit Card">
-                                <i class="credit card icon"></i>
+                            <div class="item" id="SearchCustomerAction" title="Search Customer">
+                                <i class="search icon"></i>
                             </div>
                             <div class="item" title="Reprint Ticket">
                                 <i class="print icon"></i>
@@ -698,15 +719,15 @@
                                 <div class="payment type container">
                                     <div data-payment-type="cash" class="two summary items">
                                         <div class="tender item">
-                                            <div class="description">Tender</div>
+                                            <div class="description">Cash Tender</div>
                                             <div class="control">
-                                                <input type="text" id="TenderInputText" />
+                                                <input type="text" class="decimal" id="TenderInputText" />
                                             </div>
                                         </div>
                                         <div class="change item">
-                                            <div class="description">Change</div>
+                                            <div class="description">Cash Change</div>
                                             <div class="control">
-                                                <input type="text" readonly="readonly" id="ChangeInputText" />
+                                                <input class="decimal" type="text" readonly="readonly" id="ChangeInputText" />
                                             </div>
                                         </div>
                                     </div>
@@ -718,23 +739,33 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div data-payment-type="check" style="display: none;" class="three summary items">
-                                        <div class="check number item">
-                                            <div class="description">Check Number</div>
-                                            <div class="control">
-                                                <input type="text" id="CheckNumberInputText" />
+                                    <div data-payment-type="check" style="display: none;">
+                                        <div class="two summary items">
+                                            <div class="check amount item">
+                                                <div class="description">Check Amount</div>
+                                                <div class="control">
+                                                    <input class="decimal" type="text" id="CheckAmountInputText" />
+                                                </div>
+                                            </div>
+                                            <div class="check bank name item">
+                                                <div class="description">Bank Name</div>
+                                                <div class="control">
+                                                    <input type="text" id="BankNameInputText" />
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="check date item">
-                                            <div class="description">Check Date</div>
-                                            <div class="control">
-                                                <input type="text" class="date" id="CheckDateInputText" />
+                                        <div class="two summary items">
+                                            <div class="check number item">
+                                                <div class="description">Check Number</div>
+                                                <div class="control">
+                                                    <input type="text" id="CheckNumberInputText" />
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="check amount item">
-                                            <div class="description">Check Amount</div>
-                                            <div class="control">
-                                                <input type="text" id="CheckAmountInputText" />
+                                            <div class="check date item">
+                                                <div class="description">Check Date</div>
+                                                <div class="control">
+                                                    <input type="text" class="date" id="CheckDateInputText" />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -748,7 +779,7 @@
                                         <div class="gift-card balance item">
                                             <div class="description">Gift Card Balance</div>
                                             <div class="control">
-                                                <input type="text" readonly="readonly" id="GiftCardNumberBalanceInputText" />
+                                                <input class="decimal" type="text" readonly="readonly" id="GiftCardNumberBalanceInputText" />
                                             </div>
                                         </div>
                                     </div>
@@ -761,17 +792,40 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="three summary items">
+                                    <div class="coupon code item">
+                                        <div class="description">Coupon Code</div>
+                                        <div class="control">
+                                            <input type="text" class="" id="CouponCodeInputText" />
+                                        </div>
+                                    </div>
+                                    <div class="discount type item">
+                                        <div class="description">Discount Type</div>
+                                        <div class="control">
+                                            <select id="DiscountTypeSelect">
+                                                <option value="1">Rate</option>
+                                                <option value="2">Amount</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="discount item">
+                                        <div class="description">Discount</div>
+                                        <div class="control">
+                                            <input type="text" class="decimal" id="DiscountInputText" />
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="two summary items">
                                     <div class="value date item">
                                         <div class="description">Value Date</div>
                                         <div class="control">
-                                            <input type="text" class="date" id="ValueDateInputDate" />
+                                            <input type="text" class="date" id="ValueDateInputText" />
                                         </div>
                                     </div>
                                     <div class="book date item">
                                         <div class="description">Book Date</div>
                                         <div class="control">
-                                            <input type="text" class="date" id="BookDateInputDate" />
+                                            <input type="text" class="date" id="BookDateInputText" />
                                         </div>
                                     </div>
                                 </div>
@@ -831,13 +885,23 @@
     </div>
 </div>
 
-<script>
-    window.addEventListener("beforeunload", function (e) {
-        var confirmationMessage = "\o/";
+<div class="ui customer search fullscreen modal padded segment">
+    <iframe src="/dashboard/sales/setup/customers/search"></iframe>
+</div>
 
-        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-        return confirmationMessage;                            //Webkit, Safari, Chrome
+<script>
+    $("#SearchCustomerAction").click(function() {
+        $(".customer.search.modal").modal({ blurring: true }).modal("show");
     });
+    
+    function onCustomerSearchSelect(customerId) {
+        if (customerId) {
+            $(".customer.search.modal").modal("hide");
+            alert("The customer id is --> " + customerId);
+
+            $("#CustomerSelect").dropdown("set selected", customerId);
+        };
+    };
 </script>
 <script>
     var pageLoaded = false;
@@ -850,10 +914,10 @@
             $.each(items, function () {
                 var el = $(this);
                 var itemId = parseInt(el.attr("data-item-id"));
-                var quantity = parseInt(el.find("input.quantity").val());
+                var quantity = window.parseFloat2(el.find("input.quantity").val());
                 var unitId = parseInt(el.find("select.unit").val());
-                var price = parseFloat(el.find("input.price").val() || 0);
-                var discount = parseFloat(el.find("input.discount").val() || 0);
+                var price = window.parseFloat2(el.find("input.price").val() || 0);
+                var discount = window.parseFloat2(el.find("input.discount").val() || 0);
 
                 model.push({
                     StoreId: $("#StoreSelect").val(),
@@ -868,9 +932,33 @@
             return model;
         };
 
-        var valueDate = $("#ValueDateInputDate").datepicker("getDate");
-        var bookDate = $("#BookDateInputDate").datepicker("getDate");
-        var costCenterId = $("#CostCenterSelect").val();
+        //Cash
+        var tender = window.parseFloat2($("#TenderInputText").val());
+        var change = window.parseFloat2($("#ChangeInputText").val());
+
+        //Credit
+        var paymentTermId = parseInt($("#PaymentTermSelect").val()) || null;
+
+        //Check
+        var checkAmount = window.parseFloat2($("#CheckAmountInputText").val());
+        var bankName = $("#BankNameInputText").val();
+        var checkNumber = $("#CheckNumberInputText").val();
+        var checkDate = $("#CheckDateInputText").datepicker("getDate");
+
+        //Gift Card
+        var giftCardNumber = $("#GiftCardNumberInputText").val();
+
+
+        //Discount Coupon
+        var couponCode = $("#CouponCodeInputText").val();
+
+        //Discount
+        var discountType = $("#DiscountTypeSelect").val();
+        var discount = window.parseFloat2($("#DiscountInputText").val());
+
+        var valueDate = $("#ValueDateInputText").datepicker("getDate");
+        var bookDate = $("#BookDateInputText").datepicker("getDate");
+        var costCenterId = parseInt($("#CostCenterSelect").val()) || null;
         var referenceNumber = $("#ReferenceNumberInputText").val();
         var statementReference = $("#StatementReferenceInputText").val();
         var customerId = $("#CustomerSelect").val();
@@ -880,6 +968,17 @@
         var details = getDetails();
 
         return {
+            Tender: tender,
+            Change: change,
+            PaymentTermId: paymentTermId,
+            CheckAmount: checkAmount,
+            BankName: bankName,
+            CheckNumber: checkNumber,
+            CheckDate: checkDate,
+            GiftCardNumber: giftCardNumber,
+            CouponCode: couponCode,
+            DiscountType: discountType,
+            Discount: discount,
             ValueDate: valueDate,
             BookDate: bookDate,
             CostCenterId: costCenterId,
@@ -997,8 +1096,23 @@
 
         clearScreen();
 
-        $("#ValueDateInputDate").datepicker("setDate", new Date(model.ValueDate));
-        $("#BookDateInputDate").datepicker("setDate", new Date(model.BookDate));
+
+        $("#TenderInputText").val(model.Tender);
+        $("#ChangeInputText").val(model.Change);
+        $("#PaymentTermSelect").dropdown("set selected", model.PaymentTermId);
+
+        $("#CheckAmountInputText").val(model.CheckAmount);
+        $("#BankNameInputText").val(model.BankName);
+        $("#CheckNumberInputText").val(model.CheckNumber);
+        $("#CheckDateInputText").datepicker("setDate", new Date(model.CheckDate));
+
+        $("#GiftCardNumberInputText").val(model.GiftCardNumber);
+        $("#CouponCodeInputText").val(model.CouponCode);
+        $("#DiscountTypeSelect").dropdown("set selected", model.DiscountType);
+        $("#DiscountInputText").val(model.Discount);
+
+        $("#ValueDateInputText").datepicker("setDate", new Date(model.ValueDate));
+        $("#BookDateInputText").datepicker("setDate", new Date(model.BookDate));
         $("#CostCenterSelect").dropdown("set selected", model.CostCenterId);
         $("#ReferenceNumberInputText").val(model.ReferenceNumber);
         $("#StatementReferenceInputText").val(model.StatementReference);
@@ -1006,6 +1120,9 @@
         $("#PriceTypeSelect").dropdown("set selected", model.PriceTypeId);
         $("#ShipperSelect").dropdown("set selected", model.ShipperId);
         $("#StoreSelect").dropdown("set selected", model.StoreId);
+
+
+
 
         $.each(model.Details, function () {
             var lineItem = this;
@@ -1065,9 +1182,9 @@
 		</div>
 	</div>
 	<div class="number block">
-		<input type="text" class="price" title="Edit Price" value="{CostPrice}">
-		<input type="text" class="quantity" title="Enter Quantity" value="1">
-		<input type="text" class="discount" title="Enter Discount" value="">
+		<input type="text" class="decimal price" title="Edit Price" value="{CostPrice}">
+		<input type="text" class="decimal quantity" title="Enter Quantity" value="1">
+		<input type="text" class="decimal discount" title="Enter Rate of Discount" value="">
 		<button class="ui red fluid button" onclick="removeItem(this);" style="display:none;">Delete</button>
 	</div>
 </div>`
@@ -1181,7 +1298,7 @@
             var itemName = el.attr("data-item-name");
             var itemCode = el.attr("data-item-code");
             var itemId = el.attr("data-item-id");
-            var price = parseFloat(costPrice || 0);
+            var price = window.parseFloat2(costPrice || 0);
 
             if (!price) {
                 alert("Cannot add item because the price is zero.");
@@ -1198,7 +1315,7 @@
                 var existingQuantitySpan = existingEl.find("span.quantity");
                 var existingQuantityInput = existingEl.find("input.quantity");
 
-                var quantity = parseInt(existingQuantitySpan.text() || 0);
+                var quantity = window.parseFloat2(existingQuantitySpan.text() || 0);
                 quantity++;
 
                 existingQuantitySpan.text(quantity);
@@ -1258,10 +1375,9 @@
                 var quantityEl = el.find("input.quantity");
                 var discountEl = el.find("input.discount");
 
-                var quantity = parseInt(quantityEl.val() || 0);
-                var discountRate = parseFloat(discountEl.val().replace("%", ""));
-                var price = parseFloat(el.find("input.price").val());
-                //var price = parseFloat(el.attr("data-price") || 0);
+                var quantity = window.parseFloat2(quantityEl.val() || 0);
+                var discountRate = window.parseFloat2(discountEl.val().replace("%", ""));
+                var price = window.parseFloat2(el.find("input.price").val());
 
                 var amount = (price * quantity).toFixed(2);
                 var discountedAmount = ((price * quantity) * ((100 - discountRate) / 100)).toFixed(2);
@@ -1293,7 +1409,7 @@
             discountInput.on("keyup", function () {
                 var el = $(this);
 
-                var rate = parseFloat(el.val());
+                var rate = window.parseFloat2(el.val());
                 if (rate > 100) {
                     el.val("100");
                     return;
@@ -1373,6 +1489,7 @@
 
             item.appendTo(targetEl);
             quantityInput.trigger("keyup");
+            window.setNumberFormat();
             window.updateTotal();
 
             var tabId = getSelectedTabId();
@@ -1386,10 +1503,22 @@
         window.updateTotal();
     });
 
+    $("#DiscountTypeSelect").change(function () {
+        window.updateTotal();
+    });
+
+    $("#DiscountInputText").keyup(function () {
+        window.updateTotal();
+    });
+
     function updateTotal() {
         var candidates = $("#SalesItems div.item");
         var amountEl = $("div.amount .money");
         var countEl = $("div.count .money");
+        var couponDiscountType = parseInt($("#DiscountTypeSelect").val());
+        var couponDiscountRate = window.parseFloat2($("#DiscountInputText").val());
+        var discount;
+
 
         var totalPrice = 0;
         var totalQuantity = 0;
@@ -1399,10 +1528,9 @@
             var quantityEl = el.find("input.quantity");
             var discountEl = el.find("input.discount");
 
-            var quantity = parseInt(quantityEl.val() || 0);
-            var discountRate = parseFloat(discountEl.val().replace("%", ""));
-            var price = parseFloat(el.find("input.price").val());
-            //var price = parseFloat(el.attr("data-price") || 0);
+            var quantity = window.parseFloat2(quantityEl.val() || 0);
+            var discountRate = window.parseFloat2(discountEl.val().replace("%", ""));
+            var price = window.parseFloat2(el.find("input.price").val());
 
             var amount = price * quantity;
             var discountedAmount = amount * ((100 - discountRate) / 100);
@@ -1412,6 +1540,16 @@
         });
 
         totalPrice = parseFloat(totalPrice.toFixed(2));
+
+        if (couponDiscountType === 1 && couponDiscountRate > 0 && couponDiscountRate <= 100) {
+            discount = totalPrice * (couponDiscountRate / 100);
+            totalPrice = totalPrice - discount;
+        } else if (couponDiscountType === 2 && couponDiscountRate > 0) {
+            //Discount amount
+            totalPrice = totalPrice - couponDiscountRate;
+        };
+
+
 
         amountEl.html(totalPrice);
         countEl.html(totalQuantity);
@@ -1540,6 +1678,19 @@
 
 </script>
 <script>
+    $("#TenderInputText").on("keyup", function () {
+        var total = window.parseFloat2($(".amount.item .money").text());
+        var tender = window.parseFloat2($(this).val());
+
+        var change = tender - total;
+
+        if (change < 0) {
+            change = "ERROR";
+        };
+
+        $("#ChangeInputText").val(change);
+    });
+
     $("#CheckoutButton").unbind("click").bind("click", function () {
         function request(model) {
             var url = "/dashboard/sales/tasks/entry/new";
@@ -1547,6 +1698,99 @@
             return window.getAjaxRequest(url, "POST", data);
         };
 
+        function validate() {
+            var transactionTotal = window.parseFloat2($("div.amount .money").text());
+            var cashTender = window.parseFloat2($("#TenderInputText").val());
+            var paymentTerm = parseInt($("#PaymentTermSelect").val()) || null;
+            var checkAmount = window.parseFloat2($("#CheckAmountInputText").val());
+            var bankName = $("#BankNameInputText").val();
+            var checkDate = $("#CheckDateInputText").datepicker("getDate");
+            var checkNumber = $("#CheckNumberInputText").val();
+            var giftCardNumber = $("#GiftCardNumberInputText").val();
+            var giftCardBalance = $("#GiftCardNumberBalanceInputText").val();
+
+            if (cashTender >= transactionTotal) {
+                //Cash Transaction
+
+                $("#CheckAmountInputText").val("");
+                $("#BankNameInputText").val("");
+                $("#CheckDateInputText").val("");
+                $("#CheckNumberInputText").val("");
+                $("#PaymentTermSelect").dropdown("set selected", "Select");
+                $("#GiftCardNumberInputText").val("");
+                $("#GiftCardNumberBalanceInputText").val("");
+                return true;
+            };
+
+            if (checkAmount >= transactionTotal) {
+                //Paid via Check/Cheque
+                if (!bankName) {
+                    window.displayMessage("Please enter the bank name.");
+                    return false;
+                };
+
+                if (!checkNumber) {
+                    window.displayMessage("Please enter the check number.");
+                    return false;
+                };
+
+                if (!checkDate) {
+                    window.displayMessage("Please enter the check date.");
+                    return false;
+                };
+
+                $("#TenderInputText").val("");
+                $("#ChangeInputText").val("");
+                $("#PaymentTermSelect").dropdown("set selected", "Select");
+                $("#GiftCardNumberInputText").val("");
+                $("#GiftCardNumberBalanceInputText").val("");
+
+
+                return true;
+            };
+
+            if (giftCardBalance >= transactionTotal) {
+                //Paid via Gift Card
+
+                if (!giftCardNumber) {
+                    window.displayMessage("Please enter the gift card number.");
+                    return false;
+                };
+
+                $("#TenderInputText").val("");
+                $("#ChangeInputText").val("");
+                $("#CheckAmountInputText").val("");
+                $("#BankNameInputText").val("");
+                $("#CheckDateInputText").val("");
+                $("#CheckNumberInputText").val("");
+                $("#PaymentTermSelect").dropdown("set selected", "Select");
+
+                return true;
+            };
+
+            //Credit transaction
+            $("#TenderInputText").val("");
+            $("#ChangeInputText").val("");
+            $("#CheckAmountInputText").val("");
+            $("#BankNameInputText").val("");
+            $("#CheckDateInputText").val("");
+            $("#CheckNumberInputText").val("");
+            $("#GiftCardNumberInputText").val("");
+            $("#GiftCardNumberBalanceInputText").val("");
+
+            if (!paymentTerm) {
+                window.displayMessage("Please select a payment term.");
+                return false;
+            };
+
+            return true;
+        };
+
+        var isValid = validate();
+
+        if (!isValid) {
+            return;
+        };
 
         var model = getModel();
 
@@ -1598,7 +1842,7 @@
     };
 
     function loadPaymentTerms() {
-        window.displayFieldBinder($("#PaymentTermSelect"), "/api/forms/sales/payment-terms/display-fields", true);
+        window.displayFieldBinder($("#PaymentTermSelect"), "/api/forms/sales/payment-terms/display-fields", false);
     };
 
     function loadShippers() {
@@ -1734,12 +1978,14 @@
 
         pageLoaded = true;
     });
+
+
 </script>
 
 <script>
     setTimeout(function () {
-        $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
-    },
+            $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
+        },
         100);
 
     $("select:not(.ui)").addClass("inverted fluid").dropdown();
