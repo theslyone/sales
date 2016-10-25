@@ -11,6 +11,24 @@
         font-smooth: always;
     }
 
+    @@media screen and (min-width: 1200px) {
+        #pos-container {
+            font-size: 9px!important;
+        }
+    }
+
+    @@media screen and (min-width: 1300px) {
+        #pos-container {
+            font-size: 10px!important;
+        }
+    }
+
+    @@media screen and (min-width: 1400px) {
+        #pos-container {
+            font-size: 11px!important;
+        }
+    }
+
     .sales.layout, #pos-container {
         height: 100%;
     }
@@ -49,15 +67,16 @@
         display: none;
     }
 
-.modal {
-	height:100%;
-}
+    .modal {
+        height: 100%;
+    }
 
 
-.modal iframe{
-	height:1000px;
-	display:block;
-}
+        .modal iframe {
+            height: 1000px;
+            display: block;
+        }
+
     .inverted.header, .inverted.form {
         background: transparent !important;
     }
@@ -148,9 +167,9 @@
             display: inline-flex;
             background: linear-gradient(to top, #222, #575553);
             margin: 4px;
-            height: 310px;
+            height: 280px;
             padding: 0.5em;
-            width: 242px;
+            width: 200px;
             cursor: pointer;
         }
 
@@ -166,8 +185,8 @@
                 position: relative;
                 top: -16px;
                 left: -2px;
-                width: 212px;
-                height: 300px;
+                width: 200px;
+                height: 280px;
             }
 
 
@@ -178,7 +197,7 @@
 
 
             .item.list .item .info .photo img {
-                height: 390px;
+                height: 300px;
                 filter: grayscale(50%);
             }
 
@@ -187,10 +206,10 @@
                 font-weight: 100;
                 position: relative;
                 z-index: 1;
-                top: -5.5em;
+                top: -6.5em;
                 line-height: 1.2em;
                 text-align: center;
-                text-shadow: 2px 2px 10px black;
+                text-shadow: 2px 2px 5px black;
             }
 
             .item.list .item .info .price {
@@ -872,10 +891,10 @@
                             <div id="SalesItems" class="sales items">
                             </div>
                             <div class="footer items" style="display: none;">
-                                <div class="ui clear big negative circular button" id="ClearScreenButton">
+                                <div class="ui clear negative circular button" id="ClearScreenButton">
                                     Clear Screen
                                 </div>
-                                <div class="ui next big positive circular button">Next</div>
+                                <div class="ui next positive circular button">Next</div>
                             </div>
                         </div>
                     </div>
@@ -890,10 +909,10 @@
 </div>
 
 <script>
-    $("#SearchCustomerAction").click(function() {
+    $("#SearchCustomerAction").click(function () {
         $(".customer.search.modal").modal({ blurring: true }).modal("show");
     });
-    
+
     function onCustomerSearchSelect(customerId) {
         if (customerId) {
             $(".customer.search.modal").modal("hide");
@@ -1984,8 +2003,8 @@
 
 <script>
     setTimeout(function () {
-            $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
-        },
+        $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
+    },
         100);
 
     $("select:not(.ui)").addClass("inverted fluid").dropdown();
