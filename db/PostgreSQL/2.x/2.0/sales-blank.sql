@@ -428,7 +428,7 @@ RETURNS integer
 AS
 $$
 BEGIN
-    SELECT sales.coupons.coupon_id
+    RETURN sales.coupons.coupon_id
     FROM sales.coupons
     WHERE sales.coupons.coupon_code = _coupon_code
     AND COALESCE(sales.coupons.begins_from, NOW()::date) >= NOW()::date
@@ -1362,6 +1362,7 @@ BEGIN
     _gift_card_balance                      := sales.get_gift_card_balance(_gift_card_id, _value_date);
 
 
+
     IF(COALESCE(_coupon_code, '') != '' AND COALESCE(_discount) > 0) THEN
         RAISE EXCEPTION 'Please do not specify discount rate when you mention coupon code';
     END IF;
@@ -1640,7 +1641,7 @@ LANGUAGE plpgsql;
 --     NULL,
 --     NULL
 -- );
--- 
+
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/03.menus/menus.sql --<--<--

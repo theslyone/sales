@@ -97,6 +97,7 @@ BEGIN
     _gift_card_balance                      := sales.get_gift_card_balance(_gift_card_id, _value_date);
 
 
+
     IF(COALESCE(_coupon_code, '') != '' AND COALESCE(_discount) > 0) THEN
         RAISE EXCEPTION 'Please do not specify discount rate when you mention coupon code';
     END IF;
@@ -375,4 +376,4 @@ LANGUAGE plpgsql;
 --     NULL,
 --     NULL
 -- );
--- 
+

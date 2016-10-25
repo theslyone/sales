@@ -5,7 +5,7 @@ RETURNS integer
 AS
 $$
 BEGIN
-    SELECT sales.coupons.coupon_id
+    RETURN sales.coupons.coupon_id
     FROM sales.coupons
     WHERE sales.coupons.coupon_code = _coupon_code
     AND COALESCE(sales.coupons.begins_from, NOW()::date) >= NOW()::date

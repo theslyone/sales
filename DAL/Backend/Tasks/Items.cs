@@ -16,14 +16,14 @@ namespace MixERP.Sales.DAL.Backend.Tasks
         {
             if (details == null)
             {
-                return "NULL::purchase.purchase_detail_type";
+                return "NULL::sales.sales_detail_type";
             }
 
             var items = new Collection<string>();
             for (int i = 0; i < details.Count; i++)
             {
                 items.Add(string.Format(CultureInfo.InvariantCulture,
-                    "ROW(@StoreId{0}, @TransactionType{0}, @ItemId{0}, @Quantity{0}, @UnitId{0},@Price{0}, @Discount{0}, @ShippingCharge{0})::sales.sales_detail_type",
+                    "ROW(@StoreId{0}, @TransactionType{0}, @ItemId{0}, @Quantity{0}, @UnitId{0}, @Price{0}, @Discount{0}, @ShippingCharge{0})::sales.sales_detail_type",
                     i.ToString(CultureInfo.InvariantCulture)));
             }
 
@@ -57,14 +57,15 @@ namespace MixERP.Sales.DAL.Backend.Tasks
             string connectionString = FrapidDbServer.GetConnectionString(tenant);
             string sql = @"SELECT * FROM sales.post_sales
                             (
-                                @OfficeId, @UserId, @LoginId, @CounterId, @ValueDate, @BookDate, 
-                                @CostCenterId, @ReferenceNumber, @StatementReference, 
-                                @Tender, @Change, @PaymentTermId, @CheckAmount, @CheckBankName, @CheckDate,
-                                @GiftCardNumber, 
-                                @CustomerId, @PriceTypeId, @ShipperId, @StoreId,
-                                @CouponCode, @IsFlatDiscount, 
+                                @OfficeId::integer, @UserId::integer, @LoginId::bigint, @CounterId::integer, @ValueDate::date, @BookDate::date, 
+                                @CostCenterId::integer, @ReferenceNumber::national character varying(24), @StatementReference::text, 
+                                @Tender::public.money_strict2, @Change::public.money_strict2, @PaymentTermId::integer, 
+                                @CheckAmount::public.money_strict2, @CheckBankName::national character varying(1000), @CheckNumber::national character varying(100), @CheckDate::date,
+                                @GiftCardNumber::national character varying(100), 
+                                @CustomerId::integer, @PriceTypeId::integer, @ShipperId::integer, @StoreId::integer,
+                                @CouponCode::national character varying(100), @IsFlatDiscount::boolean, @Discount::public.money_strict2,
                                 ARRAY[{0}],
-                                @SalesQuotationId, @SalesOrderId
+                                @SalesQuotationId::bigint, @SalesOrderId::bigint
                             );";
             sql = string.Format(sql, GetParametersForDetails(model.Details));
 
@@ -86,6 +87,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks
                     command.Parameters.AddWithValue("@PaymentTermId", model.PaymentTermId);
                     command.Parameters.AddWithValue("@CheckAmount", model.CheckAmount);
                     command.Parameters.AddWithValue("@CheckBankName", model.CheckBankName);
+                    command.Parameters.AddWithValue("@CheckNumber", model.CheckNumber);
                     command.Parameters.AddWithValue("@CheckDate", model.CheckDate);
                     command.Parameters.AddWithValue("@GiftCardNumber", model.GiftCardNumber);
                     command.Parameters.AddWithValue("@CustomerId", model.CustomerId);
@@ -94,6 +96,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks
                     command.Parameters.AddWithValue("@StoreId", model.StoreId);
                     command.Parameters.AddWithValue("@CouponCode", model.CouponCode);
                     command.Parameters.AddWithValue("@IsFlatDiscount", model.IsFlatDiscount);
+                    command.Parameters.AddWithValue("@Discount", model.Discount);
                     command.Parameters.AddWithValue("@SalesQuotationId", model.SalesQuotationId);
                     command.Parameters.AddWithValue("@SalesOrderId", model.SalesOrderId);
 

@@ -18,7 +18,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
         {
             if (itemId < 0 || unitId < 0)
             {
-                return this.InvalidModelState();
+                return this.InvalidModelState(this.ModelState);
             }
 
             decimal model = await Items.GetSellingPriceAsync(this.Tenant, itemId, customerId, priceTypeId, unitId).ConfigureAwait(true);

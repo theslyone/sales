@@ -19,6 +19,11 @@ namespace MixERP.Sales.ViewModels
         [Required]
         public DateTime BookDate { get; set; }
 
+        [Required]
+        public int PriceTypeId { get; set; }
+        [Required]
+        public int StoreId { get; set; }
+
         public int CostCenterId { get; set; }
         public string ReferenceNumber { get; set; }
         public string StatementReference { get; set; }
@@ -26,23 +31,20 @@ namespace MixERP.Sales.ViewModels
         public decimal Tender { get; set; }
         public decimal Change { get; set; }
 
-        public int PaymentTermId { get; set; }
-        public decimal CheckAmount { get; set; }
-        public decimal CheckBankName { get; set; }
-        public DateTime CheckDate { get; set; }
+        public int? PaymentTermId { get; set; }
+        public decimal? CheckAmount { get; set; }
+        public string CheckNumber { get; set; }
+        public string CheckBankName { get; set; }
+        public DateTime? CheckDate { get; set; }
 
         public string GiftCardNumber { get; set; }
 
 
         public int CustomerId { get; set; }
 
-        [Required]
-        public int PriceTypeId { get; set; }
 
         public int ShipperId { get; set; }
 
-        [Required]
-        public int StoreId { get; set; }
 
 
         public string CouponCode { get; set; }
@@ -54,7 +56,7 @@ namespace MixERP.Sales.ViewModels
         [Required]
         public List<SalesDetailType> Details { get; set; }
 
-        public long SalesQuotationId { get; set; }
-        public long SalesOrderId { get; set; }
+        public long? SalesQuotationId { get; set; }
+        public long? SalesOrderId { get; set; }
     }
 }
