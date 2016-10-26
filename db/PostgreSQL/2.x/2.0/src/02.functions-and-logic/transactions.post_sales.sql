@@ -205,8 +205,7 @@ BEGIN
 
      
      _receivable                    := _grand_total - COALESCE(_discount_total, 0)+ COALESCE(_shipping_charge, 0);
-    
-
+        
     IF(_is_flat_discount AND _discount > _receivable) THEN
         RAISE EXCEPTION 'The discount amount cannot be greater than total amount.';
     ELSIF(NOT _is_flat_discount AND _discount > 100) THEN
@@ -224,6 +223,19 @@ BEGIN
         _receivable                 := _receivable - _coupon_discount;
     END IF;
 
+    IF(_tender > 0) THEN
+        IF(_tender < _receivable ) THEN
+            RAISE EXCEPTION 'The tender amount must be greater than or equal to %.', _receivable;
+        END IF;
+    ELSIF(_check_amount > 0) THEN
+        IF(_check_amount < _receivable ) THEN
+            RAISE EXCEPTION 'The check amount must be greater than or equal to %.', _receivable;
+        END IF;
+    ELSIF(COALESCE(_gift_card_number, '') != '') THEN
+        IF(_gift_card_balance < _receivable ) THEN
+            RAISE EXCEPTION 'The gift card must have a balance of at least %.', _receivable;
+        END IF;
+    END IF;
     
     DROP TABLE IF EXISTS temp_transaction_details;
     CREATE TEMPORARY TABLE temp_transaction_details
@@ -376,4 +388,4 @@ LANGUAGE plpgsql;
 --     NULL,
 --     NULL
 -- );
-
+-- 
