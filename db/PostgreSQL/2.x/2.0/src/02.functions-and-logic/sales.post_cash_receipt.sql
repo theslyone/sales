@@ -17,6 +17,7 @@
     _cash_repository_id                         integer,
     _value_date                                 date,
     _book_date                                  date,
+    _receivable                                 public.money_strict2,
     _tender                                     public.money_strict2,
     _change                                     public.money_strict2,
     _cascading_tran_id                          bigint
@@ -41,6 +42,7 @@ CREATE FUNCTION sales.post_cash_receipt
     _cash_repository_id                         integer,
     _value_date                                 date,
     _book_date                                  date,
+    _receivable                                 public.money_strict2,
     _tender                                     public.money_strict2,
     _change                                     public.money_strict2,
     _cascading_tran_id                          bigint
@@ -54,12 +56,16 @@ $$
     DECLARE _credit                             public.money_strict2;
     DECLARE _lc_debit                           public.money_strict2;
     DECLARE _lc_credit                          public.money_strict2;
-BEGIN           
-    _debit                                  := _tender;
-    _lc_debit                               := _tender * _exchange_rate_debit;
+BEGIN
+    IF(_tender < _receivable) THEN
+        RAISE EXCEPTION 'The tendered amount must be greater than or equal to sales amount';
+    END IF;
+    
+    _debit                                  := _receivable;
+    _lc_debit                               := _receivable * _exchange_rate_debit;
 
-    _credit                                 := _tender * (_exchange_rate_debit/ _exchange_rate_credit);
-    _lc_credit                              := _tender * _exchange_rate_debit;
+    _credit                                 := _receivable * (_exchange_rate_debit/ _exchange_rate_credit);
+    _lc_credit                              := _receivable * _exchange_rate_debit;
     
     INSERT INTO finance.transaction_master
     (

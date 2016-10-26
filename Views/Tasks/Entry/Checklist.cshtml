@@ -2,7 +2,7 @@
 
 @{
     ViewBag.Title = "Checklist";
-    Layout = ViewBag.PurchaseLayoutPath;
+    Layout = ViewBag.SalesLayoutPath;
 }
 <style>
     iframe {
@@ -20,16 +20,16 @@
 
     <div class="ui positive message">The transaction was posted successfully.</div>
 
-    <a href="/dashboard/purchase/tasks/entry" class="ui green button">
-        View Purchases
+    <a href="/dashboard/sales/tasks/entry" class="ui green button">
+        View Sales
     </a>
-    <a href="/dashboard/purchase/tasks/entry/new" class="ui red button">
-        Add a New Purchase Entry
+    <a href="/dashboard/sales/tasks/entry/new" class="ui red button">
+        Add a New Sales Entry
     </a>
-    <iframe src="/dashboard/reports/source/Areas/MixERP.Purchases/Reports/Invoice.xml?transaction_master_id=@Model"></iframe>
+    <iframe src="/dashboard/reports/source/Areas/MixERP.Sales/Reports/Invoice.xml?transaction_master_id=@Model"></iframe>
 </div>
 
 
 <script>
-    window.overridePath = "/dashboard/purchase/tasks/entry";
+    window.overridePath = "/dashboard/sales/tasks/entry";
 </script>
