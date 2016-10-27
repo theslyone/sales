@@ -7,7 +7,7 @@ CREATE SCHEMA sales;
 CREATE TABLE sales.gift_cards
 (
     gift_card_id                            SERIAL PRIMARY KEY,
-    gift_card_number                        national character varying(100),
+    gift_card_number                        national character varying(100) NOT NULL,
 	payable_account_id					    integer NOT NULL REFERENCES finance.accounts,
     customer_id                             integer REFERENCES inventory.customers,
     first_name                              national character varying(100),
@@ -298,8 +298,12 @@ CREATE TABLE sales.returns
     return_id                               BIGSERIAL PRIMARY KEY,
     sales_id                                bigint NOT NULL REFERENCES sales.sales,
     checkout_id                             bigint NOT NULL REFERENCES inventory.checkouts,
+	transaction_master_id					bigint NOT NULL REFERENCES finance.transaction_master,
+	return_transaction_master_id			bigint NOT NULL REFERENCES finance.transaction_master,
     counter_id                              integer NOT NULL REFERENCES inventory.counters,
-    customer_id                             integer REFERENCES inventory.customers
+    customer_id                             integer REFERENCES inventory.customers,
+	price_type_id							integer NOT NULL REFERENCES sales.price_types,
+	is_credit								boolean
 );
 
 

@@ -1,7 +1,7 @@
 ﻿@model dynamic
 
 @{
-    ViewBag.Title = "Sales Returns";
+    ViewBag.Title = "Sales Verification";
     Layout = ViewBag.SalesLayoutPath;
 }
 <style>
@@ -13,16 +13,15 @@
 </style>
 <script src="/Scripts/frapid/utilities/form.js"></script>
 <div class="ui attached page segment" style="min-height: 100%; padding: 3em;">
-    <div class="ui huge header">Sales Returns</div>
+    <div class="ui huge header">Sales Verification</div>
     <div class="ui divider"></div>
     <div class="ui basic buttons">
         <a id="AddNewButton" class="ui basic button" style="" href="/dashboard/sales/tasks/entry/new">
             Add New
         </a>
-        <button id="ReturnButton" class="ui basic button" style="">
-            Return Sales
-        </button>
-        @*<a class="ui basic button" id="Import" href="ImportTransaction.mix">Import</a>*@
+        <a class="ui basic button" id="VerificationApproveButton">Approve</a>
+        <a class="ui basic button" id="VerificationRejectButton">Reject</a>
+
         <div class="ui icon top left pointing dropdown basic button" id="ExportDropDown" tabindex="0">
             <span>
                 Export
@@ -50,10 +49,10 @@
     <div class="ui stackable form segment" id="Annotation" style="">
         <div class="eight fields">
             <div class="field">
-                <input class="date" data-persist placeholder="From" id="FromInputDate" title="From" type="date">
+                <input class="date" data-persist placeholder="From" id="FromInputText" title="From" type="text">
             </div>
             <div class="field">
-                <input class="date" data-persist placeholder="To" id="ToInputDate" title="To" type="date">
+                <input class="date" data-persist placeholder="To" id="ToInputText" title="To" type="text">
             </div>
             <div class="field">
                 <input placeholder="TranId" id="TranIdInputText" title="TranId" type="text">
@@ -76,7 +75,7 @@
                 <input placeholder="Office" id="OfficeInputText" title="Office" type="text">
             </div>
             <div class="field">
-                <input placeholder="Status" id="StatusInputText" title="Status" type="text">
+                <input placeholder="Status" id="StatusInputText" title="Status" type="text" value="Unverified">
             </div>
             <div class="field">
                 <input placeholder="VerifiedBy" id="VerifiedByInputText" title="VerifiedBy" type="text">
@@ -98,13 +97,14 @@
 
     </div>
 
-    <table id="SalesView" class="ui table segment">
+    <table id="JournalView" class="ui table segment">
         <thead>
             <tr>
                 <th>Actions</th>
                 <th>Select</th>
                 <th>TranId</th>
                 <th>TranCode</th>
+                <th>Book</th>
                 <th>Value Date</th>
                 <th>Book Date</th>
                 <th>Ref#</th>
@@ -121,13 +121,34 @@
     </table>
 </div>
 
+<div id="ActionModal" class="ui modal">
+    <div class="ui massive red header"></div>
+    <div class="ui inverted red content">
+        <div class="ui form">
+            <div class="ui blue large dividing header"></div>
+            <div class="field">
+                <label for="ReasonTextArea">Verification Reason</label>
+                <textarea id="ReasonTextArea"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui buttons">
+            <input type="button" class="ui red cancel button" value="Cancel"/>
+            <input type="button" id="VerifyButton" class="ui green ok button" value="Verify" title="CTRL + RETURN"/>
+        </div>
+    </div>
+</div>
+
 <div class="ui large advice modal">
     <i class="close icon"></i>
     <iframe></iframe>
 </div>
+
 <script>
     function displayTable(target, model) {
         target.find("tbody").html("");
+
         function getCell(text) {
             var cell = $("<td />");
 
@@ -171,33 +192,37 @@
             return cell;
         };
 
-        $.each(model, function () {
-            var item = this;
+        $.each(model,
+            function() {
+                var item = this;
 
-            var row = $("<tr />");
+                var row = $("<tr />");
 
-            row.append(getActionCell(item.TransactionMasterId));
-            row.append(getSelectionCell(item.TransactionMasterId));
-            row.append(getCell(item.TransactionMasterId));
-            row.append(getCell(item.TransactionCode));
-            row.append(getCell(item.ValueDate));
-            row.append(getCell(item.BookDate));
-            row.append(getCell(item.ReferenceNumber));
-            row.append(getCell(item.StatementReference));
-            row.append(getCell(item.PostedBy));
-            row.append(getCell(item.Office));
-            row.append(getCell(item.Status));
-            row.append(getCell(item.VerifiedBy));
-            row.append(getCell(item.VerifiedOn));
-            row.append(getCell(item.Reason));
+                row.append(getActionCell(item.TransactionMasterId));
+                row.append(getSelectionCell());
+                row.append(getCell(item.TransactionMasterId));
+                row.append(getCell(item.TransactionCode));
+                row.append(getCell(item.Book));
+                row.append(getCell(item.ValueDate));
+                row.append(getCell(item.BookDate));
+                row.append(getCell(item.ReferenceNumber));
+                row.append(getCell(item.StatementReference));
+                row.append(getCell(item.PostedBy));
+                row.append(getCell(item.Office));
+                row.append(getCell(item.Status));
+                row.append(getCell(item.VerifiedBy));
+                row.append(getCell(item.VerifiedOn));
+                row.append(getCell(item.Reason));
 
-            target.find("tbody").append(row);
-        });
+                target.find("tbody").append(row);
+            });
     };
+
     function processQuery() {
         function getModel() {
             var model = window.serializeForm($("#Annotation"));
-            model.Book = "Sales Return";
+            model.Book = "Sales";
+
             return model;
         };
 
@@ -212,29 +237,169 @@
 
             var ajax = request(model);
 
-            ajax.success(function (response) {
+            ajax.success(function(response) {
                 displayTable(target, response);
                 target.removeClass("loading");
             });
 
-            ajax.fail(function (xhr) {
+            ajax.fail(function(xhr) {
                 alert(JSON.stringify(xhr));
             });
         };
 
-        var view = $("#SalesView").addClass("loading");
+        var view = $("#JournalView").addClass("loading");
 
         displayGrid(view);
     };
 
-    $("#ShowButton").unbind("click").bind("click", function () {
-        processQuery();
+    $("#ShowButton")
+        .unbind("click")
+        .bind("click",
+            function() {
+                processQuery();
+            });
+
+    processQuery();
+</script>
+
+<script>
+    var reasonTextArea = $("#ReasonTextArea");
+    var journalView = $("#JournalView");
+    var modal = $("#ActionModal");
+    var verifyButton = $("#VerifyButton");
+    var tranId;
+    var approve;
+
+    function getSelectedItem() {
+        var selected = journalView.find("input:checked").first();
+        
+        if (selected.length) {
+            var row = selected.parent().parent().parent();
+            var id = row.find("td:nth-child(3)").html();
+            return parseInt(id);
+        };
+
+        return 0;
+    };
+
+    function showModal() {
+        var header = modal.find(".ui.massive.header");
+        var subheader = modal.find(".ui.dividing.header");
+
+        header.html("Reject Transaction");
+        subheader.html(window.stringFormat("TranId: #{0}", tranId));
+        header.removeClass("green").addClass("red");
+
+        if (approve) {
+            header.html("Approve Transaction");
+            header.removeClass("red").addClass("green");
+        };
+
+        modal.modal('setting', 'closable', false).modal('show');
+    };
+
+    $("#VerificationApproveButton").click(function () {
+        tranId = getSelectedItem();
+
+        if (tranId) {
+            approve = true;
+            showModal();
+        };
     });
 
-    loadDatepicker();
-    processQuery();
+    $("#VerificationRejectButton").click(function () {
+        tranId = getSelectedItem();
 
-    
+        if (tranId) {
+            approve = false;
+            showModal();
+        };
+    });
+
+    function removeRow(index, callback) {
+        journalView.find("tr").eq(index + 1).addClass("negative").fadeOut(500, function () {
+            $(this).remove();
+
+            if (typeof (callback) === "function") {
+                callback();
+            };
+        });
+    };
+
+    function hideModal() {
+        modal.modal("hide");
+    };
+
+    verifyButton.click(function () {
+        function getModel() {
+            var reason = reasonTextArea.val();
+
+            return {
+                TranId: tranId,
+                Reason: reason
+            };
+        };
+
+        function request(model, type) {
+            var url = "/dashboard/sales/tasks/entry/verification/" + type;
+            var data = JSON.stringify(model);
+
+            return window.getAjaxRequest(url, "POST", data);
+        }
+
+        var model = getModel();
+        var type = approve ? "approve" : "reject";
+
+        var ajax = request(model, type);
+
+        ajax.success(function (response) {
+            var cascadingTranId = parseFloat(response);
+
+            if (cascadingTranId) {
+                journalView.find("tr td:nth-child(3)").each(function (i) {
+                    var tranId = parseFloat($(this).text() || 0);
+
+                    if (cascadingTranId === tranId) {
+                        removeRow(i);
+                    };
+                });
+            };
+
+            journalView.find("input:checked").first().parent().parent().parent().remove();
+            hideModal();
+        });
+
+        ajax.fail(function (xhr) {
+            window.logAjaxErrorMessage(xhr);
+        });
+
+        return false;
+    });
+
+    $(document).keyup(function (e) {
+        if (e.ctrlKey) {
+            var rowNumber = e.keyCode - 47;
+
+            if (rowNumber < 10) {
+                journalView.find("tr").eq(rowNumber).find("input").trigger('click');
+            };
+        };
+    });
+
+    shortcut.add("CTRL+K", function () {
+        $("#ApproveButton").trigger("click");
+    });
+
+    shortcut.add("CTRL+RETURN", function () {
+        if (modal.is(":visible")) {
+            verifyButton.trigger("click");
+        };
+    });
+
+    shortcut.add("CTRL+SHIFT+K", function () {
+        $("#VerificationRejectButton").trigger("click");
+    });
+
     function showPuchaseInvoice(tranId) {
         $(".advice.modal iframe").attr("src", "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Invoice.xml?transaction_master_id=" + tranId);
 
@@ -262,26 +427,4 @@
         }, 300);
     };
 
-    $("#ReturnButton").click(function() {
-        function getSelectedItem() {
-            var selected = $("#SalesView").find("input:checked").first();
-
-            if (selected.length) {
-                var row = selected.parent().parent().parent();
-                var id = row.find("td:nth-child(3)").html();
-                return parseInt(id);
-            };
-
-            return 0;
-        };
-
-        var selected = getSelectedItem();
-        if (selected) {
-            var url = "/dashboard/sales/tasks/return/new?TransactionMasterId=" + selected;
-            document.location = url;
-            return;
-        };
-
-        window.displayMessage("Please select an item from the grid.");
-    });
 </script>
