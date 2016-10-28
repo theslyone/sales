@@ -13,19 +13,19 @@
 
     @@media screen and (min-width: 1200px) {
         #pos-container {
-            font-size: 9px!important;
+            font-size: 9px !important;
         }
     }
 
     @@media screen and (min-width: 1300px) {
         #pos-container {
-            font-size: 10px!important;
+            font-size: 10px !important;
         }
     }
 
     @@media screen and (min-width: 1400px) {
         #pos-container {
-            font-size: 11px!important;
+            font-size: 11px !important;
         }
     }
 
@@ -810,7 +810,7 @@
                                     <div class="customer item">
                                         <div class="description">Customer</div>
                                         <div class="control">
-                                            <select id="CustomerSelect"></select>
+                                            <select id="CustomerSelect" class="ui search fluid inverted dropdown"></select>
                                         </div>
                                     </div>
                                 </div>
@@ -916,12 +916,16 @@
         $(".customer.search.modal").modal({ blurring: true }).modal("show");
     });
 
-    function onCustomerSearchSelect(customerId) {
+    function onCustomerSearchSelect(customerId, customerName) {
         if (customerId) {
             $(".customer.search.modal").modal("hide");
-            alert("The customer id is --> " + customerId);
+            //alert("The customer id is --> " + customerId);
 
-            $("#CustomerSelect").dropdown("set selected", customerId);
+            $("#CustomerSelect").dropdown("clear");
+            $("#CustomerSelect").html("<option value='" + customerId + "'>" + customerName + "</option>");
+            setTimeout(function() {
+                $("#CustomerSelect").dropdown("set selected", customerId);
+            }, 100);
         };
     };
 </script>
@@ -985,6 +989,7 @@
         var referenceNumber = $("#ReferenceNumberInputText").val();
         var statementReference = $("#StatementReferenceInputText").val();
         var customerId = parseInt($("#CustomerSelect").val()) || null;
+        var customerName = $("#CustomerSelect").dropdown("get text")[0];
         var priceTypeId = $("#PriceTypeSelect").val();
         var shipperId = $("#ShipperSelect").val();
         var storeId = $("#StoreSelect").val();
@@ -1012,6 +1017,7 @@
             ReferenceNumber: referenceNumber,
             StatementReference: statementReference,
             CustomerId: customerId,
+            CustomerName: customerName,
             PriceTypeId: priceTypeId,
             ShipperId: shipperId,
             StoreId: storeId,
@@ -1146,7 +1152,13 @@
         $("#CostCenterSelect").dropdown("set selected", model.CostCenterId);
         $("#ReferenceNumberInputText").val(model.ReferenceNumber);
         $("#StatementReferenceInputText").val(model.StatementReference);
-        $("#CustomerSelect").dropdown("set selected", model.CustomerId);
+
+        $("#CustomerSelect").dropdown("clear");
+        $("#CustomerSelect").html("<option value='" + model.CustomerId + "'>" + model.CustomerName + "</option>");
+        setTimeout(function () {
+            $("#CustomerSelect").dropdown("set selected", model.CustomerId);
+        }, 100);
+
         $("#PriceTypeSelect").dropdown("set selected", model.PriceTypeId);
         $("#ShipperSelect").dropdown("set selected", model.ShipperId);
         $("#StoreSelect").dropdown("set selected", model.StoreId);
@@ -1862,6 +1874,8 @@
 
     function clearScreen() {
         $("#SalesItems").html("");
+        $("#CustomerSelect").dropdown("clear");
+
         window.updateTotal();
     };
 </script>
@@ -1888,8 +1902,24 @@
     };
 
     function loadCustomers() {
-        window.displayFieldBinder($("#CustomerSelect"), "/api/forms/inventory/customers/display-fields");
-    };
+        //window.displayFieldBinder($("#CustomerSelect"), "/api/forms/inventory/customers/display-fields");
+
+        setTimeout(function() {
+            $("#CustomerSelect").parent()
+            .dropdown({
+                apiSettings: {
+                    url: "/dashboard/sales/setup/customer-search/{query}",
+                    onResponse: function (result) {
+                        console.log(JSON.stringify(result));
+                        $("#CustomerSelect").html("");
+                        $.each(result, function (index, item) {
+                            $("#CustomerSelect").append("<option value='" + item.Value + "'>" + item.Name + "</option>");
+                        });
+                    }
+                }
+            });
+        }, 1000);
+    }
 
     loadStores();
     loadPriceTypes();
