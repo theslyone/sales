@@ -667,10 +667,10 @@
                                     <select class="ui search inverted fluid dropdown" id="PriceTypeSelect"></select>
                                 </div>
                                 <div class="item">
-                                    <select id="CounterSelect"></select>
+                                    <select id="StoreSelect"></select>
                                 </div>
                                 <div class="item">
-                                    <select id="StoreSelect"></select>
+                                    <select id="CounterSelect"></select>
                                 </div>
                             </div>
                         </div>
@@ -698,11 +698,11 @@
                             <div class="toggle view item" title="Toggle View">
                                 <i class="toggle off icon"></i>
                             </div>
-                            <div class="item" data-payment-type="cash" title="Cash">
-                                <i class="money icon"></i>
-                            </div>
                             <div class="item" data-payment-type="credit" title="Credit">
                                 <i class="tags icon"></i>
+                            </div>
+                            <div class="item" data-payment-type="cash" title="Cash">
+                                <i class="money icon"></i>
                             </div>
                             <div class="item" data-payment-type="check" title="Pay by Check">
                                 <i class="newspaper icon"></i>
@@ -1881,10 +1881,6 @@
 </script>
 
 <script>
-    function loadCounters() {
-        window.displayFieldBinder($("#CounterSelect"), "/api/forms/inventory/counters/display-fields", true);
-    };
-
     function loadStores() {
         window.displayFieldBinder($("#StoreSelect"), "/api/forms/inventory/stores/display-fields", true);
     };
@@ -1925,13 +1921,27 @@
         }, 1000);
     }
 
-    loadCounters();
     loadStores();
     loadPriceTypes();
     loadCustomers();
     loadCostCenters();
     loadShippers();
     loadPaymentTerms();
+
+    $("#StoreSelect").change(function () {
+        var el = $(this);
+
+        function loadCounters() {
+            var storeId = el.val();
+
+            var filters = [];
+            filters.push(window.getAjaxColumnFilter("WHERE", "store_id", "int", window.FilterConditions.IsEqualTo, storeId));
+
+            window.displayFieldBinder($("#CounterSelect"), "/api/forms/inventory/counters/display-fields/get-where", true, filters);
+        };
+
+        loadCounters();
+    });
 </script>
 
 <script>
