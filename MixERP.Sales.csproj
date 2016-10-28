@@ -154,12 +154,14 @@
     <Compile Include="Controllers\Backend\Tasks\EntryVerificationController.cs" />
     <Compile Include="Controllers\Backend\Tasks\ItemController.cs" />
     <Compile Include="Controllers\Backend\Tasks\ReturnController.cs" />
+    <Compile Include="DAL\Backend\Service\SearchCustomer.cs" />
     <Compile Include="DAL\Backend\Tasks\Items.cs" />
     <Compile Include="DAL\Backend\Service\Items.cs" />
     <Compile Include="DTO\ItemView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\Sales.cs" />
     <Compile Include="ViewModels\SalesDetailType.cs" />
+    <Compile Include="ViewModels\SearchResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
