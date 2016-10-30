@@ -52,9 +52,19 @@ CREATE TABLE sales.late_fee
     late_fee_name                           national character varying(500) NOT NULL,
     is_flat_amount                          boolean NOT NULL DEFAULT(false),
     rate                                    numeric(24,4) NOT NULL,
+	account_id 								bigint NOT NULL REFERENCES finance.accounts,
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
 	deleted									boolean DEFAULT(false)
+);
+
+CREATE TABLE sales.late_fee_postings
+(
+	transaction_master_id               	bigint PRIMARY KEY REFERENCES finance.transaction_master,
+	customer_id                         	bigint NOT NULL REFERENCES inventory.customers,
+	value_date                          	date NOT NULL,
+	late_fee_tran_id                    	bigint NOT NULL REFERENCES finance.transaction_master,
+	amount                              	public.money_strict
 );
 
 CREATE TABLE sales.price_types
@@ -319,4 +329,5 @@ AS
     discount            public.money_strict2,
     shipping_charge     public.money_strict2
 );
+
 

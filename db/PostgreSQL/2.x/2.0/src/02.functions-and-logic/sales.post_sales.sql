@@ -84,9 +84,12 @@ $$
     DECLARE _gift_card_id                   integer;
     DECLARE _gift_card_balance              decimal(24, 4);
     DECLARE _coupon_id                      integer;
-    DECLARE _coupon_discount                decimal(24, 4);
-    
+    DECLARE _coupon_discount                decimal(24, 4);    
 BEGIN        
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
+        RETURN 0;
+    END IF;
+
     _default_currency_code                  := core.get_currency_code_by_office_id(_office_id);
     _cash_account_id                        := inventory.get_cash_account_id_by_store_id(_store_id);
     _cash_repository_id                     := inventory.get_cash_repository_id_by_store_id(_store_id);

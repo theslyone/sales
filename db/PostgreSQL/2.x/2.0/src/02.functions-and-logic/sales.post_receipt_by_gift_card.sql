@@ -55,6 +55,10 @@ $$
     DECLARE _is_cash                            boolean;
     DECLARE _gift_card_payable_account_id       integer;
 BEGIN        
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) THEN
+        RETURN 0;
+    END IF;
+
     _gift_card_payable_account_id           := sales.get_payable_account_for_gift_card(_gift_card_id);
     _debit                                  := _amount;
     _lc_debit                               := _amount * _exchange_rate_debit;

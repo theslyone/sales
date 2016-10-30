@@ -53,9 +53,19 @@ CREATE TABLE sales.late_fee
     late_fee_name                           national character varying(500) NOT NULL,
     is_flat_amount                          boolean NOT NULL DEFAULT(false),
     rate                                    numeric(24,4) NOT NULL,
+	account_id 								bigint NOT NULL REFERENCES finance.accounts,
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
 	deleted									boolean DEFAULT(false)
+);
+
+CREATE TABLE sales.late_fee_postings
+(
+	transaction_master_id               	bigint PRIMARY KEY REFERENCES finance.transaction_master,
+	customer_id                         	bigint NOT NULL REFERENCES inventory.customers,
+	value_date                          	date NOT NULL,
+	late_fee_tran_id                    	bigint NOT NULL REFERENCES finance.transaction_master,
+	amount                              	public.money_strict
 );
 
 CREATE TABLE sales.price_types
@@ -320,6 +330,7 @@ AS
     discount            public.money_strict2,
     shipping_charge     public.money_strict2
 );
+
 
 
 
@@ -724,6 +735,10 @@ $$
     DECLARE _lc_debit                           public.money_strict2;
     DECLARE _lc_credit                          public.money_strict2;
 BEGIN
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) THEN
+        RETURN 0;
+    END IF;
+
     IF(_tender < _receivable) THEN
         RAISE EXCEPTION 'The tendered amount must be greater than or equal to sales amount';
     END IF;
@@ -849,6 +864,10 @@ $$
     DECLARE _lc_debit                           public.money_strict2;
     DECLARE _lc_credit                          public.money_strict2;
 BEGIN            
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) THEN
+        RETURN 0;
+    END IF;
+
     _debit                                  := _check_amount;
     _lc_debit                               := _check_amount * _exchange_rate_debit;
 
@@ -909,6 +928,227 @@ $$
 LANGUAGE plpgsql;
 
 --SELECT * FROM sales.post_check_receipt(1, 1, 1, 1, 1, 1, 'USD', 'USD', 'USD', 1, 1, '', '', 1, '1-1-2020', '1-1-2020', 2000, '', '', '1-1-2020', null);
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.post_late_fee.sql --<--<--
+DROP FUNCTION IF EXISTS sales.post_late_fee(_user_id integer, _login_id bigint, _office_id integer, _value_date date);
+
+CREATE FUNCTION sales.post_late_fee(_user_id integer, _login_id bigint, _office_id integer, _value_date date)
+RETURNS void
+VOLATILE
+AS
+$$
+    DECLARE this                        RECORD;
+    DECLARE _transaction_master_id      bigint;
+    DECLARE _tran_counter               integer;
+    DECLARE _transaction_code           text;
+    DECLARE _default_currency_code      national character varying(12);
+    DECLARE _book_name                  national character varying(100) = 'Late Fee';
+BEGIN
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
+        RETURN;
+    END IF;
+
+    DROP TABLE IF EXISTS temp_late_fee;
+
+    CREATE TEMPORARY TABLE temp_late_fee
+    (
+        transaction_master_id           bigint,
+        value_date                      date,
+        payment_term_id                 integer,
+        payment_term_code               text,
+        payment_term_name               text,        
+        due_on_date                     boolean,
+        due_days                        integer,
+        due_frequency_id                integer,
+        grace_period                    integer,
+        late_fee_id                     integer,
+        late_fee_posting_frequency_id   integer,
+        late_fee_code                   text,
+        late_fee_name                   text,
+        is_flat_amount                  boolean,
+        rate                            numeric(24, 4),
+        due_amount                      public.money_strict2,
+        late_fee                        public.money_strict2,
+        customer_id                        bigint,
+        customer_account_id                bigint,
+        late_fee_account_id             bigint,
+        due_date                        date
+    ) ON COMMIT DROP;
+
+    WITH unpaid_invoices
+    AS
+    (
+        SELECT 
+             finance.transaction_master.transaction_master_id, 
+             finance.transaction_master.value_date,
+             sales.sales.payment_term_id,
+             sales.payment_terms.payment_term_code,
+             sales.payment_terms.payment_term_name,
+             sales.payment_terms.due_on_date,
+             sales.payment_terms.due_days,
+             sales.payment_terms.due_frequency_id,
+             sales.payment_terms.grace_period,
+             sales.payment_terms.late_fee_id,
+             sales.payment_terms.late_fee_posting_frequency_id,
+             sales.late_fee.late_fee_code,
+             sales.late_fee.late_fee_name,
+             sales.late_fee.is_flat_amount,
+             sales.late_fee.rate,
+            0.00 as due_amount,
+            0.00 as late_fee,
+             sales.sales.customer_id,
+            inventory.get_account_id_by_customer_id(sales.sales.customer_id) AS customer_account_id,
+             sales.late_fee.account_id AS late_fee_account_id
+        FROM  inventory.checkouts
+        INNER JOIN sales.sales
+        ON sales.sales.checkout_id = inventory.checkouts.checkout_id
+        INNER JOIN  finance.transaction_master
+        ON  finance.transaction_master.transaction_master_id =  inventory.checkouts.transaction_master_id
+        INNER JOIN  sales.payment_terms
+        ON  sales.payment_terms.payment_term_id =  sales.sales.payment_term_id
+        INNER JOIN  sales.late_fee
+        ON  sales.payment_terms.late_fee_id =  sales.late_fee.late_fee_id
+        WHERE  finance.transaction_master.verification_status_id > 0
+        AND  finance.transaction_master.book = ANY(ARRAY['Sales.Delivery', 'Sales.Direct'])
+        AND  sales.sales.is_credit AND NOT  sales.sales.credit_settled
+        AND  sales.sales.payment_term_id IS NOT NULL
+        AND  sales.payment_terms.late_fee_id IS NOT NULL
+        AND  finance.transaction_master.transaction_master_id NOT IN
+        (
+            SELECT  sales.late_fee_postings.transaction_master_id        --We have already posted the late fee before.
+            FROM  sales.late_fee_postings
+        )
+    ), 
+    unpaid_invoices_details
+    AS
+    (
+        SELECT *, 
+        CASE WHEN unpaid_invoices.due_on_date
+        THEN unpaid_invoices.value_date + unpaid_invoices.due_days + unpaid_invoices.grace_period
+        ELSE finance.get_frequency_end_date(unpaid_invoices.due_frequency_id, unpaid_invoices.value_date) +  unpaid_invoices.grace_period END as due_date
+        FROM unpaid_invoices
+    )
+
+
+    INSERT INTO temp_late_fee
+    SELECT * FROM unpaid_invoices_details
+    WHERE unpaid_invoices_details.due_date <= _value_date;
+
+
+    UPDATE temp_late_fee
+    SET due_amount = 
+    (
+        SELECT
+            SUM
+            (
+                (inventory.checkout_details.quantity * inventory.checkout_details.price) 
+                - 
+                inventory.checkout_details.discount 
+                + 
+                inventory.checkout_details.shipping_charge
+            )
+        FROM inventory.checkout_details
+        INNER JOIN  inventory.checkouts
+        ON  inventory.checkouts. checkout_id = inventory.checkout_details. checkout_id
+        WHERE  inventory.checkouts.transaction_master_id = temp_late_fee.transaction_master_id
+    ) WHERE NOT temp_late_fee.is_flat_amount;
+
+    UPDATE temp_late_fee
+    SET late_fee = temp_late_fee.rate
+    WHERE temp_late_fee.is_flat_amount;
+
+    UPDATE temp_late_fee
+    SET late_fee = temp_late_fee.due_amount * temp_late_fee.rate / 100
+    WHERE NOT temp_late_fee.is_flat_amount;
+
+    _default_currency_code                  :=  core.get_currency_code_by_office_id(_office_id);
+
+    FOR this IN
+    SELECT * FROM temp_late_fee
+    WHERE temp_late_fee.late_fee > 0
+    AND temp_late_fee.customer_account_id IS NOT NULL
+    AND temp_late_fee.late_fee_account_id IS NOT NULL
+    LOOP
+        _transaction_master_id  := nextval(pg_get_serial_sequence(' finance.transaction_master', 'transaction_master_id'));
+        _tran_counter           :=  finance.get_new_transaction_counter(_value_date);
+        _transaction_code       :=  finance.get_transaction_code(_value_date, _office_id, _user_id, _login_id);
+
+        INSERT INTO  finance.transaction_master
+        (
+            transaction_master_id, 
+            transaction_counter, 
+            transaction_code, 
+            book, 
+            value_date, 
+            user_id, 
+            office_id, 
+            reference_number,
+            statement_reference,
+            verification_status_id,
+            verified_by_user_id,
+            verification_reason
+        ) 
+        SELECT            
+            _transaction_master_id, 
+            _tran_counter, 
+            _transaction_code, 
+            _book_name, 
+            _value_date, 
+            _user_id, 
+            _office_id,             
+            this.transaction_master_id::text AS reference_number,
+            this.late_fee_name AS statement_reference,
+            1,
+            _user_id,
+            'Automatically verified by workflow.';
+
+        INSERT INTO  finance.transaction_details
+        (
+            transaction_master_id,
+            value_date,
+            tran_type, 
+            account_id, 
+            statement_reference, 
+            currency_code, 
+            amount_in_currency, 
+            er, 
+            local_currency_code, 
+            amount_in_local_currency
+        )
+        SELECT
+            _transaction_master_id,
+            _value_date,
+            'Cr',
+            this.late_fee_account_id,
+            this.late_fee_name || ' (' || core.get_customer_code_by_customer_id(this.customer_id) || ')',
+            _default_currency_code, 
+            this.late_fee, 
+            1 AS exchange_rate,
+            _default_currency_code,
+            this.late_fee
+        UNION ALL
+        SELECT
+            _transaction_master_id,
+            _value_date,
+            'Dr',
+            this.customer_account_id,
+            this.late_fee_name,
+            _default_currency_code, 
+            this.late_fee, 
+            1 AS exchange_rate,
+            _default_currency_code,
+            this.late_fee;
+
+        INSERT INTO  sales.late_fee(transaction_master_id, customer_id, value_date, late_fee_tran_id, amount)
+        SELECT this.transaction_master_id, this.customer_id, _value_date, _transaction_master_id, this.late_fee;
+    END LOOP;
+END
+$$
+LANGUAGE plpgsql;
+
+SELECT  finance.create_routine('POST-LF', ' sales.post_late_fee', 250);
+
+--SELECT * FROM  sales.post_late_fee(2, 5, 2,  finance.get_value_date(2));
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.post_receipt.sql --<--<--
 DROP FUNCTION IF EXISTS sales.post_receipt
@@ -996,6 +1236,10 @@ $$
     DECLARE _gift_card_id                       integer;
     DECLARE _receivable_account_id              integer;
 BEGIN
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) THEN
+        RETURN 0;
+    END IF;
+
     IF(_cash_repository_id > 0 AND _cash_account_id > 0) THEN
         _is_cash                            := true;
     END IF;
@@ -1101,6 +1345,10 @@ $$
     DECLARE _is_cash                            boolean;
     DECLARE _gift_card_payable_account_id       integer;
 BEGIN        
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) THEN
+        RETURN 0;
+    END IF;
+
     _gift_card_payable_account_id           := sales.get_payable_account_for_gift_card(_gift_card_id);
     _debit                                  := _amount;
     _lc_debit                               := _amount * _exchange_rate_debit;
@@ -1200,6 +1448,7 @@ CREATE FUNCTION sales.post_return
 RETURNS bigint
 AS
 $$
+    DECLARE _book_name              national character varying = 'Sales Return';
     DECLARE _customer_id            bigint;
     DECLARE _cost_center_id         bigint;
     DECLARE _tran_master_id         bigint;
@@ -1215,6 +1464,10 @@ $$
     DECLARE _sales_id               bigint;
     DECLARE this                    RECORD;
 BEGIN
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) THEN
+        RETURN 0;
+    END IF;
+
     _default_currency_code          := core.get_currency_code_by_office_id(_office_id);
 
     SELECT sales.sales.sales_id 
@@ -1321,7 +1574,7 @@ BEGIN
     END IF;
 
 
-    INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er,amount_in_local_currency) 
+    INSERT INTO finance.transaction_details(transaction_master_id, book, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er,amount_in_local_currency) 
     SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Dr', sales_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)), _default_currency_code, 1, SUM(COALESCE(price, 0) * COALESCE(quantity, 0))
     FROM temp_checkout_details
     GROUP BY sales_account_id;
@@ -1329,7 +1582,7 @@ BEGIN
 
     IF(_discount_total IS NOT NULL AND _discount_total > 0) THEN
         INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
-        SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Cr', sales_discount_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(discount, 0)), _default_currency_code, 1, SUM(COALESCE(discount, 0))
+        SELECT _tran_master_id, _book_name, _office_id, _value_date, _book_date, 'Cr', sales_discount_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(discount, 0)), _default_currency_code, 1, SUM(COALESCE(discount, 0))
         FROM temp_checkout_details
         GROUP BY sales_discount_account_id;
     END IF;
@@ -1347,7 +1600,7 @@ BEGIN
 
 
     INSERT INTO inventory.checkouts(checkout_id, transaction_book, value_date, book_date, transaction_master_id, office_id, posted_by) 
-    SELECT _checkout_id, 'Sales Return', _value_date, _book_date, _tran_master_id, _office_id, _user_id;
+    SELECT _checkout_id, _book_name, _value_date, _book_date, _tran_master_id, _office_id, _user_id;
 
 
     INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount)
@@ -1475,9 +1728,12 @@ $$
     DECLARE _gift_card_id                   integer;
     DECLARE _gift_card_balance              decimal(24, 4);
     DECLARE _coupon_id                      integer;
-    DECLARE _coupon_discount                decimal(24, 4);
-    
+    DECLARE _coupon_discount                decimal(24, 4);    
 BEGIN        
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
+        RETURN 0;
+    END IF;
+
     _default_currency_code                  := core.get_currency_code_by_office_id(_office_id);
     _cash_account_id                        := inventory.get_cash_account_id_by_store_id(_store_id);
     _cash_repository_id                     := inventory.get_cash_repository_id_by_store_id(_store_id);
@@ -1781,6 +2037,27 @@ LANGUAGE plpgsql;
 -- );
 -- 
 
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.refresh_materialized_views.sql --<--<--
+DROP FUNCTION IF EXISTS sales.refresh_materialized_views(_user_id integer, _login_id bigint, _office_id integer, _value_date date);
+
+CREATE FUNCTION sales.refresh_materialized_views(_user_id integer, _login_id bigint, _office_id integer, _value_date date)
+RETURNS void
+AS
+$$
+BEGIN
+    REFRESH MATERIALIZED VIEW finance.trial_balance_view;
+    REFRESH MATERIALIZED VIEW inventory.verified_checkout_view;
+    REFRESH MATERIALIZED VIEW finance.verified_transaction_mat_view;
+    REFRESH MATERIALIZED VIEW finance.verified_cash_transaction_mat_view;
+END
+$$
+LANGUAGE plpgsql;
+
+
+SELECT finance.create_routine('REF-MV', 'sales.refresh_materialized_views', 1000);
+
+--SELECT * FROM sales.refresh_materialized_views(1, 1, 1, '1-1-2000')
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.settle_customer_due.sql --<--<--
 DROP FUNCTION IF EXISTS sales.settle_customer_due(_customer_id bigint, _office_id integer);
@@ -2366,6 +2643,25 @@ BEGIN
     END IF;
 
     FOR this IN 
+    SELECT oid::regclass::text as mat_view
+    FROM   pg_class
+    WHERE  relkind = 'm'
+    LOOP
+        EXECUTE 'ALTER TABLE '|| this.mat_view ||' OWNER TO frapid_db_user;';
+    END LOOP;
+END
+$$
+LANGUAGE plpgsql;
+
+DO
+$$
+    DECLARE this record;
+BEGIN
+    IF(CURRENT_USER = 'frapid_db_user') THEN
+        RETURN;
+    END IF;
+
+    FOR this IN 
     SELECT 'ALTER '
         || CASE WHEN p.proisagg THEN 'AGGREGATE ' ELSE 'FUNCTION ' END
         || quote_ident(n.nspname) || '.' || quote_ident(p.proname) || '(' 
@@ -2527,3 +2823,5 @@ BEGIN
 END
 $$
 LANGUAGE plpgsql;
+
+

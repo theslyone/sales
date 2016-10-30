@@ -1,5 +1,6 @@
-INSERT INTO sales.late_fee(late_fee_code, late_fee_name, is_flat_amount, rate)
-SELECT '15F', '15% fine', false, 15;
+INSERT INTO sales.late_fee(late_fee_code, late_fee_name, is_flat_amount, rate, account_id)
+SELECT '15F', '15% fine', false, 15, finance.get_account_id_by_account_number('30300');
+
 
 INSERT INTO sales.price_types(price_type_code, price_type_name)
 SELECT 'RET', 'Retail'      UNION ALL
@@ -12,3 +13,4 @@ SELECT '30DC', '30 day credit', true,   30, 7, sales.get_late_fee_id_by_late_fee
 
 INSERT INTO sales.gift_cards(gift_card_number, payable_account_id, first_name, middle_name, last_name)
 SELECT '123456', finance.get_account_id_by_account_number('20100'), 'John', '', 'Doe';
+

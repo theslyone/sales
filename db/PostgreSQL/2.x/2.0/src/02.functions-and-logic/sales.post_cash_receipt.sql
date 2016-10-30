@@ -57,6 +57,10 @@ $$
     DECLARE _lc_debit                           public.money_strict2;
     DECLARE _lc_credit                          public.money_strict2;
 BEGIN
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) THEN
+        RETURN 0;
+    END IF;
+
     IF(_tender < _receivable) THEN
         RAISE EXCEPTION 'The tendered amount must be greater than or equal to sales amount';
     END IF;

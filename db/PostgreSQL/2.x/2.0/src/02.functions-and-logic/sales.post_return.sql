@@ -34,6 +34,7 @@ CREATE FUNCTION sales.post_return
 RETURNS bigint
 AS
 $$
+    DECLARE _book_name              national character varying = 'Sales Return';
     DECLARE _customer_id            bigint;
     DECLARE _cost_center_id         bigint;
     DECLARE _tran_master_id         bigint;
@@ -49,6 +50,10 @@ $$
     DECLARE _sales_id               bigint;
     DECLARE this                    RECORD;
 BEGIN
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) THEN
+        RETURN 0;
+    END IF;
+
     _default_currency_code          := core.get_currency_code_by_office_id(_office_id);
 
     SELECT sales.sales.sales_id 
@@ -155,7 +160,7 @@ BEGIN
     END IF;
 
 
-    INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er,amount_in_local_currency) 
+    INSERT INTO finance.transaction_details(transaction_master_id, book, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er,amount_in_local_currency) 
     SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Dr', sales_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)), _default_currency_code, 1, SUM(COALESCE(price, 0) * COALESCE(quantity, 0))
     FROM temp_checkout_details
     GROUP BY sales_account_id;
@@ -163,7 +168,7 @@ BEGIN
 
     IF(_discount_total IS NOT NULL AND _discount_total > 0) THEN
         INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
-        SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Cr', sales_discount_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(discount, 0)), _default_currency_code, 1, SUM(COALESCE(discount, 0))
+        SELECT _tran_master_id, _book_name, _office_id, _value_date, _book_date, 'Cr', sales_discount_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(discount, 0)), _default_currency_code, 1, SUM(COALESCE(discount, 0))
         FROM temp_checkout_details
         GROUP BY sales_discount_account_id;
     END IF;
@@ -181,7 +186,7 @@ BEGIN
 
 
     INSERT INTO inventory.checkouts(checkout_id, transaction_book, value_date, book_date, transaction_master_id, office_id, posted_by) 
-    SELECT _checkout_id, 'Sales Return', _value_date, _book_date, _tran_master_id, _office_id, _user_id;
+    SELECT _checkout_id, _book_name, _value_date, _book_date, _tran_master_id, _office_id, _user_id;
 
 
     INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount)

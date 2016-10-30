@@ -83,6 +83,10 @@ $$
     DECLARE _gift_card_id                       integer;
     DECLARE _receivable_account_id              integer;
 BEGIN
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) THEN
+        RETURN 0;
+    END IF;
+
     IF(_cash_repository_id > 0 AND _cash_account_id > 0) THEN
         _is_cash                            := true;
     END IF;
