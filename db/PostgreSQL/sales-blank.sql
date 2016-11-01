@@ -212,7 +212,7 @@ CREATE TABLE sales.coupons
     coupon_id                                   SERIAL PRIMARY KEY,
     coupon_name                                 national character varying(100) NOT NULL,
     coupon_code                                 national character varying(100) NOT NULL,
-    discount_rate                               public.decimal_strict,
+    discount_rate                               public.decimal_strict NOT NULL,
     is_percentage                               boolean NOT NULL DEFAULT(false),
     maximum_discount_amount                     public.decimal_strict,
     associated_price_type_id                    integer REFERENCES sales.price_types,
@@ -248,6 +248,7 @@ CREATE TABLE sales.sales
     counter_id                              integer NOT NULL REFERENCES inventory.counters,
     customer_id                             integer REFERENCES inventory.customers,
 	salesperson_id							integer REFERENCES account.users,
+	total_amount							public.money_strict NOT NULL,
 	coupon_id								integer REFERENCES sales.coupons,
 	is_flat_discount						boolean,
 	discount								public.decimal_strict2,
@@ -257,6 +258,7 @@ CREATE TABLE sales.sales
     payment_term_id                         integer REFERENCES sales.payment_terms,
     tender                                  decimal(24, 4) NOT NULL CHECK(tender > 0),
     change                                  decimal(24, 4) NOT NULL,
+    gift_card_id                            integer REFERENCES sales.gift_cards,
     check_number                            national character varying(100),
     check_date                              date,
     check_bank_name                         national character varying(1000),
@@ -265,7 +267,7 @@ CREATE TABLE sales.sales
     check_clear_date                        date,   
     check_clearing_memo                     national character varying(1000),
     check_clearing_transaction_master_id    integer REFERENCES finance.transaction_master,
-    gift_card_id                            integer REFERENCES sales.gift_cards
+	reward_points							numeric(24, 4) NOT NULL DEFAULT(0)
 );
 
 CREATE TABLE sales.customer_receipts
@@ -273,7 +275,7 @@ CREATE TABLE sales.customer_receipts
     receipt_id                              BIGSERIAL PRIMARY KEY,
     transaction_master_id                   bigint NOT NULL REFERENCES finance.transaction_master,
     customer_id                             bigint NOT NULL REFERENCES inventory.customers,
-    currency_code                           national character varying(12) NOT NULL REFERENCES finance.currencies,
+    currency_code                           national character varying(12) NOT NULL REFERENCES core.currencies,
     er_debit                                decimal_strict NOT NULL,
     er_credit                               decimal_strict NOT NULL,
     cash_repository_id                      integer NULL REFERENCES finance.cash_repositories,
@@ -324,7 +326,7 @@ AS
     store_id            integer,
 	transaction_type	national character varying(2),
     item_id           	integer,
-    quantity            public.integer_strict,
+    quantity            public.decimal_strict,
     unit_id           	integer,
     price               public.money_strict,
     discount            public.money_strict2,
@@ -453,6 +455,108 @@ END
 $$
 LANGUAGE plpgsql;
 
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_avaiable_coupons_to_print.sql --<--<--
+DROP FUNCTION IF EXISTS sales.get_avaiable_coupons_to_print(_tran_id bigint);
+
+CREATE FUNCTION sales.get_avaiable_coupons_to_print(_tran_id bigint)
+RETURNS TABLE
+(
+    coupon_id               integer
+)
+AS
+$$
+    DECLARE _price_type_id                  integer;
+    DECLARE _total_amount                   public.money_strict;
+    DECLARE _customer_id                    integer;
+BEGIN
+    DROP TABLE IF EXISTS temp_coupons;
+    CREATE TEMPORARY TABLE temp_coupons
+    (
+        coupon_id                           integer,
+        maximum_usage                       public.integer_strict,
+        total_used                          integer
+    ) ON COMMIT DROP;
+    
+    SELECT
+        sales.sales.price_type_id,
+        sales.sales.total_amount,
+        sales.sales.customer_id
+    INTO
+        _price_type_id,
+        _total_amount,
+        _customer_id
+    FROM sales.sales
+    WHERE sales.sales.transaction_master_id = _tran_id;
+
+
+    INSERT INTO temp_coupons
+    SELECT sales.coupons.coupon_id, sales.coupons.maximum_usage
+    FROM sales.coupons
+    WHERE NOT sales.coupons.deleted
+    AND sales.coupons.enable_ticket_printing = true
+    AND (sales.coupons.begins_from IS NULL OR sales.coupons.begins_from >= NOW()::date)
+    AND (sales.coupons.expires_on IS NULL OR sales.coupons.expires_on <= NOW()::date)
+    AND sales.coupons.for_ticket_of_price_type_id IS NULL
+    AND COALESCE(sales.coupons.for_ticket_having_minimum_amount, 0) = 0
+    AND COALESCE(sales.coupons.for_ticket_having_maximum_amount, 0) = 0
+    AND sales.coupons.for_ticket_of_unknown_customers_only IS NULL;
+
+    INSERT INTO temp_coupons
+    SELECT sales.coupons.coupon_id, sales.coupons.maximum_usage
+    FROM sales.coupons
+    WHERE NOT sales.coupons.deleted
+    AND sales.coupons.enable_ticket_printing = true
+    AND (sales.coupons.begins_from IS NULL OR sales.coupons.begins_from >= NOW()::date)
+    AND (sales.coupons.expires_on IS NULL OR sales.coupons.expires_on <= NOW()::date)
+    AND (sales.coupons.for_ticket_of_price_type_id IS NULL OR for_ticket_of_price_type_id = _price_type_id)
+    AND (sales.coupons.for_ticket_having_minimum_amount IS NULL OR sales.coupons.for_ticket_having_minimum_amount <= _total_amount)
+    AND (sales.coupons.for_ticket_having_maximum_amount IS NULL OR sales.coupons.for_ticket_having_maximum_amount >= _total_amount)
+    AND sales.coupons.for_ticket_of_unknown_customers_only IS NULL;
+
+    IF(COALESCE(_customer_id, 0) > 0) THEN
+        INSERT INTO temp_coupons
+        SELECT sales.coupons.coupon_id, sales.coupons.maximum_usage
+        FROM sales.coupons
+        WHERE NOT sales.coupons.deleted
+        AND sales.coupons.enable_ticket_printing = true
+        AND (sales.coupons.begins_from IS NULL OR sales.coupons.begins_from >= NOW()::date)
+        AND (sales.coupons.expires_on IS NULL OR sales.coupons.expires_on <= NOW()::date)
+        AND (sales.coupons.for_ticket_of_price_type_id IS NULL OR for_ticket_of_price_type_id = _price_type_id)
+        AND (sales.coupons.for_ticket_having_minimum_amount IS NULL OR sales.coupons.for_ticket_having_minimum_amount <= _total_amount)
+        AND (sales.coupons.for_ticket_having_maximum_amount IS NULL OR sales.coupons.for_ticket_having_maximum_amount >= _total_amount)
+        AND NOT sales.coupons.for_ticket_of_unknown_customers_only;
+    ELSE
+        INSERT INTO temp_coupons
+        SELECT sales.coupons.coupon_id, sales.coupons.maximum_usage
+        FROM sales.coupons
+        WHERE NOT sales.coupons.deleted
+        AND sales.coupons.enable_ticket_printing = true
+        AND (sales.coupons.begins_from IS NULL OR sales.coupons.begins_from >= NOW()::date)
+        AND (sales.coupons.expires_on IS NULL OR sales.coupons.expires_on <= NOW()::date)
+        AND (sales.coupons.for_ticket_of_price_type_id IS NULL OR for_ticket_of_price_type_id = _price_type_id)
+        AND (sales.coupons.for_ticket_having_minimum_amount IS NULL OR sales.coupons.for_ticket_having_minimum_amount <= _total_amount)
+        AND (sales.coupons.for_ticket_having_maximum_amount IS NULL OR sales.coupons.for_ticket_having_maximum_amount >= _total_amount)
+        AND sales.coupons.for_ticket_of_unknown_customers_only;    
+    END IF;
+
+    UPDATE temp_coupons
+    SET total_used = 
+    (
+        SELECT COUNT(*)
+        FROM sales.sales
+        WHERE sales.sales.coupon_id = temp_coupons.coupon_id 
+    );
+
+    DELETE FROM temp_coupons WHERE total_used > maximum_usage;
+    
+    RETURN QUERY
+    SELECT temp_coupons.coupon_id FROM temp_coupons;
+END
+$$
+LANGUAGE plpgsql;
+
+--SELECT * FROM sales.get_avaiable_coupons_to_print(29);
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_balance.sql --<--<--
 DROP FUNCTION IF EXISTS sales.get_gift_card_balance(_gift_card_id integer, _value_date date);
@@ -944,10 +1048,6 @@ $$
     DECLARE _default_currency_code      national character varying(12);
     DECLARE _book_name                  national character varying(100) = 'Late Fee';
 BEGIN
-    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
-        RETURN;
-    END IF;
-
     DROP TABLE IF EXISTS temp_late_fee;
 
     CREATE TEMPORARY TABLE temp_late_fee
@@ -1720,7 +1820,6 @@ $$
     DECLARE _tran_counter                   integer;
     DECLARE _transaction_code               text;
     DECLARE _shipping_charge                money_strict2;
-    DECLARE this                            RECORD;
     DECLARE _cash_repository_id             integer;
     DECLARE _cash_account_id                integer;
     DECLARE _is_cash                        boolean = false;
@@ -1728,7 +1827,9 @@ $$
     DECLARE _gift_card_id                   integer;
     DECLARE _gift_card_balance              decimal(24, 4);
     DECLARE _coupon_id                      integer;
-    DECLARE _coupon_discount                decimal(24, 4);    
+    DECLARE _coupon_discount                decimal(24, 4); 
+    DECLARE _default_discount_account_id    integer;   
+    DECLARE this                            RECORD;
 BEGIN        
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
         RETURN 0;
@@ -1762,11 +1863,11 @@ BEGIN
     CREATE TEMPORARY TABLE temp_checkout_details
     (
         id                              SERIAL PRIMARY KEY,
-        checkout_id                 bigint, 
+        checkout_id                     bigint, 
         tran_type                       national character varying(2), 
         store_id                        integer,
         item_id                         integer, 
-        quantity                        integer_strict,        
+        quantity                        public.decimal_strict,        
         unit_id                         integer,
         base_quantity                   decimal,
         base_unit_id                    integer,                
@@ -1838,9 +1939,9 @@ BEGIN
     
     IF EXISTS
     (
-            SELECT 1 FROM temp_checkout_details AS details
-            WHERE inventory.is_valid_unit_id(details.unit_id, details.item_id) = false
-            LIMIT 1
+        SELECT 1 FROM temp_checkout_details AS details
+        WHERE inventory.is_valid_unit_id(details.unit_id, details.item_id) = false
+        LIMIT 1
     ) THEN
         RAISE EXCEPTION 'Item/unit mismatch.'
         USING ERRCODE='P3201';
@@ -1936,7 +2037,17 @@ BEGIN
         INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
         SELECT 'Dr', sales_discount_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(discount, 0)), 1, _default_currency_code, SUM(COALESCE(discount, 0))
         FROM temp_checkout_details
-        GROUP BY sales_discount_account_id;
+        GROUP BY sales_discount_account_id
+        HAVING SUM(COALESCE(discount, 0)) > 0;
+    END IF;
+
+    IF(_coupon_discount > 0) THEN
+        SELECT inventory.inventory_setup.default_discount_account_id INTO _default_discount_account_id
+        FROM inventory.inventory_setup
+        WHERE inventory.inventory_setup.office_id = _office_id;
+
+        INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
+        SELECT 'Dr', _default_discount_account_id, _statement_reference, _default_currency_code, _coupon_discount, 1, _default_currency_code, _coupon_discount;
     END IF;
 
     INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
@@ -1974,8 +2085,8 @@ BEGIN
     END LOOP;
 
 
-    INSERT INTO sales.sales(price_type_id, counter_id, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
-    SELECT _price_type_id, _counter_id, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id;
+    INSERT INTO sales.sales(price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
+    SELECT _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id;
     
     
     PERFORM finance.auto_verify(_transaction_master_id, _office_id);
@@ -2024,18 +2135,18 @@ LANGUAGE plpgsql;
 
 -- SELECT * FROM sales.post_sales
 -- (
---     1, 1, 1, 1, '1-1-2020', '1-1-2020', 1, 'asdf', 'Test', 
---     500000,2000, 1, 500000, 'Bank', 'C001', '1-1-2020', '234234234',
+--     1, 1, 1, 1, finance.get_value_date(1), finance.get_value_date(1), 1, 'asdf', 'Test', 
+--     500000,2000, null, null, null, null, null, null,
 --     inventory.get_customer_id_by_customer_code('DEF'), 1, 1, 1,
---     '', true, 1000,
+--     null, true, 1000,
 --     ARRAY[
---     ROW(1, 'Dr', 1, 1, 1,180000, 0, 200)::sales.sales_detail_type,
---     ROW(1, 'Dr', 2, 1, 7,130000, 300, 30)::sales.sales_detail_type,
---     ROW(1, 'Dr', 3, 1, 1,110000, 5000, 50)::sales.sales_detail_type],
+--     ROW(1, 'Dr', 1, 1, 1,180000, 0, 0)::sales.sales_detail_type,
+--     ROW(1, 'Dr', 2, 1, 7,130000, 0, 0)::sales.sales_detail_type,
+--     ROW(1, 'Dr', 3, 1, 1,110000, 0, 0)::sales.sales_detail_type],
 --     NULL,
 --     NULL
 -- );
--- 
+
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.refresh_materialized_views.sql --<--<--
@@ -2577,6 +2688,41 @@ WHERE NOT sales.payment_terms.deleted;
 
 
 
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.views/sales.coupon_view.sql --<--<--
+DROP VIEW IF EXISTS sales.coupon_view;
+
+CREATE VIEW sales.coupon_view
+AS
+SELECT
+    sales.coupons.coupon_id,
+    sales.coupons.coupon_code,
+    sales.coupons.coupon_name,
+    sales.coupons.discount_rate,
+    sales.coupons.is_percentage,
+    sales.coupons.maximum_discount_amount,
+    sales.coupons.associated_price_type_id,
+    associated_price_type.price_type_code AS associated_price_type_code,
+    associated_price_type.price_type_name AS associated_price_type_name,
+    sales.coupons.minimum_purchase_amount,
+    sales.coupons.maximum_purchase_amount,
+    sales.coupons.begins_from,
+    sales.coupons.expires_on,
+    sales.coupons.maximum_usage,
+    sales.coupons.enable_ticket_printing,
+    sales.coupons.for_ticket_of_price_type_id,
+    for_ticket_of_price_type.price_type_code AS for_ticket_of_price_type_code,
+    for_ticket_of_price_type.price_type_name AS for_ticket_of_price_type_name,
+    sales.coupons.for_ticket_having_minimum_amount,
+    sales.coupons.for_ticket_having_maximum_amount,
+    sales.coupons.for_ticket_of_unknown_customers_only
+FROM sales.coupons
+LEFT JOIN sales.price_types AS associated_price_type
+ON associated_price_type.price_type_id = sales.coupons.associated_price_type_id
+LEFT JOIN sales.price_types AS for_ticket_of_price_type
+ON for_ticket_of_price_type.price_type_id = sales.coupons.for_ticket_of_price_type_id;
+
+
+
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.views/sales.item_view.sql --<--<--
 DROP VIEW IF EXISTS sales.item_view;
 
@@ -2599,7 +2745,7 @@ SELECT
     inventory.units.unit_code,
     inventory.units.unit_name,
     inventory.items.hot_item,
-    inventory.items.cost_price,
+    inventory.items.selling_price,
     inventory.items.photo
 FROM inventory.items
 INNER JOIN inventory.item_groups
@@ -2613,6 +2759,89 @@ ON inventory.units.unit_id = inventory.items.unit_id
 WHERE NOT inventory.items.deleted
 AND inventory.items.allow_sales;
 
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.views/sales.sales_view.sql --<--<--
+DROP VIEW IF EXISTS sales.sales_view;
+
+CREATE VIEW sales.sales_view
+AS
+SELECT
+    sales.sales.sales_id,
+    sales.sales.transaction_master_id,
+    finance.transaction_master.transaction_code,
+    finance.transaction_master.transaction_counter,
+    finance.transaction_master.value_date,
+    finance.transaction_master.book_date,
+    finance.transaction_master.transaction_ts,
+    finance.transaction_master.verification_status_id,
+    finance.verification_statuses.verification_status_name,
+    finance.transaction_master.verified_by_user_id,
+    account.get_name_by_user_id(finance.transaction_master.verified_by_user_id) AS verified_by,
+    sales.sales.checkout_id,
+    inventory.checkouts.discount,
+    inventory.checkouts.posted_by,
+    account.get_name_by_user_id(inventory.checkouts.posted_by) AS posted_by_name,
+    inventory.checkouts.office_id,
+    inventory.checkouts.cancelled,
+    inventory.checkouts.cancellation_reason,    
+    sales.sales.cash_repository_id,
+    sales.sales.price_type_id,    
+    sales.sales.counter_id,
+    inventory.counters.counter_code,
+    inventory.counters.counter_name,
+    inventory.counters.store_id,
+    inventory.stores.store_code,
+    inventory.stores.store_name,
+    sales.sales.customer_id,
+    inventory.customers.customer_name,
+    sales.sales.salesperson_id,
+    account.get_name_by_user_id(sales.sales.salesperson_id) as salesperson_name,
+    sales.sales.gift_card_id,
+    sales.gift_cards.gift_card_number,
+    sales.gift_cards.first_name || ' ' || sales.gift_cards.middle_name || ' ' || sales.gift_cards.last_name AS gift_card_owner,
+    sales.sales.coupon_id,
+    sales.coupons.coupon_code,
+    sales.coupons.coupon_name,
+    sales.sales.is_flat_discount,
+    sales.sales.total_discount_amount,
+    sales.sales.is_credit,
+    sales.sales.payment_term_id,
+    sales.payment_terms.payment_term_code,
+    sales.payment_terms.payment_term_name,
+    sales.sales.tender,
+    sales.sales.change,
+    sales.sales.check_number,
+    sales.sales.check_date,
+    sales.sales.check_bank_name,
+    sales.sales.check_amount,
+    sales.sales.reward_points
+FROM sales.sales
+INNER JOIN inventory.checkouts
+ON inventory.checkouts.checkout_id = sales.sales.checkout_id
+INNER JOIN finance.transaction_master
+ON finance.transaction_master.transaction_master_id = inventory.checkouts.transaction_master_id
+INNER JOIN finance.cash_repositories
+ON finance.cash_repositories.cash_repository_id = sales.sales.cash_repository_id
+INNER JOIN sales.price_types
+ON sales.price_types.price_type_id = sales.sales.price_type_id
+INNER JOIN inventory.counters
+ON inventory.counters.counter_id = sales.sales.counter_id
+INNER JOIN inventory.stores
+ON inventory.stores.store_id = inventory.counters.store_id
+INNER JOIN inventory.customers
+ON inventory.customers.customer_id = sales.sales.customer_id
+LEFT JOIN sales.gift_cards
+ON sales.gift_cards.gift_card_id = sales.sales.gift_card_id
+LEFT JOIN sales.payment_terms
+ON sales.payment_terms.payment_term_id = sales.sales.payment_term_id
+LEFT JOIN sales.coupons
+ON sales.coupons.coupon_id = sales.sales.coupon_id
+LEFT JOIN finance.verification_statuses
+ON finance.verification_statuses.verification_status_id = finance.transaction_master.verification_status_id
+WHERE NOT finance.transaction_master.deleted;
+
+
+--SELECT * FROM sales.sales_view
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/99.ownership.sql --<--<--
 DO

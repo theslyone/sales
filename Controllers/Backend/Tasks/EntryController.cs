@@ -1,3 +1,5 @@
+using System;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Frapid.ApplicationState.Cache;
@@ -44,8 +46,15 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
             model.OfficeId = meta.OfficeId;
             model.LoginId = meta.LoginId;
 
-            long tranId = await DAL.Backend.Tasks.Sales.PostAsync(this.Tenant, model).ConfigureAwait(true);
-            return this.Ok(tranId);
+            try
+            {
+                long tranId = await DAL.Backend.Tasks.SalesEntries.PostAsync(this.Tenant, model).ConfigureAwait(true);
+                return this.Ok(tranId);
+            }
+            catch (Exception ex)
+            {
+                return this.Failed(ex.Message, HttpStatusCode.InternalServerError);
+            }
         }
     }
 }

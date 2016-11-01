@@ -12,10 +12,6 @@ $$
     DECLARE _default_currency_code      national character varying(12);
     DECLARE _book_name                  national character varying(100) = 'Late Fee';
 BEGIN
-    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
-        RETURN;
-    END IF;
-
     DROP TABLE IF EXISTS temp_late_fee;
 
     CREATE TEMPORARY TABLE temp_late_fee

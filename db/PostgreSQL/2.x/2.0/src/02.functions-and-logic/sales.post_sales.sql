@@ -76,7 +76,6 @@ $$
     DECLARE _tran_counter                   integer;
     DECLARE _transaction_code               text;
     DECLARE _shipping_charge                money_strict2;
-    DECLARE this                            RECORD;
     DECLARE _cash_repository_id             integer;
     DECLARE _cash_account_id                integer;
     DECLARE _is_cash                        boolean = false;
@@ -84,7 +83,9 @@ $$
     DECLARE _gift_card_id                   integer;
     DECLARE _gift_card_balance              decimal(24, 4);
     DECLARE _coupon_id                      integer;
-    DECLARE _coupon_discount                decimal(24, 4);    
+    DECLARE _coupon_discount                decimal(24, 4); 
+    DECLARE _default_discount_account_id    integer;   
+    DECLARE this                            RECORD;
 BEGIN        
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
         RETURN 0;
@@ -118,11 +119,11 @@ BEGIN
     CREATE TEMPORARY TABLE temp_checkout_details
     (
         id                              SERIAL PRIMARY KEY,
-        checkout_id                 bigint, 
+        checkout_id                     bigint, 
         tran_type                       national character varying(2), 
         store_id                        integer,
         item_id                         integer, 
-        quantity                        integer_strict,        
+        quantity                        public.decimal_strict,        
         unit_id                         integer,
         base_quantity                   decimal,
         base_unit_id                    integer,                
@@ -194,9 +195,9 @@ BEGIN
     
     IF EXISTS
     (
-            SELECT 1 FROM temp_checkout_details AS details
-            WHERE inventory.is_valid_unit_id(details.unit_id, details.item_id) = false
-            LIMIT 1
+        SELECT 1 FROM temp_checkout_details AS details
+        WHERE inventory.is_valid_unit_id(details.unit_id, details.item_id) = false
+        LIMIT 1
     ) THEN
         RAISE EXCEPTION 'Item/unit mismatch.'
         USING ERRCODE='P3201';
@@ -292,7 +293,17 @@ BEGIN
         INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
         SELECT 'Dr', sales_discount_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(discount, 0)), 1, _default_currency_code, SUM(COALESCE(discount, 0))
         FROM temp_checkout_details
-        GROUP BY sales_discount_account_id;
+        GROUP BY sales_discount_account_id
+        HAVING SUM(COALESCE(discount, 0)) > 0;
+    END IF;
+
+    IF(_coupon_discount > 0) THEN
+        SELECT inventory.inventory_setup.default_discount_account_id INTO _default_discount_account_id
+        FROM inventory.inventory_setup
+        WHERE inventory.inventory_setup.office_id = _office_id;
+
+        INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
+        SELECT 'Dr', _default_discount_account_id, _statement_reference, _default_currency_code, _coupon_discount, 1, _default_currency_code, _coupon_discount;
     END IF;
 
     INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
@@ -330,8 +341,8 @@ BEGIN
     END LOOP;
 
 
-    INSERT INTO sales.sales(price_type_id, counter_id, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
-    SELECT _price_type_id, _counter_id, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id;
+    INSERT INTO sales.sales(price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
+    SELECT _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id;
     
     
     PERFORM finance.auto_verify(_transaction_master_id, _office_id);
@@ -380,15 +391,15 @@ LANGUAGE plpgsql;
 
 -- SELECT * FROM sales.post_sales
 -- (
---     1, 1, 1, 1, '1-1-2020', '1-1-2020', 1, 'asdf', 'Test', 
---     500000,2000, 1, 500000, 'Bank', 'C001', '1-1-2020', '234234234',
+--     1, 1, 1, 1, finance.get_value_date(1), finance.get_value_date(1), 1, 'asdf', 'Test', 
+--     500000,2000, null, null, null, null, null, null,
 --     inventory.get_customer_id_by_customer_code('DEF'), 1, 1, 1,
---     '', true, 1000,
+--     null, true, 1000,
 --     ARRAY[
---     ROW(1, 'Dr', 1, 1, 1,180000, 0, 200)::sales.sales_detail_type,
---     ROW(1, 'Dr', 2, 1, 7,130000, 300, 30)::sales.sales_detail_type,
---     ROW(1, 'Dr', 3, 1, 1,110000, 5000, 50)::sales.sales_detail_type],
+--     ROW(1, 'Dr', 1, 1, 1,180000, 0, 0)::sales.sales_detail_type,
+--     ROW(1, 'Dr', 2, 1, 7,130000, 0, 0)::sales.sales_detail_type,
+--     ROW(1, 'Dr', 3, 1, 1,110000, 0, 0)::sales.sales_detail_type],
 --     NULL,
 --     NULL
 -- );
--- 
+

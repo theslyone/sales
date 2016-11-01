@@ -943,7 +943,8 @@
                 var quantity = window.parseFloat2(el.find("input.quantity").val());
                 var unitId = parseInt(el.find("select.unit").val());
                 var price = window.parseFloat2(el.find("input.price").val() || 0);
-                var discount = window.parseFloat2(el.find("input.discount").val() || 0);
+                var discountRate = window.parseFloat2(el.find("input.discount").val() || 0);
+                var discount = (price * quantity) * (discountRate / 100);
 
                 model.push({
                     StoreId: $("#StoreSelect").val(),
@@ -951,6 +952,7 @@
                     Quantity: quantity,
                     UnitId: unitId,
                     Price: price,
+                    DiscountRate: discountRate,
                     Discount: discount
                 });
             });
@@ -1116,7 +1118,7 @@
         var discountInput = el.find("input.discount");
 
         if (discountInput.length) {
-            discountInput.val(item.Discount);
+            discountInput.val(item.DiscountRate);
         };
 
         discountInput.trigger("keyup");
@@ -1185,28 +1187,26 @@
 
 
 
-    $("#SalesItems .item")
-        .on("contextmenu",
-            function (e) {
-                e.preventDefault();
-                var el = $(this);
-                var defaultMenu = el.find(".info.block, .number.block");
-                var contextMenu = el.find(".context.menu");
+    $("#SalesItems .item").on("contextmenu", function (e) {
+        e.preventDefault();
+        var el = $(this);
+        var defaultMenu = el.find(".info.block, .number.block");
+        var contextMenu = el.find(".context.menu");
 
-                defaultMenu.toggle();
-                contextMenu.toggle();
-            });
+        defaultMenu.toggle();
+        contextMenu.toggle();
+    });
 </script>
 
 <script>
-    var itemTemplate = `<div class="item" id="pos-{ItemId}" data-cost-price="{CostPrice}" data-photo="{Photo}" data-unit-id="{UnitId}" data-valid-units="{ValidUnits}" data-brand="{BrandName}" data-item-group="{ItemGroupName}" data-item-name="{ItemName}" data-item-code="{ItemCode}" data-item-id="{ItemId}" data-price="{Price}">
+    var itemTemplate = `<div class="item" id="pos-{ItemId}" data-selling-price="{SellingPrice}" data-photo="{Photo}" data-unit-id="{UnitId}" data-valid-units="{ValidUnits}" data-brand="{BrandName}" data-item-group="{ItemGroupName}" data-item-name="{ItemName}" data-item-code="{ItemCode}" data-item-id="{ItemId}" data-price="{Price}">
 	<div class="photo block">
 		<img src="{Photo}">
 	</div>
 	<div class="info block">
 		<div class="header">{ItemName}</div>
 		<div class="price info">
-			<span class="rate">{CostPrice}</span>
+			<span class ="rate">{SellingPrice}</span>
 			<span>&nbsp; x&nbsp; </span>
 			<span class="quantity">1</span>
 			<span>&nbsp; =&nbsp; </span>
@@ -1224,7 +1224,7 @@
 		</div>
 	</div>
 	<div class="number block">
-		<input type="text" class="decimal price" title="Edit Price" value="{CostPrice}">
+		<input type="text" class ="decimal price" title="Edit Price" value="{SellingPrice}">
 		<input type="text" class="decimal quantity" title="Enter Quantity" value="1">
 		<input type="text" class="decimal discount" title="Enter Rate of Discount" value="">
 		<button class="ui red fluid button" onclick="removeItem(this);" style="display:none;">Delete</button>
@@ -1329,7 +1329,7 @@
             $(".tender.info.items").hide();
             //$(".header.items").show();
             $(".footer.items").show();
-            var costPrice = el.attr("data-cost-price");
+            var sellingPrice = el.attr("data-selling-price");
             var photo = el.attr("data-photo");
 
             var barCode = el.attr("data-barcode");
@@ -1340,10 +1340,10 @@
             var itemName = el.attr("data-item-name");
             var itemCode = el.attr("data-item-code");
             var itemId = el.attr("data-item-id");
-            var price = window.parseFloat2(costPrice || 0);
+            var price = window.parseFloat2(sellingPrice || 0);
 
             if (!price) {
-                alert("Cannot add item because the price is zero.");
+                window.displayMessage("Cannot add item because the price is zero.");
                 return;
             };
 
@@ -1370,7 +1370,7 @@
             var template = itemTemplate;
 
             template = template.replace(/{ItemId}/g, itemId);
-            template = template.replace(/{CostPrice}/g, costPrice);
+            template = template.replace(/{SellingPrice}/g, sellingPrice);
             template = template.replace(/{Photo}/g, photo);
             template = template.replace(/{BarCode}/g, barCode);
             template = template.replace(/{BrandName}/g, brand);
@@ -1665,7 +1665,10 @@
             };
         };
 
+
         target.html("").hide();
+
+        groupItems = window.Enumerable.From(groupItems).OrderBy(function (x) { return x.ItemId; }).ToArray();
 
         $.each(groupItems, function () {
             var product = this;
@@ -1680,7 +1683,7 @@
             item.attr("data-valid-units", product.ValidUnits);
             item.attr("data-barcode", product.Barcode);
             item.attr("data-photo", product.Photo);
-            item.attr("data-cost-price", product.CostPrice);
+            item.attr("data-selling-price", product.SellingPrice);
 
             if (product.HotItem) {
                 item.addClass("hot");
@@ -1689,7 +1692,7 @@
             var info = $("<div class='info' />");
 
             var price = $("<div class='price' />");
-            price.html(product.CostPrice);
+            price.html(product.SellingPrice);
 
             price.appendTo(info);
 
@@ -1837,7 +1840,7 @@
         var model = getModel();
 
         if (!model.Details.length) {
-            alert("Please select an item.");
+            window.displayMessage("Please select an item.");
             return;
         };
 
@@ -1859,7 +1862,7 @@
 
         ajax.fail(function (xhr) {
             $("#CheckoutButton").removeClass("loading");
-            alert(JSON.stringify(xhr));
+            window.displayMessage(JSON.stringify(xhr));
         });
     });
 </script>
@@ -1999,28 +2002,26 @@
                 clearScreen();
             });
 
-    $(".tabs .actions .delete.icon")
-        .unbind("click")
-        .bind("click",
-            function () {
-                var activeEl = $(".tabs .selected.item");
-                var id = parseInt(activeEl.text());
+    $(".tabs .actions .delete.icon").unbind("click").bind("click",
+    function () {
+        var activeEl = $(".tabs .selected.item");
+        var id = parseInt(activeEl.text());
 
-                if (activeEl.length && id > 1) {
-                    var confirmed = window.confirm("Are you sure you want to delete this tab?");
+        if (activeEl.length && id > 1) {
+            var confirmed = window.confirm("Are you sure you want to delete this tab?");
 
-                    if (!confirmed) {
-                        return;
-                    };
+            if (!confirmed) {
+                return;
+            };
 
-                    removeState();
+            removeState();
 
-                    var previousEl = activeEl.prev(".item");
-                    previousEl.addClass("selected");
-                    activeEl.remove();
-                    loadState();
-                };
-            });
+            var previousEl = activeEl.prev(".item");
+            previousEl.addClass("selected");
+            activeEl.remove();
+            loadState();
+        };
+    });
 
     initializeTabs();
 

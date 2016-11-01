@@ -19,7 +19,7 @@ SELECT
     inventory.units.unit_code,
     inventory.units.unit_name,
     inventory.items.hot_item,
-    inventory.items.cost_price,
+    inventory.items.selling_price,
     inventory.items.photo
 FROM inventory.items
 INNER JOIN inventory.item_groups

@@ -21,7 +21,7 @@ namespace MixERP.Sales.DTO
         public string UnitCode { get; set; }
         public string UnitName { get; set; }
         public bool HotItem { get; set; }
-        public decimal CostPrice { get; set; }
+        public decimal SellingPrice { get; set; }
         public string Photo { get; set; }
     }
 }

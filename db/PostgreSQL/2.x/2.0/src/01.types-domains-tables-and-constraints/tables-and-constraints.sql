@@ -211,7 +211,7 @@ CREATE TABLE sales.coupons
     coupon_id                                   SERIAL PRIMARY KEY,
     coupon_name                                 national character varying(100) NOT NULL,
     coupon_code                                 national character varying(100) NOT NULL,
-    discount_rate                               public.decimal_strict,
+    discount_rate                               public.decimal_strict NOT NULL,
     is_percentage                               boolean NOT NULL DEFAULT(false),
     maximum_discount_amount                     public.decimal_strict,
     associated_price_type_id                    integer REFERENCES sales.price_types,
@@ -247,6 +247,7 @@ CREATE TABLE sales.sales
     counter_id                              integer NOT NULL REFERENCES inventory.counters,
     customer_id                             integer REFERENCES inventory.customers,
 	salesperson_id							integer REFERENCES account.users,
+	total_amount							public.money_strict NOT NULL,
 	coupon_id								integer REFERENCES sales.coupons,
 	is_flat_discount						boolean,
 	discount								public.decimal_strict2,
@@ -256,6 +257,7 @@ CREATE TABLE sales.sales
     payment_term_id                         integer REFERENCES sales.payment_terms,
     tender                                  decimal(24, 4) NOT NULL CHECK(tender > 0),
     change                                  decimal(24, 4) NOT NULL,
+    gift_card_id                            integer REFERENCES sales.gift_cards,
     check_number                            national character varying(100),
     check_date                              date,
     check_bank_name                         national character varying(1000),
@@ -264,7 +266,7 @@ CREATE TABLE sales.sales
     check_clear_date                        date,   
     check_clearing_memo                     national character varying(1000),
     check_clearing_transaction_master_id    integer REFERENCES finance.transaction_master,
-    gift_card_id                            integer REFERENCES sales.gift_cards
+	reward_points							numeric(24, 4) NOT NULL DEFAULT(0)
 );
 
 CREATE TABLE sales.customer_receipts
@@ -272,7 +274,7 @@ CREATE TABLE sales.customer_receipts
     receipt_id                              BIGSERIAL PRIMARY KEY,
     transaction_master_id                   bigint NOT NULL REFERENCES finance.transaction_master,
     customer_id                             bigint NOT NULL REFERENCES inventory.customers,
-    currency_code                           national character varying(12) NOT NULL REFERENCES finance.currencies,
+    currency_code                           national character varying(12) NOT NULL REFERENCES core.currencies,
     er_debit                                decimal_strict NOT NULL,
     er_credit                               decimal_strict NOT NULL,
     cash_repository_id                      integer NULL REFERENCES finance.cash_repositories,
@@ -323,7 +325,7 @@ AS
     store_id            integer,
 	transaction_type	national character varying(2),
     item_id           	integer,
-    quantity            public.integer_strict,
+    quantity            public.decimal_strict,
     unit_id           	integer,
     price               public.money_strict,
     discount            public.money_strict2,

@@ -10,7 +10,7 @@ using Npgsql;
 
 namespace MixERP.Sales.DAL.Backend.Tasks
 {
-    public static class Sales
+    public static class SalesEntries
     {
         public static string GetParametersForDetails(List<SalesDetailType> details)
         {

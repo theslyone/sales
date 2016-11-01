@@ -4,4 +4,29 @@
     ViewBag.Title = "Add Fund to Gift Cards";
     Layout = ViewBag.Layout;
 }
-<h2>Add Fund</h2>
+
+<style>
+    iframe {
+        border: 1px solid #ccc;
+        width: 500px;
+        height: 800px;
+        margin: 0 auto;
+        padding: 1em;
+    }
+</style>
+
+<div class="ui attached center aligned segment" style="padding: 3em">
+    <div class="ui container">
+        <h2>Sales Ticket</h2>
+
+        <iframe></iframe>
+    </div>
+</div>
+
+<script>
+    var url = "/dashboard/sales/ticket/{id}";
+    var id = window.getQueryStringByName("id");
+    url = url.replace("{id}", id);
+
+    $("iframe").attr("src", url);
+</script>
