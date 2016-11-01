@@ -556,7 +556,7 @@ END
 $$
 LANGUAGE plpgsql;
 
---SELECT * FROM sales.get_avaiable_coupons_to_print(29);
+--SELECT * FROM sales.get_avaiable_coupons_to_print(2);
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_balance.sql --<--<--
 DROP FUNCTION IF EXISTS sales.get_gift_card_balance(_gift_card_id integer, _value_date date);
@@ -1807,7 +1807,7 @@ CREATE FUNCTION sales.post_sales
 RETURNS bigint
 AS
 $$
-    DECLARE _book_name                      national character varying(48) = 'Sales';
+    DECLARE _book_name                      national character varying(48) = 'Sales Entry';
     DECLARE _transaction_master_id          bigint;
     DECLARE _checkout_id                    bigint;
     DECLARE _checkout_detail_id             bigint;

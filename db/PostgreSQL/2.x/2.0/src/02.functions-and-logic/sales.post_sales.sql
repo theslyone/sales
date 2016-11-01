@@ -63,7 +63,7 @@ CREATE FUNCTION sales.post_sales
 RETURNS bigint
 AS
 $$
-    DECLARE _book_name                      national character varying(48) = 'Sales';
+    DECLARE _book_name                      national character varying(48) = 'Sales Entry';
     DECLARE _transaction_master_id          bigint;
     DECLARE _checkout_id                    bigint;
     DECLARE _checkout_detail_id             bigint;
