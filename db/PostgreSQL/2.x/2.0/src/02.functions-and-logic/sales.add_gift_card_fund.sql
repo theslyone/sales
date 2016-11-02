@@ -31,7 +31,7 @@ RETURNS bigint
 AS
 $$
     DECLARE _transaction_master_id              bigint;
-    DECLARE _book_name                          national character varying(50) = 'Gift Card Fund Transfer';
+    DECLARE _book_name                          national character varying(50) = 'Gift Card Fund Sales';
     DECLARE _payable_account_id                 integer;
     DECLARE _currency_code                      national character varying(12);
 BEGIN

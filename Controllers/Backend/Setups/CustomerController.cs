@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Dynamic;
+﻿using System;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Frapid.Dashboard;
-using Frapid.WebsiteBuilder.ViewModels;
-using MixERP.Sales.ViewModels;
-using SearchResult = MixERP.Sales.ViewModels.SearchResult;
+using MixERP.Sales.DAL.Backend.Service;
 
 namespace MixERP.Sales.Controllers.Backend.Setups
 {
@@ -20,15 +17,15 @@ namespace MixERP.Sales.Controllers.Backend.Setups
         }
 
         [Route("dashboard/sales/setup/customer-search/{query}")]
-        public async Task<ActionResult> SearchCustomer(string query)
+        public async Task<ActionResult> SearchCustomerAsync(string query)
         {
             try
             {
-                List<SearchResult> result = await DAL.Backend.Service.SearchCustomer.SearchCustomers(this.Tenant, query.Replace("\\","").Trim()).ConfigureAwait(false);
+                var result = await Customers.SearchAsync(this.Tenant, query.Replace("\\", "").Trim()).ConfigureAwait(false);
 
                 return this.Ok(result);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return this.Failed(ex.Message, HttpStatusCode.InternalServerError);
             }

@@ -16,6 +16,12 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
             }
 
             var model = await Tickets.GetTicketViewModelAsync(this.Tenant, tranId).ConfigureAwait(true);
+
+            if (model.View == null)
+            {
+                return this.HttpNotFound($"The ticket {tranId} could not be found.");
+            }
+
             return this.View(this.GetRazorView<AreaRegistration>("Ticket/Index.cshtml", this.Tenant), model);
         }
     }

@@ -1,0 +1,133 @@
+﻿@model dynamic
+
+<div class="ui large find gift card modal">
+    <i class="close icon"></i>
+    <div class="header">Search Gift Card</div>
+    <div class="content" style="padding:3em">
+        <div class="ui search form">
+            <div class="two fields">
+                <div class="field">
+                    <label>Phone</label>
+                    <input type="tel" name="PhoneInputText" />
+                </div>
+                <div class="field">
+                    <label>Name</label>
+                    <input type="text" name="NameInputText" />
+                </div>
+            </div>
+            <div class="field">
+                <label>Address</label>
+                <input type="text" name="AddressInputText" />
+            </div>
+            <div class="three fields">
+                <div class="field">
+                    <label>City</label>
+                    <input type="text" name="CityInputText" />
+                </div>
+                <div class="field">
+                    <label>State</label>
+                    <input type="text" name="StateInputText" />
+                </div>
+                <div class="field">
+                    <label>Country</label>
+                    <input type="text" name="CountryInputText" />
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <label>ZIP Code</label>
+                    <input type="text" name="ZipcodeInputText" />
+                </div>
+                <div class="field">
+                    <label>PO Box</label>
+                    <input type="text" name="PoBoxInputText" />
+                </div>
+            </div>
+
+            <div id="SearchButton" class="ui positive circular button">Search</div>
+        </div>
+
+        <table class="ui results table">
+            <thead>
+            <tr>
+                <th>Select</th>
+                <th>Gift Card #</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Country</th>
+                <th>ZIP Code</th>
+                <th>PO Box</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function showSearchResult(id) {
+        $("#GiftCardNumberInputText").val(id).trigger("change").trigger("blur");
+        $(".ui.gift.card.modal").modal("hide");
+    };
+
+    $("#SearchButton").unbind("click").bind("click", function () {
+        function displayResult(model) {
+            function getCell(html) {
+                var cell = $("<td />");
+                cell.html(html);
+                return cell;
+            };
+
+            function getActionCell(id) {
+                var html = "<a onclick='showSearchResult(\"{id}\");'>Select</a>";
+                html = html.replace("{id}", id);
+
+                var cell = $("<td />");
+                cell.html(html);
+                return cell;
+            };
+
+            var target = $(".results.table tbody").html("");
+
+            $.each(model, function () {
+                var row = $("<tr />");
+                row.append(getActionCell(this.GiftCardNumber));
+                row.append(getCell(this.GiftCardNumber));
+                row.append(getCell(this.Name));
+                row.append(getCell(this.PhoneNumbers));
+                row.append(getCell(this.Address));
+                row.append(getCell(this.City));
+                row.append(getCell(this.State));
+                row.append(getCell(this.Country));
+                row.append(getCell(this.Zipcode));
+                row.append(getCell(this.PoBox));
+
+                target.append(row);
+            });
+        };
+
+        function request(model) {
+            var url = "/dashboard/loyalty/tasks/gift-cards/search";
+            var data = JSON.stringify(model);
+
+            return window.getAjaxRequest(url, "POST", data);
+        }
+
+        var model = window.serializeForm($(".ui.search.form"));
+
+        var ajax = request(model);
+
+        ajax.success(function (response) {
+            displayResult(response);
+        });
+
+        ajax.fail(function (xhr) {
+            window.logAjaxErrorMessage(xhr);
+        });
+    });
+</script>

@@ -30,7 +30,8 @@ CREATE TABLE sales.gift_cards
 );
 
 CREATE UNIQUE INDEX gift_cards_gift_card_number_uix
-ON sales.gift_cards(UPPER(gift_card_number));
+ON sales.gift_cards(UPPER(gift_card_number))
+WHERE NOT deleted;
 
 --TODO: Create a trigger to disable deleting a gift card if the balance is not zero.
 
@@ -370,7 +371,7 @@ RETURNS bigint
 AS
 $$
     DECLARE _transaction_master_id              bigint;
-    DECLARE _book_name                          national character varying(50) = 'Gift Card Fund Transfer';
+    DECLARE _book_name                          national character varying(50) = 'Gift Card Fund Sales';
     DECLARE _payable_account_id                 integer;
     DECLARE _currency_code                      national character varying(12);
 BEGIN
@@ -2579,7 +2580,8 @@ SELECT * FROM core.create_menu('Sales', 'Check Clearing', '/dashboard/sales/task
 
 SELECT * FROM core.create_menu('Sales', 'Customer Loyalty', 'square outline', 'configure', '');
 SELECT * FROM core.create_menu('Sales', 'Gift Cards', '/dashboard/sales/loyalty/gift-cards', 'users', 'Customer Loyalty');
-SELECT * FROM core.create_menu('Sales', 'Add Funds to Gift Card', '/dashboard/loyalty/tasks/gift-cards/add-fund', 'keyboard', 'Customer Loyalty');
+SELECT * FROM core.create_menu('Sales', 'Add Gift Card Fund', '/dashboard/loyalty/tasks/gift-cards/add-fund', 'keyboard', 'Customer Loyalty');
+SELECT * FROM core.create_menu('Sales', 'Verify Gift Card Fund', '/dashboard/loyalty/tasks/gift-cards/add-fund/verification', 'keyboard', 'Customer Loyalty');
 SELECT * FROM core.create_menu('Sales', 'Sales Coupons', '/dashboard/sales/loyalty/coupons', 'users', 'Customer Loyalty');
 SELECT * FROM core.create_menu('Sales', 'Loyalty Point Configuration', '/dashboard/sales/loyalty/points', 'users', 'Customer Loyalty');
 
@@ -2722,6 +2724,70 @@ LEFT JOIN sales.price_types AS for_ticket_of_price_type
 ON for_ticket_of_price_type.price_type_id = sales.coupons.for_ticket_of_price_type_id;
 
 
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.views/sales.gift_card_search_view.sql --<--<--
+DROP VIEW IF EXISTS sales.gift_card_search_view;
+
+CREATE VIEW sales.gift_card_search_view
+AS
+SELECT
+    sales.gift_cards.gift_card_id,
+    sales.gift_cards.gift_card_number,
+    REPLACE(COALESCE(sales.gift_cards.first_name || ' ', '') || COALESCE(sales.gift_cards.middle_name || ' ', '') || COALESCE(sales.gift_cards.last_name, ''), '  ', ' ') AS name,
+    REPLACE(COALESCE(sales.gift_cards.address_line_1 || ' ', '') || COALESCE(sales.gift_cards.address_line_2 || ' ', '') || COALESCE(sales.gift_cards.street, ''), '  ', ' ') AS address,
+    sales.gift_cards.city,
+    sales.gift_cards.state,
+    sales.gift_cards.country,
+    sales.gift_cards.po_box,
+    sales.gift_cards.zipcode,
+    sales.gift_cards.phone_numbers,
+    sales.gift_cards.fax    
+FROM sales.gift_cards
+WHERE NOT sales.gift_cards.deleted;
+
+
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.views/sales.gift_card_transaction_view.sql --<--<--
+DROP VIEW IF EXISTS sales.gift_card_transaction_view;
+
+CREATE VIEW sales.gift_card_transaction_view
+AS
+SELECT
+finance.transaction_master.transaction_master_id,
+finance.transaction_master.transaction_ts,
+finance.transaction_master.transaction_code,
+finance.transaction_master.value_date,
+finance.transaction_master.book_date,
+account.users.name AS entered_by,
+sales.gift_cards.first_name || ' ' || sales.gift_cards.middle_name || ' ' || sales.gift_cards.last_name AS customer_name,
+sales.gift_card_transactions.amount,
+finance.verification_statuses.verification_status_name AS status,
+verified_by_user.name AS verified_by,
+finance.transaction_master.verification_reason,
+finance.transaction_master.last_verified_on,
+core.offices.office_name,
+finance.cost_centers.cost_center_name,
+finance.transaction_master.reference_number,
+finance.transaction_master.statement_reference,
+account.get_name_by_user_id(finance.transaction_master.user_id) AS posted_by,
+finance.transaction_master.office_id
+FROM finance.transaction_master
+INNER JOIN core.offices
+ON finance.transaction_master.office_id = core.offices.office_id
+INNER JOIN finance.cost_centers
+ON finance.transaction_master.cost_center_id = finance.cost_centers.cost_center_id
+INNER JOIN sales.gift_card_transactions
+ON sales.gift_card_transactions.transaction_master_id = finance.transaction_master.transaction_master_id
+INNER JOIN account.users
+ON finance.transaction_master.user_id = account.users.user_id
+LEFT JOIN sales.gift_cards
+ON sales.gift_card_transactions.gift_card_id = sales.gift_cards.gift_card_id
+INNER JOIN finance.verification_statuses
+ON finance.transaction_master.verification_status_id = finance.verification_statuses.verification_status_id
+LEFT JOIN account.users AS verified_by_user
+ON finance.transaction_master.verified_by_user_id = verified_by_user.user_id;
+
+--SELECT * FROM sales.gift_card_transaction_view;
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.views/sales.item_view.sql --<--<--
 DROP VIEW IF EXISTS sales.item_view;

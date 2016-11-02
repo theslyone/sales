@@ -1,0 +1,35 @@
+﻿@model long
+
+@{
+    ViewBag.Title = "Checklist";
+    Layout = ViewBag.SalesLayoutPath;
+}
+<style>
+    iframe {
+        display: block;
+        margin-top: 1em;
+        width: 800px;
+        height: 800px;
+        border: 1px solid #ccc;
+    }
+</style>
+<script src="/Scripts/frapid/utilities/form.js"></script>
+<div class="ui attached page segment" style="min-height: 100%; padding: 3em;">
+    <div class="ui huge header">Gift Card Fund Sales</div>
+    <div class="ui divider"></div>
+
+    <div class="ui positive message">The transaction was posted successfully.</div>
+
+    <a href="/dashboard/loyalty/tasks/gift-cards/add-fund" class="ui green button">
+        View Sales
+    </a>
+    <a href="/dashboard/loyalty/tasks/gift-cards/add-fund/entry" class="ui red button">
+        Add a New Sales Entry
+    </a>
+    <iframe src="/dashboard/reports/source/Areas/MixERP.Sales/Reports/GiftCardTransaction.xml?transaction_master_id=@Model"></iframe>
+</div>
+
+
+<script>
+    window.overridePath = "/dashboard/sales/tasks/entry";
+</script>

@@ -148,7 +148,7 @@
 
             var inventoryAdviceAnchor = $("<a title='View Sales Invoice'><i class='zoom icon'></i></a>");
             inventoryAdviceAnchor.attr("href", "javascript:void(0);");
-            inventoryAdviceAnchor.attr("onclick", "showPuchaseInvoice(" + tranId + ");");
+            inventoryAdviceAnchor.attr("onclick", "showInvoice(" + tranId + ");");
 
 
             cell.append(checklistAnchor);
@@ -238,15 +238,12 @@
     }, 1000);
 
     
-    function showPuchaseInvoice(tranId) {
+    function showInvoice(tranId) {
         $(".advice.modal iframe").attr("src", "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Invoice.xml?transaction_master_id=" + tranId);
 
         setTimeout(function () {
             $(".advice.modal")
                 .modal('setting', 'transition', 'horizontal flip')
-                .modal({
-                    blurring: true
-                })
                 .modal("show");
 
         }, 300);
@@ -257,9 +254,6 @@
         setTimeout(function () {
             $(".advice.modal")
                 .modal('setting', 'transition', 'horizontal flip')
-                .modal({
-                    blurring: true
-                })
                 .modal("show");
 
         }, 300);

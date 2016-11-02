@@ -141,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AreaRegistration.cs" />
+    <Compile Include="Controllers\Backend\Loyalty\GiftCardFundVerificationController.cs" />
     <Compile Include="Controllers\Backend\Loyalty\LoyalPointController.cs" />
     <Compile Include="Controllers\Backend\Loyalty\SalesCouponController.cs" />
     <Compile Include="Controllers\Backend\Setups\CustomerController.cs" />
@@ -158,16 +159,22 @@
     <Compile Include="Controllers\Backend\Tasks\EntryVerificationController.cs" />
     <Compile Include="Controllers\Backend\Tasks\ItemController.cs" />
     <Compile Include="Controllers\Backend\Tasks\ReturnController.cs" />
+    <Compile Include="DAL\Backend\Service\GiftCards.cs" />
     <Compile Include="DAL\Backend\Service\SearchCustomer.cs" />
+    <Compile Include="DAL\Backend\Tasks\GiftCardFunds.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntries.cs" />
     <Compile Include="DAL\Backend\Service\Items.cs" />
     <Compile Include="DAL\Backend\Tasks\Ticket.cs" />
     <Compile Include="DTO\CheckoutDetailView.cs" />
     <Compile Include="DTO\CouponView.cs" />
+    <Compile Include="DTO\GiftCards.cs" />
     <Compile Include="DTO\ItemView.cs" />
     <Compile Include="DTO\SalesView.cs" />
+    <Compile Include="Extensions\PartialViewExtensions.cs" />
     <Compile Include="Models\Tickets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryModels\GiftCardSearch.cs" />
+    <Compile Include="ViewModels\GiftCardFund.cs" />
     <Compile Include="ViewModels\Sales.cs" />
     <Compile Include="ViewModels\SalesDetailType.cs" />
     <Compile Include="ViewModels\SearchResult.cs" />
@@ -199,9 +206,13 @@
     <Content Include="Views\Tasks\Entry\Checklist.cshtml" />
     <Content Include="Views\Tasks\Entry\Verification.cshtml" />
     <Content Include="Views\Loyalty\Coupons\Index.cshtml" />
-    <Content Include="Views\Loyalty\GiftCards\AddFund.cshtml" />
+    <Content Include="Views\Loyalty\GiftCards\AddFund\Entry.cshtml" />
     <Content Include="Views\Loyalty\Points\Index.cshtml" />
     <Content Include="Views\Ticket\Index.cshtml" />
+    <Content Include="Views\Loyalty\GiftCards\AddFund\Index.cshtml" />
+    <Content Include="Views\Loyalty\GiftCards\AddFund\Checklist.cshtml" />
+    <Content Include="Views\Loyalty\GiftCards\AddFund\Verification.cshtml" />
+    <Content Include="Views\Shared\GiftCardSerachModal.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

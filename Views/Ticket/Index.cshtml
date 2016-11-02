@@ -4,7 +4,7 @@
 
 @{
     ViewBag.Title = "Sales Entries";
-    string logo = AppUsers.GetCurrent().Logo.Or("/Areas/CineSys/Static/images/logo.png");
+    string logo = AppUsers.GetCurrent().Logo.Or("/Static/images/logo.png");
     var appUser = AppUsers.GetCurrent();
     string currenySymbol = appUser.CurrencySymbol;
     decimal subTotal = Model.Details.Sum(x => (x.Price*x.Quantity) - x.Discount);

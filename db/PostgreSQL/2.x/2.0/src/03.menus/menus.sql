@@ -29,7 +29,8 @@ SELECT * FROM core.create_menu('Sales', 'Check Clearing', '/dashboard/sales/task
 
 SELECT * FROM core.create_menu('Sales', 'Customer Loyalty', 'square outline', 'configure', '');
 SELECT * FROM core.create_menu('Sales', 'Gift Cards', '/dashboard/sales/loyalty/gift-cards', 'users', 'Customer Loyalty');
-SELECT * FROM core.create_menu('Sales', 'Add Funds to Gift Card', '/dashboard/loyalty/tasks/gift-cards/add-fund', 'keyboard', 'Customer Loyalty');
+SELECT * FROM core.create_menu('Sales', 'Add Gift Card Fund', '/dashboard/loyalty/tasks/gift-cards/add-fund', 'keyboard', 'Customer Loyalty');
+SELECT * FROM core.create_menu('Sales', 'Verify Gift Card Fund', '/dashboard/loyalty/tasks/gift-cards/add-fund/verification', 'keyboard', 'Customer Loyalty');
 SELECT * FROM core.create_menu('Sales', 'Sales Coupons', '/dashboard/sales/loyalty/coupons', 'users', 'Customer Loyalty');
 SELECT * FROM core.create_menu('Sales', 'Loyalty Point Configuration', '/dashboard/sales/loyalty/points', 'users', 'Customer Loyalty');
 

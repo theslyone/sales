@@ -1,0 +1,129 @@
+﻿@using MixERP.Sales.Extensions
+@model dynamic
+
+@{
+    ViewBag.Title = "Add Fund to Gift Cards";
+    Layout = ViewBag.SalesLayoutPath;
+}
+
+<style>
+    iframe {
+        border: 1px solid #ccc;
+        width: 500px;
+        height: 800px;
+        margin: 0 auto;
+        padding: 1em;
+    }
+</style>
+<script src="/Scripts/frapid/utilities/form.js"></script>
+<script src="/Scripts/frapid/utilities/validator.js"></script>
+<div class="ui attached gift card fund segment" style="padding: 3em">
+    <div class="ui container">
+        <div class="ui large header">Add Funds To Gift Card</div>
+        <div class="ui divider"></div>
+        <div class="ui form" style="width: 500px;">
+            <div class="field">
+                <label>Enter Gift Card Number</label>
+                <div class="ui action input">
+                    <input id="GiftCardNumberInputText" required="" type="text">
+                    <button class="ui icon blue button" onclick='$(".ui.gift.card.modal").modal("show");'>
+                        <i class="search icon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="field">
+                <label>Enter Amount</label>
+                <input id="AmountInputText" type="text" class="decimal" required="" />
+            </div>
+            <div class="field">
+                <label>Select Debit Account</label>
+                <select id="AccountIdSelect" class="ui search dropdown" required=""></select>
+            </div>
+            <div class="field">
+                <label>Value Date</label>
+                <input type="text" class="date" required="" id="ValueDateInputText" />
+            </div>
+            <div class="field">
+                <label>Book Date</label>
+                <input type="text" class="date" required="" id="BookDateInputText" />
+            </div>
+            <div class="field">
+                <label>Select Cost Center</label>
+                <select id="CostCenterIdSelect" class="ui search dropdown" required=""></select>
+            </div>
+            <div class="field">
+                <label>Reference Number</label>
+                <input type="text" id="ReferenceNumberInputText" />
+            </div>
+            <div class="field">
+                <label>Memo</label>
+                <input type="text" id="StatementReferenceInputText" />
+            </div>
+
+            <button id="SaveButton" class="ui positive circular button">Save</button>
+            <a href="/dashboard/loyalty/tasks/gift-cards/add-fund/" class="ui negative circular button">Back</a>
+        </div>
+    </div>
+</div>
+
+@Html.PartialView("Shared/GiftCardSerachModal.cshtml", TenantConvention.GetTenant());
+
+<script>
+    function loadAccounts() {
+        
+        var filters = [];
+        filters.push(window.getAjaxColumnFilter("WHERE", "account_master_id", "int", window.FilterConditions.IsEqualTo, "10101"));//CASH
+        filters.push(window.getAjaxColumnFilter("OR", "account_master_id", "int", window.FilterConditions.IsEqualTo, "10102"));//BANK
+        filters.push(window.getAjaxColumnFilter("OR", "account_master_id", "int", window.FilterConditions.IsEqualTo, "10110"));//ACCOUNT RECEIVABLE
+
+        window.displayFieldBinder($("#AccountIdSelect"), "/api/forms/finance/accounts/display-fields/get-where", true, filters);
+    };
+
+    function loadCostCenters() {
+        window.displayFieldBinder($("#CostCenterIdSelect"), "/api/forms/finance/cost-centers/display-fields", true);
+    };
+
+    loadCostCenters();
+    loadAccounts();
+
+</script>
+<script>
+    var segment = $(".gift.card.fund.segment");
+
+    window.validator.initialize(segment);
+
+    $("#SaveButton").unbind("click").bind("click", function () {
+        function request(model) {
+            var url = "/dashboard/loyalty/tasks/gift-cards/add-fund/entry";
+            var data = JSON.stringify(model);
+            return window.getAjaxRequest(url, "POST", data);
+        };
+
+        function getModel() {
+            var model = window.serializeForm(segment);
+            return model;
+        };
+
+        var isValid = window.validator.validate($(".ui.form"));
+        if (!isValid) {
+            return;
+        };
+
+        var model = getModel();
+
+        var ajax = request(model);
+
+        ajax.success(function (response) {
+            var id = response;
+            var url = "/dashboard/loyalty/tasks/gift-cards/add-fund/checklist/" + id;
+
+            window.location = url;
+        });
+
+        ajax.fail(function (xhr) {
+            window.logAjaxErrorMessage(xhr);
+        });
+    });
+
+    window.overridePath = "/dashboard/loyalty/tasks/gift-cards/add-fund";
+</script>

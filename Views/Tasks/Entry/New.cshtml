@@ -1,4 +1,5 @@
 ﻿@using Frapid.ApplicationState.Cache
+@using MixERP.Sales.Extensions
 @model dynamic
 
 @{
@@ -58,7 +59,9 @@
         color: yellow !important;
         font-size: 1.5em;
     }
-
+    #GiftCardNumberBalanceInputText {
+        color: yellow!important;
+    }
     #TicketIframe {
         background-color: white;
         width: 100%;
@@ -722,11 +725,8 @@
                             <div class="item" id="SearchCustomerAction" title="Search Customer">
                                 <i class="search icon"></i>
                             </div>
-                            <div class="item" onclick="$('.reprint.ticket.modal').modal({blurring:true}).modal('show');" title="Reprint Ticket">
+                            <div class="item" onclick="$('.reprint.ticket.modal').modal('show');" title="Reprint Ticket">
                                 <i class="print icon"></i>
-                            </div>
-                            <div class="item" title="Sign Out of POS">
-                                <i class="sign out icon"></i>
                             </div>
                         </div>
                         <div class="action container">
@@ -804,7 +804,12 @@
                                         <div class="gift-card number item">
                                             <div class="description">Gift Card Number</div>
                                             <div class="control">
-                                                <input type="text" id="GiftCardNumberInputText" />
+                                                <div class="ui action fluid input">
+                                                    <input id="GiftCardNumberInputText" required="" type="text">
+                                                    <button class="ui icon blue button" onclick='$(".ui.gift.card.modal").modal("show");'>
+                                                        <i class="search icon"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="gift-card balance item">
@@ -943,6 +948,7 @@
     </div>
 </div>
 
+@Html.PartialView("Shared/GiftCardSerachModal.cshtml", TenantConvention.GetTenant());
 
 <script>
     function showTicket(id) {
@@ -976,7 +982,7 @@
     });
 
     $("#SearchCustomerAction").click(function () {
-        $(".customer.search.modal").modal({ blurring: true }).modal("show");
+        $(".customer.search.modal").modal("show");
     });
 
     function onCustomerSearchSelect(customerId, customerName) {
@@ -2131,4 +2137,27 @@
     $("select:not(.ui)").addClass("inverted fluid").dropdown();
 
     window.overridePath = "/dashboard/sales/tasks/entry";
+</script>
+<script>
+    $("#GiftCardNumberInputText").on("change", function() {
+        function request(giftCardNumber) {
+            var url = "/dashboard/loyalty/tasks/gift-cards/get-balance/{giftCardNumber}";
+            url = url.replace("{giftCardNumber}", giftCardNumber);
+
+            return window.getAjaxRequest(url, "POST");
+        };
+
+        var el = $(this);
+        var giftCardNumber = el.val();
+
+        if (!giftCardNumber) {
+            return;
+        };
+
+        var ajax = request(giftCardNumber);
+
+        ajax.success(function(response) {
+            $("#GiftCardNumberBalanceInputText").val(response);
+        });
+    });
 </script>

@@ -29,7 +29,8 @@ CREATE TABLE sales.gift_cards
 );
 
 CREATE UNIQUE INDEX gift_cards_gift_card_number_uix
-ON sales.gift_cards(UPPER(gift_card_number));
+ON sales.gift_cards(UPPER(gift_card_number))
+WHERE NOT deleted;
 
 --TODO: Create a trigger to disable deleting a gift card if the balance is not zero.
 

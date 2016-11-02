@@ -1,7 +1,7 @@
 ﻿@model dynamic
 
 @{
-    ViewBag.Title = "Sales Verification";
+    ViewBag.Title = "Gift Card Funds Verification";
     Layout = ViewBag.SalesLayoutPath;
 }
 <style>
@@ -13,10 +13,10 @@
 </style>
 <script src="/Scripts/frapid/utilities/form.js"></script>
 <div class="ui attached page segment" style="min-height: 100%; padding: 3em;">
-    <div class="ui huge header">Sales Verification</div>
+    <div class="ui huge header">Gift Card Fund Verification</div>
     <div class="ui divider"></div>
     <div class="ui basic buttons">
-        <a id="AddNewButton" class="ui basic button" style="" href="/dashboard/sales/tasks/entry/new">
+        <a id="AddNewButton" class="ui basic button" style="" href="/dashboard/loyalty/tasks/gift-cards/add-fund/entry">
             Add New
         </a>
         <a class="ui basic button" id="VerificationApproveButton">Approve</a>
@@ -49,16 +49,16 @@
     <div class="ui stackable form segment" id="Annotation" style="">
         <div class="eight fields">
             <div class="field">
-                <input class="date" data-persist placeholder="From" id="FromInputText" title="From" type="text">
+                <input class="date" data-persist placeholder="From" id="FromInputDate" title="From" type="date">
             </div>
             <div class="field">
-                <input class="date" data-persist placeholder="To" id="ToInputText" title="To" type="text">
-            </div>
-            <div class="field">
-                <input placeholder="TranId" id="TranIdInputText" title="TranId" type="text">
+                <input class="date" data-persist placeholder="To" id="ToInputDate" title="To" type="date">
             </div>
             <div class="field">
                 <input placeholder="TranCode" id="TranCodeInputText" title="TranCode" type="text">
+            </div>
+            <div class="field">
+                <input placeholder="Customer" id="CustomerNameInputText" title="Customer" type="text">
             </div>
             <div class="field">
                 <input placeholder="ReferenceNumber" id="ReferenceNumberInputText" title="ReferenceNumber" type="text">
@@ -69,13 +69,13 @@
             <div class="field">
                 <input placeholder="PostedBy" id="PostedByInputText" title="PostedBy" type="text">
             </div>
-        </div>
-        <div class="eight fields">
             <div class="field">
                 <input placeholder="Office" id="OfficeInputText" title="Office" type="text">
             </div>
+        </div>
+        <div class="eight fields">
             <div class="field">
-                <input placeholder="Status" id="StatusInputText" title="Status" type="text" value="Unverified">
+                <input placeholder="Status" id="StatusInputText" value="Unverified" title="Status" type="text">
             </div>
             <div class="field">
                 <input placeholder="VerifiedBy" id="VerifiedByInputText" title="VerifiedBy" type="text">
@@ -104,9 +104,10 @@
                 <th>Select</th>
                 <th>TranId</th>
                 <th>TranCode</th>
-                <th>Book</th>
                 <th>Value Date</th>
                 <th>Book Date</th>
+                <th>Customer Name</th>
+                <th>Amount</th>
                 <th>Ref#</th>
                 <th>Statement Reference</th>
                 <th>Posted By</th>
@@ -119,6 +120,7 @@
         </thead>
         <tbody></tbody>
     </table>
+
 </div>
 
 <div id="ActionModal" class="ui modal">
@@ -148,7 +150,6 @@
 <script>
     function displayTable(target, model) {
         target.find("tbody").html("");
-
         function getCell(text) {
             var cell = $("<td />");
 
@@ -167,14 +168,13 @@
             journalAdviceAnchor.attr("href", "javascript:void(0);");
             journalAdviceAnchor.attr("onclick", "showJournalAdvice(" + tranId + ");");
 
-            var inventoryAdviceAnchor = $("<a title='View Sales Invoice'><i class='zoom icon'></i></a>");
-            inventoryAdviceAnchor.attr("href", "javascript:void(0);");
-            inventoryAdviceAnchor.attr("onclick", "showInvoice(" + tranId + ");");
+            var salesAdvice = $("<a title='View Sales Invoice'><i class='zoom icon'></i></a>");
+            salesAdvice.attr("href", "javascript:void(0);");
 
 
             cell.append(checklistAnchor);
             cell.append(journalAdviceAnchor);
-            cell.append(inventoryAdviceAnchor);
+            cell.append(salesAdvice);
             return cell;
         };
 
@@ -192,43 +192,57 @@
             return cell;
         };
 
-        $.each(model,
-            function() {
-                var item = this;
+        $.each(model, function () {
+            var item = this;
 
-                var row = $("<tr />");
+            var row = $("<tr />");
 
-                row.append(getActionCell(item.TransactionMasterId));
-                row.append(getSelectionCell());
-                row.append(getCell(item.TransactionMasterId));
-                row.append(getCell(item.TransactionCode));
-                row.append(getCell(item.Book));
-                row.append(getCell(item.ValueDate));
-                row.append(getCell(item.BookDate));
-                row.append(getCell(item.ReferenceNumber));
-                row.append(getCell(item.StatementReference));
-                row.append(getCell(item.PostedBy));
-                row.append(getCell(item.Office));
-                row.append(getCell(item.Status));
-                row.append(getCell(item.VerifiedBy));
-                row.append(getCell(item.VerifiedOn));
-                row.append(getCell(item.Reason));
+            row.append(getActionCell(item.transaction_master_id));
+            row.append(getSelectionCell(item.transaction_master_id));
+            row.append(getCell(item.transaction_master_id));
+            row.append(getCell(item.transaction_code));
+            row.append(getCell(item.value_date));
+            row.append(getCell(item.book_date));
+            row.append(getCell(item.customer_name));
+            row.append(getCell(item.amount));
+            row.append(getCell(item.reference_number));
+            row.append(getCell(item.statement_reference));
+            row.append(getCell(item.posted_by));
+            row.append(getCell(item.office_name));
+            row.append(getCell(item.status));
+            row.append(getCell(item.verified_by));
+            row.append(getCell(item.last_verified_on));
+            row.append(getCell(item.verification_reason));
 
-                target.find("tbody").append(row);
-            });
+            target.find("tbody").append(row);
+        });
     };
-
     function processQuery() {
         function getModel() {
             var model = window.serializeForm($("#Annotation"));
-            model.Book = "Sales Entry";
 
-            return model;
+            var filters = [];
+
+            filters.push(window.getAjaxColumnFilter("WHERE", "office_id", "int", window.FilterConditions.IsEqualTo, window.metaView.OfficeId));
+            filters.push(window.getAjaxColumnFilter("WHERE", "value_date", "System.DateTime", window.FilterConditions.IsGreaterThanEqualTo, model.From));
+            filters.push(window.getAjaxColumnFilter("WHERE", "value_date", "System.DateTime", window.FilterConditions.IsLessThanEqualTo, model.To));
+            filters.push(window.getAjaxColumnFilter("WHERE", "transaction_code", "string", window.FilterConditions.IsLike, model.TranCode));
+            filters.push(window.getAjaxColumnFilter("WHERE", "customer_name", "string", window.FilterConditions.IsLike, model.CustomerName));
+            filters.push(window.getAjaxColumnFilter("WHERE", "reference_number", "string", window.FilterConditions.IsLike, model.ReferenceNumber));
+            filters.push(window.getAjaxColumnFilter("WHERE", "statement_reference", "string", window.FilterConditions.IsLike, model.StatementReference));
+            filters.push(window.getAjaxColumnFilter("WHERE", "posted_by", "string", window.FilterConditions.IsLike, model.PostedBy));
+            filters.push(window.getAjaxColumnFilter("WHERE", "office_name", "string", window.FilterConditions.IsLike, model.Office));
+            filters.push(window.getAjaxColumnFilter("WHERE", "status", "string", window.FilterConditions.IsLike, model.Status));
+            filters.push(window.getAjaxColumnFilter("WHERE", "verified_by", "string", window.FilterConditions.IsLike, model.VerifiedBy));
+            filters.push(window.getAjaxColumnFilter("WHERE", "verification_reason", "string", window.FilterConditions.IsLike, model.Reason));
+
+
+            return filters;
         };
 
         function displayGrid(target) {
             function request(model) {
-                var url = "/dashboard/finance/tasks/journal/view";
+                var url = "/api/views/sales/gift-card-transaction-view/get-where/-1";
                 var data = JSON.stringify(model);
                 return window.getAjaxRequest(url, "POST", data);
             };
@@ -237,12 +251,12 @@
 
             var ajax = request(model);
 
-            ajax.success(function(response) {
+            ajax.success(function (response) {
                 displayTable(target, response);
                 target.removeClass("loading");
             });
 
-            ajax.fail(function(xhr) {
+            ajax.fail(function (xhr) {
                 alert(JSON.stringify(xhr));
             });
         };
@@ -343,7 +357,7 @@
         };
 
         function request(model, type) {
-            var url = "/dashboard/sales/tasks/entry/verification/" + type;
+            var url = "/dashboard/loyalty/tasks/gift-cards/add-fund/verification/" + type;
             var data = JSON.stringify(model);
 
             return window.getAjaxRequest(url, "POST", data);
