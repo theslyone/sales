@@ -256,7 +256,7 @@ CREATE TABLE sales.sales
     is_credit                               boolean NOT NULL DEFAULT(false),
 	credit_settled							boolean,
     payment_term_id                         integer REFERENCES sales.payment_terms,
-    tender                                  decimal(24, 4) NOT NULL CHECK(tender > 0),
+    tender                                  decimal(24, 4) NOT NULL,
     change                                  decimal(24, 4) NOT NULL,
     gift_card_id                            integer REFERENCES sales.gift_cards,
     check_number                            national character varying(100),
@@ -329,7 +329,7 @@ AS
     quantity            public.decimal_strict,
     unit_id           	integer,
     price               public.money_strict,
-    discount            public.money_strict2,
+    discount_rate       public.money_strict2,
     shipping_charge     public.money_strict2
 );
 

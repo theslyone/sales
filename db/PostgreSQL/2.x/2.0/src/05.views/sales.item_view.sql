@@ -20,6 +20,7 @@ SELECT
     inventory.units.unit_name,
     inventory.items.hot_item,
     inventory.items.selling_price,
+    inventory.items.selling_price_includes_tax,
     inventory.items.photo
 FROM inventory.items
 INNER JOIN inventory.item_groups

@@ -33,15 +33,15 @@ BEGIN
         item_in_stock       numeric(24, 4),
         quantity            public.decimal_strict,        
         unit_id             integer,
-        price               money_strict,
-        discount            money_strict2,
+        price               public.money_strict,
+        discount_rate       public.decimal_strict2,
         shipping_charge     money_strict2,
         root_unit_id        integer,
         base_quantity       numeric(24, 4)
     ) ON COMMIT DROP;
 
-    INSERT INTO details_temp(store_id, item_id, quantity, unit_id, price, discount, shipping_charge)
-    SELECT store_id, item_id, quantity, unit_id, price, discount, shipping_charge
+    INSERT INTO details_temp(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
     FROM explode_array(_details);
 
     UPDATE details_temp

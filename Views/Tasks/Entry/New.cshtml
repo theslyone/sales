@@ -160,13 +160,13 @@
 
     .status.head .left {
         display: inline-block;
-        width: 50%;
+        width: 40%;
     }
 
     .status.head .right {
         display: inline-block;
         text-align: right;
-        width: 50%;
+        width: 60%;
     }
 
     .item.list {
@@ -674,7 +674,7 @@
                         </div>
 
                         <div class="right">
-                            <div class="inline blocks">
+                            <div class="three inline blocks">
                                 <div class="item">
                                     <select class="ui search inverted fluid dropdown" id="PriceTypeSelect"></select>
                                 </div>
@@ -689,20 +689,7 @@
 
                     </div>
 
-
-
-                    <div class="category list">
-                        <div class="cat filter" style="display: none;">
-                            Clear
-                            <i class="delete icon"></i>
-                        </div>
-                    </div>
-                    <div class="search panel">
-                        <input type="search" placeholder="Search ..." />
-
-                    </div>
-                    <div class="item list" id="POSItemList">
-                    </div>
+                    @Html.PartialView("Shared/POSItemList.cshtml", TenantConvention.GetTenant())
                 </div>
                 <div class="five wide column">
                     <div class="ui action panel inverted segment">
@@ -730,187 +717,8 @@
                             </div>
                         </div>
                         <div class="action container">
-                            <div class="header items">
-                                <div class="two summary items">
-                                    <div class="amount item">
-                                        <div class="description">Amount</div>
-                                        <div class="money">
-                                            <span></span>
-                                        </div>
-                                    </div>
-                                    <div class="count item">
-                                        <div class="description">Count</div>
-                                        <div class="money">
+                            @Html.PartialView("Shared/SalesEntryForm.cshtml", TenantConvention.GetTenant())
 
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tender info items">
-                                <div class="payment type container">
-                                    <div data-payment-type="cash" class="two summary items">
-                                        <div class="tender item">
-                                            <div class="description">Cash Tender</div>
-                                            <div class="control">
-                                                <input type="text" class="decimal" id="TenderInputText" />
-                                            </div>
-                                        </div>
-                                        <div class="change item">
-                                            <div class="description">Cash Change</div>
-                                            <div class="control">
-                                                <input class="decimal" type="text" readonly="readonly" id="ChangeInputText" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div data-payment-type="credit" style="display: none;" class="one summary items">
-                                        <div class="gift-card number item">
-                                            <div class="description">Payment Term</div>
-                                            <div class="control">
-                                                <select id="PaymentTermSelect"></select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div data-payment-type="check" style="display: none;">
-                                        <div class="two summary items">
-                                            <div class="check amount item">
-                                                <div class="description">Check Amount</div>
-                                                <div class="control">
-                                                    <input class="decimal" type="text" id="CheckAmountInputText" />
-                                                </div>
-                                            </div>
-                                            <div class="check bank name item">
-                                                <div class="description">Bank Name</div>
-                                                <div class="control">
-                                                    <input type="text" id="BankNameInputText" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="two summary items">
-                                            <div class="check number item">
-                                                <div class="description">Check Number</div>
-                                                <div class="control">
-                                                    <input type="text" id="CheckNumberInputText" />
-                                                </div>
-                                            </div>
-                                            <div class="check date item">
-                                                <div class="description">Check Date</div>
-                                                <div class="control">
-                                                    <input type="text" class="date" id="CheckDateInputText" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div data-payment-type="gift-card" style="display: none;" class="two summary items">
-                                        <div class="gift-card number item">
-                                            <div class="description">Gift Card Number</div>
-                                            <div class="control">
-                                                <div class="ui action fluid input">
-                                                    <input id="GiftCardNumberInputText" required="" type="text">
-                                                    <button class="ui icon blue button" onclick='$(".ui.gift.card.modal").modal("show");'>
-                                                        <i class="search icon"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="gift-card balance item">
-                                            <div class="description">Gift Card Balance</div>
-                                            <div class="control">
-                                                <input class="decimal" type="text" readonly="readonly" id="GiftCardNumberBalanceInputText" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="one summary items">
-                                    <div class="customer item">
-                                        <div class="description">Customer</div>
-                                        <div class="control">
-                                            <select id="CustomerSelect" class="ui search fluid inverted dropdown"></select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="three summary items">
-                                    <div class="coupon code item">
-                                        <div class="description">Coupon Code</div>
-                                        <div class="control">
-                                            <input type="text" class="" id="CouponCodeInputText" />
-                                        </div>
-                                    </div>
-                                    <div class="discount type item">
-                                        <div class="description">Discount Type</div>
-                                        <div class="control">
-                                            <select id="DiscountTypeSelect">
-                                                <option value="1">Rate</option>
-                                                <option value="2">Amount</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="discount item">
-                                        <div class="description">Discount</div>
-                                        <div class="control">
-                                            <input type="text" class="decimal" id="DiscountInputText" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="two summary items">
-                                    <div class="value date item">
-                                        <div class="description">Value Date</div>
-                                        <div class="control">
-                                            <input type="text" class="date" id="ValueDateInputText" />
-                                        </div>
-                                    </div>
-                                    <div class="book date item">
-                                        <div class="description">Book Date</div>
-                                        <div class="control">
-                                            <input type="text" class="date" id="BookDateInputText" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <a class="show more anchor">Show More</a>
-                                <div class="more" style="display: none;">
-                                    <div class="one summary items">
-                                        <div class="cost center item">
-                                            <div class="description">Cost Center</div>
-                                            <div class="control">
-                                                <select id="CostCenterSelect"></select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="one summary items">
-                                        <div class="shipping company item">
-                                            <div class="description">Shipper</div>
-                                            <div class="control">
-                                                <select id="ShipperSelect"></select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="two summary items">
-                                        <div class="reference number item">
-                                            <div class="description">Ref#</div>
-                                            <div class="control">
-                                                <input type="text" id="ReferenceNumberInputText" />
-                                            </div>
-                                        </div>
-                                        <div class="memo item">
-                                            <div class="description">Memo</div>
-                                            <div class="control">
-                                                <input type="text" id="StatementReferenceInputText" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <a class="show less anchor">Show Less</a>
-                                </div>
-                                <div class="ui one column padded grid">
-                                    <div class="column">
-                                        <button class="ui big green button" id="CheckoutButton">Checkout</button>
-
-                                        <div class="ticket panel">
-                                            <iframe id="TicketIframe"></iframe>
-                                            <button class="ui blue circular button" onclick="$('#TicketIframe').get(0).contentWindow.print();" id="PrintButton">Print</button>
-                                            <button class="ui red  circular button" onclick="$('.ticket.panel').hide();">Hide</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             <div id="SalesItems" class="sales items">
                             </div>
                             <div class="footer items" style="display: none;">
@@ -927,233 +735,14 @@
     </div>
 </div>
 
-<div class="ui customer search fullscreen modal padded segment">
-    <iframe src="/dashboard/sales/setup/customers/search"></iframe>
-</div>
 
-<div class="ui reprint ticket small modal">
-    <i class="close icon"></i>
-    <div class="header">
-        Reprint Ticket
-    </div>
-    <div class="content">
-        <div class="ui big form">
-            <div class="field">
-                <label>Enter Transaction Id</label>
-                <input id="TicketTranIdInputText" class="integer" placeholder="Enter Transaction Id" type="text">
-            </div>
-            <button reprint-ticket-button class="ui blue button">Reprint</button>
-            <button onclick="$(this).parent().parent().parent().modal('hide');" class="ui red button">Close</button>
-        </div>
-    </div>
-</div>
 
-@Html.PartialView("Shared/GiftCardSerachModal.cshtml", TenantConvention.GetTenant());
+@Html.PartialView("Shared/CustomerSearchModal.cshtml", TenantConvention.GetTenant())
+@Html.PartialView("Shared/ReprintTicketModal.cshtml", TenantConvention.GetTenant())
+@Html.PartialView("Shared/GiftCardSerachModal.cshtml", TenantConvention.GetTenant())
 
-<script>
-    function showTicket(id) {
-        var url = "/dashboard/sales/ticket/" + id;
-
-        $("#TicketIframe").attr("src", url);
-        $(".ticket.panel").show();
-    };
-
-    function reprintTicket() {
-        var id = $("#TicketTranIdInputText").val();
-
-        if (!id) {
-            return;
-        };
-
-        showTicket(id);
-        $(".reprint.ticket.modal").modal("hide");
-    };
-
-    $("#TicketTranIdInputText").keydown(function(e) {
-        var code = e.keyCode ? e.keyCode : E.which;
-
-        if (code === 13) {
-            reprintTicket();
-        };
-    });
-
-    $("[reprint-ticket-button]").unbind("click").bind("click", function () {
-        reprintTicket();
-    });
-
-    $("#SearchCustomerAction").click(function () {
-        $(".customer.search.modal").modal("show");
-    });
-
-    function onCustomerSearchSelect(customerId, customerName) {
-        if (customerId) {
-            $(".customer.search.modal").modal("hide");
-            //alert("The customer id is --> " + customerId);
-
-            $("#CustomerSelect").dropdown("clear");
-            $("#CustomerSelect").html("<option value='" + customerId + "'>" + customerName + "</option>");
-            setTimeout(function () {
-                $("#CustomerSelect").dropdown("set selected", customerId);
-            }, 100);
-        };
-    };
-</script>
 <script>
     var pageLoaded = false;
-
-    function getModel() {
-        function getDetails() {
-            var items = $("#SalesItems .item");
-            var model = [];
-
-            $.each(items, function () {
-                var el = $(this);
-                var itemId = parseInt(el.attr("data-item-id"));
-                var quantity = window.parseFloat2(el.find("input.quantity").val());
-                var unitId = parseInt(el.find("select.unit").val());
-                var price = window.parseFloat2(el.find("input.price").val() || 0);
-                var discountRate = window.parseFloat2(el.find("input.discount").val() || 0);
-                var discount = (price * quantity) * (discountRate / 100);
-
-                model.push({
-                    StoreId: $("#StoreSelect").val(),
-                    ItemId: itemId,
-                    Quantity: quantity,
-                    UnitId: unitId,
-                    Price: price,
-                    DiscountRate: discountRate,
-                    Discount: discount
-                });
-            });
-
-            return model;
-        };
-
-        //Cash
-        var tender = window.parseFloat2($("#TenderInputText").val());
-        var change = window.parseFloat2($("#ChangeInputText").val());
-
-        //Credit
-        var counterId = parseInt($("#CounterSelect").val()) || null;
-        var paymentTermId = parseInt($("#PaymentTermSelect").val()) || null;
-
-        //Check
-        var checkAmount = window.parseFloat2($("#CheckAmountInputText").val()) || null;
-        var bankName = $("#BankNameInputText").val();
-        var checkNumber = $("#CheckNumberInputText").val();
-        var checkDate = $("#CheckDateInputText").datepicker("getDate");
-
-        //Gift Card
-        var giftCardNumber = $("#GiftCardNumberInputText").val();
-
-
-        //Discount Coupon
-        var couponCode = $("#CouponCodeInputText").val();
-
-        //Discount
-        var discountType = $("#DiscountTypeSelect").val();
-        var discount = window.parseFloat2($("#DiscountInputText").val());
-
-        var valueDate = $("#ValueDateInputText").datepicker("getDate");
-        var bookDate = $("#BookDateInputText").datepicker("getDate");
-        var costCenterId = parseInt($("#CostCenterSelect").val()) || null;
-        var referenceNumber = $("#ReferenceNumberInputText").val();
-        var statementReference = $("#StatementReferenceInputText").val();
-        var customerId = parseInt($("#CustomerSelect").val()) || null;
-        var customerName = $("#CustomerSelect").dropdown("get text")[0];
-        var priceTypeId = $("#PriceTypeSelect").val();
-        var shipperId = $("#ShipperSelect").val();
-        var storeId = $("#StoreSelect").val();
-        var details = getDetails();
-        var quotationId = parseInt(window.getQueryStringByName("QuotationId")) || null;
-        var orderId = parseInt(window.getQueryStringByName("OrderId")) || null;
-
-        return {
-            Tender: tender,
-            Change: change,
-            PaymentTermId: paymentTermId,
-            CheckAmount: checkAmount,
-            CheckBankName: bankName,
-            CheckNumber: checkNumber,
-            CheckDate: checkDate,
-            CounterId: counterId,
-            GiftCardNumber: giftCardNumber,
-            CouponCode: couponCode,
-            DiscountType: discountType,
-            IsFlatDiscount: discountType === 2,
-            Discount: discount,
-            ValueDate: valueDate,
-            BookDate: bookDate,
-            CostCenterId: costCenterId,
-            ReferenceNumber: referenceNumber,
-            StatementReference: statementReference,
-            CustomerId: customerId,
-            CustomerName: customerName,
-            PriceTypeId: priceTypeId,
-            ShipperId: shipperId,
-            StoreId: storeId,
-            Details: details,
-            SalesQuotationId: quotationId,
-            SalesOrderId: orderId
-        };
-    };
-
-    function clearState() {
-        $.each(localStorage, function (key) {
-            if (key.substr(0, 6) === "posTab") {
-                localStorage.removeItem(key);
-            };
-        });
-    };
-
-    clearState();
-
-    function getSelectedTabId() {
-        var id = parseInt($(".tabs .selected.item:not(.new)").html());
-        return id;
-    };
-
-    function getLocalStorageKey(id) {
-        return "posTab" + id;
-    };
-
-    function getModelById(id) {
-        var key = getLocalStorageKey(id);
-        var item = localStorage.getItem(key);
-
-        if (item) {
-            return JSON.parse(item);
-        };
-
-        return null;
-    };
-
-    function removeModelById(id) {
-        var key = getLocalStorageKey(id);
-        localStorage.removeItem(key);
-    };
-
-    function saveState() {
-        var id = getSelectedTabId();
-
-        if (!id) {
-            window.displayMessage("Please select a tab");
-            return;
-        };
-
-        var model = getModel();
-        var key = getLocalStorageKey(id);
-        localStorage.setItem(key, JSON.stringify(model));
-    };
-
-
-    function removeState() {
-        var id = getSelectedTabId();
-
-        if (id) {
-            removeModelById(id);
-        };
-    };
 
     $(document).unbind("itemAdded").bind("itemAdded", function (e, tabId, itemId) {
         var model = getModelById(tabId);
@@ -1194,66 +783,6 @@
 
     });
 
-    function loadModelById(id) {
-        var model = getModelById(id);
-        if (!model) {
-            return;
-        };
-
-        clearScreen();
-
-
-        $("#TenderInputText").val(model.Tender);
-        $("#ChangeInputText").val(model.Change);
-        $("#PaymentTermSelect").dropdown("set selected", model.PaymentTermId);
-        $("#CounterSelect").dropdown("set selected", model.CounterId);
-
-        $("#CheckAmountInputText").val(model.CheckAmount);
-        $("#BankNameInputText").val(model.CheckBankName);
-        $("#CheckNumberInputText").val(model.CheckNumber);
-        $("#CheckDateInputText").datepicker("setDate", new Date(model.CheckDate));
-
-        $("#GiftCardNumberInputText").val(model.GiftCardNumber);
-        $("#CouponCodeInputText").val(model.CouponCode);
-        $("#DiscountTypeSelect").dropdown("set selected", model.DiscountType);
-        $("#DiscountInputText").val(model.Discount);
-
-        $("#ValueDateInputText").datepicker("setDate", new Date(model.ValueDate));
-        $("#BookDateInputText").datepicker("setDate", new Date(model.BookDate));
-        $("#CostCenterSelect").dropdown("set selected", model.CostCenterId);
-        $("#ReferenceNumberInputText").val(model.ReferenceNumber);
-        $("#StatementReferenceInputText").val(model.StatementReference);
-
-        $("#CustomerSelect").dropdown("clear");
-        $("#CustomerSelect").html("<option value='" + model.CustomerId + "'>" + model.CustomerName + "</option>");
-        setTimeout(function () {
-            $("#CustomerSelect").dropdown("set selected", model.CustomerId);
-        }, 100);
-
-        $("#PriceTypeSelect").dropdown("set selected", model.PriceTypeId);
-        $("#ShipperSelect").dropdown("set selected", model.ShipperId);
-        $("#StoreSelect").dropdown("set selected", model.StoreId);
-
-
-
-
-        $.each(model.Details, function () {
-            var lineItem = this;
-
-            var itemId = lineItem.ItemId;
-            var selector = "#POSItemList .item[data-item-id=" + itemId + "]";
-            $(selector).trigger("click");
-        });
-    };
-
-    function loadState() {
-        var id = getSelectedTabId();
-
-        if (id) {
-            loadModelById(id);
-        };
-    };
-
 
 
     $("#SalesItems .item").on("contextmenu", function (e) {
@@ -1267,99 +796,8 @@
     });
 </script>
 
-<script>
-    var itemTemplate = `<div class="item" id="pos-{ItemId}" data-selling-price="{SellingPrice}" data-photo="{Photo}" data-unit-id="{UnitId}" data-valid-units="{ValidUnits}" data-brand="{BrandName}" data-item-group="{ItemGroupName}" data-item-name="{ItemName}" data-item-code="{ItemCode}" data-item-id="{ItemId}" data-price="{Price}">
-	<div class="photo block">
-		<img src="{Photo}">
-	</div>
-	<div class="info block">
-		<div class="header">{ItemName}</div>
-		<div class="price info">
-			<span class ="rate">{SellingPrice}</span>
-			<span>&nbsp; x&nbsp; </span>
-			<span class="quantity">1</span>
-			<span>&nbsp; =&nbsp; </span>
-			<span class="amount"></span>
-		</div>
-		<div class="discount info" style="display:none;">
-			<span>Less&nbsp; </span>
-			<span class="discount rate"></span>
-			<span>&nbsp; =&nbsp; </span>
-			<span class="discounted amount"></span>
-		</div>
-		<div>
-			<select class="unit inverted" data-item-id="{ItemId}">
-			</select>
-		</div>
-	</div>
-	<div class="number block">
-		<input type="text" class ="decimal price" title="Edit Price" value="{SellingPrice}">
-		<input type="text" class="decimal quantity" title="Enter Quantity" value="1">
-		<input type="text" class="decimal discount" title="Enter Rate of Discount" value="">
-		<button class="ui red fluid button" onclick="removeItem(this);" style="display:none;">Delete</button>
-	</div>
-</div>`
-</script>
 
 <script>
-    var products = [];
-    var metaUnits = [];
-
-    function fetchUnits() {
-        function request() {
-            var url = "/api/forms/inventory/units/all";
-            return window.getAjaxRequest(url);
-        };
-
-        var ajax = request();
-
-        ajax.success(function (response) {
-            window.metaUnits = response;
-        });
-    };
-
-    function fetchProducts() {
-        function request() {
-            var url = "/dashboard/sales/tasks/items";
-            return window.getAjaxRequest(url);
-        };
-
-        var ajax = request();
-
-        ajax.success(function (response) {
-            window.products = response;
-            $(document).trigger("itemFetched");
-        });
-    };
-
-    $(".search.panel input").keyup(function () {
-        var el = $(this);
-        var term = el.val();
-
-        var categoryEl = $(".category.list .selected.category");
-        var category = "";
-
-        if (categoryEl.length) {
-            category = categoryEl.text();
-        };
-
-        displayProducts(category, term);
-
-        initializeClickAndAction();
-    });
-
-    $(".search.panel input").keydown(function (e) {
-        if (e.keyCode === 13) {
-            var item = $(".item.list .item:first");
-
-            if (item.length) {
-                item.trigger("click");
-            };
-        };
-    });
-
-    window.fetchUnits();
-    window.fetchProducts();
 
     setTimeout(function () {
         window.fetchProducts();
@@ -1378,236 +816,13 @@
         window.updateTotal();
     };
 
-    $(document).on("itemFetched", function () {
-        $("#POSDimmer").removeClass("active");
-        displayProducts();
-        displayCategories();
-        initializeClickAndAction();
-    });
 
     $(".toggle.view.item, .next.button").unbind("click").bind("click", function () {
         $(".tender.info.items").toggle();
-        //$(".header.items").toggle();
         $(".footer.items").toggle();
         $(".sales.items").toggle();
     });
 
-    function initializeClickAndAction() {
-        $("#POSItemList .item").unbind("click").bind("click", function () {
-            var el = $(this);
-            $(".tender.info.items").hide();
-            //$(".header.items").show();
-            $(".footer.items").show();
-            var sellingPrice = el.attr("data-selling-price");
-            var photo = el.attr("data-photo");
-
-            var barCode = el.attr("data-barcode");
-            var brand = el.attr("data-brand");
-            var unitId = el.attr("data-unit-id");
-            var validUnits = el.attr("data-valid-units");
-            var itemGroup = el.attr("data-item-group");
-            var itemName = el.attr("data-item-name");
-            var itemCode = el.attr("data-item-code");
-            var itemId = el.attr("data-item-id");
-            var price = window.parseFloat2(sellingPrice || 0);
-
-            if (!price) {
-                window.displayMessage("Cannot add item because the price is zero.");
-                return;
-            };
-
-
-
-            var targetEl = $("#SalesItems");
-            var selector = "pos-" + itemId;
-            var existingEl = $("#" + selector);
-
-            if (existingEl.length) {
-                var existingQuantitySpan = existingEl.find("span.quantity");
-                var existingQuantityInput = existingEl.find("input.quantity");
-
-                var quantity = window.parseFloat2(existingQuantitySpan.text() || 0);
-                quantity++;
-
-                existingQuantitySpan.text(quantity);
-                existingQuantityInput.val(quantity).trigger("keyup");
-
-                window.updateTotal();
-                return;
-            };
-
-            var template = itemTemplate;
-
-            template = template.replace(/{ItemId}/g, itemId);
-            template = template.replace(/{SellingPrice}/g, sellingPrice);
-            template = template.replace(/{Photo}/g, photo);
-            template = template.replace(/{BarCode}/g, barCode);
-            template = template.replace(/{BrandName}/g, brand);
-            template = template.replace(/{ItemGroupName}/g, itemGroup);
-            template = template.replace(/{ItemName}/g, itemName);
-            template = template.replace(/{ItemCode}/g, itemCode);
-            template = template.replace(/{Price}/g, price);
-            template = template.replace(/{UnitId}/g, unitId);
-            template = template.replace(/{ValidUnits}/g, validUnits);
-
-            var item = $(template);
-            var quantityInput = item.find("input.quantity");
-            var priceInput = item.find("input.price");
-            var discountInput = item.find("input.discount");
-            var unitSelect = item.find("select.unit");
-
-            function loadUnits(el, defaultUnitId, validUnits) {
-                el.html("");
-
-                var units = window.Enumerable.From(window.metaUnits)
-                    .Where(function (x) {
-                        return validUnits.indexOf(x.unit_id.toString()) > -1;
-                    }).ToArray();
-
-                $.each(units, function () {
-                    var unit = this;
-
-                    var option = $("<option/ >");
-                    option.attr("value", unit.unit_id);
-                    option.html(unit.unit_name);
-
-                    if (defaultUnitId === unit.unit_id) {
-                        option.attr("selected", "");
-                    };
-
-                    option.appendTo(el);
-                });
-
-            };
-
-            loadUnits(unitSelect, unitId, validUnits.split(','));
-
-            function updateItemTotal(el) {
-                var quantityEl = el.find("input.quantity");
-                var discountEl = el.find("input.discount");
-
-                var quantity = window.parseFloat2(quantityEl.val() || 0);
-                var discountRate = window.parseFloat2(discountEl.val().replace("%", ""));
-                var price = window.parseFloat2(el.find("input.price").val());
-
-                var amount = (price * quantity).toFixed(2);
-                var discountedAmount = ((price * quantity) * ((100 - discountRate) / 100)).toFixed(2);
-
-                el.find("span.rate:not(.discount)").html(price);
-                el.find("span.quantity").html(quantity);
-                el.find("span.amount").html(amount);
-                el.find("span.discount.rate").html("");
-                el.find("span.discounted.amount").html("");
-
-                if (discountRate) {
-                    el.find(".discount.info").show();
-                    el.find("span.discount.rate").html(discountEl.val().replace("%", "") + "%");
-                    el.find("span.discounted.amount").html(discountedAmount);
-                } else {
-                    el.find(".discount.info").hide();
-                }
-
-                window.updateTotal();
-            };
-
-            quantityInput.on("keyup", function () {
-                var el = $(this);
-                var parentInfo = el.parent().parent();
-                updateItemTotal(parentInfo);
-            });
-
-            discountInput.on("keyup", function () {
-                var el = $(this);
-
-                var rate = window.parseFloat2(el.val());
-                if (rate > 100) {
-                    el.val("100");
-                    return;
-                };
-
-                var parentInfo = el.parent().parent();
-                updateItemTotal(parentInfo);
-            });
-
-            priceInput.on("keyup", function () {
-                var el = $(this);
-                var parentInfo = el.parent().parent();
-                updateItemTotal(parentInfo);
-            });
-
-            discountInput.on("blur", function () {
-                var el = $(this);
-                var value = el.val();
-
-                if (!value) {
-                    return;
-                };
-
-                if (value.substr(value.length - 1) === "%") {
-                    return;
-                };
-
-                el.val(el.val() + "%");
-                var parentInfo = el.parent().parent();
-                updateItemTotal(parentInfo);
-            });
-
-            function getPrice(el) {
-                function request(itemId, customerId, priceTypeId, unitId) {
-                    var url = "/dashboard/sales/tasks/selling-price/{itemId}/{customerId}/{priceTypeId}/{unitId}";
-                    url = url.replace("{itemId}", itemId);
-                    url = url.replace("{customerId}", customerId);
-                    url = url.replace("{priceTypeId}", priceTypeId);
-                    url = url.replace("{unitId}", unitId);
-
-                    return window.getAjaxRequest(url);
-                };
-
-                var itemId = el.attr("data-item-id");
-                var customerId = parseInt($("#CustomerSelect").val()) || 0;
-                var priceTypeId = parseInt($("#PriceTypeSelect").val()) || 0;
-                var unitId = el.val();
-
-                $(".action.panel.segment").addClass("loading");
-                var ajax = request(itemId, customerId, priceTypeId, unitId);
-
-                ajax.success(function (response) {
-                    $(".action.panel.segment").removeClass("loading");
-                    var priceInput = el.parent().parent().parent().find("input.price");
-                    priceInput.val(response).trigger("keyup");
-                });
-
-                ajax.fail(function (xhr) {
-                    $(".action.panel.segment").removeClass("loading");
-                    console.log(window.getAjaxErrorMessage(xhr));
-                });
-            };
-
-            unitSelect.on("change", function () {
-                getPrice($(this));
-            });
-
-            item.on("contextmenu", function (e) {
-                e.preventDefault();
-                var el = $(this);
-                var inputEl = el.find(".number.block input");
-                var buttonEl = el.find(".number.block button");
-
-                inputEl.toggle();
-                buttonEl.toggle();
-            });
-
-            item.appendTo(targetEl);
-            quantityInput.trigger("keyup");
-            window.setNumberFormat();
-            window.updateTotal();
-
-            var tabId = getSelectedTabId();
-            var triggerName = "itemAdded";
-
-            $(document).trigger(triggerName, [tabId, itemId]);
-        });
-    };
 
     $("#ReceiptSummary div.tender .money input").keyup(function () {
         window.updateTotal();
@@ -1665,286 +880,13 @@
         countEl.html(totalQuantity.toFixed(2));
     };
 
-    function displayCategories() {
-        var categories = window.Enumerable.From(products).Distinct(function (x) { return x.ItemGroupName }).Select(function (x) { return x.ItemGroupName }).ToArray();
-        var targetEl = $(".cat.filter");
-        $(".category.list").find(".category").remove();
 
-        targetEl.unbind("click").bind("click", function () {
-            displayProducts();
-            $(".category").removeClass("selected");
-            targetEl.hide();
-            initializeClickAndAction();
-        });
-
-        $.each(categories, function () {
-            var category = $("<div class='category' />");
-            category.html(this);
-
-            category.unbind("click").bind("click", function () {
-                $(".search.panel input").val("");
-                var el = $(this);
-                var name = el.text();
-
-                if (name) {
-                    displayProducts(name);
-                    $(".category").removeClass("selected");
-                    el.addClass("selected");
-
-                    targetEl.show();
-                } else {
-                    targetEl.hide();
-                };
-
-                initializeClickAndAction();
-            });
-
-            targetEl.before(category);
-        });
-    };
-
-    function displayProducts(category, searchQuery) {
-        var target = $("#POSItemList");
-
-        var groupItems;
-
-        if (!category && !searchQuery) {
-            groupItems = products;
-        } else {
-            if (category && searchQuery) {
-                groupItems = window.Enumerable
-                    .From(products)
-                    .Where(function (x) {
-                        return x.ItemGroupName.toLowerCase() === category.toString().toLowerCase()
-                            && x.ItemName.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1;
-                    }).ToArray();
-            } else if (!category && searchQuery) {
-                groupItems = window.Enumerable
-                    .From(products)
-                    .Where(function (x) {
-                        return x.ItemName.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1;
-                    }).ToArray();
-            } else {
-                groupItems = window.Enumerable
-                    .From(products)
-                    .Where(function (x) {
-                        return x.ItemGroupName.toLowerCase() === category.toString().toLowerCase();
-                    }).ToArray();
-            };
-        };
-
-
-        target.html("").hide();
-
-        groupItems = window.Enumerable.From(groupItems).OrderBy(function (x) { return x.ItemId; }).ToArray();
-
-        $.each(groupItems, function () {
-            var product = this;
-
-            var item = $("<div class='item' />");
-            item.attr("data-item-id", product.ItemId);
-            item.attr("data-item-code", product.ItemCode);
-            item.attr("data-item-name", product.ItemName);
-            item.attr("data-item-group", product.ItemGroupName);
-            item.attr("data-brand", product.BrandName);
-            item.attr("data-unit-id", product.UnitId);
-            item.attr("data-valid-units", product.ValidUnits);
-            item.attr("data-barcode", product.Barcode);
-            item.attr("data-photo", product.Photo);
-            item.attr("data-selling-price", product.SellingPrice);
-
-            if (product.HotItem) {
-                item.addClass("hot");
-            };
-
-            var info = $("<div class='info' />");
-
-            var price = $("<div class='price' />");
-            price.html(product.SellingPrice);
-
-            price.appendTo(info);
-
-
-            var photo = $("<div class='photo' />");
-            var img = $("<img />");
-            img.attr("src", product.Photo + "?Height=200&Width=200");
-
-            img.appendTo(photo);
-            photo.appendTo(info);
-
-            var name = $("<div class='name' />");
-            name.html(product.ItemName);
-
-            name.appendTo(info);
-
-            info.appendTo(item);
-            item.appendTo(target);
-        });
-
-        if (searchQuery) {
-            target.show();
-            return;
-        };
-
-        target.fadeIn(500);
-    };
 
 </script>
 <script>
-    $("#TenderInputText").on("keyup", function () {
-        var total = window.parseFloat2($(".amount.item .money").text());
-        var tender = window.parseFloat2($(this).val());
-
-        var change = tender - total;
-
-        if (change < 0) {
-            change = "ERROR";
-        };
-
-        $("#ChangeInputText").val(change);
+    $("#ClearScreenButton").unbind("click").bind("click", function () {
+        clearScreen();
     });
-
-    $("#CheckoutButton").unbind("click").bind("click", function () {
-        function request(model) {
-            var url = "/dashboard/sales/tasks/entry/new";
-            var data = JSON.stringify(model);
-            return window.getAjaxRequest(url, "POST", data);
-        };
-
-        function validate() {
-            var transactionTotal = window.parseFloat2($("div.amount .money").text());
-            var cashTender = window.parseFloat2($("#TenderInputText").val());
-            var paymentTerm = parseInt($("#PaymentTermSelect").val()) || null;
-            var checkAmount = window.parseFloat2($("#CheckAmountInputText").val());
-            var bankName = $("#BankNameInputText").val();
-            var checkDate = $("#CheckDateInputText").datepicker("getDate");
-            var checkNumber = $("#CheckNumberInputText").val();
-            var giftCardNumber = $("#GiftCardNumberInputText").val();
-            var giftCardBalance = $("#GiftCardNumberBalanceInputText").val();
-
-            if (cashTender >= transactionTotal) {
-                //Cash Transaction
-
-                $("#CheckAmountInputText").val("");
-                $("#BankNameInputText").val("");
-                $("#CheckDateInputText").val("");
-                $("#CheckNumberInputText").val("");
-                $("#PaymentTermSelect").dropdown("set selected", "Select");
-                $("#GiftCardNumberInputText").val("");
-                $("#GiftCardNumberBalanceInputText").val("");
-                return true;
-            };
-
-            if (checkAmount >= transactionTotal) {
-                //Paid via Check/Cheque
-                if (!bankName) {
-                    window.displayMessage("Please enter the bank name.");
-                    return false;
-                };
-
-                if (!checkNumber) {
-                    window.displayMessage("Please enter the check number.");
-                    return false;
-                };
-
-                if (!checkDate) {
-                    window.displayMessage("Please enter the check date.");
-                    return false;
-                };
-
-                $("#TenderInputText").val("");
-                $("#ChangeInputText").val("");
-                $("#PaymentTermSelect").dropdown("set selected", "Select");
-                $("#GiftCardNumberInputText").val("");
-                $("#GiftCardNumberBalanceInputText").val("");
-
-
-                return true;
-            };
-
-            if (giftCardBalance >= transactionTotal) {
-                //Paid via Gift Card
-
-                if (!giftCardNumber) {
-                    window.displayMessage("Please enter the gift card number.");
-                    return false;
-                };
-
-                $("#TenderInputText").val("");
-                $("#ChangeInputText").val("");
-                $("#CheckAmountInputText").val("");
-                $("#BankNameInputText").val("");
-                $("#CheckDateInputText").val("");
-                $("#CheckNumberInputText").val("");
-                $("#PaymentTermSelect").dropdown("set selected", "Select");
-
-                return true;
-            };
-
-            //Credit transaction
-            $("#TenderInputText").val("");
-            $("#ChangeInputText").val("");
-            $("#CheckAmountInputText").val("");
-            $("#BankNameInputText").val("");
-            $("#CheckDateInputText").val("");
-            $("#CheckNumberInputText").val("");
-            $("#GiftCardNumberInputText").val("");
-            $("#GiftCardNumberBalanceInputText").val("");
-
-            if (!paymentTerm) {
-                window.displayMessage("Please select a payment term.");
-                return false;
-            };
-
-            return true;
-        };
-
-        var isValid = validate();
-
-        if (!isValid) {
-            return;
-        };
-
-        var model = getModel();
-
-        if (!model.Details.length) {
-            window.displayMessage("Please select an item.");
-            return;
-        };
-
-        var confirmed = confirm("Are you sure");
-
-        if (!confirmed) {
-            return;
-        };
-
-
-        $("#CheckoutButton").addClass("loading");
-
-        var ajax = request(model);
-
-        ajax.success(function (response) {
-            var id = response;
-            window.clearScreen();
-
-            showTicket(id);
-            $("#CheckoutButton").removeClass("loading");
-        });
-
-        ajax.fail(function (xhr) {
-            $("#CheckoutButton").removeClass("loading");
-            window.displayMessage(JSON.stringify(xhr));
-        });
-    });
-</script>
-
-<script>
-    $("#ClearScreenButton")
-        .unbind("click")
-        .bind("click",
-            function () {
-                clearScreen();
-            });
 
     function clearScreen() {
         $("#SalesItems").html("");
@@ -1954,9 +896,7 @@
 
         window.updateTotal();
     };
-</script>
 
-<script>
     function loadStores() {
         window.displayFieldBinder($("#StoreSelect"), "/api/forms/inventory/stores/display-fields", true);
     };
@@ -2021,77 +961,71 @@
 
 <script>
     function initializeTabs() {
-        $(".pos.tabs .item:not(.new)").unbind("click").bind("click",
-            function () {
-                saveState();
-                $(".pos.tabs .item").removeClass("selected");
-                var el = $(this);
-                el.addClass("selected");
-                loadState();
-            });
+        $(".pos.tabs .item:not(.new)").unbind("click").bind("click", function () {
+            window.saveState();
+            $(".pos.tabs .item").removeClass("selected");
+            var el = $(this);
+            el.addClass("selected");
+            window.loadState();
+        });
     };
 
-    $(".tabs .new.item")
-        .unbind("click")
-        .bind("click",
-            function () {
-                var el = $(this);
-                saveState();
+    $(".tabs .new.item").unbind("click").bind("click", function () {
+        var el = $(this);
+        window.saveState();
 
-                function createTab(id) {
-                    var item = $("<div class='item' />");
-                    item.attr("id", "tab-item-" + id);
-                    item.html(id);
+        function createTab(id) {
+            var item = $("<div class='item' />");
+            item.attr("id", "tab-item-" + id);
+            item.html(id);
 
-                    el.siblings(".actions").before(item);
-                };
+            el.siblings(".actions").before(item);
+        };
 
-                var items = [];
-                var candidates = $(".tabs .item:not(.new)");
+        var items = [];
+        var candidates = $(".tabs .item:not(.new)");
 
-                $.each(candidates,
-                    function () {
-                        var el = $(this);
-                        var id = parseInt(el.text());
-                        items.push(id);
-                    });
-
-                var max = window.Enumerable.From(items).Max(function (x) { return x; });
-                var nextValue = 1;
-
-                if (max) {
-                    nextValue = max + 1;
-                };
-
-                createTab(nextValue);
-
-
-                initializeTabs();
-                $(".tabs .item").removeClass("selected");
-                $("#tab-item-" + nextValue).addClass("selected");
-                clearScreen();
-            });
-
-    $(".tabs .actions .delete.icon").unbind("click").bind("click",
-        function () {
-            var activeEl = $(".tabs .selected.item");
-            var id = parseInt(activeEl.text());
-
-            if (activeEl.length && id > 1) {
-                var confirmed = window.confirm("Are you sure you want to delete this tab?");
-
-                if (!confirmed) {
-                    return;
-                };
-
-                removeState();
-
-                var previousEl = activeEl.prev(".item");
-                previousEl.addClass("selected");
-                activeEl.remove();
-                loadState();
-            };
+        $.each(candidates, function () {
+            var el = $(this);
+            var id = parseInt(el.text());
+            items.push(id);
         });
+
+        var max = window.Enumerable.From(items).Max(function (x) { return x; });
+        var nextValue = 1;
+
+        if (max) {
+            nextValue = max + 1;
+        };
+
+        createTab(nextValue);
+
+
+        initializeTabs();
+        $(".tabs .item").removeClass("selected");
+        $("#tab-item-" + nextValue).addClass("selected");
+        clearScreen();
+    });
+
+    $(".tabs .actions .delete.icon").unbind("click").bind("click", function () {
+        var activeEl = $(".tabs .selected.item");
+        var id = parseInt(activeEl.text());
+
+        if (activeEl.length && id > 1) {
+            var confirmed = window.confirm("Are you sure you want to delete this tab?");
+
+            if (!confirmed) {
+                return;
+            };
+
+            window.removeState();
+
+            var previousEl = activeEl.prev(".item");
+            previousEl.addClass("selected");
+            activeEl.remove();
+            window.loadState();
+        };
+    });
 
     initializeTabs();
 
@@ -2130,16 +1064,15 @@
 
 <script>
     setTimeout(function () {
-            $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
-        },
-        100);
+        $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
+    }, 100);
 
     $("select:not(.ui)").addClass("inverted fluid").dropdown();
 
     window.overridePath = "/dashboard/sales/tasks/entry";
 </script>
 <script>
-    $("#GiftCardNumberInputText").on("change", function() {
+    $("#GiftCardNumberInputText").on("change", function () {
         function request(giftCardNumber) {
             var url = "/dashboard/loyalty/tasks/gift-cards/get-balance/{giftCardNumber}";
             url = url.replace("{giftCardNumber}", giftCardNumber);
@@ -2156,7 +1089,7 @@
 
         var ajax = request(giftCardNumber);
 
-        ajax.success(function(response) {
+        ajax.success(function (response) {
             $("#GiftCardNumberBalanceInputText").val(response);
         });
     });

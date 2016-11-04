@@ -2,7 +2,7 @@
 
 @{
     ViewBag.Title = "Customers";
-    Layout = ViewBag.SalesLayoutPath;
+    Layout = ViewBag.Layout;
 }
 
 <script>
@@ -27,7 +27,7 @@
         image: "photo",
         header: "customer_name",
         meta: "customer_code",
-        description: "contact_phone_numbers"
+        description: "contact_phone_numbers"        
     };
 
     scrudFactory.layout = [
@@ -47,6 +47,13 @@
         {
             property: "CustomerTypeId",
             url: '/api/forms/inventory/customer-types/display-fields',
+            data: null,
+            valueField: "Key",
+            textField: "Value"
+        },
+        {
+            property: "AccountId",
+            url: '/api/views/finance/receivable-account-selector-view/display-fields',
             data: null,
             valueField: "Key",
             textField: "Value"

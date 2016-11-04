@@ -86,10 +86,11 @@ BEGIN
         unit_id                         integer,
         base_quantity                   decimal,
         base_unit_id                    integer,                
-        price                           money_strict,
-        cost_of_goods_sold              money_strict2 DEFAULT(0),
-        discount                        money_strict2,
-        shipping_charge                 money_strict2,
+        price                           public.money_strict,
+        cost_of_goods_sold              public.money_strict2 DEFAULT(0),
+        discount                        public.money_strict2,
+        discount_rate                   public.decimal_strict2,
+        shipping_charge                 public.money_strict2,
         sales_account_id                integer,
         sales_discount_account_id       integer,
         sales_return_account_id         integer,
@@ -97,8 +98,8 @@ BEGIN
         cost_of_goods_sold_account_id   integer
     ) ON COMMIT DROP;
         
-    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount, shipping_charge)
-    SELECT store_id, item_id, quantity, unit_id, price, discount, shipping_charge
+    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
     FROM explode_array(_details);
 
     UPDATE temp_checkout_details 

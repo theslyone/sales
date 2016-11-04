@@ -1,0 +1,42 @@
+﻿@model dynamic
+
+<div class="ui reprint ticket small modal">
+    <i class="close icon"></i>
+    <div class="header">
+        Reprint Ticket
+    </div>
+    <div class="content">
+        <div class="ui big form">
+            <div class="field">
+                <label>Enter Transaction Id</label>
+                <input id="TicketTranIdInputText" class="integer" placeholder="Enter Transaction Id" type="text">
+            </div>
+            <button reprint-ticket-button class="ui blue button">Reprint</button>
+            <button onclick="$(this).parent().parent().parent().modal('hide');" class="ui red button">Close</button>
+        </div>
+    </div>
+</div>
+<script>
+    function reprintTicket() {
+        var id = $("#TicketTranIdInputText").val();
+
+        if (!id) {
+            return;
+        };
+
+        window.showTicket(id);
+        $(".reprint.ticket.modal").modal("hide");
+    };
+
+    $("#TicketTranIdInputText").keydown(function (e) {
+        var code = e.keyCode ? e.keyCode : E.which;
+
+        if (code === 13) {
+            reprintTicket();
+        };
+    });
+
+    $("[reprint-ticket-button]").unbind("click").bind("click", function () {
+        reprintTicket();
+    });
+</script>

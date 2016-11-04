@@ -257,7 +257,7 @@ CREATE TABLE sales.sales
     is_credit                               boolean NOT NULL DEFAULT(false),
 	credit_settled							boolean,
     payment_term_id                         integer REFERENCES sales.payment_terms,
-    tender                                  decimal(24, 4) NOT NULL CHECK(tender > 0),
+    tender                                  decimal(24, 4) NOT NULL,
     change                                  decimal(24, 4) NOT NULL,
     gift_card_id                            integer REFERENCES sales.gift_cards,
     check_number                            national character varying(100),
@@ -330,7 +330,7 @@ AS
     quantity            public.decimal_strict,
     unit_id           	integer,
     price               public.money_strict,
-    discount            public.money_strict2,
+    discount_rate       public.money_strict2,
     shipping_charge     public.money_strict2
 );
 
@@ -1601,10 +1601,11 @@ BEGIN
         unit_id                         integer,
         base_quantity                   decimal,
         base_unit_id                    integer,                
-        price                           money_strict,
-        cost_of_goods_sold              money_strict2 DEFAULT(0),
-        discount                        money_strict2,
-        shipping_charge                 money_strict2,
+        price                           public.money_strict,
+        cost_of_goods_sold              public.money_strict2 DEFAULT(0),
+        discount                        public.money_strict2,
+        discount_rate                   public.decimal_strict2,
+        shipping_charge                 public.money_strict2,
         sales_account_id                integer,
         sales_discount_account_id       integer,
         sales_return_account_id         integer,
@@ -1612,8 +1613,8 @@ BEGIN
         cost_of_goods_sold_account_id   integer
     ) ON COMMIT DROP;
         
-    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount, shipping_charge)
-    SELECT store_id, item_id, quantity, unit_id, price, discount, shipping_charge
+    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
     FROM explode_array(_details);
 
     UPDATE temp_checkout_details 
@@ -1848,14 +1849,20 @@ BEGIN
 
 
     IF(COALESCE(_coupon_code, '') != '' AND COALESCE(_discount) > 0) THEN
-        RAISE EXCEPTION 'Please do not specify discount rate when you mention coupon code';
+        RAISE EXCEPTION 'Please do not specify discount rate when you mention coupon code.';
+    END IF;
+    --TODO: VALIDATE COUPON CODE AND POST DISCOUNT
+
+    IF(COALESCE(_payment_term_id, 0) > 0) THEN
+        _is_credit                          := true;
     END IF;
 
     IF(NOT _is_credit AND NOT _is_cash) THEN
         RAISE EXCEPTION 'Cannot post sales. Invalid cash account mapping on store.'
         USING ERRCODE='P1302';
-    END IF; 
+    END IF;
 
+   
     IF(NOT _is_cash) THEN
         _cash_repository_id                 := NULL;
     END IF;
@@ -1872,26 +1879,28 @@ BEGIN
         unit_id                         integer,
         base_quantity                   decimal,
         base_unit_id                    integer,                
-        price                           money_strict,
-        cost_of_goods_sold              money_strict2 DEFAULT(0),
-        discount                        money_strict2,
-        shipping_charge                 money_strict2,
+        price                           public.money_strict,
+        cost_of_goods_sold              public.money_strict2 DEFAULT(0),
+        discount_rate                   public.decimal_strict2,
+        discount                        public.money_strict2,
+        shipping_charge                 public.money_strict2,
         sales_account_id                integer,
         sales_discount_account_id       integer,
         inventory_account_id            integer,
         cost_of_goods_sold_account_id   integer
     ) ON COMMIT DROP;
         
-    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount, shipping_charge)
-    SELECT store_id, item_id, quantity, unit_id, price, discount, shipping_charge
+    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
     FROM explode_array(_details);
 
-
+    
     UPDATE temp_checkout_details 
     SET
         tran_type                       = 'Cr',
         base_quantity                   = inventory.get_base_quantity_by_unit_id(unit_id, quantity),
-        base_unit_id                    = inventory.get_root_unit_id(unit_id);
+        base_unit_id                    = inventory.get_root_unit_id(unit_id),
+        discount                        = (price * quantity) * (discount_rate / 100);
 
 
     UPDATE temp_checkout_details
@@ -2316,15 +2325,15 @@ BEGIN
         item_in_stock       numeric(24, 4),
         quantity            public.decimal_strict,        
         unit_id             integer,
-        price               money_strict,
-        discount            money_strict2,
+        price               public.money_strict,
+        discount_rate       public.decimal_strict2,
         shipping_charge     money_strict2,
         root_unit_id        integer,
         base_quantity       numeric(24, 4)
     ) ON COMMIT DROP;
 
-    INSERT INTO details_temp(store_id, item_id, quantity, unit_id, price, discount, shipping_charge)
-    SELECT store_id, item_id, quantity, unit_id, price, discount, shipping_charge
+    INSERT INTO details_temp(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
     FROM explode_array(_details);
 
     UPDATE details_temp
@@ -2617,9 +2626,6 @@ SELECT * FROM auth.create_app_menu_policy
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/04.default-values/01.default-values.sql --<--<--
 
 
--->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.reports/cinesys.sales_by_cashier_view.sql --<--<--
-
-
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.scrud-views/sales.cashier_scrud_view.sql --<--<--
 DROP VIEW IF EXISTS sales.cashier_scrud_view;
 
@@ -2812,6 +2818,7 @@ SELECT
     inventory.units.unit_name,
     inventory.items.hot_item,
     inventory.items.selling_price,
+    inventory.items.selling_price_includes_tax,
     inventory.items.photo
 FROM inventory.items
 INNER JOIN inventory.item_groups

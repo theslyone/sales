@@ -7,7 +7,7 @@
     string logo = AppUsers.GetCurrent().Logo.Or("/Static/images/logo.png");
     var appUser = AppUsers.GetCurrent();
     string currenySymbol = appUser.CurrencySymbol;
-    decimal subTotal = Model.Details.Sum(x => (x.Price*x.Quantity) - x.Discount);
+    decimal subTotal = Model.Details.Sum(x => x.Price*x.Quantity - x.Discount);
     decimal total = subTotal - Model.View.Discount;
 }
 <style>
@@ -169,13 +169,13 @@
                     <td>
                         <div class="item info">
                             @item.ItemName
-                            
+
                             @item.Quantity@item.UnitCode x @item.Price.ToString("N2") = @currenySymbol@((item.Quantity*item.Price).ToString("N2"))
                         </div>
                         @if (item.Discount > 0)
                         {
                             <div class="discount info">
-                                Less  @currenySymbol@item.Discount.ToString("N2") (@((item.Discount * 100 / (item.Amount + item.Discount)).ToString("N2"))%)
+                                Less @currenySymbol@item.Discount.ToString("N2") (@((item.Discount*100/(item.Amount + item.Discount)).ToString("N2"))%)
                             </div>
                         }
                     </td>
@@ -186,19 +186,26 @@
             }
             </tbody>
             <tfoot>
-            <tr>
-                <th class="right">Sub Total</th>
-                <th class="right">@currenySymbol@subTotal.ToString("N2")</th>
-            </tr>
             @if (Model.View.Discount > 0)
             {
                 <tr>
+                    <th class="right">Sub Total</th>
+                    <th class="right">@currenySymbol@subTotal.ToString("N2")</th>
+                </tr>
+                <tr>
                     <th class="right">
                         Discount
-                        (@((Model.View.Discount * 100 / subTotal).ToString("N2"))%)
+                        (@((Model.View.Discount*100/subTotal).ToString("N2"))%)
                     </th>
                     <th class="right">@currenySymbol@Model.View.Discount.ToString("N2")</th>
                 </tr>
+                <tr>
+                    <th class="right">Total</th>
+                    <th class="right">@currenySymbol@total.ToString("N2")</th>
+                </tr>
+            }
+            else
+            {
                 <tr>
                     <th class="right">Total</th>
                     <th class="right">@currenySymbol@total.ToString("N2")</th>

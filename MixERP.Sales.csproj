@@ -178,7 +178,7 @@
     <Compile Include="ViewModels\Sales.cs" />
     <Compile Include="ViewModels\SalesDetailType.cs" />
     <Compile Include="ViewModels\SearchResult.cs" />
-    <Compile Include="ViewModels\TicketViewMode.cs" />
+    <Compile Include="ViewModels\TicketViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -213,6 +213,10 @@
     <Content Include="Views\Loyalty\GiftCards\AddFund\Checklist.cshtml" />
     <Content Include="Views\Loyalty\GiftCards\AddFund\Verification.cshtml" />
     <Content Include="Views\Shared\GiftCardSerachModal.cshtml" />
+    <Content Include="Views\Shared\ReprintTicketModal.cshtml" />
+    <Content Include="Views\Shared\CustomerSearchModal.cshtml" />
+    <Content Include="Views\Shared\SalesEntryForm.cshtml" />
+    <Content Include="Views\Shared\POSItemList.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
