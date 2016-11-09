@@ -18,7 +18,7 @@
 </div>
 <script>
     function reprintTicket() {
-        var id = $("#TicketTranIdInputText").val();
+        const id = $("#TicketTranIdInputText").val();
 
         if (!id) {
             return;
@@ -29,7 +29,7 @@
     };
 
     $("#TicketTranIdInputText").keydown(function (e) {
-        var code = e.keyCode ? e.keyCode : E.which;
+        const code = e.keyCode ? e.keyCode : E.which;
 
         if (code === 13) {
             reprintTicket();

@@ -74,33 +74,33 @@
     $(document).on("formready", function () {
         $("#customer_id").change(function () {
             function request(customerId) {
-                var url = '/api/forms/inventory/customers/get-where/1';
+                const url = '/api/forms/inventory/customers/get-where/1';
 
-                var filters = [];
+                const filters = [];
                 filters.push(window.getAjaxColumnFilter("WHERE", "customer_id", "int", window.FilterConditions.IsEqualTo, customerId));
-                var data = JSON.stringify(filters);
+                const data = JSON.stringify(filters);
 
                 return window.getAjaxRequest(url, "POST", data);
             };
 
             function setValueByElementId(elementId, value) {
-                var el = $("#" + elementId);
-                var currentValue = el.val();
+                const el = $("#" + elementId);
+                const currentValue = el.val();
                 if (!currentValue) {
                     el.val(value);
                 };
             };
 
-            var customerId = $(this).val();
+            const customerId = $(this).val();
 
-            var ajax = request(customerId);
+            const ajax = request(customerId);
 
             ajax.success(function (response) {
                 if (!response || !response[0]) {
                     return;
                 };
 
-                var model = response[0];
+                const model = response[0];
 
                 setValueByElementId("first_name", model.contact_first_name);
                 setValueByElementId("middle_name", model.contact_middle_name);

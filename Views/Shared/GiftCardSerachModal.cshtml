@@ -78,7 +78,7 @@
     $("#SearchButton").unbind("click").bind("click", function () {
         function displayResult(model) {
             function getCell(html) {
-                var cell = $("<td />");
+                const cell = $("<td />");
                 cell.html(html);
                 return cell;
             };
@@ -87,7 +87,7 @@
                 var html = "<a onclick='showSearchResult(\"{id}\");'>Select</a>";
                 html = html.replace("{id}", id);
 
-                var cell = $("<td />");
+                const cell = $("<td />");
                 cell.html(html);
                 return cell;
             };
@@ -95,7 +95,7 @@
             var target = $(".results.table tbody").html("");
 
             $.each(model, function () {
-                var row = $("<tr />");
+                const row = $("<tr />");
                 row.append(getActionCell(this.GiftCardNumber));
                 row.append(getCell(this.GiftCardNumber));
                 row.append(getCell(this.Name));
@@ -112,15 +112,15 @@
         };
 
         function request(model) {
-            var url = "/dashboard/loyalty/tasks/gift-cards/search";
-            var data = JSON.stringify(model);
+            const url = "/dashboard/loyalty/tasks/gift-cards/search";
+            const data = JSON.stringify(model);
 
             return window.getAjaxRequest(url, "POST", data);
         }
 
-        var model = window.serializeForm($(".ui.search.form"));
+        const model = window.serializeForm($(".ui.search.form"));
 
-        var ajax = request(model);
+        const ajax = request(model);
 
         ajax.success(function (response) {
             displayResult(response);

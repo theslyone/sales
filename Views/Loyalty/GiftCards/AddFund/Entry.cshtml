@@ -71,7 +71,7 @@
 <script>
     function loadAccounts() {
         
-        var filters = [];
+        const filters = [];
         filters.push(window.getAjaxColumnFilter("WHERE", "account_master_id", "int", window.FilterConditions.IsEqualTo, "10101"));//CASH
         filters.push(window.getAjaxColumnFilter("OR", "account_master_id", "int", window.FilterConditions.IsEqualTo, "10102"));//BANK
         filters.push(window.getAjaxColumnFilter("OR", "account_master_id", "int", window.FilterConditions.IsEqualTo, "10110"));//ACCOUNT RECEIVABLE
@@ -94,28 +94,28 @@
 
     $("#SaveButton").unbind("click").bind("click", function () {
         function request(model) {
-            var url = "/dashboard/loyalty/tasks/gift-cards/add-fund/entry";
-            var data = JSON.stringify(model);
+            const url = "/dashboard/loyalty/tasks/gift-cards/add-fund/entry";
+            const data = JSON.stringify(model);
             return window.getAjaxRequest(url, "POST", data);
         };
 
         function getModel() {
-            var model = window.serializeForm(segment);
+            const model = window.serializeForm(segment);
             return model;
         };
 
-        var isValid = window.validator.validate($(".ui.form"));
+        const isValid = window.validator.validate($(".ui.form"));
         if (!isValid) {
             return;
         };
 
-        var model = getModel();
+        const model = getModel();
 
-        var ajax = request(model);
+        const ajax = request(model);
 
         ajax.success(function (response) {
-            var id = response;
-            var url = "/dashboard/loyalty/tasks/gift-cards/add-fund/checklist/" + id;
+            const id = response;
+            const url = "/dashboard/loyalty/tasks/gift-cards/add-fund/checklist/" + id;
 
             window.location = url;
         });
