@@ -49,7 +49,7 @@
     var products = [];
     var metaUnits = [];
 
-    function defaulPOSItemClick(el) {
+    function defaulPOSItemClick(el, callback) {
         $(".tender.info.items").hide();
         //$(".header.items").show();
         $(".footer.items").show();
@@ -261,6 +261,10 @@
         var triggerName = "itemAdded";
 
         $(document).trigger(triggerName, [tabId, itemId]);
+
+        if (typeof (callback) === "function") {
+            callback(el);
+        };
     };
 
     function initializeClickAndAction() {

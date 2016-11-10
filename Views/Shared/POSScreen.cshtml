@@ -463,7 +463,10 @@
         }
 
     .summary.items input,
-    .summary.items select {
+    .summary.items select,
+    .inverted.input,
+    .inverted.select
+     {
         background-color: #555 !important;
         color: #eee !important;
         border: 1px solid #666 !important;
@@ -744,8 +747,11 @@
 <script>
     var pageLoaded = false;
 
-    $(document).unbind("itemAdded").bind("itemAdded", function (e, tabId, itemId) {
-        const model = getModelById(tabId);
+    $(document).on("itemAdded", function (e, tabId, itemId) {
+        const model = window.getModelById(tabId);
+        if (!model) {
+            return;
+        };
 
         const item = window.Enumerable.From(model.Details).Where(function (x) { return x.ItemId.toString() === itemId.toString(); }).FirstOrDefault();
 
