@@ -37,7 +37,7 @@
             <div class="gift-card number item">
                 <div class="description">Payment Term</div>
                 <div class="control">
-                    <select id="PaymentTermSelect"></select>
+                    <select class="ui inverted fluid dropdown" id="PaymentTermSelect"></select>
                 </div>
             </div>
         </div>
@@ -95,7 +95,13 @@
         <div class="customer item">
             <div class="description">Customer</div>
             <div class="control">
-                <select id="CustomerSelect" class="ui search fluid inverted dropdown"></select>
+                @*<select id="CustomerSelect" class="ui search fluid inverted dropdown"></select>*@
+                <div class="ui fluid customer search">
+                    <div class="ui left icon fluid input">
+                        <input id="CustomerInputText" class="prompt" type="text">
+                        <i class="search grey icon"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -109,7 +115,7 @@
         <div class="discount type item">
             <div class="description">Discount Type</div>
             <div class="control">
-                <select id="DiscountTypeSelect">
+                <select class="ui inverted fluid dropdown" id="DiscountTypeSelect">
                     <option value="1">Rate</option>
                     <option value="2">Amount</option>
                 </select>
@@ -142,7 +148,7 @@
             <div class="cost center item">
                 <div class="description">Cost Center</div>
                 <div class="control">
-                    <select id="CostCenterSelect"></select>
+                    <select class="ui inverted fluid dropdown" id="CostCenterSelect"></select>
                 </div>
             </div>
         </div>
@@ -150,7 +156,7 @@
             <div class="shipping company item">
                 <div class="description">Shipper</div>
                 <div class="control">
-                    <select id="ShipperSelect"></select>
+                    <select class="ui inverted fluid dropdown" id="ShipperSelect"></select>
                 </div>
             </div>
         </div>
@@ -246,8 +252,8 @@
         const costCenterId = parseInt($("#CostCenterSelect").val()) || null;
         const referenceNumber = $("#ReferenceNumberInputText").val();
         const statementReference = $("#StatementReferenceInputText").val();
-        const customerId = parseInt($("#CustomerSelect").val()) || null;
-        const customerName = $("#CustomerSelect").dropdown("get text")[0];
+        const customerId = parseInt($("#CustomerInputText").attr("data-customer-id")) || null;
+        const customerName = $("#CustomerInputText").val();
         const priceTypeId = $("#PriceTypeSelect").val();
         const shipperId = $("#ShipperSelect").val();
         const storeId = $("#StoreSelect").val();
@@ -344,8 +350,7 @@
         };
     };
 
-    function loadModelById(id) {
-        var model = getModelById(id);
+    function loadModelData(model) {
         if (!model) {
             return;
         };
@@ -361,30 +366,42 @@
         $("#CheckAmountInputText").val(model.CheckAmount);
         $("#BankNameInputText").val(model.CheckBankName);
         $("#CheckNumberInputText").val(model.CheckNumber);
-        $("#CheckDateInputText").datepicker("setDate", new Date(model.CheckDate));
 
-        $("#GiftCardNumberInputText").val(model.GiftCardNumber);
+        if (model.CheckDate) {
+            $("#CheckDateInputText").datepicker("setDate", new Date(model.CheckDate));
+        };
+
+
+        $("#GiftCardNumberInputText").val(model.GiftCardNumber).trigger("change");
         $("#CouponCodeInputText").val(model.CouponCode);
         $("#DiscountTypeSelect").dropdown("set selected", model.DiscountType);
         $("#DiscountInputText").val(model.Discount);
 
-        $("#ValueDateInputText").datepicker("setDate", new Date(model.ValueDate));
-        $("#BookDateInputText").datepicker("setDate", new Date(model.BookDate));
+        if (model.ValueDate) {
+            $("#ValueDateInputText").datepicker("setDate", new Date(model.ValueDate));
+        };
+
+        if (model.BookDate) {
+            $("#BookDateInputText").datepicker("setDate", new Date(model.BookDate));
+        };
+
         $("#CostCenterSelect").dropdown("set selected", model.CostCenterId);
         $("#ReferenceNumberInputText").val(model.ReferenceNumber);
         $("#StatementReferenceInputText").val(model.StatementReference);
 
-        $("#CustomerSelect").dropdown("clear");
-        $("#CustomerSelect").html("<option value='" + model.CustomerId + "'>" + model.CustomerName + "</option>");
-        setTimeout(function () {
-            $("#CustomerSelect").dropdown("set selected", model.CustomerId);
-        }, 100);
+        $("#CustomerInputText").attr("data-customer-id", model.CustomerId).val(model.CustomerCode);
+        
+        if (model.PriceTypeId) {
+            $("#PriceTypeSelect").dropdown("set selected", model.PriceTypeId);
+        };
 
-        $("#PriceTypeSelect").dropdown("set selected", model.PriceTypeId);
-        $("#ShipperSelect").dropdown("set selected", model.ShipperId);
-        $("#StoreSelect").dropdown("set selected", model.StoreId);
+        if (model.ShipperId) {
+            $("#ShipperSelect").dropdown("set selected", model.ShipperId);
+        };
 
-
+        if (model.StoreId) {
+            $("#StoreSelect").dropdown("set selected", model.StoreId);
+        };
 
 
         $.each(model.Details, function () {
@@ -394,6 +411,11 @@
             const selector = "#POSItemList .item[data-item-id=" + itemId + "]";
             $(selector).trigger("click");
         });
+    };
+
+    function loadModelById(id) {
+        const model = getModelById(id);
+        loadModelData(model);
     };
 </script>
 <script>

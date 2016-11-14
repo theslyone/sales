@@ -219,7 +219,7 @@
             };
 
             const itemId = el.attr("data-item-id");
-            const customerId = parseInt($("#CustomerSelect").val()) || 0;
+            const customerId = parseInt($("#CustomerInputText").attr("data-customer-id")) || 0;
             const priceTypeId = parseInt($("#PriceTypeSelect").val()) || 0;
             const unitId = el.val();
 

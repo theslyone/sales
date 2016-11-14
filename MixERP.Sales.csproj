@@ -174,10 +174,11 @@
     <Compile Include="Models\Tickets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryModels\GiftCardSearch.cs" />
+    <Compile Include="ViewModels\CustomerSearchViewModel.cs" />
     <Compile Include="ViewModels\GiftCardFund.cs" />
     <Compile Include="ViewModels\Sales.cs" />
     <Compile Include="ViewModels\SalesDetailType.cs" />
-    <Compile Include="ViewModels\SearchResult.cs" />
+    <Compile Include="ViewModels\CustomerSearchResult.cs" />
     <Compile Include="ViewModels\TicketViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

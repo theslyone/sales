@@ -465,8 +465,7 @@
     .summary.items input,
     .summary.items select,
     .inverted.input,
-    .inverted.select
-     {
+    .inverted.select {
         background-color: #555 !important;
         color: #eee !important;
         border: 1px solid #666 !important;
@@ -679,13 +678,13 @@
                         <div class="right">
                             <div class="three inline blocks">
                                 <div class="item">
-                                    <select class="ui search inverted fluid dropdown" id="PriceTypeSelect"></select>
+                                    <select class="ui inverted fluid dropdown" id="PriceTypeSelect"></select>
                                 </div>
                                 <div class="item">
-                                    <select id="StoreSelect"></select>
+                                    <select class="ui inverted fluid dropdown" id="StoreSelect"></select>
                                 </div>
                                 <div class="item">
-                                    <select id="CounterSelect"></select>
+                                    <select class="ui inverted fluid dropdown" id="CounterSelect"></select>
                                 </div>
                             </div>
                         </div>
@@ -896,7 +895,7 @@
 
     function clearScreen() {
         $("#SalesItems").html("");
-        $("#CustomerSelect").dropdown("clear");
+        $("#CustomerInputText").removeAttr("data-customer-id").val("");
         $("#TenderInputText").val("");
         $("#ChangeInputText").val("");
 
@@ -923,31 +922,35 @@
         window.displayFieldBinder($("#PriceTypeSelect"), "/api/forms/sales/price-types/display-fields", true);
     };
 
-    function loadCustomers() {
-        //window.displayFieldBinder($("#CustomerSelect"), "/api/forms/inventory/customers/display-fields");
-
-        setTimeout(function () {
-            $("#CustomerSelect").parent().dropdown({
-                apiSettings: {
-                    url: "/dashboard/sales/setup/customer-search/{query}",
-                    onResponse: function (result) {
-                        console.log(JSON.stringify(result));
-                        $("#CustomerSelect").html("");
-                        $.each(result, function (index, item) {
-                            $("#CustomerSelect").append("<option value='" + item.Value + "'>" + item.Name + "</option>");
-                        });
-                    }
-                }
-            });
-        }, 1000);
-    }
 
     loadStores();
     loadPriceTypes();
-    loadCustomers();
+
     loadCostCenters();
     loadShippers();
     loadPaymentTerms();
+
+    $('.ui.customer.search').search({
+        apiSettings: {
+            url: '/dashboard/sales/setup/customer/search/{query}'
+        },
+        fields: {
+            results: 'Items',
+            title: 'CustomerCode',
+            description: 'CustomerName',
+            image: 'Photo',
+            price: 'PhoneNumbers'
+        },
+        onSelect: function (result) {
+            const customerId = result.CustomerId;
+            if (!customerId) {
+                return;
+            };
+
+            $("#CustomerInputText").attr("data-customer-id", customerId);
+        },
+        minCharacters: 1
+    });
 
     $("#StoreSelect").change(function () {
         var el = $(this);
@@ -1062,6 +1065,10 @@
             $("#pos-container .layout").fadeIn(500);
         };
 
+        if (!pageLoaded) {
+            $(document).trigger("posready");
+        };
+
         pageLoaded = true;
     });
 
@@ -1073,7 +1080,7 @@
         $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
     }, 100);
 
-    $("select:not(.ui)").addClass("inverted fluid").dropdown();
+    //$("select:not(.ui)").addClass("inverted fluid").dropdown();
 
     window.overridePath = "/dashboard/sales/tasks/entry";
 </script>

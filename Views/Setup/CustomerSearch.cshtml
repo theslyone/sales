@@ -97,9 +97,9 @@
         selectButton.click(function() {
             const customerId = window.getSelected();
             const tr = $("table#ScrudView input:checkbox:checked").first().closest("tr");
-            const customerName = tr.find("td:eq(4)").html();
+            const customerCode = tr.find("td:eq(3)").html();
 
-            parent.onCustomerSearchSelect(customerId, customerName);
+            parent.onCustomerSearchSelect(customerId, customerCode);
         });
 
         useButton.click(function () {
