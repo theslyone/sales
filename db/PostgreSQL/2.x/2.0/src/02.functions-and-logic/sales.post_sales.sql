@@ -102,6 +102,10 @@ BEGIN
 
 
 
+    IF(COALESCE(_customer_id, 0) = 0) THEN
+        RAISE EXCEPTION 'Please select a customer.';
+    END IF;
+
     IF(COALESCE(_coupon_code, '') != '' AND COALESCE(_discount) > 0) THEN
         RAISE EXCEPTION 'Please do not specify discount rate when you mention coupon code.';
     END IF;
@@ -143,7 +147,7 @@ BEGIN
         inventory_account_id            integer,
         cost_of_goods_sold_account_id   integer
     ) ON COMMIT DROP;
-        
+
     INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
     SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
     FROM explode_array(_details);
@@ -216,7 +220,7 @@ BEGIN
     SELECT SUM(COALESCE(shipping_charge, 0))                    INTO _shipping_charge FROM temp_checkout_details;
 
      
-     _receivable                    := _grand_total - COALESCE(_discount_total, 0)+ COALESCE(_shipping_charge, 0);
+     _receivable                    := COALESCE(_grand_total, 0) - COALESCE(_discount_total, 0)+ COALESCE(_shipping_charge, 0);
         
     IF(_is_flat_discount AND _discount > _receivable) THEN
         RAISE EXCEPTION 'The discount amount cannot be greater than total amount.';
@@ -254,11 +258,11 @@ BEGIN
     (
         transaction_master_id       BIGINT, 
         tran_type                   national character varying(2), 
-        account_id                  integer, 
+        account_id                  integer NOT NULL, 
         statement_reference         text, 
         cash_repository_id          integer, 
         currency_code               national character varying(12), 
-        amount_in_currency          money_strict, 
+        amount_in_currency          money_strict NOT NULL, 
         local_currency_code         national character varying(12), 
         er                          decimal_strict, 
         amount_in_local_currency    money_strict
@@ -277,6 +281,7 @@ BEGIN
         
         SELECT SUM(cost_of_goods_sold) INTO _cost_of_goods
         FROM temp_checkout_details;
+
 
         IF(_cost_of_goods > 0) THEN
             INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
@@ -305,6 +310,7 @@ BEGIN
         HAVING SUM(COALESCE(discount, 0)) > 0;
     END IF;
 
+
     IF(_coupon_discount > 0) THEN
         SELECT inventory.inventory_setup.default_discount_account_id INTO _default_discount_account_id
         FROM inventory.inventory_setup
@@ -313,6 +319,8 @@ BEGIN
         INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
         SELECT 'Dr', _default_discount_account_id, _statement_reference, _default_currency_code, _coupon_discount, 1, _default_currency_code, _coupon_discount;
     END IF;
+
+
 
     INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
     SELECT 'Dr', inventory.get_account_id_by_customer_id(_customer_id), _statement_reference, _default_currency_code, _receivable, 1, _default_currency_code, _receivable;
@@ -345,7 +353,7 @@ BEGIN
         INSERT INTO inventory.checkout_details(checkout_detail_id, value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, shipping_charge)
         SELECT _checkout_detail_id, _value_date, _book_date, this.checkout_id, this.tran_type, this.store_id, this.item_id, this.quantity, this.unit_id, this.base_quantity, this.base_unit_id, this.price, COALESCE(this.cost_of_goods_sold, 0), this.discount, this.shipping_charge 
         FROM temp_checkout_details
-        WHERE id = this.id;        
+        WHERE id = this.id;
     END LOOP;
 
 
@@ -404,9 +412,9 @@ LANGUAGE plpgsql;
 --     inventory.get_customer_id_by_customer_code('DEF'), 1, 1, 1,
 --     null, true, 1000,
 --     ARRAY[
---     ROW(1, 'Dr', 1, 1, 1,180000, 0, 0)::sales.sales_detail_type,
---     ROW(1, 'Dr', 2, 1, 7,130000, 0, 0)::sales.sales_detail_type,
---     ROW(1, 'Dr', 3, 1, 1,110000, 0, 0)::sales.sales_detail_type],
+--     ROW(1, 'Cr', 1, 1, 1,180000, 0, 0)::sales.sales_detail_type,
+--     ROW(1, 'Cr', 2, 1, 7,130000, 0, 0)::sales.sales_detail_type,
+--     ROW(1, 'Cr', 3, 1, 1,110000, 0, 0)::sales.sales_detail_type],
 --     NULL,
 --     NULL
 -- );

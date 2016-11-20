@@ -50,9 +50,12 @@
     var metaUnits = [];
 
     function defaulPOSItemClick(el, callback) {
+        var targetEl = $("#SalesItems");
+
         $(".tender.info.items").hide();
-        //$(".header.items").show();
         $(".footer.items").show();
+        targetEl.show();
+
         var sellingPrice = el.attr("data-selling-price");
         var photo = el.attr("data-photo");
 
@@ -73,7 +76,6 @@
 
 
 
-        var targetEl = $("#SalesItems");
         var selector = "pos-" + itemId;
         var existingEl = $("#" + selector);
 

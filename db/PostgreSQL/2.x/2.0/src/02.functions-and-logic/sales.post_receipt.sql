@@ -118,7 +118,7 @@ BEGIN
     ELSIF(_gift_card_id > 0) THEN
         _transaction_master_id              := sales.post_receipt_by_gift_card(_user_id, _office_id, _login_id, _customer_id, _customer_account_id, _currency_code, _local_currency_code, _base_currency_code, _exchange_rate_debit, _exchange_rate_credit, _reference_number, _statement_reference, _cost_center_id, _value_date, _book_date, _gift_card_id, _gift_card_number, _receipt_amount, _cascading_tran_id);
     ELSE
-        RAISE EXCEPTION 'Cannot post receipt. Please check the form and submit again';    
+        RAISE EXCEPTION 'Cannot post receipt. Please enter the tender amount.';    
     END IF;
 
     

@@ -1372,7 +1372,7 @@ BEGIN
     ELSIF(_gift_card_id > 0) THEN
         _transaction_master_id              := sales.post_receipt_by_gift_card(_user_id, _office_id, _login_id, _customer_id, _customer_account_id, _currency_code, _local_currency_code, _base_currency_code, _exchange_rate_debit, _exchange_rate_credit, _reference_number, _statement_reference, _cost_center_id, _value_date, _book_date, _gift_card_id, _gift_card_number, _receipt_amount, _cascading_tran_id);
     ELSE
-        RAISE EXCEPTION 'Cannot post receipt. Please check the form and submit again';    
+        RAISE EXCEPTION 'Cannot post receipt. Please enter the tender amount.';    
     END IF;
 
     
@@ -1848,6 +1848,10 @@ BEGIN
 
 
 
+    IF(COALESCE(_customer_id, 0) = 0) THEN
+        RAISE EXCEPTION 'Please select a customer.';
+    END IF;
+
     IF(COALESCE(_coupon_code, '') != '' AND COALESCE(_discount) > 0) THEN
         RAISE EXCEPTION 'Please do not specify discount rate when you mention coupon code.';
     END IF;
@@ -1889,7 +1893,7 @@ BEGIN
         inventory_account_id            integer,
         cost_of_goods_sold_account_id   integer
     ) ON COMMIT DROP;
-        
+
     INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
     SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
     FROM explode_array(_details);
@@ -1962,7 +1966,7 @@ BEGIN
     SELECT SUM(COALESCE(shipping_charge, 0))                    INTO _shipping_charge FROM temp_checkout_details;
 
      
-     _receivable                    := _grand_total - COALESCE(_discount_total, 0)+ COALESCE(_shipping_charge, 0);
+     _receivable                    := COALESCE(_grand_total, 0) - COALESCE(_discount_total, 0)+ COALESCE(_shipping_charge, 0);
         
     IF(_is_flat_discount AND _discount > _receivable) THEN
         RAISE EXCEPTION 'The discount amount cannot be greater than total amount.';
@@ -2000,11 +2004,11 @@ BEGIN
     (
         transaction_master_id       BIGINT, 
         tran_type                   national character varying(2), 
-        account_id                  integer, 
+        account_id                  integer NOT NULL, 
         statement_reference         text, 
         cash_repository_id          integer, 
         currency_code               national character varying(12), 
-        amount_in_currency          money_strict, 
+        amount_in_currency          money_strict NOT NULL, 
         local_currency_code         national character varying(12), 
         er                          decimal_strict, 
         amount_in_local_currency    money_strict
@@ -2023,6 +2027,7 @@ BEGIN
         
         SELECT SUM(cost_of_goods_sold) INTO _cost_of_goods
         FROM temp_checkout_details;
+
 
         IF(_cost_of_goods > 0) THEN
             INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
@@ -2051,6 +2056,7 @@ BEGIN
         HAVING SUM(COALESCE(discount, 0)) > 0;
     END IF;
 
+
     IF(_coupon_discount > 0) THEN
         SELECT inventory.inventory_setup.default_discount_account_id INTO _default_discount_account_id
         FROM inventory.inventory_setup
@@ -2059,6 +2065,8 @@ BEGIN
         INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
         SELECT 'Dr', _default_discount_account_id, _statement_reference, _default_currency_code, _coupon_discount, 1, _default_currency_code, _coupon_discount;
     END IF;
+
+
 
     INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
     SELECT 'Dr', inventory.get_account_id_by_customer_id(_customer_id), _statement_reference, _default_currency_code, _receivable, 1, _default_currency_code, _receivable;
@@ -2091,7 +2099,7 @@ BEGIN
         INSERT INTO inventory.checkout_details(checkout_detail_id, value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, shipping_charge)
         SELECT _checkout_detail_id, _value_date, _book_date, this.checkout_id, this.tran_type, this.store_id, this.item_id, this.quantity, this.unit_id, this.base_quantity, this.base_unit_id, this.price, COALESCE(this.cost_of_goods_sold, 0), this.discount, this.shipping_charge 
         FROM temp_checkout_details
-        WHERE id = this.id;        
+        WHERE id = this.id;
     END LOOP;
 
 
@@ -2150,9 +2158,9 @@ LANGUAGE plpgsql;
 --     inventory.get_customer_id_by_customer_code('DEF'), 1, 1, 1,
 --     null, true, 1000,
 --     ARRAY[
---     ROW(1, 'Dr', 1, 1, 1,180000, 0, 0)::sales.sales_detail_type,
---     ROW(1, 'Dr', 2, 1, 7,130000, 0, 0)::sales.sales_detail_type,
---     ROW(1, 'Dr', 3, 1, 1,110000, 0, 0)::sales.sales_detail_type],
+--     ROW(1, 'Cr', 1, 1, 1,180000, 0, 0)::sales.sales_detail_type,
+--     ROW(1, 'Cr', 2, 1, 7,130000, 0, 0)::sales.sales_detail_type,
+--     ROW(1, 'Cr', 3, 1, 1,110000, 0, 0)::sales.sales_detail_type],
 --     NULL,
 --     NULL
 -- );
@@ -2579,38 +2587,37 @@ WHERE app_name = 'Sales';
 SELECT * FROM core.create_app('Sales', 'Sales', '1.0', 'MixERP Inc.', 'December 1, 2015', 'shipping blue', '/dashboard/sales/tasks/entry', NULL::text[]);
 
 SELECT * FROM core.create_menu('Sales', 'Tasks', '', 'lightning', '');
-SELECT * FROM core.create_menu('Sales', 'Sales Entry', '/dashboard/sales/tasks/entry', 'user', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'Sales Returns', '/dashboard/sales/tasks/return', 'ticket', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'Sales Quotation', '/dashboard/sales/tasks/quotation', 'food', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'Sales Orders', '/dashboard/sales/tasks/orders', 'keyboard', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'keyboard', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'keyboard', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'keyboard', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'Sales Entry', '/dashboard/sales/tasks/entry', 'write', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'Sales Returns', '/dashboard/sales/tasks/return', 'minus square', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'Sales Quotation', '/dashboard/sales/tasks/quotation', 'quote left', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'Sales Orders', '/dashboard/sales/tasks/orders', 'file text outline', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');
 
-SELECT * FROM core.create_menu('Sales', 'Customer Loyalty', 'square outline', 'configure', '');
-SELECT * FROM core.create_menu('Sales', 'Gift Cards', '/dashboard/sales/loyalty/gift-cards', 'users', 'Customer Loyalty');
-SELECT * FROM core.create_menu('Sales', 'Add Gift Card Fund', '/dashboard/loyalty/tasks/gift-cards/add-fund', 'keyboard', 'Customer Loyalty');
-SELECT * FROM core.create_menu('Sales', 'Verify Gift Card Fund', '/dashboard/loyalty/tasks/gift-cards/add-fund/verification', 'keyboard', 'Customer Loyalty');
-SELECT * FROM core.create_menu('Sales', 'Sales Coupons', '/dashboard/sales/loyalty/coupons', 'users', 'Customer Loyalty');
-SELECT * FROM core.create_menu('Sales', 'Loyalty Point Configuration', '/dashboard/sales/loyalty/points', 'users', 'Customer Loyalty');
+SELECT * FROM core.create_menu('Sales', 'Customer Loyalty', 'square outline', 'user', '');
+SELECT * FROM core.create_menu('Sales', 'Gift Cards', '/dashboard/sales/loyalty/gift-cards', 'gift', 'Customer Loyalty');
+SELECT * FROM core.create_menu('Sales', 'Add Gift Card Fund', '/dashboard/loyalty/tasks/gift-cards/add-fund', 'pound', 'Customer Loyalty');
+SELECT * FROM core.create_menu('Sales', 'Verify Gift Card Fund', '/dashboard/loyalty/tasks/gift-cards/add-fund/verification', 'checkmark', 'Customer Loyalty');
+SELECT * FROM core.create_menu('Sales', 'Sales Coupons', '/dashboard/sales/loyalty/coupons', 'browser', 'Customer Loyalty');
+SELECT * FROM core.create_menu('Sales', 'Loyalty Point Configuration', '/dashboard/sales/loyalty/points', 'selected radio', 'Customer Loyalty');
 
 SELECT * FROM core.create_menu('Sales', 'Setup', 'square outline', 'configure', '');
-SELECT * FROM core.create_menu('Sales', 'Customer Types', '/dashboard/sales/setup/customer-types', 'users', 'Setup');
-SELECT * FROM core.create_menu('Sales', 'Customers', '/dashboard/sales/setup/customers', 'users', 'Setup');
-SELECT * FROM core.create_menu('Sales', 'Price Types', '/dashboard/sales/setup/price-types', 'users', 'Setup');
-SELECT * FROM core.create_menu('Sales', 'Selling Prices', '/dashboard/sales/setup/selling-prices', 'users', 'Setup');
-SELECT * FROM core.create_menu('Sales', 'Late Fee', '/dashboard/sales/setup/late-fee', 'users', 'Setup');
-SELECT * FROM core.create_menu('Sales', 'Payment Terms', '/dashboard/sales/setup/payment-terms', 'users', 'Setup');
-SELECT * FROM core.create_menu('Sales', 'Cashiers', '/dashboard/sales/setup/cashiers', 'users', 'Setup');
+SELECT * FROM core.create_menu('Sales', 'Customer Types', '/dashboard/sales/setup/customer-types', 'child', 'Setup');
+SELECT * FROM core.create_menu('Sales', 'Customers', '/dashboard/sales/setup/customers', 'street view', 'Setup');
+SELECT * FROM core.create_menu('Sales', 'Price Types', '/dashboard/sales/setup/price-types', 'ruble', 'Setup');
+SELECT * FROM core.create_menu('Sales', 'Selling Prices', '/dashboard/sales/setup/selling-prices', 'in cart', 'Setup');
+SELECT * FROM core.create_menu('Sales', 'Late Fee', '/dashboard/sales/setup/late-fee', 'alarm mute', 'Setup');
+SELECT * FROM core.create_menu('Sales', 'Payment Terms', '/dashboard/sales/setup/payment-terms', 'checked calendar', 'Setup');
+SELECT * FROM core.create_menu('Sales', 'Cashiers', '/dashboard/sales/setup/cashiers', 'male', 'Setup');
 
-SELECT * FROM core.create_menu('Sales', 'Reports', '', 'configure', '');
-SELECT * FROM core.create_menu('Sales', 'All Gift Cards', '/dashboard/sales/reports/gift-cards/account-statement', 'money', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Gift Card Usage Statement', '/dashboard/sales/reports/gift-cards/account-statement', 'money', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Customer Account Statement', '/dashboard/sales/reports/customer/account-statement', 'money', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Credit Statement', '/dashboard/sales/reports/credit-statement', 'money', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Credit Statement', '/dashboard/sales/reports/credit-statement', 'money', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Top Selling Items', '/dashboard/sales/reports/sales-account-statement', 'money', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Sales by Office', '/dashboard/sales/reports/sales-account-statement', 'money', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Reports', '', 'block layout', '');
+SELECT * FROM core.create_menu('Sales', 'All Gift Cards', '/dashboard/sales/reports/gift-cards/account-statement', 'certificate', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Gift Card Usage Statement', '/dashboard/sales/reports/gift-cards/account-statement', 'columns', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Customer Account Statement', '/dashboard/sales/reports/customer/account-statement', 'content', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Credit Statement', '/dashboard/sales/reports/credit-statement', 'newspaper', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Top Selling Items', '/dashboard/sales/reports/sales-account-statement', 'map signs', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Sales by Office', '/dashboard/sales/reports/sales-account-statement', 'building', 'Reports');
 
 
 SELECT * FROM auth.create_app_menu_policy

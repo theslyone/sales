@@ -823,9 +823,18 @@
 
 
     $(".toggle.view.item, .next.button").unbind("click").bind("click", function () {
-        $(".tender.info.items").toggle();
-        $(".footer.items").toggle();
-        $(".sales.items").toggle();
+        const salesItemState = $(".sales.items").is(":visible");
+
+        $(".tender.info.items").hide();
+        $(".footer.items").hide();
+        $(".sales.items").hide();
+
+        if(salesItemState) {
+            $(".tender.info.items").show();
+        }else {
+            $(".footer.items").show();
+            $(".sales.items").show();
+        };
     });
 
 
@@ -957,7 +966,6 @@
 
         function loadCounters() {
             const storeId = el.val();
-
             const filters = [];
             filters.push(window.getAjaxColumnFilter("WHERE", "store_id", "int", window.FilterConditions.IsEqualTo, storeId));
 
