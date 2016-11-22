@@ -148,6 +148,7 @@
     <Compile Include="Controllers\Backend\Setups\CustomerTypeController.cs" />
     <Compile Include="Controllers\Backend\Tasks\CustomerSearchController.cs" />
     <Compile Include="Controllers\Backend\Loyalty\GiftCardController.cs" />
+    <Compile Include="Controllers\Backend\Tasks\OpeningCashController.cs" />
     <Compile Include="Controllers\Backend\Tasks\SalesTicketController.cs" />
     <Compile Include="Controllers\SalesDashboardController.cs" />
     <Compile Include="Controllers\Backend\Setups\CashierController.cs" />
@@ -161,6 +162,7 @@
     <Compile Include="Controllers\Backend\Tasks\ReturnController.cs" />
     <Compile Include="DAL\Backend\Service\GiftCards.cs" />
     <Compile Include="DAL\Backend\Service\SearchCustomer.cs" />
+    <Compile Include="DAL\Backend\Tasks\OpeningCashTransaction.cs" />
     <Compile Include="DAL\Backend\Tasks\GiftCardFunds.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntries.cs" />
     <Compile Include="DAL\Backend\Service\Items.cs" />
@@ -174,6 +176,7 @@
     <Compile Include="Models\Tickets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryModels\GiftCardSearch.cs" />
+    <Compile Include="ViewModels\OpeningCash.cs" />
     <Compile Include="ViewModels\CustomerSearchViewModel.cs" />
     <Compile Include="ViewModels\GiftCardFund.cs" />
     <Compile Include="ViewModels\Sales.cs" />
@@ -219,6 +222,7 @@
     <Content Include="Views\Shared\SalesEntryForm.cshtml" />
     <Content Include="Views\Shared\POSItemList.cshtml" />
     <Content Include="Views\Shared\POSScreen.cshtml" />
+    <Content Include="Views\Tasks\OpeningCash\Index.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

@@ -321,6 +321,57 @@ CREATE TABLE sales.returns
 );
 
 
+CREATE TABLE sales.opening_cash
+(
+	opening_cash_id						    BIGSERIAL PRIMARY KEY,
+	user_id									integer NOT NULL REFERENCES account.users,
+	transaction_date						date NOT NULL,
+	amount									decimal(24, 4) NOT NULL,
+	provided_by								national character varying(1000) NOT NULL DEFAULT(''),
+	memo									national character varying(4000) DEFAULT(''),
+	closed									boolean NOT NULL DEFAULT(false),
+    audit_user_id                           integer REFERENCES account.users,
+    audit_ts                                TIMESTAMP WITH TIME ZONE NULL DEFAULT(NOW()),
+	deleted									boolean DEFAULT(false)
+);
+
+CREATE UNIQUE INDEX opening_cash_transaction_date_user_id_uix
+ON sales.opening_cash(user_id, transaction_date);
+
+CREATE TABLE sales.closing_cash
+(
+	closing_cash_id							BIGSERIAL PRIMARY KEY,
+	user_id									integer NOT NULL REFERENCES account.users,
+	transaction_date						date NOT NULL,
+	opening_cash							decimal(24, 4) NOT NULL,
+	box_office_sales						decimal(24, 4) NOT NULL,
+	submitted_to							national character varying(1000) NOT NULL DEFAULT(''),
+	memo									national character varying(4000) NOT NULL DEFAULT(''),
+	deno1000								integer NOT NULL DEFAULT(0),
+	deno500									integer NOT NULL DEFAULT(0),
+	deno250									integer NOT NULL DEFAULT(0),
+	deno200									integer NOT NULL DEFAULT(0),
+	deno100									integer NOT NULL DEFAULT(0),
+	deno50									integer NOT NULL DEFAULT(0),
+	deno25									integer NOT NULL DEFAULT(0),
+	deno20									integer NOT NULL DEFAULT(0),
+	deno10									integer NOT NULL DEFAULT(0),
+	deno5									integer NOT NULL DEFAULT(0),
+	deno2									integer NOT NULL DEFAULT(0),
+	deno1									integer NOT NULL DEFAULT(0),
+	coins									integer NOT NULL DEFAULT(0),
+	submitted_cash							decimal(24, 4) NOT NULL,
+	approved_by								integer REFERENCES account.users,
+	approval_memo							national character varying(4000),
+    audit_user_id                           integer REFERENCES account.users,
+    audit_ts                                TIMESTAMP WITH TIME ZONE NULL DEFAULT(NOW()),
+	deleted									boolean DEFAULT(false)
+);
+
+CREATE UNIQUE INDEX closing_cash_transaction_date_user_id_uix
+ON sales.closing_cash(user_id, transaction_date);
+
+
 CREATE TYPE sales.sales_detail_type
 AS
 (
@@ -437,6 +488,54 @@ LANGUAGE plpgsql;
 --SELECT * FROM sales.add_gift_card_fund(1, 1, 1, sales.get_gift_card_id_by_gift_card_number('123456'), '1-1-2020', '1-1-2020', 1, 2000, 1, '', '');
 
 
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.add_opening_cash.sql --<--<--
+DROP FUNCTION IF EXISTS sales.add_opening_cash
+(
+	_user_id								integer,
+	_transaction_date						TIMESTAMP,
+	_amount									decimal(24, 4),
+	_provided_by							national character varying(1000),
+	_memo									national character varying(4000)
+);
+
+CREATE FUNCTION sales.add_opening_cash
+(
+	_user_id								integer,
+	_transaction_date						TIMESTAMP,
+	_amount									decimal(24, 4),
+	_provided_by							national character varying(1000),
+	_memo									national character varying(4000)
+)
+RETURNS void
+AS
+$$
+BEGIN
+	IF NOT EXISTS
+	(
+		SELECT 1
+		FROM sales.opening_cash
+		WHERE user_id = _user_id
+		AND transaction_date = _transaction_date
+	) THEN
+		INSERT INTO sales.opening_cash(user_id, transaction_date, amount, provided_by, memo, audit_user_id, audit_ts, deleted)
+		SELECT _user_id, _transaction_date, _amount, _provided_by, _memo, _user_id, NOW(), false;
+	ELSE
+		UPDATE sales.opening_cash
+		SET
+			amount = _amount,
+			provided_by = _provided_by,
+			memo = _memo,
+			user_id = _user_id,
+			audit_user_id = _user_id,
+			audit_ts = NOW(),
+			deleted = false
+		WHERE user_id = _user_id
+		AND transaction_date = _transaction_date;
+	END IF;
+END
+$$
+LANGUAGE plpgsql;
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_active_coupon_id_by_coupon_code.sql --<--<--
 DROP FUNCTION IF EXISTS sales.get_active_coupon_id_by_coupon_code(_coupon_code national character varying(100));
@@ -2587,6 +2686,7 @@ WHERE app_name = 'Sales';
 SELECT * FROM core.create_app('Sales', 'Sales', '1.0', 'MixERP Inc.', 'December 1, 2015', 'shipping blue', '/dashboard/sales/tasks/entry', NULL::text[]);
 
 SELECT * FROM core.create_menu('Sales', 'Tasks', '', 'lightning', '');
+SELECT * FROM core.create_menu('Sales', 'Opening Cash', '/dashboard/sales/tasks/opening-cash', 'money', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Entry', '/dashboard/sales/tasks/entry', 'write', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Returns', '/dashboard/sales/tasks/return', 'minus square', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Quotation', '/dashboard/sales/tasks/quotation', 'quote left', 'Tasks');
@@ -2594,6 +2694,7 @@ SELECT * FROM core.create_menu('Sales', 'Sales Orders', '/dashboard/sales/tasks/
 SELECT * FROM core.create_menu('Sales', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'EOD', '/dashboard/sales/tasks/eod', 'money', 'Tasks');
 
 SELECT * FROM core.create_menu('Sales', 'Customer Loyalty', 'square outline', 'user', '');
 SELECT * FROM core.create_menu('Sales', 'Gift Cards', '/dashboard/sales/loyalty/gift-cards', 'gift', 'Customer Loyalty');

@@ -1,0 +1,95 @@
+﻿@using Frapid.ApplicationState.Cache
+@model MixERP.Sales.ViewModels.OpeningCash
+
+@{
+    ViewBag.Title = "title";
+    Layout = ViewBag.Layout;
+}
+
+
+<script src="/Scripts/frapid/utilities/form.js"></script>
+<script src="/Scripts/frapid/utilities/validator.js"></script>
+<style>
+    .very.relaxed.segment {
+        padding: 4em;
+    }
+</style>
+<div class="ui attached very relaxed segment">
+    <div class="ui container">
+        <div class="ui huge header">
+            BOD Cash
+            <div class="ui teal label">@DateTime.Now.ToLongDateString()</div>
+        </div>
+        <div class="ui divider"></div>
+        <div class="ui positive message">
+            @AppUsers.GetCurrent().Name, you may also edit the beginning cash later <a href="eod-cash">this evening</a>.
+        </div>
+        <div class="ui form">
+            <div class="four fields">
+                <div class="field">
+                    <label>Today's Beginning Cash</label>
+                    <input type="text" id="AmountInputText" class="decimal" required="" value="@Model.Amount" 
+                           disabled="disabled" data-allow-edit="@(!Model.Closed)" />
+                </div>
+                <div class="field">
+                    <label>Provided By</label>
+                    <input type="text" id="ProvidedByInputText" required="" value="@Model.ProvidedBy" 
+                           disabled="disabled" data-allow-edit="@(!Model.Closed)" />
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <label>Memo</label>
+                    <textarea id="MemoTextArea" disabled="disabled" data-allow-edit="@(!Model.Closed)">@Model.Memo</textarea>
+                </div>
+            </div>
+
+            <button id="SaveButton" class="ui green button" disabled="disabled" data-allow-edit="@(!Model.Closed)">Save</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const candidates = $("[data-allow-edit]");
+
+        $.each(candidates, function () {
+            const el = $(this);
+
+            const allowEdit = el.attr("data-allow-edit").toLowerCase() === "true";
+            el.prop("disabled", !allowEdit);
+        });
+    })();
+
+    $(document).ready(function () {
+        window.validator.initialize($(".ui.form"));
+        $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
+    });
+
+
+    $("#SaveButton").unbind("click").bind("click", function () {
+        function request(model) {
+            const url = "/dashboard/sales/tasks/opening-cash";
+            const data = JSON.stringify(model);
+
+            return window.getAjaxRequest(url, "POST", data);
+        };
+
+        const confirmed = confirm("Are you sure?");
+
+        if (!confirmed) {
+            return;
+        };
+
+        const model = window.serializeForm($(".ui.form"));
+        const ajax = request(model);
+
+        ajax.success(function () {
+            window.displaySuccess();
+        });
+
+        ajax.fail(function (xhr) {
+            alert(JSON.stringify(xhr));
+        });
+    });
+</script>

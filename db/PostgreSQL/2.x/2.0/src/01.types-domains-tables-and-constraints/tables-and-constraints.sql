@@ -320,6 +320,57 @@ CREATE TABLE sales.returns
 );
 
 
+CREATE TABLE sales.opening_cash
+(
+	opening_cash_id						    BIGSERIAL PRIMARY KEY,
+	user_id									integer NOT NULL REFERENCES account.users,
+	transaction_date						date NOT NULL,
+	amount									decimal(24, 4) NOT NULL,
+	provided_by								national character varying(1000) NOT NULL DEFAULT(''),
+	memo									national character varying(4000) DEFAULT(''),
+	closed									boolean NOT NULL DEFAULT(false),
+    audit_user_id                           integer REFERENCES account.users,
+    audit_ts                                TIMESTAMP WITH TIME ZONE NULL DEFAULT(NOW()),
+	deleted									boolean DEFAULT(false)
+);
+
+CREATE UNIQUE INDEX opening_cash_transaction_date_user_id_uix
+ON sales.opening_cash(user_id, transaction_date);
+
+CREATE TABLE sales.closing_cash
+(
+	closing_cash_id							BIGSERIAL PRIMARY KEY,
+	user_id									integer NOT NULL REFERENCES account.users,
+	transaction_date						date NOT NULL,
+	opening_cash							decimal(24, 4) NOT NULL,
+	box_office_sales						decimal(24, 4) NOT NULL,
+	submitted_to							national character varying(1000) NOT NULL DEFAULT(''),
+	memo									national character varying(4000) NOT NULL DEFAULT(''),
+	deno1000								integer NOT NULL DEFAULT(0),
+	deno500									integer NOT NULL DEFAULT(0),
+	deno250									integer NOT NULL DEFAULT(0),
+	deno200									integer NOT NULL DEFAULT(0),
+	deno100									integer NOT NULL DEFAULT(0),
+	deno50									integer NOT NULL DEFAULT(0),
+	deno25									integer NOT NULL DEFAULT(0),
+	deno20									integer NOT NULL DEFAULT(0),
+	deno10									integer NOT NULL DEFAULT(0),
+	deno5									integer NOT NULL DEFAULT(0),
+	deno2									integer NOT NULL DEFAULT(0),
+	deno1									integer NOT NULL DEFAULT(0),
+	coins									integer NOT NULL DEFAULT(0),
+	submitted_cash							decimal(24, 4) NOT NULL,
+	approved_by								integer REFERENCES account.users,
+	approval_memo							national character varying(4000),
+    audit_user_id                           integer REFERENCES account.users,
+    audit_ts                                TIMESTAMP WITH TIME ZONE NULL DEFAULT(NOW()),
+	deleted									boolean DEFAULT(false)
+);
+
+CREATE UNIQUE INDEX closing_cash_transaction_date_user_id_uix
+ON sales.closing_cash(user_id, transaction_date);
+
+
 CREATE TYPE sales.sales_detail_type
 AS
 (
