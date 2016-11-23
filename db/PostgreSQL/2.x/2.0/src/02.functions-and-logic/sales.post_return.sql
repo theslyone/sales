@@ -50,7 +50,7 @@ $$
     DECLARE _sales_id               bigint;
     DECLARE this                    RECORD;
 BEGIN
-    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) THEN
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
         RETURN 0;
     END IF;
 
@@ -88,7 +88,7 @@ BEGIN
         base_unit_id                    integer,                
         price                           public.money_strict,
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),
-        discount                        public.money_strict2,
+        discount                        public.money_strict2 DEFAULT(0),
         discount_rate                   public.decimal_strict2,
         shipping_charge                 public.money_strict2,
         sales_account_id                integer,
@@ -141,7 +141,7 @@ BEGIN
 
 
     UPDATE temp_checkout_details
-    SET cost_of_goods_sold = inventory.get_write_off_cost_of_goods_sold(_ck_id, item_id, unit_id, quantity);
+    SET cost_of_goods_sold = COALESCE(inventory.get_write_off_cost_of_goods_sold(_ck_id, item_id, unit_id, quantity), 0);
 
 
     SELECT SUM(cost_of_goods_sold) INTO _cost_of_goods_sold FROM temp_checkout_details;
@@ -161,7 +161,7 @@ BEGIN
     END IF;
 
 
-    INSERT INTO finance.transaction_details(transaction_master_id, book, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er,amount_in_local_currency) 
+    INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er,amount_in_local_currency) 
     SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Dr', sales_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)), _default_currency_code, 1, SUM(COALESCE(price, 0) * COALESCE(quantity, 0))
     FROM temp_checkout_details
     GROUP BY sales_account_id;
@@ -209,8 +209,8 @@ LANGUAGE plpgsql;
 --     1::integer, --_office_id                      integer,
 --     1::integer, --_user_id                        integer,
 --     1::bigint, --_login_id                       bigint,
---     '1-1-2020'::date, --_value_date                     date,
---     '1-1-2020'::date, --_book_date                      date,
+--     '11/24/2016'::date, --_value_date                     date,
+--     '11/24/2016'::date, --_book_date                      date,
 --     1::integer, --_store_id                       integer,
 --     1::integer, --_counter_id                       integer,
 --     1::integer, --_customer_id                    integer,

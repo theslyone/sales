@@ -63,6 +63,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\Frapid.DataAccess.dll</HintPath>
     </Reference>
+    <Reference Include="Frapid.DbPolicy">
+      <HintPath>..\..\bin\Frapid.DbPolicy.dll</HintPath>
+    </Reference>
     <Reference Include="Frapid.Framework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\Frapid.Framework.dll</HintPath>
@@ -146,6 +149,7 @@
     <Compile Include="Controllers\Backend\Loyalty\SalesCouponController.cs" />
     <Compile Include="Controllers\Backend\Setups\CustomerController.cs" />
     <Compile Include="Controllers\Backend\Setups\CustomerTypeController.cs" />
+    <Compile Include="Controllers\Backend\Tasks\ClosingCashController.cs" />
     <Compile Include="Controllers\Backend\Tasks\CustomerSearchController.cs" />
     <Compile Include="Controllers\Backend\Loyalty\GiftCardController.cs" />
     <Compile Include="Controllers\Backend\Tasks\OpeningCashController.cs" />
@@ -162,12 +166,15 @@
     <Compile Include="Controllers\Backend\Tasks\ReturnController.cs" />
     <Compile Include="DAL\Backend\Service\GiftCards.cs" />
     <Compile Include="DAL\Backend\Service\SearchCustomer.cs" />
+    <Compile Include="DAL\Backend\Tasks\ClosingCashTransactions.cs" />
     <Compile Include="DAL\Backend\Tasks\OpeningCashTransaction.cs" />
     <Compile Include="DAL\Backend\Tasks\GiftCardFunds.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntries.cs" />
     <Compile Include="DAL\Backend\Service\Items.cs" />
+    <Compile Include="DAL\Backend\Tasks\SalesReturnEntries.cs" />
     <Compile Include="DAL\Backend\Tasks\Ticket.cs" />
     <Compile Include="DTO\CheckoutDetailView.cs" />
+    <Compile Include="DTO\ClosingCash.cs" />
     <Compile Include="DTO\CouponView.cs" />
     <Compile Include="DTO\GiftCards.cs" />
     <Compile Include="DTO\ItemView.cs" />
@@ -176,13 +183,170 @@
     <Compile Include="Models\Tickets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryModels\GiftCardSearch.cs" />
+    <Compile Include="ViewModels\ClosingCashViewModel.cs" />
     <Compile Include="ViewModels\OpeningCash.cs" />
     <Compile Include="ViewModels\CustomerSearchViewModel.cs" />
     <Compile Include="ViewModels\GiftCardFund.cs" />
     <Compile Include="ViewModels\Sales.cs" />
     <Compile Include="ViewModels\SalesDetailType.cs" />
     <Compile Include="ViewModels\CustomerSearchResult.cs" />
+    <Compile Include="ViewModels\SalesReturn.cs" />
     <Compile Include="ViewModels\TicketViewModel.cs" />
+    <Compile Include="Views\Layout.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Layout.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Loyalty\Coupons\Index.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Index.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Loyalty\GiftCards\AddFund\Checklist.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Checklist.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Loyalty\GiftCards\AddFund\Entry.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Entry.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Loyalty\GiftCards\AddFund\Index.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Index.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Loyalty\GiftCards\AddFund\Verification.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Verification.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Loyalty\GiftCards\Index.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Index.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Loyalty\Points\Index.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Index.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Setup\Cashiers.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Cashiers.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Setup\Customers.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Customers.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Setup\CustomerSearch.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CustomerSearch.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Setup\CustomerTypes.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CustomerTypes.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Setup\LateFee.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LateFee.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Setup\PaymentTerms.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PaymentTerms.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Setup\PriceTypes.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PriceTypes.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Setup\SellingPrices.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SellingPrices.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\CustomerSearchModal.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CustomerSearchModal.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\GiftCardSerachModal.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GiftCardSerachModal.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\POSItemList.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>POSItemList.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\POSScreen.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>POSScreen.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\ReprintTicketModal.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReprintTicketModal.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\SalesEntryForm.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SalesEntryForm.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tasks\Entry\Checklist.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Checklist.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tasks\Entry\Index.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Index.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tasks\Entry\New.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>New.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tasks\Entry\Verification.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Verification.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tasks\ClosingCash\Index.generated.cs">
+      <DependentUpon>Index.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Views\Tasks\OpeningCash\Index.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Index.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tasks\Return\Index.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Index.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tasks\Return\New.generated.cs">
+      <DependentUpon>New.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Views\Ticket\Index.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Index.cshtml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -194,35 +358,130 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="web.config" />
-    <Content Include="Views\Layout.cshtml" />
-    <Content Include="Views\Setup\PriceTypes.cshtml" />
-    <Content Include="Views\Setup\PaymentTerms.cshtml" />
-    <Content Include="Views\Setup\SellingPrices.cshtml" />
-    <Content Include="Views\Setup\LateFee.cshtml" />
-    <Content Include="Views\Setup\Cashiers.cshtml" />
-    <Content Include="Views\Tasks\Entry\Index.cshtml" />
-    <Content Include="Views\Tasks\Return\Index.cshtml" />
-    <Content Include="Views\Tasks\Entry\New.cshtml" />
-    <Content Include="Views\Setup\Customers.cshtml" />
-    <Content Include="Views\Setup\CustomerTypes.cshtml" />
-    <Content Include="Views\Loyalty\GiftCards\Index.cshtml" />
-    <Content Include="Views\Setup\CustomerSearch.cshtml" />
-    <Content Include="Views\Tasks\Entry\Checklist.cshtml" />
-    <Content Include="Views\Tasks\Entry\Verification.cshtml" />
-    <Content Include="Views\Loyalty\Coupons\Index.cshtml" />
-    <Content Include="Views\Loyalty\GiftCards\AddFund\Entry.cshtml" />
-    <Content Include="Views\Loyalty\Points\Index.cshtml" />
-    <Content Include="Views\Ticket\Index.cshtml" />
-    <Content Include="Views\Loyalty\GiftCards\AddFund\Index.cshtml" />
-    <Content Include="Views\Loyalty\GiftCards\AddFund\Checklist.cshtml" />
-    <Content Include="Views\Loyalty\GiftCards\AddFund\Verification.cshtml" />
-    <Content Include="Views\Shared\GiftCardSerachModal.cshtml" />
-    <Content Include="Views\Shared\ReprintTicketModal.cshtml" />
-    <Content Include="Views\Shared\CustomerSearchModal.cshtml" />
-    <Content Include="Views\Shared\SalesEntryForm.cshtml" />
-    <Content Include="Views\Shared\POSItemList.cshtml" />
-    <Content Include="Views\Shared\POSScreen.cshtml" />
-    <Content Include="Views\Tasks\OpeningCash\Index.cshtml" />
+    <Content Include="Views\Layout.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Layout.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Setup\PriceTypes.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>PriceTypes.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Setup\PaymentTerms.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>PaymentTerms.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Setup\SellingPrices.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>SellingPrices.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Setup\LateFee.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>LateFee.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Setup\Cashiers.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Cashiers.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Tasks\Entry\Index.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Index.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Tasks\Return\Index.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Index.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Tasks\Entry\New.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>New.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Setup\Customers.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Customers.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Setup\CustomerTypes.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>CustomerTypes.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Loyalty\GiftCards\Index.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Index.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Setup\CustomerSearch.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>CustomerSearch.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Tasks\Entry\Checklist.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Checklist.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Tasks\Entry\Verification.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Verification.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Loyalty\Coupons\Index.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Index.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Loyalty\GiftCards\AddFund\Entry.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Entry.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Loyalty\Points\Index.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Index.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Ticket\Index.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Index.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Loyalty\GiftCards\AddFund\Index.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Index.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Loyalty\GiftCards\AddFund\Checklist.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Checklist.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Loyalty\GiftCards\AddFund\Verification.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Verification.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Shared\GiftCardSerachModal.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>GiftCardSerachModal.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Shared\ReprintTicketModal.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>ReprintTicketModal.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Shared\CustomerSearchModal.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>CustomerSearchModal.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Shared\SalesEntryForm.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>SalesEntryForm.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Shared\POSItemList.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>POSItemList.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Shared\POSScreen.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>POSScreen.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Tasks\OpeningCash\Index.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Index.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Tasks\ClosingCash\Index.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Index.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Tasks\Return\New.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>New.generated.cs</LastGenOutput>
+    </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

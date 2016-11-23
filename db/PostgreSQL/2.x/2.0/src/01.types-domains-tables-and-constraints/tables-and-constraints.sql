@@ -239,6 +239,8 @@ ON sales.coupons(UPPER(coupon_code));
 CREATE TABLE sales.sales
 (
     sales_id                                BIGSERIAL PRIMARY KEY,
+	invoice_number							bigint NOT NULL,
+	fiscal_year_code						national character varying(12) NOT NULL REFERENCES finance.fiscal_year,
 	cash_repository_id						integer REFERENCES finance.cash_repositories,
 	price_type_id							integer NOT NULL REFERENCES sales.price_types,
 	sales_order_id							bigint REFERENCES sales.orders,
@@ -269,6 +271,10 @@ CREATE TABLE sales.sales
     check_clearing_transaction_master_id    integer REFERENCES finance.transaction_master,
 	reward_points							numeric(24, 4) NOT NULL DEFAULT(0)
 );
+
+CREATE UNIQUE INDEX sales_invoice_number_fiscal_year_uix
+ON sales.sales(UPPER(fiscal_year_code), invoice_number);
+
 
 CREATE TABLE sales.customer_receipts
 (
@@ -343,22 +349,22 @@ CREATE TABLE sales.closing_cash
 	user_id									integer NOT NULL REFERENCES account.users,
 	transaction_date						date NOT NULL,
 	opening_cash							decimal(24, 4) NOT NULL,
-	box_office_sales						decimal(24, 4) NOT NULL,
+	total_cash_sales						decimal(24, 4) NOT NULL,
 	submitted_to							national character varying(1000) NOT NULL DEFAULT(''),
 	memo									national character varying(4000) NOT NULL DEFAULT(''),
-	deno1000								integer NOT NULL DEFAULT(0),
-	deno500									integer NOT NULL DEFAULT(0),
-	deno250									integer NOT NULL DEFAULT(0),
-	deno200									integer NOT NULL DEFAULT(0),
-	deno100									integer NOT NULL DEFAULT(0),
-	deno50									integer NOT NULL DEFAULT(0),
-	deno25									integer NOT NULL DEFAULT(0),
-	deno20									integer NOT NULL DEFAULT(0),
-	deno10									integer NOT NULL DEFAULT(0),
-	deno5									integer NOT NULL DEFAULT(0),
-	deno2									integer NOT NULL DEFAULT(0),
-	deno1									integer NOT NULL DEFAULT(0),
-	coins									integer NOT NULL DEFAULT(0),
+	deno1000								integer DEFAULT(0),
+	deno500									integer DEFAULT(0),
+	deno250									integer DEFAULT(0),
+	deno200									integer DEFAULT(0),
+	deno100									integer DEFAULT(0),
+	deno50									integer DEFAULT(0),
+	deno25									integer DEFAULT(0),
+	deno20									integer DEFAULT(0),
+	deno10									integer DEFAULT(0),
+	deno5									integer DEFAULT(0),
+	deno2									integer DEFAULT(0),
+	deno1									integer DEFAULT(0),
+	coins									decimal(24, 4) DEFAULT(0),
 	submitted_cash							decimal(24, 4) NOT NULL,
 	approved_by								integer REFERENCES account.users,
 	approval_memo							national character varying(4000),

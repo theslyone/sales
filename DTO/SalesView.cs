@@ -25,7 +25,11 @@ namespace MixERP.Sales.DTO
         public bool Cancelled { get; set; }
         public string CancellationReason { get; set; }
         public int CashRepositoryId { get; set; }
+        public string CashRepositoryCode { get; set; }
+        public string CashRepositoryName { get; set; }
         public int PriceTypeId { get; set; }
+        public string PriceTypeCode { get; set; }
+        public string PriceTypeName { get; set; }
         public int CounterId { get; set; }
         public string CounterCode { get; set; }
         public string CounterName { get; set; }
@@ -48,6 +52,9 @@ namespace MixERP.Sales.DTO
         public int? PaymentTermId { get; set; }
         public string PaymentTermCode { get; set; }
         public string PaymentTermName { get; set; }
+        public string FiscalYearCode { get; set; }
+        public long InvoiceNumber { get; set; }
+        public decimal TotalAmount { get; set; }
         public decimal Tender { get; set; }
         public decimal Change { get; set; }
         public string CheckNumber { get; set; }

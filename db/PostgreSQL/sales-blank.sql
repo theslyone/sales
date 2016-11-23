@@ -240,6 +240,8 @@ ON sales.coupons(UPPER(coupon_code));
 CREATE TABLE sales.sales
 (
     sales_id                                BIGSERIAL PRIMARY KEY,
+	invoice_number							bigint NOT NULL,
+	fiscal_year_code						national character varying(12) NOT NULL REFERENCES finance.fiscal_year,
 	cash_repository_id						integer REFERENCES finance.cash_repositories,
 	price_type_id							integer NOT NULL REFERENCES sales.price_types,
 	sales_order_id							bigint REFERENCES sales.orders,
@@ -270,6 +272,10 @@ CREATE TABLE sales.sales
     check_clearing_transaction_master_id    integer REFERENCES finance.transaction_master,
 	reward_points							numeric(24, 4) NOT NULL DEFAULT(0)
 );
+
+CREATE UNIQUE INDEX sales_invoice_number_fiscal_year_uix
+ON sales.sales(UPPER(fiscal_year_code), invoice_number);
+
 
 CREATE TABLE sales.customer_receipts
 (
@@ -344,7 +350,7 @@ CREATE TABLE sales.closing_cash
 	user_id									integer NOT NULL REFERENCES account.users,
 	transaction_date						date NOT NULL,
 	opening_cash							decimal(24, 4) NOT NULL,
-	box_office_sales						decimal(24, 4) NOT NULL,
+	total_cash_sales						decimal(24, 4) NOT NULL,
 	submitted_to							national character varying(1000) NOT NULL DEFAULT(''),
 	memo									national character varying(4000) NOT NULL DEFAULT(''),
 	deno1000								integer NOT NULL DEFAULT(0),
@@ -2989,6 +2995,7 @@ SELECT
     sales.sales.payment_term_id,
     sales.payment_terms.payment_term_code,
     sales.payment_terms.payment_term_name,
+    sales.sales.total_amount,
     sales.sales.tender,
     sales.sales.change,
     sales.sales.check_number,

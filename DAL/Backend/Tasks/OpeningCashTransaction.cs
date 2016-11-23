@@ -8,7 +8,7 @@ using MixERP.Sales.ViewModels;
 
 namespace MixERP.Sales.DAL.Backend.Tasks
 {
-    public static class OpeningCashTransaction
+    public static class OpeningCashTransactions
     {
         public static async Task<OpeningCash> GetAsync(string tenant, int userId, DateTime transactionDate)
         {

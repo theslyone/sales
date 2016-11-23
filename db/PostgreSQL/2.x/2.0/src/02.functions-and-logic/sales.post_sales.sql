@@ -84,13 +84,15 @@ $$
     DECLARE _gift_card_balance              decimal(24, 4);
     DECLARE _coupon_id                      integer;
     DECLARE _coupon_discount                decimal(24, 4); 
-    DECLARE _default_discount_account_id    integer;   
+    DECLARE _default_discount_account_id    integer;
+    DECLARE _fiscal_year_code               national character varying(12);
+    DECLARE _invoice_number                 bigint;
     DECLARE this                            RECORD;
 BEGIN        
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
         RETURN 0;
     END IF;
-
+    
     _default_currency_code                  := core.get_currency_code_by_office_id(_office_id);
     _cash_account_id                        := inventory.get_cash_account_id_by_store_id(_store_id);
     _cash_repository_id                     := inventory.get_cash_repository_id_by_store_id(_store_id);
@@ -101,6 +103,10 @@ BEGIN
     _gift_card_balance                      := sales.get_gift_card_balance(_gift_card_id, _value_date);
 
 
+    SELECT finance.fiscal_year.fiscal_year_code INTO _fiscal_year_code
+    FROM finance.fiscal_year
+    WHERE _value_date BETWEEN finance.fiscal_year.starts_from AND finance.fiscal_year.ends_on
+    LIMIT 1;
 
     IF(COALESCE(_customer_id, 0) = 0) THEN
         RAISE EXCEPTION 'Please select a customer.';
@@ -357,9 +363,15 @@ BEGIN
     END LOOP;
 
 
-    INSERT INTO sales.sales(price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
-    SELECT _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id;
+    SELECT
+        COALESCE(MAX(invoice_number), 0) + 1
+    INTO
+        _invoice_number
+    FROM sales.sales
+    WHERE sales.sales.fiscal_year_code = _fiscal_year_code;
     
+    INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
+    SELECT _fiscal_year_code, _invoice_number, _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id;
     
     PERFORM finance.auto_verify(_transaction_master_id, _office_id);
 

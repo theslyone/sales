@@ -1,0 +1,466 @@
+﻿@using Frapid.ApplicationState.Cache
+@model MixERP.Sales.ViewModels.ClosingCashViewModel
+
+@{
+    ViewBag.Title = "title";
+    Layout = ViewBag.Layout;
+    decimal tenderTotal = Model.SalesView.Sum(x => x.Tender);
+    decimal changeTotal = Model.SalesView.Sum(x => x.Change);
+    decimal total = Model.SalesView.Sum(x => x.TotalAmount);
+    decimal submittedAmount = total;
+    string submittedTo = string.Empty;
+    string memo = string.Empty;
+    bool submitted = false;
+}
+
+@{
+    if (Model.ClosingCashInfo != null && Model.ClosingCashInfo.ClosingCashId > 0)
+    {
+        submitted = true;
+        submittedAmount = Model.ClosingCashInfo.SubmittedCash;
+        submittedTo = Model.ClosingCashInfo.SubmittedTo;
+        memo = Model.ClosingCashInfo.Memo;
+    }
+}
+<script src="/Scripts/frapid/utilities/form.js"></script>
+<script src="/Scripts/frapid/utilities/validator.js"></script>
+
+<style>
+    .very.relaxed.segment { padding: 4em; }
+
+    @@media print {
+        .no.print { display: none !important; }
+
+        table { page-break-inside: auto !important; }
+
+        tr {
+            page-break-after: auto !important;
+            page-break-inside: avoid !important;
+        }
+
+        thead { display: table-header-group !important; }
+
+        tfoot { display: table-footer-group !important; }
+
+        .page.break { page-break-before: always; }
+    }
+
+    @@media screen {
+        .no.screen { display: none !important; }
+    }
+
+    #SubmittedCashInputText.selected {
+        border: 1px solid #BD6711;
+        color: #BD6711;
+    }
+
+    .denomination .field,
+    .denomination .multiply,
+    .denomination .text,
+    .denomination .equals {
+        display: inline-block;
+        padding: 0.2em 0.5em;
+    }
+
+
+    .denomination .text {
+        text-align: right;
+        width: 40px;
+    }
+</style>
+<div class="ui attached very relaxed segment">
+<div class="ui container">
+<div class="ui huge header">
+    EOD Cash
+    <div class="ui teal label">@Model.OpeningCashInfo.TransactionDate.ToLongDateString()</div>
+
+</div>
+<div class="ui divider"></div>
+<div class="ui positive message">
+    @AppUsers.GetCurrent().Name
+</div>
+<div class="ui stackable grid eod no print cash" style="padding: 1em 0;">
+    <div class="eight wide column">
+        <div class="ui header">Denominations</div>
+        <div class="denominations">
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="integer" id="Deno1000InputText" data-value="1000" value="@Model.ClosingCashInfo.Deno1000" data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">1000</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="Deno1000TotalInputText"/>
+                </div>
+            </div>
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="integer" id="Deno500InputText" data-value="500" value="@Model.ClosingCashInfo.Deno500" data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">500</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="Deno500TotalInputText"/>
+                </div>
+            </div>
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="integer" id="Deno250InputText" data-value="250" value="@Model.ClosingCashInfo.Deno250" data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">250</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="Deno250TotalInputText"/>
+                </div>
+            </div>
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="integer" id="Deno200InputText" data-value="200" value="@Model.ClosingCashInfo.Deno200" data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">200</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="Deno200TotalInputText"/>
+                </div>
+            </div>
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="integer" id="Deno100InputText" data-value="100" value="@Model.ClosingCashInfo.Deno100" data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">100</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="Deno100TotalInputText"/>
+                </div>
+            </div>
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="integer" id="Deno50InputText" data-value="50" value="@Model.ClosingCashInfo.Deno50" data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">50</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="Deno50TotalInputText"/>
+                </div>
+            </div>
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="integer" id="Deno25InputText" data-value="25" value="@Model.ClosingCashInfo.Deno25" data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">25</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="Deno25TotalInputText"/>
+                </div>
+            </div>
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="integer" id="Deno20InputText" data-value="20" value="@Model.ClosingCashInfo.Deno20" data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">20</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="Deno20TotalInputText"/>
+                </div>
+            </div>
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="integer" id="Deno10InputText" data-value="10" value="@Model.ClosingCashInfo.Deno10" data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">10</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="Deno10TotalInputText"/>
+                </div>
+            </div>
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="integer" id="Deno5InputText" data-value="5" value="@Model.ClosingCashInfo.Deno5" data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">5</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="Deno5TotalInputText"/>
+                </div>
+            </div>
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="integer" id="Deno2InputText" data-value="2" value="@Model.ClosingCashInfo.Deno2" data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">2</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="Deno2TotalInputText"/>
+                </div>
+            </div>
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="integer" id="Deno1InputText" data-value="1" value="@Model.ClosingCashInfo.Deno1" data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">1</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="Deno1TotalInputText"/>
+                </div>
+            </div>
+            <div class="denomination">
+                <div class="ui input field">
+                    <input type="text" class="decimal" id="CoinsInputText"
+                           data-value="1" value="@Model.ClosingCashInfo.Coins" 
+                           data-allow-edit="@(!submitted)"/>
+                </div>
+                <div class="multiply">x</div>
+                <div class="text">Coins</div>
+                <div class="equals">=</div>
+                <div class="ui input total field">
+                    <input type="text" disabled="disabled" id="CoinsTotalInputText"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="eight wide column">
+        <div class="ui header">Closing Summary</div>
+        <div class="ui divider"></div>
+        <div class="ui no print form">
+            <div class="two fields">
+                <div class="field">
+                    <label>Today's Beginning Cash</label>
+                    <input id="BodCashInputText" class="decimal" disabled="disabled" type="text" value="@Model.OpeningCashInfo.Amount.ToString("N2")">
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <label>Total</label>
+                    <input id="TotalInputText" disabled="disabled" type="text" value="@total.ToString("N2")">
+                </div>
+                <div class="field">
+                    <label>Submitted Cash</label>
+
+                    <input id="SubmittedCashInputText" class="decimal" readonly="" required="" type="text"
+                           value="@submittedAmount.ToString("N2")" disabled="disabled" data-allow-edit="@(!submitted)">
+                </div>
+            </div>
+            <div class="field">
+                <label>Submitted To</label>
+                <input id="SubmittedToInputText" required="" type="text" value="@submittedTo" disabled="disabled" data-allow-edit="@(!submitted)">
+            </div>
+            <div class="field">
+                <label>Memo</label>
+                <textarea id="MemoTextArea" rows="10" disabled="disabled" data-allow-edit="@(!submitted)">@memo</textarea>
+            </div>
+            <button id="SaveButton" class="ui green button" disabled="disabled" data-allow-edit="@(!submitted)">Save</button>
+        </div>
+    </div>
+</div>
+
+<table class="ui celled compact striped table">
+    <caption>
+        Your Sales for @DateTime.Now.ToLongDateString()
+    </caption>
+    <tfoot>
+    <tr>
+        <th colspan="6" class="right aligned">Total</th>
+        <th class="right aligned">@tenderTotal.ToString("N2")</th>
+        <th class="right aligned">@changeTotal.ToString("N2")</th>
+        <th class="warning right aligned">@total.ToString("N2")</th>
+    </tr>
+    </tfoot>
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Inv#</th>
+        <th>Price Type</th>
+        <th>Counter</th>
+        <th>Customer</th>
+        <th>Coupon Code</th>
+        <th class="right aligned">Tender</th>
+        <th class="right aligned">Change</th>
+        <th class="right aligned">Sales</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.SalesView.OrderBy(x => x.InvoiceNumber))
+    {
+        <tr>
+            <td>@item.TransactionMasterId</td>
+            <td>@item.InvoiceNumber</td>
+            <td>@item.PriceTypeName</td>
+            <td>@item.CounterName</td>
+            <td>@item.CustomerName</td>
+            <td>@item.CouponCode (@item.CouponName)</td>
+            <td class="right aligned">@item.Tender</td>
+            <td class="right aligned">@item.Change</td>
+            <td class="right aligned">@item.TotalAmount</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<table class="ui no screen celled collapsing definition page break table">
+    <thead>
+    <tr>
+        <th></th>
+        <th>Amount</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th>Opening Cash</th>
+        <td>@Model.OpeningCashInfo.Amount.ToString("N2")</td>
+    </tr>
+    <tr>
+        <th>Total Sales</th>
+        <td>@total.ToString("N2")</td>
+    </tr>
+    <tr>
+        <th>Submitted Amount</th>
+        <td class="submitted amount"></td>
+    </tr>
+    </tbody>
+</table>
+
+<a class="ui positive no print download button" download="Sales-@AppUsers.GetCurrent().Name-@(Model.OpeningCashInfo.TransactionDate.ToShortDateString()).csv">Export to Excel</a>
+</div>
+</div>
+
+<script>
+    function updateTotal() {
+        const candidates = $(".denomination .ui.input.field:not(.total) input");
+
+        var total = 0;
+
+        $.each(candidates, function() {
+            const el = $(this);
+            const value = parseInt(el.attr("data-value")) || 0;
+            const number = window.parseFloat2(el.val());
+
+            const result = value * number;
+
+            total += result;
+        });
+
+        $("#SubmittedCashInputText").val(total).addClass("selected");
+        $(".submitted.Amount").html(total);
+    };
+
+    (function() {
+        const candidates = $("[data-allow-edit]");
+
+        $.each(candidates, function() {
+            const el = $(this);
+
+            const allowEdit = el.attr("data-allow-edit").toLowerCase() === "true";
+            el.prop("disabled", !allowEdit);
+        });
+
+        updateTotal();
+    })();
+
+    $(document).ready(function() {
+        window.validator.initialize($(".ui.form"));
+        window.setNumberFormat();
+    });
+
+    $("#SaveButton").unbind("click").bind("click", function() {
+        function request(model) {
+            const url = "/dashboard/sales/tasks/eod";
+            const data = JSON.stringify(model);
+            return window.getAjaxRequest(url, "POST", data);
+        };
+
+        const confirmed = confirm("Are you sure?");
+
+        if (!confirmed) {
+            return;
+        };
+
+        const model = window.serializeForm($(".eod.cash"));
+        const total = parseFloat($("#TotalInputText").val());
+
+        if (parseFloat(model.SubmittedCash) !== total) {
+            window.displayMessage("The submitted amount must be equal to total amount.");
+            return;
+        };
+
+        const ajax = request(model);
+
+        ajax.success(function() {
+            window.displaySuccess();
+            document.location = document.location;
+        });
+
+        ajax.fail(function(xhr) {
+            alert(JSON.stringify(xhr));
+        });
+    });
+
+
+    $(".denomination .ui.input.field:not(.total) input").keyup(function() {
+        const el = $(this);
+        const value = parseInt(el.attr("data-value")) || 0;
+        const number = window.parseFloat2(el.val()) || 0;
+        const result = value * number;
+
+        const target = el.parent().parent().find(".ui.input.total.field input");
+        target.val(result);
+
+        updateTotal();
+    });
+
+    $(".download.button").click(function() {
+    });
+
+    function getTableInText() {
+        const headerCells = $("table:first thead tr th");
+        const rows = $("table:first tbody tr");
+
+        var contents = "";
+
+        var members = [];
+
+        $.each(headerCells, function () {
+            const cell = $(this);
+            members.push(cell.html());
+        });
+
+        contents += members.join(",");
+        members = [];
+        contents += "\n";
+
+        $.each(rows, function () {
+            const row = $(this);
+            const cells = row.find("td");
+
+            $.each(cells, function () {
+                const cell = $(this);
+
+                members.push(cell.html());
+            });
+
+            contents += members.join(",");
+            contents += "\n";
+            members = [];
+        });
+
+        return contents;
+    };
+
+
+    $(document).ready(function() {
+        const text = getTableInText();
+        const href = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
+        $(".download.button").attr("href", href);
+    });
+</script>

@@ -19,7 +19,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
             var meta = await AppUsers.GetCurrentAsync(this.Tenant).ConfigureAwait(true);
             var dates = await Dates.GetFrequencyDatesAsync(this.Tenant, meta.OfficeId).ConfigureAwait(true);
 
-            var model = await OpeningCashTransaction.GetAsync(this.Tenant, meta.UserId, dates.Today).ConfigureAwait(true) ??
+            var model = await OpeningCashTransactions.GetAsync(this.Tenant, meta.UserId, dates.Today).ConfigureAwait(true) ??
                 new OpeningCash();
 
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/OpeningCash/Index.cshtml", this.Tenant), model);
@@ -42,7 +42,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
             try
             {
-                await OpeningCashTransaction.AddAsync(this.Tenant, model).ConfigureAwait(true);
+                await OpeningCashTransactions.AddAsync(this.Tenant, model).ConfigureAwait(true);
                 return this.Ok();
             }
             catch (Exception ex)

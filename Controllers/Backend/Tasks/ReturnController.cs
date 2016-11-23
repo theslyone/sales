@@ -1,4 +1,8 @@
+using System;
+using System.Net;
+using System.Threading.Tasks;
 using System.Web.Mvc;
+using Frapid.ApplicationState.Cache;
 using Frapid.Dashboard;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
@@ -26,24 +30,30 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Return/New.cshtml", this.Tenant));
         }
 
-        //public async Task<ActionResult> PostAsync(SalesReturn model)
-        //[HttpPost]
+        [Route("dashboard/sales/tasks/return/new")]
+        [HttpPost]
+        public async Task<ActionResult> PostAsync(ViewModels.SalesReturn model)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.InvalidModelState(this.ModelState);
+            }
 
-        //[Route("dashboard/sales/tasks/return/new")]
-        //{
-        //    if (!this.ModelState.IsValid)
-        //    {
-        //        return this.InvalidModelState(this.ModelState);
-        //    }
+            var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);
 
-        //    var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);
+            model.UserId = meta.UserId;
+            model.OfficeId = meta.OfficeId;
+            model.LoginId = meta.LoginId;
 
-        //    model.UserId = meta.UserId;
-        //    model.OfficeId = meta.OfficeId;
-        //    model.LoginId = meta.LoginId;
-
-        //    long tranId = await DAL.Backend.Tasks.SalesReturns.PostAsync(this.Tenant, model).ConfigureAwait(true);
-        //    return this.Ok(tranId);
-        //}
+            try
+            {
+                long tranId = await DAL.Backend.Tasks.SalesReturnEntries.PostAsync(this.Tenant, model).ConfigureAwait(true);
+                return this.Ok(tranId);
+            }
+            catch (Exception ex)
+            {
+                return this.Failed(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
