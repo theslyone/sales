@@ -353,19 +353,19 @@ CREATE TABLE sales.closing_cash
 	total_cash_sales						decimal(24, 4) NOT NULL,
 	submitted_to							national character varying(1000) NOT NULL DEFAULT(''),
 	memo									national character varying(4000) NOT NULL DEFAULT(''),
-	deno1000								integer NOT NULL DEFAULT(0),
-	deno500									integer NOT NULL DEFAULT(0),
-	deno250									integer NOT NULL DEFAULT(0),
-	deno200									integer NOT NULL DEFAULT(0),
-	deno100									integer NOT NULL DEFAULT(0),
-	deno50									integer NOT NULL DEFAULT(0),
-	deno25									integer NOT NULL DEFAULT(0),
-	deno20									integer NOT NULL DEFAULT(0),
-	deno10									integer NOT NULL DEFAULT(0),
-	deno5									integer NOT NULL DEFAULT(0),
-	deno2									integer NOT NULL DEFAULT(0),
-	deno1									integer NOT NULL DEFAULT(0),
-	coins									integer NOT NULL DEFAULT(0),
+	deno1000								integer DEFAULT(0),
+	deno500									integer DEFAULT(0),
+	deno250									integer DEFAULT(0),
+	deno200									integer DEFAULT(0),
+	deno100									integer DEFAULT(0),
+	deno50									integer DEFAULT(0),
+	deno25									integer DEFAULT(0),
+	deno20									integer DEFAULT(0),
+	deno10									integer DEFAULT(0),
+	deno5									integer DEFAULT(0),
+	deno2									integer DEFAULT(0),
+	deno1									integer DEFAULT(0),
+	coins									decimal(24, 4) DEFAULT(0),
 	submitted_cash							decimal(24, 4) NOT NULL,
 	approved_by								integer REFERENCES account.users,
 	approval_memo							national character varying(4000),
@@ -1670,7 +1670,11 @@ $$
     DECLARE _sales_id               bigint;
     DECLARE this                    RECORD;
 BEGIN
-    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) THEN
+    IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
+        RETURN 0;
+    END IF;
+
+    IF(NOT sales.validate_items_for_return(_transaction_master_id, _details)) THEN
         RETURN 0;
     END IF;
 
@@ -1708,7 +1712,7 @@ BEGIN
         base_unit_id                    integer,                
         price                           public.money_strict,
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),
-        discount                        public.money_strict2,
+        discount                        public.money_strict2 DEFAULT(0),
         discount_rate                   public.decimal_strict2,
         shipping_charge                 public.money_strict2,
         sales_account_id                integer,
@@ -1753,7 +1757,7 @@ BEGIN
     _tran_code                  := finance.get_transaction_code(_value_date, _office_id, _user_id, _login_id);
 
     INSERT INTO finance.transaction_master(transaction_master_id, transaction_counter, transaction_code, book, value_date, book_date, user_id, login_id, office_id, cost_center_id, reference_number, statement_reference)
-    SELECT _tran_master_id, _tran_counter, _tran_code, 'Sales.Return', _value_date, _book_date, _user_id, _login_id, _office_id, _cost_center_id, _reference_number, _statement_reference;
+    SELECT _tran_master_id, _tran_counter, _tran_code, _book_name, _value_date, _book_date, _user_id, _login_id, _office_id, _cost_center_id, _reference_number, _statement_reference;
         
     SELECT SUM(COALESCE(discount, 0))                           INTO _discount_total FROM temp_checkout_details;
     SELECT SUM(COALESCE(price, 0) * COALESCE(quantity, 0))      INTO _grand_total FROM temp_checkout_details;
@@ -1761,7 +1765,7 @@ BEGIN
 
 
     UPDATE temp_checkout_details
-    SET cost_of_goods_sold = inventory.get_write_off_cost_of_goods_sold(_ck_id, item_id, unit_id, quantity);
+    SET cost_of_goods_sold = COALESCE(inventory.get_write_off_cost_of_goods_sold(_ck_id, item_id, unit_id, quantity), 0);
 
 
     SELECT SUM(cost_of_goods_sold) INTO _cost_of_goods_sold FROM temp_checkout_details;
@@ -1781,7 +1785,7 @@ BEGIN
     END IF;
 
 
-    INSERT INTO finance.transaction_details(transaction_master_id, book, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er,amount_in_local_currency) 
+    INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er,amount_in_local_currency) 
     SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Dr', sales_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)), _default_currency_code, 1, SUM(COALESCE(price, 0) * COALESCE(quantity, 0))
     FROM temp_checkout_details
     GROUP BY sales_account_id;
@@ -1829,8 +1833,8 @@ LANGUAGE plpgsql;
 --     1::integer, --_office_id                      integer,
 --     1::integer, --_user_id                        integer,
 --     1::bigint, --_login_id                       bigint,
---     '1-1-2020'::date, --_value_date                     date,
---     '1-1-2020'::date, --_book_date                      date,
+--     '11/24/2016'::date, --_value_date                     date,
+--     '11/24/2016'::date, --_book_date                      date,
 --     1::integer, --_store_id                       integer,
 --     1::integer, --_counter_id                       integer,
 --     1::integer, --_customer_id                    integer,
@@ -1935,13 +1939,15 @@ $$
     DECLARE _gift_card_balance              decimal(24, 4);
     DECLARE _coupon_id                      integer;
     DECLARE _coupon_discount                decimal(24, 4); 
-    DECLARE _default_discount_account_id    integer;   
+    DECLARE _default_discount_account_id    integer;
+    DECLARE _fiscal_year_code               national character varying(12);
+    DECLARE _invoice_number                 bigint;
     DECLARE this                            RECORD;
 BEGIN        
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
         RETURN 0;
     END IF;
-
+    
     _default_currency_code                  := core.get_currency_code_by_office_id(_office_id);
     _cash_account_id                        := inventory.get_cash_account_id_by_store_id(_store_id);
     _cash_repository_id                     := inventory.get_cash_repository_id_by_store_id(_store_id);
@@ -1952,6 +1958,10 @@ BEGIN
     _gift_card_balance                      := sales.get_gift_card_balance(_gift_card_id, _value_date);
 
 
+    SELECT finance.fiscal_year.fiscal_year_code INTO _fiscal_year_code
+    FROM finance.fiscal_year
+    WHERE _value_date BETWEEN finance.fiscal_year.starts_from AND finance.fiscal_year.ends_on
+    LIMIT 1;
 
     IF(COALESCE(_customer_id, 0) = 0) THEN
         RAISE EXCEPTION 'Please select a customer.';
@@ -2208,9 +2218,15 @@ BEGIN
     END LOOP;
 
 
-    INSERT INTO sales.sales(price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
-    SELECT _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id;
+    SELECT
+        COALESCE(MAX(invoice_number), 0) + 1
+    INTO
+        _invoice_number
+    FROM sales.sales
+    WHERE sales.sales.fiscal_year_code = _fiscal_year_code;
     
+    INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
+    SELECT _fiscal_year_code, _invoice_number, _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id;
     
     PERFORM finance.auto_verify(_transaction_master_id, _office_id);
 
@@ -2426,6 +2442,9 @@ $$
     DECLARE _actual_price_in_root_unit      public.money_strict2 = 0;
     DECLARE _price_in_root_unit             public.money_strict2 = 0;
     DECLARE _item_in_stock                  public.decimal_strict2 = 0;
+    DECLARE _error_item_id                  integer;
+    DECLARE _error_quantity                 decimal;
+    DECLARE _error_amount                   decimal;
     DECLARE this                            RECORD; 
 BEGIN        
     _checkout_id                            := inventory.get_checkout_id_by_transaction_master_id(_transaction_master_id);
@@ -2605,7 +2624,7 @@ BEGIN
     LIMIT 1;
 
     IF(COALESCE(_item_id, 0) != 0) THEN
-        RAISE EXCEPTION '%', format('The item %1$s is not associated with this transaction.', _item_id)
+        RAISE EXCEPTION '%', format('The item %1$s is not associated with this transaction.', inventory.get_item_name_by_item_id(_item_id))
         USING ERRCODE='P4020';
     END IF;
 
@@ -2623,14 +2642,18 @@ BEGIN
         USING ERRCODE='P3053';
     END IF;
 
-    IF EXISTS
-    (
-        SELECT 0
-        FROM item_summary_temp
-        WHERE returned_quantity + returned_in_previous_batch + in_verification_queue > actual_quantity
-        LIMIT 1
-    ) THEN    
-        RAISE EXCEPTION 'The returned quantity cannot be greater than actual quantity.'
+    SELECT 
+        item_id,
+        returned_quantity
+    INTO
+        _error_item_id,
+        _error_quantity
+    FROM item_summary_temp
+    WHERE returned_quantity + returned_in_previous_batch + in_verification_queue > actual_quantity
+    LIMIT 1;
+
+    IF(_error_item_id IS NOT NULL) THEN    
+        RAISE EXCEPTION 'The returned quantity (%) of % is greater than actual quantity.', _error_quantity, inventory.get_item_name_by_item_id(_error_item_id)
         USING ERRCODE='P5203';
     END IF;
 
@@ -2638,15 +2661,20 @@ BEGIN
     SELECT item_id, base_quantity, (price / base_quantity * quantity)::numeric(24, 4) as price
     FROM details_temp
     LOOP
-        IF NOT EXISTS
-        (
-            SELECT 0
-            FROM cumulative_pricing_temp
-            WHERE item_id = this.item_id
-            AND base_price >=  this.price
-            AND allowed_returns >= this.base_quantity
-        ) THEN
-            RAISE EXCEPTION 'The returned amount cannot be greater than actual amount.'
+        SELECT 
+            item_id,
+            base_price
+        INTO
+            _error_item_id,
+            _error_amount
+        FROM cumulative_pricing_temp
+        WHERE item_id = this.item_id
+        AND base_price <=  this.price
+        AND allowed_returns >= this.base_quantity
+        LIMIT 1;
+        
+        IF (_error_item_id IS NOT NULL) THEN
+            RAISE EXCEPTION 'The returned base amount % of % cannot be greater than actual amount %.', this.price, inventory.get_item_name_by_item_id(_error_item_id), _error_amount
             USING ERRCODE='P5204';
 
             RETURN FALSE;
@@ -2972,7 +3000,11 @@ SELECT
     inventory.checkouts.cancelled,
     inventory.checkouts.cancellation_reason,    
     sales.sales.cash_repository_id,
-    sales.sales.price_type_id,    
+    finance.cash_repositories.cash_repository_code,
+    finance.cash_repositories.cash_repository_name,
+    sales.sales.price_type_id,
+    sales.price_types.price_type_code,
+    sales.price_types.price_type_name,
     sales.sales.counter_id,
     inventory.counters.counter_code,
     inventory.counters.counter_name,
@@ -2995,6 +3027,8 @@ SELECT
     sales.sales.payment_term_id,
     sales.payment_terms.payment_term_code,
     sales.payment_terms.payment_term_name,
+    sales.sales.fiscal_year_code,
+    sales.sales.invoice_number,
     sales.sales.total_amount,
     sales.sales.tender,
     sales.sales.change,

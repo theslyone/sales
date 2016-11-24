@@ -37,25 +37,25 @@ namespace ASP
     using Frapid.WebsiteBuilder;
     using MixERP.Sales;
     
-    #line 1 "..\..\Views\Tasks\Entry\Checklist.cshtml"
+    #line 1 "..\..\Views\Tasks\Return\Verification.cshtml"
     using MixERP.Sales.Extensions;
     
     #line default
     #line hidden
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]
-    [System.Web.WebPages.PageVirtualPathAttribute("~/Views/Tasks/Entry/Checklist.cshtml")]
-    public partial class _Views_Tasks_Entry_Checklist_cshtml : System.Web.Mvc.WebViewPage<long>
+    [System.Web.WebPages.PageVirtualPathAttribute("~/Views/Tasks/Return/Verification.cshtml")]
+    public partial class _Views_Tasks_Return_Verification_cshtml : System.Web.Mvc.WebViewPage<dynamic>
     {
-        public _Views_Tasks_Entry_Checklist_cshtml()
+        public _Views_Tasks_Return_Verification_cshtml()
         {
         }
         public override void Execute()
         {
             
-            #line 4 "..\..\Views\Tasks\Entry\Checklist.cshtml"
+            #line 4 "..\..\Views\Tasks\Return\Verification.cshtml"
   
-    ViewBag.Title = "Checklist";
+    ViewBag.Title = "Sales Return Verification";
     Layout = ViewBag.SalesLayoutPath;
 
             
@@ -64,37 +64,39 @@ namespace ASP
 WriteLiteral("\r\n");
 
             
-            #line 8 "..\..\Views\Tasks\Entry\Checklist.cshtml"
-Write(Html.FinancePartialView("Shared/Checklist.cshtml", TenantConvention.GetTenant()));
+            #line 8 "..\..\Views\Tasks\Return\Verification.cshtml"
+Write(Html.FinancePartialView("Shared/Verification.cshtml", TenantConvention.GetTenant()));
 
             
             #line default
             #line hidden
-WriteLiteral("\r\n\r\n<script>\r\n    window.overridePath = \"/dashboard/sales/tasks/entry\";\r\n\r\n    wi" +
-"ndow.prepareChecklist({\r\n        Title: \"Sales Checklist #");
+WriteLiteral(@"
 
-            
-            #line 14 "..\..\Views\Tasks\Entry\Checklist.cshtml"
-                            Write(Model);
+<script>
+    window.prepareVerification({
+        Title: ""Sales Return Verification"",
+        Book: ""Sales Return"",
+        ChecklistUrl : ""/dashboard/sales/tasks/return/checklist/{tranId}"",
+        AdviceButtons: [
+            {
+                Title: ""View Sales Return"",
+                Href: ""javascript:void(0);"",
+                OnClick: ""showReturn({tranId});""
+            }
+        ]
+    });
 
-            
-            #line default
-            #line hidden
-WriteLiteral(@""",
-        ViewText: ""View Sales"",
-        ViewUrl: ""/dashboard/sales/tasks/entry"",
-        AddNewText: ""Add New Sales Entry"",
-        AddNewUrl: ""/dashboard/sales/tasks/entry/new"",
-        ReportPath: ""/dashboard/reports/source/Areas/MixERP.Sales/Reports/Invoice.xml?transaction_master_id=");
+    function showReturn(tranId) {
+        $("".advice.modal iframe"").attr(""src"", ""/dashboard/reports/source/Areas/MixERP.Sales/Reports/Return.xml?transaction_master_id="" + tranId);
 
-            
-            #line 19 "..\..\Views\Tasks\Entry\Checklist.cshtml"
-                                                                                                       Write(Model);
+        setTimeout(function () {
+            $("".advice.modal"")
+                .modal('setting', 'transition', 'horizontal flip')
+                .modal(""show"");
 
-            
-            #line default
-            #line hidden
-WriteLiteral("\"\r\n    });\r\n</script>");
+        }, 300);
+    };
+</script>");
 
         }
     }

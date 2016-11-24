@@ -1,0 +1,19 @@
+﻿@using MixERP.Sales.Extensions
+@model long
+
+@{
+    ViewBag.Title = "Checklist";
+    Layout = ViewBag.SalesLayoutPath;
+}
+@Html.FinancePartialView("Shared/Checklist.cshtml", TenantConvention.GetTenant())
+
+<script>
+    window.overridePath = "/dashboard/sales/tasks/entry";
+
+    window.prepareChecklist({
+        Title: "Sales Return Checklist #@Model",
+        ViewText: "View Sales Returns",
+        ViewUrl: "/dashboard/sales/tasks/return",
+        ReportPath: "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Return.xml?transaction_master_id=@Model"
+    });
+</script>

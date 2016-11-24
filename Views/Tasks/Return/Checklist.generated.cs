@@ -37,23 +37,23 @@ namespace ASP
     using Frapid.WebsiteBuilder;
     using MixERP.Sales;
     
-    #line 1 "..\..\Views\Tasks\Entry\Checklist.cshtml"
+    #line 1 "..\..\Views\Tasks\Return\Checklist.cshtml"
     using MixERP.Sales.Extensions;
     
     #line default
     #line hidden
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]
-    [System.Web.WebPages.PageVirtualPathAttribute("~/Views/Tasks/Entry/Checklist.cshtml")]
-    public partial class _Views_Tasks_Entry_Checklist_cshtml : System.Web.Mvc.WebViewPage<long>
+    [System.Web.WebPages.PageVirtualPathAttribute("~/Views/Tasks/Return/Checklist.cshtml")]
+    public partial class _Views_Tasks_Return_Checklist_cshtml : System.Web.Mvc.WebViewPage<long>
     {
-        public _Views_Tasks_Entry_Checklist_cshtml()
+        public _Views_Tasks_Return_Checklist_cshtml()
         {
         }
         public override void Execute()
         {
             
-            #line 4 "..\..\Views\Tasks\Entry\Checklist.cshtml"
+            #line 4 "..\..\Views\Tasks\Return\Checklist.cshtml"
   
     ViewBag.Title = "Checklist";
     Layout = ViewBag.SalesLayoutPath;
@@ -64,32 +64,29 @@ namespace ASP
 WriteLiteral("\r\n");
 
             
-            #line 8 "..\..\Views\Tasks\Entry\Checklist.cshtml"
+            #line 8 "..\..\Views\Tasks\Return\Checklist.cshtml"
 Write(Html.FinancePartialView("Shared/Checklist.cshtml", TenantConvention.GetTenant()));
 
             
             #line default
             #line hidden
 WriteLiteral("\r\n\r\n<script>\r\n    window.overridePath = \"/dashboard/sales/tasks/entry\";\r\n\r\n    wi" +
-"ndow.prepareChecklist({\r\n        Title: \"Sales Checklist #");
+"ndow.prepareChecklist({\r\n        Title: \"Sales Return Checklist #");
 
             
-            #line 14 "..\..\Views\Tasks\Entry\Checklist.cshtml"
-                            Write(Model);
+            #line 14 "..\..\Views\Tasks\Return\Checklist.cshtml"
+                                   Write(Model);
 
             
             #line default
             #line hidden
-WriteLiteral(@""",
-        ViewText: ""View Sales"",
-        ViewUrl: ""/dashboard/sales/tasks/entry"",
-        AddNewText: ""Add New Sales Entry"",
-        AddNewUrl: ""/dashboard/sales/tasks/entry/new"",
-        ReportPath: ""/dashboard/reports/source/Areas/MixERP.Sales/Reports/Invoice.xml?transaction_master_id=");
+WriteLiteral("\",\r\n        ViewText: \"View Sales Returns\",\r\n        ViewUrl: \"/dashboard/sales/t" +
+"asks/return\",\r\n        ReportPath: \"/dashboard/reports/source/Areas/MixERP.Sales" +
+"/Reports/Return.xml?transaction_master_id=");
 
             
-            #line 19 "..\..\Views\Tasks\Entry\Checklist.cshtml"
-                                                                                                       Write(Model);
+            #line 17 "..\..\Views\Tasks\Return\Checklist.cshtml"
+                                                                                                      Write(Model);
 
             
             #line default

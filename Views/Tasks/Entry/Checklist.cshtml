@@ -1,35 +1,21 @@
-﻿@model long
+﻿@using MixERP.Sales.Extensions
+@model long
 
 @{
     ViewBag.Title = "Checklist";
     Layout = ViewBag.SalesLayoutPath;
 }
-<style>
-    iframe {
-        display: block;
-        margin-top: 1em;
-        width: 800px;
-        height: 800px;
-        border: 1px solid #ccc;
-    }
-</style>
-<script src="/Scripts/frapid/utilities/form.js"></script>
-<div class="ui attached page segment" style="min-height: 100%; padding: 3em;">
-    <div class="ui huge header">Sales Entry</div>
-    <div class="ui divider"></div>
-
-    <div class="ui positive message">The transaction was posted successfully.</div>
-
-    <a href="/dashboard/sales/tasks/entry" class="ui green button">
-        View Sales
-    </a>
-    <a href="/dashboard/sales/tasks/entry/new" class="ui red button">
-        Add a New Sales Entry
-    </a>
-    <iframe src="/dashboard/reports/source/Areas/MixERP.Sales/Reports/Invoice.xml?transaction_master_id=@Model"></iframe>
-</div>
-
+@Html.FinancePartialView("Shared/Checklist.cshtml", TenantConvention.GetTenant())
 
 <script>
     window.overridePath = "/dashboard/sales/tasks/entry";
+
+    window.prepareChecklist({
+        Title: "Sales Checklist #@Model",
+        ViewText: "View Sales",
+        ViewUrl: "/dashboard/sales/tasks/entry",
+        AddNewText: "Add New Sales Entry",
+        AddNewUrl: "/dashboard/sales/tasks/entry/new",
+        ReportPath: "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Invoice.xml?transaction_master_id=@Model"
+    });
 </script>

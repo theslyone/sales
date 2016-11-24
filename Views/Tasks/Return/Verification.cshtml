@@ -2,14 +2,14 @@
 @model dynamic
 
 @{
-    ViewBag.Title = "Sales Returns";
+    ViewBag.Title = "Sales Return Verification";
     Layout = ViewBag.SalesLayoutPath;
 }
-@Html.FinancePartialView("Shared/JournalView.cshtml", TenantConvention.GetTenant())
+@Html.FinancePartialView("Shared/Verification.cshtml", TenantConvention.GetTenant())
 
 <script>
-    window.prepareView({
-        Title: "Sales Returns",
+    window.prepareVerification({
+        Title: "Sales Return Verification",
         Book: "Sales Return",
         ChecklistUrl : "/dashboard/sales/tasks/return/checklist/{tranId}",
         AdviceButtons: [

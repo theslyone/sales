@@ -54,6 +54,10 @@ BEGIN
         RETURN 0;
     END IF;
 
+    IF(NOT sales.validate_items_for_return(_transaction_master_id, _details)) THEN
+        RETURN 0;
+    END IF;
+
     _default_currency_code          := core.get_currency_code_by_office_id(_office_id);
 
     SELECT sales.sales.sales_id 
@@ -133,7 +137,7 @@ BEGIN
     _tran_code                  := finance.get_transaction_code(_value_date, _office_id, _user_id, _login_id);
 
     INSERT INTO finance.transaction_master(transaction_master_id, transaction_counter, transaction_code, book, value_date, book_date, user_id, login_id, office_id, cost_center_id, reference_number, statement_reference)
-    SELECT _tran_master_id, _tran_counter, _tran_code, 'Sales.Return', _value_date, _book_date, _user_id, _login_id, _office_id, _cost_center_id, _reference_number, _statement_reference;
+    SELECT _tran_master_id, _tran_counter, _tran_code, _book_name, _value_date, _book_date, _user_id, _login_id, _office_id, _cost_center_id, _reference_number, _statement_reference;
         
     SELECT SUM(COALESCE(discount, 0))                           INTO _discount_total FROM temp_checkout_details;
     SELECT SUM(COALESCE(price, 0) * COALESCE(quantity, 0))      INTO _grand_total FROM temp_checkout_details;

@@ -161,7 +161,6 @@
     <Compile Include="Controllers\Backend\Setups\PriceTypeController.cs" />
     <Compile Include="Controllers\Backend\Setups\SellingPriceController.cs" />
     <Compile Include="Controllers\Backend\Tasks\EntryController.cs" />
-    <Compile Include="Controllers\Backend\Tasks\EntryVerificationController.cs" />
     <Compile Include="Controllers\Backend\Tasks\ItemController.cs" />
     <Compile Include="Controllers\Backend\Tasks\ReturnController.cs" />
     <Compile Include="DAL\Backend\Service\GiftCards.cs" />
@@ -332,6 +331,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Index.cshtml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Tasks\Return\Checklist.generated.cs">
+      <DependentUpon>Checklist.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Views\Tasks\Return\Index.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -339,6 +343,11 @@
     </Compile>
     <Compile Include="Views\Tasks\Return\New.generated.cs">
       <DependentUpon>New.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Views\Tasks\Return\Verification.generated.cs">
+      <DependentUpon>Verification.cshtml</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
@@ -481,6 +490,14 @@
     <Content Include="Views\Tasks\Return\New.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>New.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Tasks\Return\Checklist.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Checklist.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Tasks\Return\Verification.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Verification.generated.cs</LastGenOutput>
     </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>

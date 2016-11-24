@@ -21,6 +21,9 @@ $$
     DECLARE _actual_price_in_root_unit      public.money_strict2 = 0;
     DECLARE _price_in_root_unit             public.money_strict2 = 0;
     DECLARE _item_in_stock                  public.decimal_strict2 = 0;
+    DECLARE _error_item_id                  integer;
+    DECLARE _error_quantity                 decimal;
+    DECLARE _error_amount                   decimal;
     DECLARE this                            RECORD; 
 BEGIN        
     _checkout_id                            := inventory.get_checkout_id_by_transaction_master_id(_transaction_master_id);
@@ -200,7 +203,7 @@ BEGIN
     LIMIT 1;
 
     IF(COALESCE(_item_id, 0) != 0) THEN
-        RAISE EXCEPTION '%', format('The item %1$s is not associated with this transaction.', _item_id)
+        RAISE EXCEPTION '%', format('The item %1$s is not associated with this transaction.', inventory.get_item_name_by_item_id(_item_id))
         USING ERRCODE='P4020';
     END IF;
 
@@ -218,14 +221,18 @@ BEGIN
         USING ERRCODE='P3053';
     END IF;
 
-    IF EXISTS
-    (
-        SELECT 0
-        FROM item_summary_temp
-        WHERE returned_quantity + returned_in_previous_batch + in_verification_queue > actual_quantity
-        LIMIT 1
-    ) THEN    
-        RAISE EXCEPTION 'The returned quantity cannot be greater than actual quantity.'
+    SELECT 
+        item_id,
+        returned_quantity
+    INTO
+        _error_item_id,
+        _error_quantity
+    FROM item_summary_temp
+    WHERE returned_quantity + returned_in_previous_batch + in_verification_queue > actual_quantity
+    LIMIT 1;
+
+    IF(_error_item_id IS NOT NULL) THEN    
+        RAISE EXCEPTION 'The returned quantity (%) of % is greater than actual quantity.', _error_quantity, inventory.get_item_name_by_item_id(_error_item_id)
         USING ERRCODE='P5203';
     END IF;
 
@@ -233,15 +240,20 @@ BEGIN
     SELECT item_id, base_quantity, (price / base_quantity * quantity)::numeric(24, 4) as price
     FROM details_temp
     LOOP
-        IF NOT EXISTS
-        (
-            SELECT 0
-            FROM cumulative_pricing_temp
-            WHERE item_id = this.item_id
-            AND base_price >=  this.price
-            AND allowed_returns >= this.base_quantity
-        ) THEN
-            RAISE EXCEPTION 'The returned amount cannot be greater than actual amount.'
+        SELECT 
+            item_id,
+            base_price
+        INTO
+            _error_item_id,
+            _error_amount
+        FROM cumulative_pricing_temp
+        WHERE item_id = this.item_id
+        AND base_price <=  this.price
+        AND allowed_returns >= this.base_quantity
+        LIMIT 1;
+        
+        IF (_error_item_id IS NOT NULL) THEN
+            RAISE EXCEPTION 'The returned base amount % of % cannot be greater than actual amount %.', this.price, inventory.get_item_name_by_item_id(_error_item_id), _error_amount
             USING ERRCODE='P5204';
 
             RETURN FALSE;

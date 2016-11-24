@@ -23,6 +23,13 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Return/Index.cshtml", this.Tenant));
         }
 
+        [Route("dashboard/sales/tasks/return/verification")]
+        [MenuPolicy]
+        public ActionResult Verification()
+        {
+            return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Return/Verification.cshtml", this.Tenant));
+        }
+
         [Route("dashboard/sales/tasks/return/new")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/return")]
         public ActionResult New()
