@@ -23,7 +23,7 @@ SELECT * FROM core.create_menu('Sales', 'Opening Cash', '/dashboard/sales/tasks/
 SELECT * FROM core.create_menu('Sales', 'Sales Entry', '/dashboard/sales/tasks/entry', 'write', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Returns', '/dashboard/sales/tasks/return', 'minus square', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Quotation', '/dashboard/sales/tasks/quotation', 'quote left', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'Sales Orders', '/dashboard/sales/tasks/orders', 'file text outline', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'Sales Orders', '/dashboard/sales/tasks/order', 'file text outline', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');

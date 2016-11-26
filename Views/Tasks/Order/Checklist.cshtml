@@ -1,0 +1,24 @@
+﻿@using MixERP.Sales.Extensions
+@model long
+
+@{
+    ViewBag.Title = "Checklist";
+    Layout = ViewBag.SalesLayoutPath;
+}
+
+@Html.FinancePartialView("Shared/Checklist.cshtml", TenantConvention.GetTenant())
+
+<script>
+    window.overridePath = "/dashboard/sales/tasks/entry";
+
+    window.prepareChecklist({
+        Title: "Sales Order Checklist #@Model",
+        ViewText: "View Sales Orders",
+        ViewUrl: "/dashboard/sales/tasks/order",
+        AddNewText: "Add New Sales Order",
+        AddNewUrl: "/dashboard/sales/tasks/order/new",
+        ReportPath: "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Order.xml?order_id=@Model"
+    });
+
+    $(".withdraw.button").remove();
+</script>

@@ -141,17 +141,20 @@ CREATE TABLE sales.cashier_login_info
 );
 
 
+
 CREATE TABLE sales.quotations
 (
     quotation_id                            BIGSERIAL PRIMARY KEY,
     value_date                              date NOT NULL,
+	expected_delivery_date					date NOT NULL,
     transaction_timestamp                   TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT(NOW()),
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     price_type_id                           integer NOT NULL REFERENCES sales.price_types,
+	shipper_id								integer REFERENCES inventory.shippers,
     user_id                                 integer NOT NULL REFERENCES account.users,
     office_id                               integer NOT NULL REFERENCES core.offices,
     reference_number                        national character varying(24),
-    memo                                    national character varying(500),
+	terms									national character varying(500),
     internal_memo                           national character varying(500),
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
@@ -165,12 +168,10 @@ CREATE TABLE sales.quotation_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
-    discount                                public.money_strict2 NOT NULL DEFAULT(0),    
+    discount_rate                           public.decimal_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
-    quantity                                public.integer_strict2 NOT NULL,
-    base_unit_id                            integer NOT NULL REFERENCES inventory.units,
-    base_quantity                           numeric NOT NULL
+    quantity                                public.decimal_strict2 NOT NULL
 );
 
 
@@ -179,13 +180,15 @@ CREATE TABLE sales.orders
     order_id                                BIGSERIAL PRIMARY KEY,
     quotation_id                            bigint REFERENCES sales.quotations,
     value_date                              date NOT NULL,
+	expected_delivery_date					date NOT NULL,
     transaction_timestamp                   TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT(NOW()),
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     price_type_id                           integer NOT NULL REFERENCES sales.price_types,
+	shipper_id								integer REFERENCES inventory.shippers,
     user_id                                 integer NOT NULL REFERENCES account.users,
     office_id                               integer NOT NULL REFERENCES core.offices,
     reference_number                        national character varying(24),
-    memo                                    national character varying(500),
+    terms                                   national character varying(500),
     internal_memo                           national character varying(500),
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
@@ -199,12 +202,10 @@ CREATE TABLE sales.order_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
-    discount                                public.money_strict2 NOT NULL DEFAULT(0),    
+    discount_rate                           public.decimal_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
-    quantity                                public.integer_strict2 NOT NULL,
-    base_unit_id                            integer NOT NULL REFERENCES inventory.units,
-    base_quantity                           numeric NOT NULL
+    quantity                                public.decimal_strict2 NOT NULL
 );
 
 
@@ -833,6 +834,103 @@ $$
 LANGUAGE plpgsql;
 
 
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_order_view.sql --<--<--
+DROP FUNCTION IF EXISTS sales.get_order_view
+(
+    _user_id                        integer,
+    _office_id                      integer,
+    _customer                       national character varying(500),
+    _from                           date,
+    _to                             date,
+    _expected_from                  date,
+    _expected_to                    date,
+    _id                             bigint,
+    _reference_number               national character varying(500),
+    _internal_memo                  national character varying(500),
+    _terms                          national character varying(500),
+    _posted_by                      national character varying(500),
+    _office                         national character varying(500)
+);
+
+
+CREATE FUNCTION sales.get_order_view
+(
+    _user_id                        integer,
+    _office_id                      integer,
+    _customer                       national character varying(500),
+    _from                           date,
+    _to                             date,
+    _expected_from                  date,
+    _expected_to                    date,
+    _id                             bigint,
+    _reference_number               national character varying(500),
+    _internal_memo                  national character varying(500),
+    _terms                          national character varying(500),
+    _posted_by                      national character varying(500),
+    _office                         national character varying(500)
+)
+RETURNS TABLE
+(
+    id                              bigint,
+    customer                        national character varying(500),
+    value_date                      date,
+    expected_date                   date,
+    reference_number                national character varying(24),
+    terms                           national character varying(500),
+    internal_memo                   national character varying(500),
+    posted_by                       national character varying(500),
+    office                          national character varying(500),
+    transaction_ts                  TIMESTAMP WITH TIME ZONE
+)
+AS
+$$
+BEGIN
+    RETURN QUERY
+    WITH RECURSIVE office_cte(office_id) AS 
+    (
+        SELECT _office_id
+        UNION ALL
+        SELECT
+            c.office_id
+        FROM 
+        office_cte AS p, 
+        core.offices AS c 
+        WHERE 
+        parent_office_id = p.office_id
+    )
+
+    SELECT 
+        sales.orders.order_id,
+        inventory.get_customer_name_by_customer_id(sales.orders.customer_id),
+        sales.orders.value_date,
+        sales.orders.expected_delivery_date,
+        sales.orders.reference_number,
+        sales.orders.terms,
+        sales.orders.internal_memo,
+        account.get_name_by_user_id(sales.orders.user_id)::national character varying(500) AS posted_by,
+        core.get_office_name_by_office_id(office_id)::national character varying(500) AS office,
+        sales.orders.transaction_timestamp
+    FROM sales.orders
+    WHERE 1 = 1
+    AND sales.orders.value_date BETWEEN _from AND _to
+    AND sales.orders.expected_delivery_date BETWEEN _expected_from AND _expected_to
+    AND sales.orders.office_id IN (SELECT office_id FROM office_cte)
+    AND (COALESCE(_id, 0) = 0 OR _id = sales.orders.order_id)
+    AND COALESCE(LOWER(sales.orders.reference_number), '') LIKE '%' || LOWER(_reference_number) || '%' 
+    AND COALESCE(LOWER(sales.orders.internal_memo), '') LIKE '%' || LOWER(_internal_memo) || '%' 
+    AND COALESCE(LOWER(sales.orders.terms), '') LIKE '%' || LOWER(_terms) || '%' 
+    AND LOWER(inventory.get_customer_name_by_customer_id(sales.orders.customer_id)) LIKE '%' || LOWER(_customer) || '%' 
+    AND LOWER(account.get_name_by_user_id(sales.orders.user_id)) LIKE '%' || LOWER(_posted_by) || '%' 
+    AND LOWER(core.get_office_name_by_office_id(sales.orders.office_id)) LIKE '%' || LOWER(_office) || '%' 
+    AND NOT sales.orders.deleted;
+END
+$$
+LANGUAGE plpgsql;
+
+
+--SELECT * FROM sales.get_order_view(1,1, '', '11/27/2010','11/27/2016','1-1-2000','1-1-2020', null,'','','','', '');
+
+
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_payable_account_for_gift_card.sql --<--<--
 DROP FUNCTION IF EXISTS sales.get_payable_account_for_gift_card(_gift_card_id integer);
 
@@ -866,6 +964,102 @@ BEGIN
 END
 $$
 LANGUAGE plpgsql;
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_quotation_view.sql --<--<--
+DROP FUNCTION IF EXISTS sales.get_quotation_view
+(
+    _user_id                        integer,
+    _office_id                      integer,
+    _customer                       national character varying(500),
+    _from                           date,
+    _to                             date,
+    _expected_from                  date,
+    _expected_to                    date,
+    _id                             bigint,
+    _reference_number               national character varying(500),
+    _internal_memo                  national character varying(500),
+    _terms                          national character varying(500),
+    _posted_by                      national character varying(500),
+    _office                         national character varying(500)
+);
+
+CREATE FUNCTION sales.get_quotation_view
+(
+    _user_id                        integer,
+    _office_id                      integer,
+    _customer                       national character varying(500),
+    _from                           date,
+    _to                             date,
+    _expected_from                  date,
+    _expected_to                    date,
+    _id                             bigint,
+    _reference_number               national character varying(500),
+    _internal_memo                  national character varying(500),
+    _terms                          national character varying(500),
+    _posted_by                      national character varying(500),
+    _office                         national character varying(500)
+)
+RETURNS TABLE
+(
+    id                              bigint,
+    customer                        national character varying(500),
+    value_date                      date,
+    expected_date                   date,
+    reference_number                national character varying(24),
+    terms                           national character varying(500),
+    internal_memo                   national character varying(500),
+    posted_by                       national character varying(500),
+    office                          national character varying(500),
+    transaction_ts                  TIMESTAMP WITH TIME ZONE
+)
+AS
+$$
+BEGIN
+    RETURN QUERY
+    WITH RECURSIVE office_cte(office_id) AS 
+    (
+        SELECT _office_id
+        UNION ALL
+        SELECT
+            c.office_id
+        FROM 
+        office_cte AS p, 
+        core.offices AS c 
+        WHERE 
+        parent_office_id = p.office_id
+    )
+
+    SELECT 
+        sales.quotations.quotation_id,
+        inventory.get_customer_name_by_customer_id(sales.quotations.customer_id),
+        sales.quotations.value_date,
+        sales.quotations.expected_delivery_date,
+        sales.quotations.reference_number,
+        sales.quotations.terms,
+        sales.quotations.internal_memo,
+        account.get_name_by_user_id(sales.quotations.user_id)::national character varying(500) AS posted_by,
+        core.get_office_name_by_office_id(office_id)::national character varying(500) AS office,
+        sales.quotations.transaction_timestamp
+    FROM sales.quotations
+    WHERE 1 = 1
+    AND sales.quotations.value_date BETWEEN _from AND _to
+    AND sales.quotations.expected_delivery_date BETWEEN _expected_from AND _expected_to
+    AND sales.quotations.office_id IN (SELECT office_id FROM office_cte)
+    AND (COALESCE(_id, 0) = 0 OR _id = sales.quotations.quotation_id)
+    AND COALESCE(LOWER(sales.quotations.reference_number), '') LIKE '%' || LOWER(_reference_number) || '%' 
+    AND COALESCE(LOWER(sales.quotations.internal_memo), '') LIKE '%' || LOWER(_internal_memo) || '%' 
+    AND COALESCE(LOWER(sales.quotations.terms), '') LIKE '%' || LOWER(_terms) || '%' 
+    AND LOWER(inventory.get_customer_name_by_customer_id(sales.quotations.customer_id)) LIKE '%' || LOWER(_customer) || '%' 
+    AND LOWER(account.get_name_by_user_id(sales.quotations.user_id)) LIKE '%' || LOWER(_posted_by) || '%' 
+    AND LOWER(core.get_office_name_by_office_id(sales.quotations.office_id)) LIKE '%' || LOWER(_office) || '%' 
+    AND NOT sales.quotations.deleted;
+END
+$$
+LANGUAGE plpgsql;
+
+
+--SELECT * FROM sales.get_quotation_view(1,1,'','11/27/2010','11/27/2016','1-1-2000','1-1-2020', null,'','','','', '');
+
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_receivable_account_for_check_receipts.sql --<--<--
 DROP FUNCTION IF EXISTS sales.get_receivable_account_for_check_receipts(_store_id integer);
@@ -2724,7 +2918,7 @@ SELECT * FROM core.create_menu('Sales', 'Opening Cash', '/dashboard/sales/tasks/
 SELECT * FROM core.create_menu('Sales', 'Sales Entry', '/dashboard/sales/tasks/entry', 'write', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Returns', '/dashboard/sales/tasks/return', 'minus square', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Quotation', '/dashboard/sales/tasks/quotation', 'quote left', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'Sales Orders', '/dashboard/sales/tasks/orders', 'file text outline', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'Sales Orders', '/dashboard/sales/tasks/order', 'file text outline', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');

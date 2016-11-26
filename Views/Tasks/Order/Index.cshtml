@@ -1,0 +1,223 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "Sales Orders";
+    Layout = ViewBag.SalesLayoutPath;
+}
+<style>
+    .modal iframe {
+        width: 100%;
+        border: none;
+        height: 700px;
+    }
+</style>
+
+<div class="ui attached page segment" style="min-height: 100%; padding: 3em;">
+    <div class="ui huge title header">Sales Orders</div>
+    <div class="ui divider"></div>
+    <div class="ui basic buttons">
+        <a id="AddNewButton" href="/dashboard/sales/tasks/order/new" class="ui basic add new button">Add a New Sales Order</a>
+        <div class="ui icon top left pointing dropdown basic button" id="ExportDropDown" tabindex="0">
+            <span>
+                Export
+            </span>
+            <div class="menu" tabindex="-1">
+                <div class="header">
+                    Export This Document
+                </div>
+                <a class="item" href="javascript:void(0);" onclick="createDoc();">
+                    <i class="file word outline blue icon"></i> Export to Doc
+                </a>
+                <a class="item" href="javascript:void(0);" onclick="createXls();">
+                    <i class="file excel outline green icon"></i> Export to Excel
+                </a>
+                <a class="item" href="javascript:void(0);" onclick="createPDF();">
+                    <i class="file pdf outline red icon"></i> Export to PDF
+                </a>
+            </div>
+        </div>
+        <a id="PrintButton" href="javascript:void(0);" onclick="print()" class="ui basic button">
+            Print
+        </a>
+    </div>
+
+    <div class="ui stackable form segment" id="Annotation" style="">
+        <div class="six fields">
+            <div class="field">
+                <input class="date" data-persist placeholder="From" id="FromInputDate" title="From" type="date">
+            </div>
+            <div class="field">
+                <input class="date" data-persist placeholder="To" id="ToInputDate" title="To" type="date">
+            </div>
+            <div class="field">
+                <input class="date" data-persist placeholder="Expected From" id="ExpectedFromInputDate" title="Expected From" type="date">
+            </div>
+            <div class="field">
+                <input class="date" data-persist placeholder="Expected To" id="ExpectedToInputDate" title="Expected To" type="date">
+            </div>
+            <div class="field">
+                <input placeholder="Id" id="IdInputText" title="Id" type="text">
+            </div>
+            <div class="field">
+                <input placeholder="ReferenceNumber" id="ReferenceNumberInputText" title="ReferenceNumber" type="text">
+            </div>
+        </div>
+        <div class="six fields">
+            <div class="field">
+                <input placeholder="Customer" id="CustomerInputText" title="Customer" type="text">
+            </div>
+            <div class="field">
+                <input placeholder="Terms & Conditions" id="TermsInputText" title="Internal Memo" type="text">
+            </div>
+            <div class="field">
+                <input placeholder="InternalMemo" id="InternalMemoInputText" title="Internal Memo" type="text">
+            </div>
+            <div class="field">
+                <input placeholder="PostedBy" id="PostedByInputText" title="PostedBy" type="text">
+            </div>
+            <div class="field">
+                <input placeholder="Office" id="OfficeInputText" title="Office" type="text">
+            </div>
+            <div class="field hidden">
+                <input placeholder="UserId" id="UserIdInputText" title="UserId" type="text">
+            </div>
+            <div class="field hidden">
+                <input placeholder="OfficeId" id="OfficeIdInputText" title="OfficeId" type="text">
+            </div>
+            <div class="field">
+                <div class="ui green button" id="ShowButton">Show</div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <table id="JournalView" class="ui table segment">
+        <thead>
+        <tr>
+            <th>Actions</th>
+            <th>Id</th>
+            <th>Customer</th>
+            <th>Value Date</th>
+            <th>Expected Date</th>
+            <th>Ref#</th>
+            <th>Terms</th>
+            <th>Internal Memo</th>
+            <th>Posted By</th>
+            <th>Office</th>
+            <th>Posted On</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div class="ui large advice modal">
+    <i class="close icon"></i>
+    <iframe></iframe>
+</div>
+<script>
+    function displayTable(target, data) {
+        target.find("tbody").html("");
+
+        function getCell(text) {
+            const cell = $("<td />");
+
+            cell.text(text || "");
+
+            return cell;
+        };
+
+        function getActionCell(id) {
+            const cell = $("<td />");
+
+            const checklistAnchor = $("<a title='Checklist Window'><i class='list icon'></i></a>");
+            const checklistUrl = "/dashboard/sales/tasks/order/checklist/{id}";
+            checklistAnchor.attr("href", checklistUrl.replace("{id}", id));
+
+
+            const journalAdviceAnchor = $("<a title='View Order'><i class='print icon'></i></a>");
+            journalAdviceAnchor.attr("href", "javascript:void(0);");
+            journalAdviceAnchor.attr("onclick", "showOrder(" + id + ");");
+
+            cell.append(checklistAnchor);
+            cell.append(journalAdviceAnchor);
+
+            return cell;
+        };
+
+
+        $.each(data, function() {
+            const item = this;
+
+            const row = $("<tr />");
+
+            row.append(getActionCell(item.Id));
+            row.append(getCell(item.Id));
+            row.append(getCell(item.Customer));
+            row.append(getCell(item.ValueDate));
+            row.append(getCell(item.ExpectedDate));
+            row.append(getCell(item.ReferenceNumber));
+            row.append(getCell(item.Terms));
+            row.append(getCell(item.InternalMemo));
+            row.append(getCell(item.PostedBy));
+            row.append(getCell(item.Office));
+            row.append(getCell(item.TransactionTs));
+
+            target.find("tbody").append(row);
+        });
+    };
+
+    function processQuery() {
+        function getModel() {
+            const form = window.serializeForm($("#Annotation"));
+            return form;
+        };
+
+        function displayGrid(target) {
+            function request(query) {
+                const url = "/dashboard/sales/tasks/order/view";
+                const data = JSON.stringify(query);
+                return window.getAjaxRequest(url, "POST", data);
+            };
+
+            const query = getModel();
+
+            const ajax = request(query);
+
+            ajax.success(function(response) {
+                displayTable(target, response);
+                target.removeClass("loading");
+            });
+
+            ajax.fail(function(xhr) {
+                alert(JSON.stringify(xhr));
+            });
+        };
+
+        const view = $("#JournalView").addClass("loading");
+
+        displayGrid(view);
+    };
+
+    $("#ShowButton").unbind("click").bind("click", function() {
+        processQuery();
+    });
+
+    function showOrder(id) {
+        $(".modal iframe").attr("src", "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Order.xml?order_id=" + id);
+
+        setTimeout(function () {
+            $(".advice.modal")
+                .modal('setting', 'transition', 'horizontal flip')
+                .modal("show");
+
+        }, 300);
+    };
+
+    window.loadDatepicker();
+
+    setTimeout(function() {
+        processQuery();
+    }, 1000);
+</script>

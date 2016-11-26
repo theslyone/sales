@@ -153,6 +153,8 @@
     <Compile Include="Controllers\Backend\Tasks\CustomerSearchController.cs" />
     <Compile Include="Controllers\Backend\Loyalty\GiftCardController.cs" />
     <Compile Include="Controllers\Backend\Tasks\OpeningCashController.cs" />
+    <Compile Include="Controllers\Backend\Tasks\OrderController.cs" />
+    <Compile Include="Controllers\Backend\Tasks\QuotationController.cs" />
     <Compile Include="Controllers\Backend\Tasks\SalesTicketController.cs" />
     <Compile Include="Controllers\SalesDashboardController.cs" />
     <Compile Include="Controllers\Backend\Setups\CashierController.cs" />
@@ -168,6 +170,8 @@
     <Compile Include="DAL\Backend\Tasks\ClosingCashTransactions.cs" />
     <Compile Include="DAL\Backend\Tasks\OpeningCashTransaction.cs" />
     <Compile Include="DAL\Backend\Tasks\GiftCardFunds.cs" />
+    <Compile Include="DAL\Backend\Tasks\Orders.cs" />
+    <Compile Include="DAL\Backend\Tasks\Quotations.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntries.cs" />
     <Compile Include="DAL\Backend\Service\Items.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesReturnEntries.cs" />
@@ -177,11 +181,19 @@
     <Compile Include="DTO\CouponView.cs" />
     <Compile Include="DTO\GiftCards.cs" />
     <Compile Include="DTO\ItemView.cs" />
+    <Compile Include="DTO\Order.cs" />
+    <Compile Include="DTO\OrderDetail.cs" />
+    <Compile Include="DTO\OrderResultview.cs" />
+    <Compile Include="DTO\Quotation.cs" />
+    <Compile Include="DTO\QuotationDetail.cs" />
+    <Compile Include="DTO\QuotationResultview.cs" />
     <Compile Include="DTO\SalesView.cs" />
     <Compile Include="Extensions\PartialViewExtensions.cs" />
     <Compile Include="Models\Tickets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryModels\GiftCardSearch.cs" />
+    <Compile Include="QueryModels\OrderQueryModel.cs" />
+    <Compile Include="QueryModels\QuotationQueryModel.cs" />
     <Compile Include="ViewModels\ClosingCashViewModel.cs" />
     <Compile Include="ViewModels\OpeningCash.cs" />
     <Compile Include="ViewModels\CustomerSearchViewModel.cs" />
@@ -363,6 +375,7 @@
   <ItemGroup>
     <Content Include="Reports\Invoice.xml" />
     <Content Include="Reports\Return.xml" />
+    <Content Include="Styles\sales.css" />
     <Content Include="Views\web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -499,6 +512,13 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>Verification.generated.cs</LastGenOutput>
     </Content>
+    <Content Include="Views\Shared\ItemList.cshtml" />
+    <Content Include="Views\Tasks\Order\Checklist.cshtml" />
+    <Content Include="Views\Tasks\Order\Index.cshtml" />
+    <Content Include="Views\Tasks\Order\New.cshtml" />
+    <Content Include="Views\Tasks\Quotation\Checklist.cshtml" />
+    <Content Include="Views\Tasks\Quotation\Index.cshtml" />
+    <Content Include="Views\Tasks\Quotation\New.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

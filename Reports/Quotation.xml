@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<FrapidReport>
+  <Header />
+  <Title>Sales Quotation</Title>
+  <TopSection>
+    <table class="table horizontal">
+      <tr>
+        <td>{Resources.Titles.QuotationId}</td>
+        <td>
+          {DataSource[0].quotation_id}
+        </td>
+      </tr>
+      <tr>
+        <td>{Resources.Titles.TransactionDate}</td>
+        <td>{DataSource[0].transaction_timestamp}</td>
+      </tr>
+      <tr>
+        <td>{Resources.Titles.ValueDate}</td>
+        <td>{DataSource[0].value_date}</td>
+      </tr>
+      <tr>
+        <td>{Resources.Titles.EnteredBy}</td>
+        <td> {DataSource[0].entered_by}</td>
+      </tr>
+      <tr>
+        <td>{Resources.Titles.Office}</td>
+        <td>{DataSource[0].office_name}</td>
+      </tr>
+      <tr>
+        <td>{Resources.Titles.CustomerName}</td>
+        <td>{DataSource[0].customer_name}</td>
+      </tr>
+    </table>
+    <br />
+  </TopSection>
+  <Body>
+    <Content>
+      <h2>{Resources.Titles.QuotationItems}</h2>
+    </Content>
+    <GridViews>
+      <GridView>
+        <GridViewDataSource Index="1">
+        </GridViewDataSource>
+      </GridView>
+    </GridViews>
+  </Body>
+  <BottomSection>
+    <h3>{Resources.Titles.OtherDetails}</h3>
+    <p>
+      <table class="table horizontal">
+        <tr>
+          <td>{Resources.Titles.Terms}</td>
+          <td>{DataSource[0].terms}</td>
+        </tr>
+        <tr>
+          <td>{Resources.Titles.InternalMemo}</td>
+          <td>{DataSource[0].internal_memo}</td>
+        </tr>
+      </table>
+    </p>
+  </BottomSection>
+  <DataSources>
+    <DataSource>
+      <Query>
+		SELECT
+			sales.quotations.quotation_id,
+			sales.quotations.transaction_timestamp,
+			sales.quotations.value_date,
+			account.get_name_by_user_id(sales.quotations.user_id) AS entered_by,
+			core.get_office_name_by_office_id(sales.quotations.office_id) AS office_name,
+			sales.quotations.terms,
+			sales.quotations.internal_memo,
+			inventory.get_customer_name_by_customer_id(sales.quotations.customer_id) AS customer_name    
+		FROM sales.quotations
+		WHERE sales.quotations.quotation_id = @quotation_id;
+      </Query>
+      <Parameters>
+        <Parameter Name="@quotation_id" Type="Number" />
+      </Parameters>
+    </DataSource>
+    <DataSource>
+      <Query>
+		SELECT
+			sales.quotation_details.item_id,
+			inventory.items.item_code,
+			inventory.items.item_name,
+			sales.quotation_details.quantity,
+			inventory.get_unit_name_by_unit_id(sales.quotation_details.unit_id) AS unit,
+			sales.quotation_details.price,
+			sales.quotation_details.price * sales.quotation_details.quantity AS amount,
+			sales.quotation_details.discount_rate,
+			ROUND((sales.quotation_details.price * sales.quotation_details.quantity) * ((100 - sales.quotation_details.discount_rate)/100), 4) AS total
+		FROM sales.quotation_details
+		INNER JOIN inventory.items
+		ON inventory.items.item_id = sales.quotation_details.item_id
+		WHERE sales.quotation_details.quotation_id = @quotation_id
+		ORDER BY sales.quotation_details.quotation_detail_id;
+      </Query>
+      <Parameters>
+        <Parameter Name="@quotation_id" Type="Number" />
+      </Parameters>
+      <RunningTotalTextColumnIndex>3</RunningTotalTextColumnIndex>
+      <RunningTotalFieldIndices>5,6,7,8,9</RunningTotalFieldIndices>
+    </DataSource>
+  </DataSources>
+</FrapidReport>

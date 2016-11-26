@@ -140,17 +140,20 @@ CREATE TABLE sales.cashier_login_info
 );
 
 
+
 CREATE TABLE sales.quotations
 (
     quotation_id                            BIGSERIAL PRIMARY KEY,
     value_date                              date NOT NULL,
+	expected_delivery_date					date NOT NULL,
     transaction_timestamp                   TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT(NOW()),
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     price_type_id                           integer NOT NULL REFERENCES sales.price_types,
+	shipper_id								integer REFERENCES inventory.shippers,
     user_id                                 integer NOT NULL REFERENCES account.users,
     office_id                               integer NOT NULL REFERENCES core.offices,
     reference_number                        national character varying(24),
-    memo                                    national character varying(500),
+	terms									national character varying(500),
     internal_memo                           national character varying(500),
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
@@ -164,12 +167,10 @@ CREATE TABLE sales.quotation_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
-    discount                                public.money_strict2 NOT NULL DEFAULT(0),    
+    discount_rate                           public.decimal_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
-    quantity                                public.integer_strict2 NOT NULL,
-    base_unit_id                            integer NOT NULL REFERENCES inventory.units,
-    base_quantity                           numeric NOT NULL
+    quantity                                public.decimal_strict2 NOT NULL
 );
 
 
@@ -178,13 +179,15 @@ CREATE TABLE sales.orders
     order_id                                BIGSERIAL PRIMARY KEY,
     quotation_id                            bigint REFERENCES sales.quotations,
     value_date                              date NOT NULL,
+	expected_delivery_date					date NOT NULL,
     transaction_timestamp                   TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT(NOW()),
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     price_type_id                           integer NOT NULL REFERENCES sales.price_types,
+	shipper_id								integer REFERENCES inventory.shippers,
     user_id                                 integer NOT NULL REFERENCES account.users,
     office_id                               integer NOT NULL REFERENCES core.offices,
     reference_number                        national character varying(24),
-    memo                                    national character varying(500),
+    terms                                   national character varying(500),
     internal_memo                           national character varying(500),
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
@@ -198,12 +201,10 @@ CREATE TABLE sales.order_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
-    discount                                public.money_strict2 NOT NULL DEFAULT(0),    
+    discount_rate                           public.decimal_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
-    quantity                                public.integer_strict2 NOT NULL,
-    base_unit_id                            integer NOT NULL REFERENCES inventory.units,
-    base_quantity                           numeric NOT NULL
+    quantity                                public.decimal_strict2 NOT NULL
 );
 
 
