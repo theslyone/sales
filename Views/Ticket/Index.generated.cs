@@ -91,7 +91,7 @@ WriteLiteral("\r\n<style>\r\n    html, body, table {\r\n        font-family: Con
 "upon .description .info .name {\r\n        font-size: 0.87em;\r\n        font-weight" +
 ": bold;\r\n        padding-right: 1em;\r\n    }\r\n</style>\r\n<script");
 
-WriteLiteral(" src=\"/Scripts/jquery-2.2.3.min.js\"");
+WriteLiteral(" src=\"/Scripts/jquery-2.2.4.min.js\"");
 
 WriteLiteral("></script>\r\n<script");
 
