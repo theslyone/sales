@@ -7,6 +7,7 @@ using Frapid.Configuration;
 using Frapid.Framework.Extensions;
 using MixERP.Sales.ViewModels;
 using Npgsql;
+using Frapid.DataAccess.Extensions;
 
 namespace MixERP.Sales.DAL.Backend.Tasks
 {
@@ -73,32 +74,32 @@ namespace MixERP.Sales.DAL.Backend.Tasks
             {
                 using (var command = new NpgsqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@OfficeId", model.OfficeId);
-                    command.Parameters.AddWithValue("@UserId", model.UserId);
-                    command.Parameters.AddWithValue("@LoginId", model.LoginId);
-                    command.Parameters.AddWithValue("@CounterId", model.CounterId);
-                    command.Parameters.AddWithValue("@ValueDate", model.ValueDate);
-                    command.Parameters.AddWithValue("@BookDate", model.BookDate);
-                    command.Parameters.AddWithValue("@CostCenterId", model.CostCenterId);
-                    command.Parameters.AddWithValue("@ReferenceNumber", model.ReferenceNumber);
-                    command.Parameters.AddWithValue("@StatementReference", model.StatementReference);
-                    command.Parameters.AddWithValue("@Tender", model.Tender);
-                    command.Parameters.AddWithValue("@Change", model.Change);
-                    command.Parameters.AddWithValue("@PaymentTermId", model.PaymentTermId);
-                    command.Parameters.AddWithValue("@CheckAmount", model.CheckAmount);
-                    command.Parameters.AddWithValue("@CheckBankName", model.CheckBankName);
-                    command.Parameters.AddWithValue("@CheckNumber", model.CheckNumber);
-                    command.Parameters.AddWithValue("@CheckDate", model.CheckDate);
-                    command.Parameters.AddWithValue("@GiftCardNumber", model.GiftCardNumber);
-                    command.Parameters.AddWithValue("@CustomerId", model.CustomerId);
-                    command.Parameters.AddWithValue("@PriceTypeId", model.PriceTypeId);
-                    command.Parameters.AddWithValue("@ShipperId", model.ShipperId);
-                    command.Parameters.AddWithValue("@StoreId", model.StoreId);
-                    command.Parameters.AddWithValue("@CouponCode", model.CouponCode);
-                    command.Parameters.AddWithValue("@IsFlatDiscount", model.IsFlatDiscount);
-                    command.Parameters.AddWithValue("@Discount", model.Discount);
-                    command.Parameters.AddWithValue("@SalesQuotationId", model.SalesQuotationId);
-                    command.Parameters.AddWithValue("@SalesOrderId", model.SalesOrderId);
+                    command.Parameters.AddWithNullableValue("@OfficeId", model.OfficeId);
+                    command.Parameters.AddWithNullableValue("@UserId", model.UserId);
+                    command.Parameters.AddWithNullableValue("@LoginId", model.LoginId);
+                    command.Parameters.AddWithNullableValue("@CounterId", model.CounterId);
+                    command.Parameters.AddWithNullableValue("@ValueDate", model.ValueDate);
+                    command.Parameters.AddWithNullableValue("@BookDate", model.BookDate);
+                    command.Parameters.AddWithNullableValue("@CostCenterId", model.CostCenterId);
+                    command.Parameters.AddWithNullableValue("@ReferenceNumber", model.ReferenceNumber.Or(""));
+                    command.Parameters.AddWithNullableValue("@StatementReference", model.StatementReference.Or(""));
+                    command.Parameters.AddWithNullableValue("@Tender", model.Tender);
+                    command.Parameters.AddWithNullableValue("@Change", model.Change);
+                    command.Parameters.AddWithNullableValue("@PaymentTermId", model.PaymentTermId);
+                    command.Parameters.AddWithNullableValue("@CheckAmount", model.CheckAmount);
+                    command.Parameters.AddWithNullableValue("@CheckBankName", model.CheckBankName.Or(""));
+                    command.Parameters.AddWithNullableValue("@CheckNumber", model.CheckNumber.Or(""));
+                    command.Parameters.AddWithNullableValue("@CheckDate", model.CheckDate);
+                    command.Parameters.AddWithNullableValue("@GiftCardNumber", model.GiftCardNumber.Or(""));
+                    command.Parameters.AddWithNullableValue("@CustomerId", model.CustomerId);
+                    command.Parameters.AddWithNullableValue("@PriceTypeId", model.PriceTypeId);
+                    command.Parameters.AddWithNullableValue("@ShipperId", model.ShipperId);
+                    command.Parameters.AddWithNullableValue("@StoreId", model.StoreId);
+                    command.Parameters.AddWithNullableValue("@CouponCode", model.CouponCode.Or(""));
+                    command.Parameters.AddWithNullableValue("@IsFlatDiscount", model.IsFlatDiscount);
+                    command.Parameters.AddWithNullableValue("@Discount", model.Discount);
+                    command.Parameters.AddWithNullableValue("@SalesQuotationId", model.SalesQuotationId);
+                    command.Parameters.AddWithNullableValue("@SalesOrderId", model.SalesOrderId);
 
                     command.Parameters.AddRange(AddParametersForDetails(model.Details).ToArray());
 
