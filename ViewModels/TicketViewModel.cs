@@ -6,7 +6,7 @@ namespace MixERP.Sales.ViewModels
     public sealed class TicketViewModel
     {
         public SalesView View { get; set; }
-        public List<CheckoutDetailView> Details { get; set; }
-        public List<CouponView> DiscountCoupons { get; set; }
+        public IEnumerable<CheckoutDetailView> Details { get; set; }
+        public IEnumerable<CouponView> DiscountCoupons { get; set; }
     }
 }

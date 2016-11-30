@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Frapid.Configuration;
 using Frapid.Configuration.Db;
 using Frapid.DataAccess;
+using Frapid.Mapper;
+using Frapid.Mapper.Query.Select;
 using MixERP.Sales.DTO;
 
 namespace MixERP.Sales.DAL.Backend.Tasks
@@ -14,15 +16,21 @@ namespace MixERP.Sales.DAL.Backend.Tasks
         {
             using (var db = DbProvider.Get(FrapidDbServer.GetConnectionString(tenant), tenant).GetDatabase())
             {
-                return await db.Query<SalesView>().Where(x => x.TransactionMasterId == tranId).FirstOrDefaultAsync().ConfigureAwait(false);
+                var sql = new Sql("SELECT * FROM sales.sales_view");
+                sql.Where("transaction_master_id=@0", tranId);
+
+                var awaiter = await db.SelectAsync<SalesView>(sql).ConfigureAwait(false);
+                return awaiter.FirstOrDefault();
             }
         }
 
-        public static async Task<List<CheckoutDetailView>> GetCheckoutDetailViewAsync(string tenant, long tranId)
+        public static async Task<IEnumerable<CheckoutDetailView>> GetCheckoutDetailViewAsync(string tenant, long tranId)
         {
             using (var db = DbProvider.Get(FrapidDbServer.GetConnectionString(tenant), tenant).GetDatabase())
             {
-                return await db.Query<CheckoutDetailView>().Where(x => x.TransactionMasterId == tranId).ToListAsync().ConfigureAwait(false);
+                var sql = new Sql("SELECT * FROM inventory.checkout_detail_view");
+                sql.Where("transaction_master_id=@0", tranId);
+                return await db.SelectAsync<CheckoutDetailView>(sql).ConfigureAwait(false);
             }
         }
 

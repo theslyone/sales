@@ -197,22 +197,22 @@
 
             const row = $("<tr />");
 
-            row.append(getActionCell(item.transaction_master_id));
-            row.append(getSelectionCell(item.transaction_master_id));
-            row.append(getCell(item.transaction_master_id));
-            row.append(getCell(item.transaction_code));
-            row.append(getCell(item.value_date));
-            row.append(getCell(item.book_date));
-            row.append(getCell(item.customer_name));
-            row.append(getCell(item.amount));
-            row.append(getCell(item.reference_number));
-            row.append(getCell(item.statement_reference));
-            row.append(getCell(item.posted_by));
-            row.append(getCell(item.office_name));
-            row.append(getCell(item.status));
-            row.append(getCell(item.verified_by));
-            row.append(getCell(item.last_verified_on));
-            row.append(getCell(item.verification_reason));
+            row.append(getActionCell(item.TransactionMasterId));
+            row.append(getSelectionCell(item.TransactionMasterId));
+            row.append(getCell(item.TransactionMasterId));
+            row.append(getCell(item.TransactionCode));
+            row.append(getCell(item.ValueDate));
+            row.append(getCell(item.BookDate));
+            row.append(getCell(item.CustomerName));
+            row.append(getCell(item.Amount));
+            row.append(getCell(item.ReferenceNumber));
+            row.append(getCell(item.StatementReference));
+            row.append(getCell(item.PostedBy));
+            row.append(getCell(item.OfficeName));
+            row.append(getCell(item.Status));
+            row.append(getCell(item.VerifiedBy));
+            row.append(getCell(item.LastVerifiedOn));
+            row.append(getCell(item.VerificationReason));
 
             target.find("tbody").append(row);
         });
@@ -223,18 +223,18 @@
 
             const filters = [];
 
-            filters.push(window.getAjaxColumnFilter("WHERE", "office_id", "int", window.FilterConditions.IsEqualTo, window.metaView.OfficeId));
-            filters.push(window.getAjaxColumnFilter("WHERE", "value_date", "System.DateTime", window.FilterConditions.IsGreaterThanEqualTo, model.From));
-            filters.push(window.getAjaxColumnFilter("WHERE", "value_date", "System.DateTime", window.FilterConditions.IsLessThanEqualTo, model.To));
-            filters.push(window.getAjaxColumnFilter("WHERE", "transaction_code", "string", window.FilterConditions.IsLike, model.TranCode));
-            filters.push(window.getAjaxColumnFilter("WHERE", "customer_name", "string", window.FilterConditions.IsLike, model.CustomerName));
-            filters.push(window.getAjaxColumnFilter("WHERE", "reference_number", "string", window.FilterConditions.IsLike, model.ReferenceNumber));
-            filters.push(window.getAjaxColumnFilter("WHERE", "statement_reference", "string", window.FilterConditions.IsLike, model.StatementReference));
-            filters.push(window.getAjaxColumnFilter("WHERE", "posted_by", "string", window.FilterConditions.IsLike, model.PostedBy));
-            filters.push(window.getAjaxColumnFilter("WHERE", "office_name", "string", window.FilterConditions.IsLike, model.Office));
-            filters.push(window.getAjaxColumnFilter("WHERE", "status", "string", window.FilterConditions.IsLike, model.Status));
-            filters.push(window.getAjaxColumnFilter("WHERE", "verified_by", "string", window.FilterConditions.IsLike, model.VerifiedBy));
-            filters.push(window.getAjaxColumnFilter("WHERE", "verification_reason", "string", window.FilterConditions.IsLike, model.Reason));
+            filters.push(window.getAjaxColumnFilter("WHERE", "OfficeId", "int", window.FilterConditions.IsEqualTo, window.metaView.OfficeId));
+            filters.push(window.getAjaxColumnFilter("WHERE", "ValueDate", "System.DateTime", window.FilterConditions.IsGreaterThanEqualTo, model.From));
+            filters.push(window.getAjaxColumnFilter("WHERE", "ValueDate", "System.DateTime", window.FilterConditions.IsLessThanEqualTo, model.To));
+            filters.push(window.getAjaxColumnFilter("WHERE", "TransactionCode", "string", window.FilterConditions.IsLike, model.TranCode));
+            filters.push(window.getAjaxColumnFilter("WHERE", "CustomerName", "string", window.FilterConditions.IsLike, model.CustomerName));
+            filters.push(window.getAjaxColumnFilter("WHERE", "ReferenceNumber", "string", window.FilterConditions.IsLike, model.ReferenceNumber));
+            filters.push(window.getAjaxColumnFilter("WHERE", "StatementReference", "string", window.FilterConditions.IsLike, model.StatementReference));
+            filters.push(window.getAjaxColumnFilter("WHERE", "PostedBy", "string", window.FilterConditions.IsLike, model.PostedBy));
+            filters.push(window.getAjaxColumnFilter("WHERE", "OfficeName", "string", window.FilterConditions.IsLike, model.Office));
+            filters.push(window.getAjaxColumnFilter("WHERE", "Status", "string", window.FilterConditions.IsLike, model.Status));
+            filters.push(window.getAjaxColumnFilter("WHERE", "VerifiedBy", "string", window.FilterConditions.IsLike, model.VerifiedBy));
+            filters.push(window.getAjaxColumnFilter("WHERE", "VerificationReason", "string", window.FilterConditions.IsLike, model.Reason));
 
 
             return filters;

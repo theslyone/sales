@@ -72,9 +72,9 @@
     function loadAccounts() {
         
         const filters = [];
-        filters.push(window.getAjaxColumnFilter("WHERE", "account_master_id", "int", window.FilterConditions.IsEqualTo, "10101"));//CASH
-        filters.push(window.getAjaxColumnFilter("OR", "account_master_id", "int", window.FilterConditions.IsEqualTo, "10102"));//BANK
-        filters.push(window.getAjaxColumnFilter("OR", "account_master_id", "int", window.FilterConditions.IsEqualTo, "10110"));//ACCOUNT RECEIVABLE
+        filters.push(window.getAjaxColumnFilter("WHERE", "AccountMasterId", "int", window.FilterConditions.IsEqualTo, "10101"));//CASH
+        filters.push(window.getAjaxColumnFilter("OR", "AccountMasterId", "int", window.FilterConditions.IsEqualTo, "10102"));//BANK
+        filters.push(window.getAjaxColumnFilter("OR", "AccountMasterId", "int", window.FilterConditions.IsEqualTo, "10110"));//ACCOUNT RECEIVABLE
 
         window.displayFieldBinder($("#AccountIdSelect"), "/api/forms/finance/accounts/display-fields/get-where", true, filters);
     };

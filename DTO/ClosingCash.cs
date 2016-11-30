@@ -1,5 +1,5 @@
 using System;
-using Frapid.NPoco;
+using Frapid.Mapper.Decorators;
 
 namespace MixERP.Sales.DTO
 {

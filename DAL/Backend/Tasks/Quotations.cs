@@ -5,6 +5,7 @@ using Frapid.Configuration;
 using Frapid.Configuration.Db;
 using Frapid.DataAccess;
 using Frapid.Framework.Extensions;
+using Frapid.Mapper.Query.Insert;
 using MixERP.Sales.DTO;
 using MixERP.Sales.QueryModels;
 

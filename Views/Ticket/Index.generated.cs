@@ -45,7 +45,7 @@ namespace ASP
     #line hidden
     using Frapid.i18n;
     using Frapid.Messaging;
-    using Frapid.NPoco;
+    using Frapid.Mapper.Decorators;
     using Frapid.WebsiteBuilder;
     using MixERP.Sales;
     

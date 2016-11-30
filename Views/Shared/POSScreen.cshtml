@@ -967,7 +967,7 @@
         function loadCounters() {
             const storeId = el.val();
             const filters = [];
-            filters.push(window.getAjaxColumnFilter("WHERE", "store_id", "int", window.FilterConditions.IsEqualTo, storeId));
+            filters.push(window.getAjaxColumnFilter("WHERE", "StoreId", "int", window.FilterConditions.IsEqualTo, storeId));
 
             window.displayFieldBinder($("#CounterSelect"), "/api/forms/inventory/counters/display-fields/get-where", true, filters);
         };

@@ -5,23 +5,27 @@ using System.Threading.Tasks;
 using Frapid.Configuration;
 using Frapid.Configuration.Db;
 using Frapid.DataAccess;
-using Frapid.NPoco;
+using Frapid.Mapper;
+using Frapid.Mapper.Decorators;
+using Frapid.Mapper.Query.Insert;
+using Frapid.Mapper.Query.NonQuery;
+using Frapid.Mapper.Query.Select;
 using MixERP.Sales.DTO;
 
 namespace MixERP.Sales.DAL.Backend.Tasks
 {
     public static class ClosingCashTransactions
     {
-        public static async Task<List<SalesView>> GetCashSalesViewAsync(string tenant, int userId, DateTime transacitonDate)
+        public static async Task<IEnumerable<SalesView>> GetCashSalesViewAsync(string tenant, int userId, DateTime transacitonDate)
         {
             using (var db = DbProvider.Get(FrapidDbServer.GetConnectionString(tenant), tenant).GetDatabase())
             {
-                return await db.Query<SalesView>().Where
-                    (
-                        x => x.Tender > 0 
-                        && x.VerificationStatusId > 0
-                        && x.ValueDate == transacitonDate.Date
-                    ).ToListAsync().ConfigureAwait(false);
+                var sql = new Sql("SELECT * FROM sales.sales_view");
+                sql.Where("tender > 0");
+                sql.And("verification_status_id > 0");
+                sql.And("value_date=@0", transacitonDate.Date);
+
+                return await db.SelectAsync<SalesView>(sql).ConfigureAwait(false);
             }
         }
 
@@ -36,16 +40,24 @@ namespace MixERP.Sales.DAL.Backend.Tasks
         {
             using (var db = DbProvider.Get(FrapidDbServer.GetConnectionString(tenant), tenant).GetDatabase())
             {
-                db.BeginTransaction();
+                try
+                {
+                    await db.BeginTransactionAsync().ConfigureAwait(false);
 
-                await db.InsertAsync("sales.closing_cash", "closing_cash_id", true, model).ConfigureAwait(false);
+                    await db.InsertAsync("sales.closing_cash", "closing_cash_id", true, model).ConfigureAwait(false);
 
-                var sql = new Sql("UPDATE sales.opening_cash SET closed=@0", true);
-                sql.Where("user_id=@0 AND transaction_date=@1", model.UserId, model.TransactionDate);
+                    var sql = new Sql("UPDATE sales.opening_cash SET closed=@0", true);
+                    sql.Where("user_id=@0 AND transaction_date=@1", model.UserId, model.TransactionDate);
 
-                await db.ExecuteAsync(sql).ConfigureAwait(false);
+                    await db.NonQueryAsync(sql).ConfigureAwait(false);
 
-                db.CompleteTransaction();
+                    db.CommitTransaction();
+                }
+                catch
+                {
+                    db.RollbackTransaction();
+                    throw;
+                }
             }
         }
 
