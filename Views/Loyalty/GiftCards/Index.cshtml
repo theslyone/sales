@@ -70,7 +70,7 @@
                 const url = '/api/forms/inventory/customers/get-where/1';
 
                 const filters = [];
-                filters.push(window.getAjaxColumnFilter("WHERE", "customer_id", "int", window.FilterConditions.IsEqualTo, customerId));
+                filters.push(window.getAjaxColumnFilter("WHERE", "CustomerId", "int", window.FilterConditions.IsEqualTo, customerId));
                 const data = JSON.stringify(filters);
 
                 return window.getAjaxRequest(url, "POST", data);
