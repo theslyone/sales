@@ -33,7 +33,6 @@ namespace ASP
     using Frapid.Framework;
     using Frapid.i18n;
     using Frapid.Messaging;
-    using Frapid.Mapper.Decorators;
     using Frapid.WebsiteBuilder;
     using MixERP.Sales;
     
@@ -95,44 +94,51 @@ WriteLiteral(" type=\"text/css\"");
 
 WriteLiteral(" href=\"/dashboard/my/template/Contents/dashboard.css\"");
 
-WriteLiteral("/>\r\n    <style>\r\n        html, body {\r\n            font-size: 12px;\r\n        }\r\n " +
-"   </style>\r\n</head>\r\n<body>\r\n\r\n    <script>\r\n        var scrudFactory = new Obj" +
-"ect();\r\n\r\n        scrudFactory.title = \"Customers\";\r\n\r\n        scrudFactory.view" +
-"API = \"/api/views/inventory/customer-scrud-view\";\r\n        scrudFactory.viewTabl" +
-"eName = \"inventory.customers\";\r\n\r\n        scrudFactory.formAPI = \"/api/forms/inv" +
-"entory/customers\";\r\n        scrudFactory.formTableName = \"inventory.customers\";\r" +
-"\n\r\n        scrudFactory.excludedColumns = [\"audit_user_id\", \"audit_ts\"];\r\n\r\n    " +
-"    scrudFactory.allowDelete = true;\r\n        scrudFactory.allowEdit = true;\r\n\r\n" +
-"        scrudFactory.live = \"CustomerName\";\r\n\r\n        //scrudFactory.card = {\r\n" +
-"        //    header: \"\",\r\n        //    description: \"\",\r\n        //    image: " +
-"\"\"\r\n        //};\r\n\r\n        scrudFactory.layout = [\r\n            {\r\n            " +
-"    tab: \"\",\r\n                fields: [\r\n                    [\"CustomerId\", \"\"]," +
-"\r\n                    [\"Photo\", \"\"],\r\n                    [\"CustomerCode\", \"Cust" +
-"omerName\"],\r\n                    [\"CustomerTypeId\", \"\"],\r\n                    [\"" +
-"Logo\", \"\"]\r\n                ]\r\n            }\r\n        ];\r\n\r\n        scrudFactory" +
-".keys = [\r\n            {\r\n                property: \"CustomerTypeId\",\r\n         " +
-"       url: \'/api/forms/inventory/customer-types/display-fields\',\r\n             " +
-"   data: null,\r\n                valueField: \"Key\",\r\n                textField: \"" +
-"Value\"\r\n            }\r\n        ];\r\n\r\n\r\n        var selectButton = $(\"<button cla" +
-"ss=\'ui basic button\' id=\'SelectButton\'>Select & Close</button>\");\r\n        var u" +
-"seButton = $(\"<button class=\'ui blue button\' id=\'UseButton\'>Use</button>\");\r\n   " +
-"     var scrudSaveButtonCallback = undefined;\r\n\r\n        $.get(\'/ScrudFactory/Vi" +
-"ew.html\', function (view) {\r\n            $.get(\'/ScrudFactory/Form.html\', functi" +
-"on (form) {\r\n                $(\"#ScrudFactoryView\").html(view);\r\n               " +
-" $(\"#ScrudFactoryForm\").html(form);\r\n\r\n                $(\".filter.column\").hide(" +
-");\r\n                $(\".scrud-grid.column\").removeClass(\"thirteen wide\").addClas" +
-"s(\"sixteen wide\");\r\n\r\n\r\n                $(\"#AddNewButton\").after(selectButton);\r" +
-"\n                $(\"#SaveButton\").before(useButton);\r\n\r\n                $.cached" +
-"Script(\"/assets/js/scrudfactory-view.js\");\r\n                $.cachedScript(\"/ass" +
-"ets/js/scrudfactory-form.js\");\r\n            });\r\n        });\r\n\r\n        selectBu" +
-"tton.click(function() {\r\n            const customerId = window.getSelected();\r\n " +
-"           const tr = $(\"table#ScrudView input:checkbox:checked\").first().closes" +
-"t(\"tr\");\r\n            const customerCode = tr.find(\"td:eq(3)\").html();\r\n\r\n      " +
-"      parent.onCustomerSearchSelect(customerId, customerCode);\r\n        });\r\n\r\n " +
-"       useButton.click(function () {\r\n            scrudSaveButtonCallback = func" +
-"tion (customerId) {\r\n                const parent = window.parent;\r\n            " +
-"    parent.onCustomerSearchSelect(customerId);\r\n            };\r\n\r\n            $(" +
-"\"#SaveButton\").trigger(\"click\");\r\n        });\r\n\r\n    </script>\r\n\r\n    <div");
+WriteLiteral("/>\r\n    <script");
+
+WriteAttribute("src", Tuple.Create(" src=\"", 698), Tuple.Create("\"", 749)
+, Tuple.Create(Tuple.Create("", 704), Tuple.Create<System.Object, System.Int32>(Href("~/dashboard/my/template/Contents/dashboard.js")
+, 704), false)
+);
+
+WriteLiteral("></script>\r\n    <style>\r\n        html, body {\r\n            font-size: 12px;\r\n    " +
+"    }\r\n    </style>\r\n</head>\r\n<body>\r\n\r\n    <script>\r\n        var scrudFactory =" +
+" new Object();\r\n\r\n        scrudFactory.title = \"Customers\";\r\n\r\n        scrudFact" +
+"ory.viewAPI = \"/api/views/inventory/customer-scrud-view\";\r\n        scrudFactory." +
+"viewTableName = \"inventory.customers\";\r\n\r\n        scrudFactory.formAPI = \"/api/f" +
+"orms/inventory/customers\";\r\n        scrudFactory.formTableName = \"inventory.cust" +
+"omers\";\r\n\r\n        scrudFactory.uploadHanlder = \"/dashboard/inventory/services/a" +
+"ttachments\";\r\n\r\n        scrudFactory.excludedColumns = [\"audit_user_id\", \"audit_" +
+"ts\"];\r\n\r\n        scrudFactory.allowDelete = true;\r\n        scrudFactory.allowEdi" +
+"t = true;\r\n\r\n        scrudFactory.live = \"CustomerName\";\r\n\r\n\r\n        scrudFacto" +
+"ry.layout = [\r\n            {\r\n                tab: \"\",\r\n                fields: " +
+"[\r\n                    [\"CustomerId\", \"\"],\r\n                    [\"Photo\", \"\"],\r\n" +
+"                    [\"CustomerCode\", \"CustomerName\"],\r\n                    [\"Cus" +
+"tomerTypeId\", \"\"],\r\n                    [\"Logo\", \"\"]\r\n                ]\r\n       " +
+"     }\r\n        ];\r\n\r\n        scrudFactory.keys = [\r\n            {\r\n            " +
+"    property: \"CustomerTypeId\",\r\n                url: \'/api/forms/inventory/cust" +
+"omer-types/display-fields\',\r\n                data: null,\r\n                valueF" +
+"ield: \"Key\",\r\n                textField: \"Value\"\r\n            }\r\n        ];\r\n\r\n\r" +
+"\n        var selectButton = $(\"<button class=\'ui basic button\' id=\'SelectButton\'" +
+">Select & Close</button>\");\r\n        var useButton = $(\"<button class=\'ui blue b" +
+"utton\' id=\'UseButton\'>Use</button>\");\r\n        var scrudSaveButtonCallback = und" +
+"efined;\r\n\r\n        $.get(\'/ScrudFactory/View.html\', function (view) {\r\n         " +
+"   $.get(\'/ScrudFactory/Form.html\', function (form) {\r\n                $(\"#Scrud" +
+"FactoryView\").html(view);\r\n                $(\"#ScrudFactoryForm\").html(form);\r\n\r" +
+"\n                $(\".filter.column\").hide();\r\n                $(\".scrud-grid.col" +
+"umn\").removeClass(\"thirteen wide\").addClass(\"sixteen wide\");\r\n\r\n\r\n              " +
+"  $(\"#AddNewButton\").after(selectButton);\r\n                $(\"#SaveButton\").befo" +
+"re(useButton);\r\n\r\n                $.cachedScript(\"/assets/js/scrudfactory-view.j" +
+"s\");\r\n                $.cachedScript(\"/assets/js/scrudfactory-form.js\");\r\n      " +
+"      });\r\n        });\r\n\r\n        selectButton.click(function() {\r\n            c" +
+"onst customerId = window.getSelected();\r\n            const tr = $(\"table#ScrudVi" +
+"ew input:checkbox:checked\").first().closest(\"tr\");\r\n            const customerCo" +
+"de = tr.find(\"td:eq(3)\").html();\r\n\r\n            parent.onCustomerSearchSelect(cu" +
+"stomerId, customerCode);\r\n        });\r\n\r\n        useButton.click(function () {\r\n" +
+"            scrudSaveButtonCallback = function (customerId) {\r\n                c" +
+"onst parent = window.parent;\r\n                parent.onCustomerSearchSelect(cust" +
+"omerId);\r\n            };\r\n\r\n            $(\"#SaveButton\").trigger(\"click\");\r\n    " +
+"    });\r\n\r\n    </script>\r\n\r\n    <div");
 
 WriteLiteral(" id=\"ScrudFactoryForm\"");
 
