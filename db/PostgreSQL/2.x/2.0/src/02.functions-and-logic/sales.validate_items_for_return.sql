@@ -249,7 +249,7 @@ BEGIN
             _error_amount
         FROM cumulative_pricing_temp
         WHERE item_id = this.item_id
-        AND base_price <=  this.price
+        AND base_price <  this.price
         AND allowed_returns >= this.base_quantity
         LIMIT 1;
         

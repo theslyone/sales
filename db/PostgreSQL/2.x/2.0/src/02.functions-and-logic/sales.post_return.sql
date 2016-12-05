@@ -186,7 +186,7 @@ BEGIN
 
     IF(COALESCE(_tax_total, 0) > 0) THEN
         INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
-        SELECT _tran_master_id, _book_name, _office_id, _value_date, _book_date, 'Dr', _tax_account_id, _statement_reference, _default_currency_code, _tax_total, _default_currency_code, 1, _tax_total;
+        SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Dr', _tax_account_id, _statement_reference, _default_currency_code, _tax_total, _default_currency_code, 1, _tax_total;
     END IF;	
 
     IF(_is_credit) THEN
@@ -205,8 +205,8 @@ BEGIN
     SELECT _checkout_id, _book_name, _value_date, _book_date, _tran_master_id, _office_id, _user_id;
 
 
-    INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount)
-    SELECT _value_date, _book_date, _checkout_id, tran_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount FROM temp_checkout_details;
+    INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, tax, cost_of_goods_sold, discount)
+    SELECT _value_date, _book_date, _checkout_id, tran_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, tax, cost_of_goods_sold, discount FROM temp_checkout_details;
 
     INSERT INTO sales.returns(sales_id, checkout_id, counter_id, transaction_master_id, return_transaction_master_id, customer_id, price_type_id, is_credit)
     SELECT _sales_id, _checkout_id, _counter_id, _transaction_master_id, _tran_master_id, _customer_id, _price_type_id, false;
@@ -220,7 +220,7 @@ LANGUAGE plpgsql;
 
 -- SELECT * FROM sales.post_return
 -- (
---     6::bigint, --_transaction_master_id          bigint,
+--     12::bigint, --_transaction_master_id          bigint,
 --     1::integer, --_office_id                      integer,
 --     1::integer, --_user_id                        integer,
 --     1::bigint, --_login_id                       bigint,
@@ -234,10 +234,10 @@ LANGUAGE plpgsql;
 --     ''::text, --_statement_reference            text,
 --     ARRAY
 --     [
---         ROW(1, 'Dr', 1, 1, 1,180000, 0, 10, 200)::sales.sales_detail_type,
---         ROW(1, 'Dr', 2, 1, 7,130000, 300, 10, 30)::sales.sales_detail_type,
---         ROW(1, 'Dr', 3, 1, 1,110000, 5000, 10, 50)::sales.sales_detail_type
+--         ROW(1, 'Dr', 1, 1, 1,1, 0, 10, 200)::sales.sales_detail_type,
+--         ROW(1, 'Dr', 2, 1, 7,1, 300, 10, 30)::sales.sales_detail_type,
+--         ROW(1, 'Dr', 3, 1, 1,1, 5000, 10, 50)::sales.sales_detail_type
 --     ]
 -- );
-
-
+-- 
+-- 

@@ -207,6 +207,7 @@
                 const price = window.parseFloat2(el.find("input.price").val() || 0);
                 const discountRate = window.parseFloat2(el.find("input.discount").val() || 0);
                 const discount = (price * quantity) * (discountRate / 100);
+                const tax = window.parseFloat(el.find(".tax-amount").html() || 0);
 
                 model.push({
                     StoreId: $("#StoreSelect").val(),
@@ -215,7 +216,8 @@
                     UnitId: unitId,
                     Price: price,
                     DiscountRate: discountRate,
-                    Discount: discount
+                    Discount: discount,
+                    Tax: tax
                 });
             });
 
@@ -426,9 +428,9 @@
         $(".ticket.panel").show();
     };
 
-    $("#TenderInputText").on("keyup", function () {
+    function updateTenderInfo() {
         const total = window.parseFloat2($(".amount.item .money").text());
-        const tender = window.parseFloat2($(this).val());
+        const tender = window.parseFloat2($("#TenderInputText").val());
 
         var change = tender - total;
 
@@ -437,6 +439,10 @@
         };
 
         $("#ChangeInputText").val(change);
+    };
+
+    $("#TenderInputText").on("keyup", function () {
+        updateTenderInfo();
     });
 
     $("#CheckoutButton").unbind("click").bind("click", function () {

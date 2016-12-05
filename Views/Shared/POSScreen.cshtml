@@ -355,6 +355,7 @@
 
             .sales.items .item .info.block .price.info,
             .sales.items .item .info.block .discount.info,
+            .sales.items .item .info.block .tax.info,
             .sales.items .item .info.block .header {
                 display: block;
             }
@@ -370,6 +371,7 @@
             }
 
             .sales.items .item .info.block .price.info,
+            .sales.items .item .info.block .tax.info,
             .sales.items .item .info.block .discount.info {
                 font-size: 1.1em;
                 text-align: left;
@@ -641,7 +643,7 @@
             <i class="ui huge loading spinner icon"></i>
         </div>
         <div>
-            We're loading things
+            Loading Point of Sale
         </div>
     </div>
     <div class="layout" style="display: none;">
@@ -736,7 +738,7 @@
         </div>
     </div>
 </div>
-
+<input type="hidden" id="SalesTaxRateHidden"/>
 
 
 @Html.PartialView("Shared/CustomerSearchModal.cshtml", TenantConvention.GetTenant())
@@ -847,7 +849,15 @@
     });
 
     $("#DiscountInputText").keyup(function () {
+        const rate = window.parseFloat2($("#DiscountInputText").val());
+        const type = window.parseInt($("#DiscountTypeSelect").val());
+
+        if (type === 1 && rate > 100) {
+            $("#DiscountInputText").val("0");
+        };
+
         window.updateTotal();
+        window.updateTenderInfo();
     });
 
     function updateTotal() {
@@ -873,12 +883,13 @@
 
             const amount = price * quantity;
             const discountedAmount = amount * ((100 - discountRate) / 100);
+            const amountPlusTax = window.parseFloat(el.find(".amount-plus-tax").html());
 
-            totalPrice += (discountedAmount || amount);
+            totalPrice += (amountPlusTax || discountedAmount || amount);
             totalQuantity += quantity;
         });
 
-        totalPrice = parseFloat(totalPrice.toFixed(2));
+        totalPrice = parseFloat(window.round(totalPrice, 2));
 
         if (couponDiscountType === 1 && couponDiscountRate > 0 && couponDiscountRate <= 100) {
             discount = totalPrice * (couponDiscountRate / 100);
@@ -890,8 +901,8 @@
 
 
 
-        amountEl.html(totalPrice.toFixed(2));
-        countEl.html(totalQuantity.toFixed(2));
+        amountEl.html(window.round(totalPrice, 2));
+        countEl.html(window.round(totalQuantity, 2));
     };
 
 
@@ -1119,4 +1130,24 @@
             $("#GiftCardNumberBalanceInputText").val(response);
         });
     });
+</script>
+<script>
+    function getTaxRate() {
+        function request() {
+            const url = "/api/forms/finance/tax-setups/get-where/-1";
+            const filters = [];
+            filters.push(window.getAjaxColumnFilter("WHERE", "OfficeId", "int", window.FilterConditions.IsEqualTo, window.metaView.OfficeId));
+
+            return window.getAjaxRequest(url, "POST", filters);
+        };
+
+        const ajax = request();
+
+        ajax.success(function (response) {
+            const salesTaxRate = window.parseFloat(response[0].SalesTaxRate);
+            $("#SalesTaxRateHidden").val(salesTaxRate);
+        });
+    };
+
+    getTaxRate();
 </script>

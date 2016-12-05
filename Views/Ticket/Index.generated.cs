@@ -45,7 +45,6 @@ namespace ASP
     #line hidden
     using Frapid.i18n;
     using Frapid.Messaging;
-    using Frapid.Mapper.Decorators;
     using Frapid.WebsiteBuilder;
     using MixERP.Sales;
     
@@ -65,8 +64,18 @@ namespace ASP
     string logo = AppUsers.GetCurrent().Logo.Or("/Static/images/logo.png");
     var appUser = AppUsers.GetCurrent();
     string currenySymbol = appUser.CurrencySymbol;
-    decimal subTotal = Model.Details.Sum(x => x.Price*x.Quantity - x.Discount);
-    decimal total = subTotal - Model.View.Discount;
+    decimal taxableTotal = Model.Details.Where(x => x.IsTaxableItem).Sum(x => x.Price*x.Quantity - x.Discount);
+    decimal taxTotal = Model.Details.Where(x => x.IsTaxableItem).Sum(x => x.Tax);
+    decimal taxRate = 0;
+
+    if (taxableTotal > 0)
+    {
+        taxRate = taxTotal/taxableTotal*100;
+    }
+
+    decimal nonTaxableTotal = Model.Details.Where(x => !x.IsTaxableItem).Sum(x => x.Price*x.Quantity - x.Discount);
+    decimal totalBeforeDisount = nonTaxableTotal + taxableTotal + taxTotal;
+    decimal grandTotal = totalBeforeDisount - Model.View.Discount;
 
             
             #line default
@@ -102,106 +111,106 @@ WriteLiteral("></script>\r\n<div");
 
 WriteLiteral(" class=\"ticket\"");
 
-WriteLiteral(">\r\n    <div");
+WriteLiteral(">\r\n<div");
 
 WriteLiteral(" class=\"header\"");
 
-WriteLiteral(">\r\n        <div");
+WriteLiteral(">\r\n<div");
 
 WriteLiteral(" class=\"logo\"");
 
-WriteLiteral(">\r\n            <img");
+WriteLiteral(">\r\n    <img");
 
-WriteAttribute("src", Tuple.Create(" src=\"", 2217), Tuple.Create("\"", 2228)
+WriteAttribute("src", Tuple.Create(" src=\"", 2638), Tuple.Create("\"", 2649)
             
-            #line 88 "..\..\Views\Ticket\Index.cshtml"
-, Tuple.Create(Tuple.Create("", 2223), Tuple.Create<System.Object, System.Int32>(logo
+            #line 98 "..\..\Views\Ticket\Index.cshtml"
+, Tuple.Create(Tuple.Create("", 2644), Tuple.Create<System.Object, System.Int32>(logo
             
             #line default
             #line hidden
-, 2223), false)
+, 2644), false)
 );
 
-WriteLiteral("/>\r\n        </div>\r\n        <div");
+WriteLiteral("/>\r\n</div>\r\n<div");
 
 WriteLiteral(" class=\"company name\"");
 
 WriteLiteral(">");
 
             
-            #line 90 "..\..\Views\Ticket\Index.cshtml"
-                             Write(appUser.OfficeName);
+            #line 100 "..\..\Views\Ticket\Index.cshtml"
+                     Write(appUser.OfficeName);
 
             
             #line default
             #line hidden
-WriteLiteral("</div>\r\n        <div");
+WriteLiteral("</div>\r\n<div");
 
 WriteLiteral(" class=\"address\"");
 
 WriteLiteral(">\r\n");
 
             
-            #line 92 "..\..\Views\Ticket\Index.cshtml"
-            
-            
-            #line default
-            #line hidden
-            
-            #line 92 "..\..\Views\Ticket\Index.cshtml"
-             if (!string.IsNullOrWhiteSpace(appUser.AddressLine1))
-            {
-                
+            #line 102 "..\..\Views\Ticket\Index.cshtml"
+    
             
             #line default
             #line hidden
             
-            #line 94 "..\..\Views\Ticket\Index.cshtml"
-           Write(appUser.AddressLine1);
+            #line 102 "..\..\Views\Ticket\Index.cshtml"
+     if (!string.IsNullOrWhiteSpace(appUser.AddressLine1))
+    {
+        
+            
+            #line default
+            #line hidden
+            
+            #line 104 "..\..\Views\Ticket\Index.cshtml"
+   Write(appUser.AddressLine1);
 
             
             #line default
             #line hidden
             
-            #line 94 "..\..\Views\Ticket\Index.cshtml"
-                                     
-            }
+            #line 104 "..\..\Views\Ticket\Index.cshtml"
+                             
+    }
 
             
             #line default
             #line hidden
-WriteLiteral("            ");
+WriteLiteral("    ");
 
             
-            #line 96 "..\..\Views\Ticket\Index.cshtml"
-             if (!string.IsNullOrWhiteSpace(appUser.AddressLine2))
-            {
-                
+            #line 106 "..\..\Views\Ticket\Index.cshtml"
+     if (!string.IsNullOrWhiteSpace(appUser.AddressLine2))
+    {
+        
             
             #line default
             #line hidden
             
-            #line 98 "..\..\Views\Ticket\Index.cshtml"
-           Write(appUser.AddressLine2);
+            #line 108 "..\..\Views\Ticket\Index.cshtml"
+   Write(appUser.AddressLine2);
 
             
             #line default
             #line hidden
             
-            #line 98 "..\..\Views\Ticket\Index.cshtml"
-                                     
-            }
+            #line 108 "..\..\Views\Ticket\Index.cshtml"
+                             
+    }
 
             
             #line default
             #line hidden
 WriteLiteral("\r\n");
 
-WriteLiteral("            ");
+WriteLiteral("    ");
 
             
-            #line 101 "..\..\Views\Ticket\Index.cshtml"
-       Write(appUser.Street);
+            #line 111 "..\..\Views\Ticket\Index.cshtml"
+Write(appUser.Street);
 
             
             #line default
@@ -209,8 +218,8 @@ WriteLiteral("            ");
 WriteLiteral(", ");
 
             
-            #line 101 "..\..\Views\Ticket\Index.cshtml"
-                        Write(appUser.City);
+            #line 111 "..\..\Views\Ticket\Index.cshtml"
+                Write(appUser.City);
 
             
             #line default
@@ -218,58 +227,58 @@ WriteLiteral(", ");
 WriteLiteral(" ");
 
             
-            #line 101 "..\..\Views\Ticket\Index.cshtml"
-                                      Write(appUser.State);
+            #line 111 "..\..\Views\Ticket\Index.cshtml"
+                              Write(appUser.State);
 
             
             #line default
             #line hidden
-WriteLiteral("\r\n            <br/>\r\n        </div>\r\n\r\n        <div");
+WriteLiteral("\r\n    <br/>\r\n</div>\r\n\r\n<div");
 
 WriteLiteral(" class=\"coupon header\"");
 
-WriteLiteral(">Sales Coupon</div>\r\n\r\n        <div");
+WriteLiteral(">Sales Receipt</div>\r\n\r\n<div");
 
 WriteLiteral(" class=\"transaction items\"");
 
-WriteLiteral(">\r\n            <div");
+WriteLiteral(">\r\n    <div");
 
 WriteLiteral(" class=\"info\"");
 
-WriteLiteral(">\r\n                <div");
+WriteLiteral(">\r\n        <div");
 
 WriteLiteral(" class=\"name\"");
 
-WriteLiteral(">Invoice Number</div>\r\n                <div");
+WriteLiteral(">Invoice Number</div>\r\n        <div");
 
 WriteLiteral(" class=\"value\"");
 
 WriteLiteral(">#");
 
             
-            #line 110 "..\..\Views\Ticket\Index.cshtml"
-                               Write(Model.View.InvoiceNumber);
+            #line 120 "..\..\Views\Ticket\Index.cshtml"
+                       Write(Model.View.InvoiceNumber);
 
             
             #line default
             #line hidden
-WriteLiteral("</div>\r\n            </div>\r\n            <div");
+WriteLiteral("</div>\r\n    </div>\r\n    <div");
 
 WriteLiteral(" class=\"info\"");
 
-WriteLiteral(">\r\n                <div");
+WriteLiteral(">\r\n        <div");
 
 WriteLiteral(" class=\"name\"");
 
-WriteLiteral(">Tran Code</div>\r\n                <div");
+WriteLiteral(">Tran Code</div>\r\n        <div");
 
 WriteLiteral(" class=\"value\"");
 
 WriteLiteral(">#");
 
             
-            #line 114 "..\..\Views\Ticket\Index.cshtml"
-                               Write(Model.View.TransactionMasterId);
+            #line 124 "..\..\Views\Ticket\Index.cshtml"
+                       Write(Model.View.TransactionMasterId);
 
             
             #line default
@@ -277,29 +286,29 @@ WriteLiteral(">#");
 WriteLiteral("/");
 
             
-            #line 114 "..\..\Views\Ticket\Index.cshtml"
-                                                               Write(Model.View.TransactionCode);
+            #line 124 "..\..\Views\Ticket\Index.cshtml"
+                                                       Write(Model.View.TransactionCode);
 
             
             #line default
             #line hidden
-WriteLiteral("</div>\r\n            </div>\r\n            <div");
+WriteLiteral("</div>\r\n    </div>\r\n    <div");
 
 WriteLiteral(" class=\"info\"");
 
-WriteLiteral(">\r\n                <div");
+WriteLiteral(">\r\n        <div");
 
 WriteLiteral(" class=\"name\"");
 
-WriteLiteral(">Tran Date</div>\r\n                <div");
+WriteLiteral(">Tran Date</div>\r\n        <div");
 
 WriteLiteral(" class=\"value\"");
 
 WriteLiteral(">");
 
             
-            #line 118 "..\..\Views\Ticket\Index.cshtml"
-                              Write(Model.View.ValueDate.ToString("d"));
+            #line 128 "..\..\Views\Ticket\Index.cshtml"
+                      Write(Model.View.ValueDate.ToString("d"));
 
             
             #line default
@@ -307,29 +316,29 @@ WriteLiteral(">");
 WriteLiteral(" (");
 
             
-            #line 118 "..\..\Views\Ticket\Index.cshtml"
-                                                                   Write(Model.View.TransactionTs);
+            #line 128 "..\..\Views\Ticket\Index.cshtml"
+                                                           Write(Model.View.TransactionTs);
 
             
             #line default
             #line hidden
-WriteLiteral(")</div>\r\n            </div>\r\n            <div");
+WriteLiteral(")</div>\r\n    </div>\r\n    <div");
 
 WriteLiteral(" class=\"info\"");
 
-WriteLiteral(">\r\n                <div");
+WriteLiteral(">\r\n        <div");
 
 WriteLiteral(" class=\"name\"");
 
-WriteLiteral(">Customer</div>\r\n                <div");
+WriteLiteral(">Customer</div>\r\n        <div");
 
 WriteLiteral(" class=\"value\"");
 
 WriteLiteral(">#");
 
             
-            #line 122 "..\..\Views\Ticket\Index.cshtml"
-                               Write(Model.View.CustomerId);
+            #line 132 "..\..\Views\Ticket\Index.cshtml"
+                       Write(Model.View.CustomerId);
 
             
             #line default
@@ -337,29 +346,29 @@ WriteLiteral(">#");
 WriteLiteral(", ");
 
             
-            #line 122 "..\..\Views\Ticket\Index.cshtml"
-                                                       Write(Model.View.CustomerName);
+            #line 132 "..\..\Views\Ticket\Index.cshtml"
+                                               Write(Model.View.CustomerName);
 
             
             #line default
             #line hidden
-WriteLiteral("</div>\r\n            </div>\r\n            <div");
+WriteLiteral("</div>\r\n    </div>\r\n    <div");
 
 WriteLiteral(" class=\"info\"");
 
-WriteLiteral(">\r\n                <div");
+WriteLiteral(">\r\n        <div");
 
 WriteLiteral(" class=\"name\"");
 
-WriteLiteral(">Posted By</div>\r\n                <div");
+WriteLiteral(">Posted By</div>\r\n        <div");
 
 WriteLiteral(" class=\"value\"");
 
 WriteLiteral(">");
 
             
-            #line 126 "..\..\Views\Ticket\Index.cshtml"
-                              Write(Model.View.PostedBy);
+            #line 136 "..\..\Views\Ticket\Index.cshtml"
+                      Write(Model.View.PostedBy);
 
             
             #line default
@@ -367,8 +376,8 @@ WriteLiteral(">");
 WriteLiteral(" (");
 
             
-            #line 126 "..\..\Views\Ticket\Index.cshtml"
-                                                    Write(Model.View.CounterName);
+            #line 136 "..\..\Views\Ticket\Index.cshtml"
+                                            Write(Model.View.CounterName);
 
             
             #line default
@@ -376,85 +385,85 @@ WriteLiteral(" (");
 WriteLiteral("/");
 
             
-            #line 126 "..\..\Views\Ticket\Index.cshtml"
-                                                                            Write(Model.View.StoreName);
+            #line 136 "..\..\Views\Ticket\Index.cshtml"
+                                                                    Write(Model.View.StoreName);
 
             
             #line default
             #line hidden
-WriteLiteral(")</div>\r\n            </div>\r\n");
+WriteLiteral(")</div>\r\n    </div>\r\n");
 
             
-            #line 128 "..\..\Views\Ticket\Index.cshtml"
-            
+            #line 138 "..\..\Views\Ticket\Index.cshtml"
+    
             
             #line default
             #line hidden
             
-            #line 128 "..\..\Views\Ticket\Index.cshtml"
-             if (Model.View.PaymentTermId > 0)
-            {
+            #line 138 "..\..\Views\Ticket\Index.cshtml"
+     if (Model.View.PaymentTermId > 0)
+    {
 
             
             #line default
             #line hidden
-WriteLiteral("                <div");
+WriteLiteral("        <div");
 
 WriteLiteral(" class=\"info\"");
 
-WriteLiteral(">\r\n                    <div");
+WriteLiteral(">\r\n            <div");
 
 WriteLiteral(" class=\"name\"");
 
-WriteLiteral(">Payment Term</div>\r\n                    <div");
+WriteLiteral(">Payment Term</div>\r\n            <div");
 
 WriteLiteral(" class=\"value\"");
 
 WriteLiteral(">");
 
             
-            #line 132 "..\..\Views\Ticket\Index.cshtml"
-                                  Write(Model.View.PaymentTermName);
+            #line 142 "..\..\Views\Ticket\Index.cshtml"
+                          Write(Model.View.PaymentTermName);
 
             
             #line default
             #line hidden
-WriteLiteral("</div>\r\n                </div>\r\n");
+WriteLiteral("</div>\r\n        </div>\r\n");
 
             
-            #line 134 "..\..\Views\Ticket\Index.cshtml"
-            }
-
-            
-            #line default
-            #line hidden
-WriteLiteral("            ");
-
-            
-            #line 135 "..\..\Views\Ticket\Index.cshtml"
-             if (Model.View.CheckAmount > 0)
-            {
+            #line 144 "..\..\Views\Ticket\Index.cshtml"
+    }
 
             
             #line default
             #line hidden
-WriteLiteral("                <div");
+WriteLiteral("    ");
+
+            
+            #line 145 "..\..\Views\Ticket\Index.cshtml"
+     if (Model.View.CheckAmount > 0)
+    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("        <div");
 
 WriteLiteral(" class=\"info\"");
 
-WriteLiteral(">\r\n                    <div");
+WriteLiteral(">\r\n            <div");
 
 WriteLiteral(" class=\"name\"");
 
-WriteLiteral(">Check</div>\r\n                    <div");
+WriteLiteral(">Check</div>\r\n            <div");
 
 WriteLiteral(" class=\"value\"");
 
 WriteLiteral(">Check #");
 
             
-            #line 139 "..\..\Views\Ticket\Index.cshtml"
-                                         Write(Model.View.CheckNumber);
+            #line 149 "..\..\Views\Ticket\Index.cshtml"
+                                 Write(Model.View.CheckNumber);
 
             
             #line default
@@ -462,8 +471,8 @@ WriteLiteral(">Check #");
 WriteLiteral(" dated ");
 
             
-            #line 139 "..\..\Views\Ticket\Index.cshtml"
-                                                                       Write(Model.View.CheckDate.ToString("D"));
+            #line 149 "..\..\Views\Ticket\Index.cshtml"
+                                                               Write(Model.View.CheckDate.ToString("D"));
 
             
             #line default
@@ -471,174 +480,174 @@ WriteLiteral(" dated ");
 WriteLiteral(" (");
 
             
-            #line 139 "..\..\Views\Ticket\Index.cshtml"
-                                                                                                            Write(Model.View.CheckBankName);
+            #line 149 "..\..\Views\Ticket\Index.cshtml"
+                                                                                                    Write(Model.View.CheckBankName);
 
             
             #line default
             #line hidden
-WriteLiteral(") </div>\r\n                </div>\r\n");
+WriteLiteral(") </div>\r\n        </div>\r\n");
 
-WriteLiteral("                <div");
+WriteLiteral("        <div");
 
 WriteLiteral(" class=\"info\"");
 
-WriteLiteral(">\r\n                    <div");
+WriteLiteral(">\r\n            <div");
 
 WriteLiteral(" class=\"name\"");
 
-WriteLiteral(">Check Amount</div>\r\n                    <div");
+WriteLiteral(">Check Amount</div>\r\n            <div");
 
 WriteLiteral(" class=\"value\"");
 
 WriteLiteral(">Check #");
 
             
-            #line 143 "..\..\Views\Ticket\Index.cshtml"
-                                         Write(Model.View.CheckAmount);
-
-            
-            #line default
-            #line hidden
-WriteLiteral(" </div>\r\n                </div>\r\n");
-
-            
-            #line 145 "..\..\Views\Ticket\Index.cshtml"
-            }
-
-            
-            #line default
-            #line hidden
-WriteLiteral("            ");
-
-            
-            #line 146 "..\..\Views\Ticket\Index.cshtml"
-             if (Model.View.GiftCardId > 0)
-            {
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                <div");
-
-WriteLiteral(" class=\"info\"");
-
-WriteLiteral(">\r\n                    <div");
-
-WriteLiteral(" class=\"name\"");
-
-WriteLiteral(">Gift Card #</div>\r\n                    <div");
-
-WriteLiteral(" class=\"value\"");
-
-WriteLiteral(">");
-
-            
-            #line 150 "..\..\Views\Ticket\Index.cshtml"
-                                  Write(Model.View.GiftCardNumber);
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</div>\r\n                </div>\r\n");
-
-            
-            #line 152 "..\..\Views\Ticket\Index.cshtml"
-            }
-
-            
-            #line default
-            #line hidden
-WriteLiteral("            ");
-
-            
             #line 153 "..\..\Views\Ticket\Index.cshtml"
-             if (Model.View.RewardPoints > 0)
-            {
+                                 Write(Model.View.CheckAmount);
 
             
             #line default
             #line hidden
-WriteLiteral("                <div");
+WriteLiteral(" </div>\r\n        </div>\r\n");
+
+            
+            #line 155 "..\..\Views\Ticket\Index.cshtml"
+    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("    ");
+
+            
+            #line 156 "..\..\Views\Ticket\Index.cshtml"
+     if (Model.View.GiftCardId > 0)
+    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("        <div");
 
 WriteLiteral(" class=\"info\"");
 
-WriteLiteral(">\r\n                    <div");
+WriteLiteral(">\r\n            <div");
 
 WriteLiteral(" class=\"name\"");
 
-WriteLiteral(">Reward Points</div>\r\n                    <div");
+WriteLiteral(">Gift Card #</div>\r\n            <div");
 
 WriteLiteral(" class=\"value\"");
 
 WriteLiteral(">");
 
             
-            #line 157 "..\..\Views\Ticket\Index.cshtml"
-                                  Write(Model.View.RewardPoints.ToString("N2"));
+            #line 160 "..\..\Views\Ticket\Index.cshtml"
+                          Write(Model.View.GiftCardNumber);
 
             
             #line default
             #line hidden
-WriteLiteral("</div>\r\n                </div>\r\n");
+WriteLiteral("</div>\r\n        </div>\r\n");
 
             
-            #line 159 "..\..\Views\Ticket\Index.cshtml"
-            }
+            #line 162 "..\..\Views\Ticket\Index.cshtml"
+    }
 
             
             #line default
             #line hidden
-WriteLiteral("        </div>\r\n\r\n        <table>\r\n            <thead>\r\n            <tr>\r\n       " +
-"         <th>Description</th>\r\n                <th");
+WriteLiteral("    ");
+
+            
+            #line 163 "..\..\Views\Ticket\Index.cshtml"
+     if (Model.View.RewardPoints > 0)
+    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("        <div");
+
+WriteLiteral(" class=\"info\"");
+
+WriteLiteral(">\r\n            <div");
+
+WriteLiteral(" class=\"name\"");
+
+WriteLiteral(">Reward Points</div>\r\n            <div");
+
+WriteLiteral(" class=\"value\"");
+
+WriteLiteral(">");
+
+            
+            #line 167 "..\..\Views\Ticket\Index.cshtml"
+                          Write(Model.View.RewardPoints.ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</div>\r\n        </div>\r\n");
+
+            
+            #line 169 "..\..\Views\Ticket\Index.cshtml"
+    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</div>\r\n\r\n<table>\r\n    <thead>\r\n    <tr>\r\n        <th>Description</th>\r\n        <" +
+"th");
 
 WriteLiteral(" class=\"right\"");
 
-WriteLiteral(">Amount</th>\r\n            </tr>\r\n            </thead>\r\n            <tbody>\r\n");
+WriteLiteral(">Amount</th>\r\n    </tr>\r\n    </thead>\r\n    <tbody>\r\n");
 
             
-            #line 170 "..\..\Views\Ticket\Index.cshtml"
-            
+            #line 180 "..\..\Views\Ticket\Index.cshtml"
+    
             
             #line default
             #line hidden
             
-            #line 170 "..\..\Views\Ticket\Index.cshtml"
-             foreach (var item in Model.Details)
-            {
+            #line 180 "..\..\Views\Ticket\Index.cshtml"
+     foreach (var item in Model.Details)
+    {
 
             
             #line default
             #line hidden
-WriteLiteral("                <tr>\r\n                    <td>\r\n                        <div");
+WriteLiteral("        <tr>\r\n            <td>\r\n                <div");
 
 WriteLiteral(" class=\"item info\"");
 
 WriteLiteral(">\r\n");
 
-WriteLiteral("                            ");
+WriteLiteral("                    ");
 
             
-            #line 175 "..\..\Views\Ticket\Index.cshtml"
-                       Write(item.ItemName);
+            #line 185 "..\..\Views\Ticket\Index.cshtml"
+               Write(item.ItemName);
 
             
             #line default
             #line hidden
 WriteLiteral("\r\n\r\n");
 
-WriteLiteral("                            ");
+WriteLiteral("                    ");
 
             
-            #line 177 "..\..\Views\Ticket\Index.cshtml"
-                       Write(item.Quantity);
+            #line 187 "..\..\Views\Ticket\Index.cshtml"
+               Write(item.Quantity);
 
             
             #line default
             #line hidden
             
-            #line 177 "..\..\Views\Ticket\Index.cshtml"
-                                     Write(item.UnitCode);
+            #line 187 "..\..\Views\Ticket\Index.cshtml"
+                             Write(item.UnitCode);
 
             
             #line default
@@ -646,8 +655,8 @@ WriteLiteral("                            ");
 WriteLiteral(" x ");
 
             
-            #line 177 "..\..\Views\Ticket\Index.cshtml"
-                                                      Write(item.Price.ToString("N2"));
+            #line 187 "..\..\Views\Ticket\Index.cshtml"
+                                              Write(item.Price.ToString("N2"));
 
             
             #line default
@@ -655,349 +664,30 @@ WriteLiteral(" x ");
 WriteLiteral(" = ");
 
             
-            #line 177 "..\..\Views\Ticket\Index.cshtml"
-                                                                                   Write(currenySymbol);
-
-            
-            #line default
-            #line hidden
-            
-            #line 177 "..\..\Views\Ticket\Index.cshtml"
-                                                                                                  Write((item.Quantity*item.Price).ToString("N2"));
-
-            
-            #line default
-            #line hidden
-WriteLiteral("\r\n                        </div>\r\n");
-
-            
-            #line 179 "..\..\Views\Ticket\Index.cshtml"
-                        
-            
-            #line default
-            #line hidden
-            
-            #line 179 "..\..\Views\Ticket\Index.cshtml"
-                         if (item.Discount > 0)
-                        {
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                            <div");
-
-WriteLiteral(" class=\"discount info\"");
-
-WriteLiteral(">\r\n                                Less ");
-
-            
-            #line 182 "..\..\Views\Ticket\Index.cshtml"
-                                Write(currenySymbol);
-
-            
-            #line default
-            #line hidden
-            
-            #line 182 "..\..\Views\Ticket\Index.cshtml"
-                                              Write(item.Discount.ToString("N2"));
-
-            
-            #line default
-            #line hidden
-WriteLiteral(" (");
-
-            
-            #line 182 "..\..\Views\Ticket\Index.cshtml"
-                                                                              Write((item.Discount*100/(item.Amount + item.Discount)).ToString("N2"));
-
-            
-            #line default
-            #line hidden
-WriteLiteral("%)\r\n                            </div>\r\n");
-
-            
-            #line 184 "..\..\Views\Ticket\Index.cshtml"
-                        }
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                    </td>\r\n                    <td");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">\r\n");
-
-WriteLiteral("                        ");
-
-            
             #line 187 "..\..\Views\Ticket\Index.cshtml"
-                   Write(currenySymbol);
+                                                                           Write(currenySymbol);
 
             
             #line default
             #line hidden
             
             #line 187 "..\..\Views\Ticket\Index.cshtml"
-                                  Write(item.Amount.ToString("N2"));
+                                                                                          Write((item.Quantity*item.Price).ToString("N2"));
 
             
             #line default
             #line hidden
-WriteLiteral("\r\n                    </td>\r\n                </tr>\r\n");
+WriteLiteral("\r\n                </div>\r\n");
 
             
-            #line 190 "..\..\Views\Ticket\Index.cshtml"
-            }
-
-            
-            #line default
-            #line hidden
-WriteLiteral("            </tbody>\r\n            <tfoot>\r\n");
-
-            
-            #line 193 "..\..\Views\Ticket\Index.cshtml"
-            
-            
-            #line default
-            #line hidden
-            
-            #line 193 "..\..\Views\Ticket\Index.cshtml"
-             if (Model.View.Discount > 0)
-            {
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                <tr>\r\n                    <th");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">Sub Total</th>\r\n                    <th");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">");
-
-            
-            #line 197 "..\..\Views\Ticket\Index.cshtml"
-                                 Write(currenySymbol);
-
-            
-            #line default
-            #line hidden
-            
-            #line 197 "..\..\Views\Ticket\Index.cshtml"
-                                               Write(subTotal.ToString("N2"));
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</th>\r\n                </tr>\r\n");
-
-WriteLiteral("                <tr>\r\n                    <th");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">\r\n                        Discount\r\n                        (");
-
-            
-            #line 202 "..\..\Views\Ticket\Index.cshtml"
-                     Write((Model.View.Discount*100/subTotal).ToString("N2"));
-
-            
-            #line default
-            #line hidden
-WriteLiteral("%)\r\n                    </th>\r\n                    <th");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">");
-
-            
-            #line 204 "..\..\Views\Ticket\Index.cshtml"
-                                 Write(currenySymbol);
-
-            
-            #line default
-            #line hidden
-            
-            #line 204 "..\..\Views\Ticket\Index.cshtml"
-                                               Write(Model.View.Discount.ToString("N2"));
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</th>\r\n                </tr>\r\n");
-
-WriteLiteral("                <tr>\r\n                    <th");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">Total</th>\r\n                    <th");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">");
-
-            
-            #line 208 "..\..\Views\Ticket\Index.cshtml"
-                                 Write(currenySymbol);
-
-            
-            #line default
-            #line hidden
-            
-            #line 208 "..\..\Views\Ticket\Index.cshtml"
-                                               Write(total.ToString("N2"));
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</th>\r\n                </tr>\r\n");
-
-            
-            #line 210 "..\..\Views\Ticket\Index.cshtml"
-            }
-            else
-            {
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                <tr>\r\n                    <th");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">Total</th>\r\n                    <th");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">");
-
-            
-            #line 215 "..\..\Views\Ticket\Index.cshtml"
-                                 Write(currenySymbol);
-
-            
-            #line default
-            #line hidden
-            
-            #line 215 "..\..\Views\Ticket\Index.cshtml"
-                                               Write(total.ToString("N2"));
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</th>\r\n                </tr>\r\n");
-
-            
-            #line 217 "..\..\Views\Ticket\Index.cshtml"
-            }
-
-            
-            #line default
-            #line hidden
-WriteLiteral("            ");
-
-            
-            #line 218 "..\..\Views\Ticket\Index.cshtml"
-             if (Model.View.Tender > 0)
-            {
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                <tr>\r\n                    <th");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">Tender</th>\r\n                    <th");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">");
-
-            
-            #line 222 "..\..\Views\Ticket\Index.cshtml"
-                                 Write(currenySymbol);
-
-            
-            #line default
-            #line hidden
-            
-            #line 222 "..\..\Views\Ticket\Index.cshtml"
-                                               Write(Model.View.Tender.ToString("N2"));
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</th>\r\n                </tr>\r\n");
-
-WriteLiteral("                <tr>\r\n                    <th");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">Change</th>\r\n                    <th");
-
-WriteLiteral(" class=\"right\"");
-
-WriteLiteral(">");
-
-            
-            #line 226 "..\..\Views\Ticket\Index.cshtml"
-                                 Write(currenySymbol);
-
-            
-            #line default
-            #line hidden
-            
-            #line 226 "..\..\Views\Ticket\Index.cshtml"
-                                               Write(Model.View.Change.ToString("N2"));
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</th>\r\n                </tr>\r\n");
-
-            
-            #line 228 "..\..\Views\Ticket\Index.cshtml"
-            }
-
-            
-            #line default
-            #line hidden
-WriteLiteral("            </tfoot>\r\n        </table>\r\n\r\n");
-
-            
-            #line 232 "..\..\Views\Ticket\Index.cshtml"
-        
-            
-            #line default
-            #line hidden
-            
-            #line 232 "..\..\Views\Ticket\Index.cshtml"
-         if (Model.DiscountCoupons.Any())
-        {
-
-            
-            #line default
-            #line hidden
-WriteLiteral("            <div");
-
-WriteLiteral(" class=\"discount coupons\"");
-
-WriteLiteral(">\r\n");
-
-            
-            #line 235 "..\..\Views\Ticket\Index.cshtml"
+            #line 189 "..\..\Views\Ticket\Index.cshtml"
                 
             
             #line default
             #line hidden
             
-            #line 235 "..\..\Views\Ticket\Index.cshtml"
-                 foreach (var coupon in Model.DiscountCoupons)
+            #line 189 "..\..\Views\Ticket\Index.cshtml"
+                 if (item.Discount > 0)
                 {
 
             
@@ -1005,56 +695,488 @@ WriteLiteral(">\r\n");
             #line hidden
 WriteLiteral("                    <div");
 
+WriteLiteral(" class=\"discount info\"");
+
+WriteLiteral(">\r\n                        Less ");
+
+            
+            #line 192 "..\..\Views\Ticket\Index.cshtml"
+                        Write(currenySymbol);
+
+            
+            #line default
+            #line hidden
+            
+            #line 192 "..\..\Views\Ticket\Index.cshtml"
+                                      Write(item.Discount.ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral(" (");
+
+            
+            #line 192 "..\..\Views\Ticket\Index.cshtml"
+                                                                      Write((item.Discount*100/(item.Amount + item.Discount)).ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("%)\r\n                    </div>\r\n");
+
+            
+            #line 194 "..\..\Views\Ticket\Index.cshtml"
+                }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("            </td>\r\n            <td");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">\r\n");
+
+WriteLiteral("                ");
+
+            
+            #line 197 "..\..\Views\Ticket\Index.cshtml"
+           Write(currenySymbol);
+
+            
+            #line default
+            #line hidden
+            
+            #line 197 "..\..\Views\Ticket\Index.cshtml"
+                          Write(item.Amount.ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("\r\n            </td>\r\n        </tr>\r\n");
+
+            
+            #line 200 "..\..\Views\Ticket\Index.cshtml"
+    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("    </tbody>\r\n    <tfoot>\r\n");
+
+            
+            #line 203 "..\..\Views\Ticket\Index.cshtml"
+    
+            
+            #line default
+            #line hidden
+            
+            #line 203 "..\..\Views\Ticket\Index.cshtml"
+     if (taxableTotal > 0)
+    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("        <tr>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">Sub Total</th>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">");
+
+            
+            #line 207 "..\..\Views\Ticket\Index.cshtml"
+                         Write(currenySymbol);
+
+            
+            #line default
+            #line hidden
+            
+            #line 207 "..\..\Views\Ticket\Index.cshtml"
+                                       Write(taxableTotal.ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</th>\r\n        </tr>\r\n");
+
+            
+            #line 209 "..\..\Views\Ticket\Index.cshtml"
+    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("    ");
+
+            
+            #line 210 "..\..\Views\Ticket\Index.cshtml"
+     if (taxTotal > 0)
+    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("        <tr>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">Tax (");
+
+            
+            #line 213 "..\..\Views\Ticket\Index.cshtml"
+                              Write(taxRate.ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("%)</th>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">");
+
+            
+            #line 214 "..\..\Views\Ticket\Index.cshtml"
+                         Write(currenySymbol);
+
+            
+            #line default
+            #line hidden
+            
+            #line 214 "..\..\Views\Ticket\Index.cshtml"
+                                       Write(taxTotal.ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</th>\r\n        </tr>\r\n");
+
+            
+            #line 216 "..\..\Views\Ticket\Index.cshtml"
+    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("\r\n");
+
+            
+            #line 218 "..\..\Views\Ticket\Index.cshtml"
+    
+            
+            #line default
+            #line hidden
+            
+            #line 218 "..\..\Views\Ticket\Index.cshtml"
+     if (nonTaxableTotal > 0 && nonTaxableTotal != grandTotal)
+    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("        <tr>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">Non Taxable Sales</th>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">");
+
+            
+            #line 222 "..\..\Views\Ticket\Index.cshtml"
+                         Write(currenySymbol);
+
+            
+            #line default
+            #line hidden
+            
+            #line 222 "..\..\Views\Ticket\Index.cshtml"
+                                       Write(nonTaxableTotal.ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</th>\r\n        </tr>\r\n");
+
+            
+            #line 224 "..\..\Views\Ticket\Index.cshtml"
+    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("\r\n");
+
+            
+            #line 226 "..\..\Views\Ticket\Index.cshtml"
+    
+            
+            #line default
+            #line hidden
+            
+            #line 226 "..\..\Views\Ticket\Index.cshtml"
+     if (Model.View.Discount > 0)
+    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("        <tr>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">Total</th>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">");
+
+            
+            #line 230 "..\..\Views\Ticket\Index.cshtml"
+                         Write(currenySymbol);
+
+            
+            #line default
+            #line hidden
+            
+            #line 230 "..\..\Views\Ticket\Index.cshtml"
+                                        Write(totalBeforeDisount.ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</th>\r\n        </tr>\r\n");
+
+WriteLiteral("        <tr>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">\r\n                Discount\r\n                (");
+
+            
+            #line 235 "..\..\Views\Ticket\Index.cshtml"
+             Write((Model.View.Discount*100/totalBeforeDisount).ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("%)\r\n            </th>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">");
+
+            
+            #line 237 "..\..\Views\Ticket\Index.cshtml"
+                         Write(currenySymbol);
+
+            
+            #line default
+            #line hidden
+            
+            #line 237 "..\..\Views\Ticket\Index.cshtml"
+                                       Write(Model.View.Discount.ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</th>\r\n        </tr>\r\n");
+
+            
+            #line 239 "..\..\Views\Ticket\Index.cshtml"
+    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("\r\n\r\n    <tr>\r\n        <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">Grand Total</th>\r\n        <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">");
+
+            
+            #line 244 "..\..\Views\Ticket\Index.cshtml"
+                     Write(currenySymbol);
+
+            
+            #line default
+            #line hidden
+            
+            #line 244 "..\..\Views\Ticket\Index.cshtml"
+                                    Write(grandTotal.ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</th>\r\n    </tr>\r\n");
+
+            
+            #line 246 "..\..\Views\Ticket\Index.cshtml"
+    
+            
+            #line default
+            #line hidden
+            
+            #line 246 "..\..\Views\Ticket\Index.cshtml"
+     if (Model.View.Tender > 0)
+    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("        <tr>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">Tender</th>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">");
+
+            
+            #line 250 "..\..\Views\Ticket\Index.cshtml"
+                         Write(currenySymbol);
+
+            
+            #line default
+            #line hidden
+            
+            #line 250 "..\..\Views\Ticket\Index.cshtml"
+                                       Write(Model.View.Tender.ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</th>\r\n        </tr>\r\n");
+
+WriteLiteral("        <tr>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">Change</th>\r\n            <th");
+
+WriteLiteral(" class=\"right\"");
+
+WriteLiteral(">");
+
+            
+            #line 254 "..\..\Views\Ticket\Index.cshtml"
+                         Write(currenySymbol);
+
+            
+            #line default
+            #line hidden
+            
+            #line 254 "..\..\Views\Ticket\Index.cshtml"
+                                       Write(Model.View.Change.ToString("N2"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</th>\r\n        </tr>\r\n");
+
+            
+            #line 256 "..\..\Views\Ticket\Index.cshtml"
+    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("    </tfoot>\r\n</table>\r\n\r\n");
+
+            
+            #line 260 "..\..\Views\Ticket\Index.cshtml"
+ if (Model.DiscountCoupons.Any())
+{
+
+            
+            #line default
+            #line hidden
+WriteLiteral("    <div");
+
+WriteLiteral(" class=\"discount coupons\"");
+
+WriteLiteral(">\r\n");
+
+            
+            #line 263 "..\..\Views\Ticket\Index.cshtml"
+        
+            
+            #line default
+            #line hidden
+            
+            #line 263 "..\..\Views\Ticket\Index.cshtml"
+         foreach (var coupon in Model.DiscountCoupons)
+        {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("            <div");
+
 WriteLiteral(" class=\"coupon\"");
 
-WriteLiteral(">\r\n                        <div");
+WriteLiteral(">\r\n                <div");
 
 WriteLiteral(" class=\"qrcode\"");
 
 WriteLiteral(" data-coupon=\"");
 
             
-            #line 238 "..\..\Views\Ticket\Index.cshtml"
-                                                    Write(coupon.CouponCode);
+            #line 266 "..\..\Views\Ticket\Index.cshtml"
+                                            Write(coupon.CouponCode);
 
             
             #line default
             #line hidden
 WriteLiteral("\"");
 
-WriteLiteral("></div>\r\n                        <div");
+WriteLiteral("></div>\r\n                <div");
 
 WriteLiteral(" class=\"description\"");
 
-WriteLiteral(">\r\n                            <div");
+WriteLiteral(">\r\n                    <div");
 
 WriteLiteral(" class=\"title\"");
 
 WriteLiteral(">");
 
             
-            #line 240 "..\..\Views\Ticket\Index.cshtml"
-                                          Write(coupon.CouponName);
+            #line 268 "..\..\Views\Ticket\Index.cshtml"
+                                  Write(coupon.CouponName);
 
             
             #line default
             #line hidden
-WriteLiteral("</div>\r\n                            <div");
+WriteLiteral("</div>\r\n                    <div");
 
 WriteLiteral(" class=\"sub title\"");
 
 WriteLiteral(">");
 
             
-            #line 241 "..\..\Views\Ticket\Index.cshtml"
-                                              Write(coupon.DiscountRate);
+            #line 269 "..\..\Views\Ticket\Index.cshtml"
+                                      Write(coupon.DiscountRate);
 
             
             #line default
             #line hidden
             
-            #line 241 "..\..\Views\Ticket\Index.cshtml"
-                                                                   Write(coupon.IsPercentage ? "%" : "");
+            #line 269 "..\..\Views\Ticket\Index.cshtml"
+                                                           Write(coupon.IsPercentage ? "%" : "");
 
             
             #line default
@@ -1062,188 +1184,28 @@ WriteLiteral(">");
 WriteLiteral(" off</div>\r\n\r\n");
 
             
-            #line 243 "..\..\Views\Ticket\Index.cshtml"
-                            
+            #line 271 "..\..\Views\Ticket\Index.cshtml"
+                    
             
             #line default
             #line hidden
-            
-            #line 243 "..\..\Views\Ticket\Index.cshtml"
-                             if (coupon.MinimumPurchaseAmount > 0)
-                            {
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                                <div");
-
-WriteLiteral(" class=\"info\"");
-
-WriteLiteral(">\r\n                                    <div");
-
-WriteLiteral(" class=\"name\"");
-
-WriteLiteral(">Minimum purchase amount</div>\r\n                                    <div");
-
-WriteLiteral(" class=\"value\"");
-
-WriteLiteral(">");
-
-            
-            #line 247 "..\..\Views\Ticket\Index.cshtml"
-                                                  Write(coupon.MinimumPurchaseAmount);
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</div>\r\n                                </div>\r\n");
-
-            
-            #line 249 "..\..\Views\Ticket\Index.cshtml"
-                            }
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                            ");
-
-            
-            #line 250 "..\..\Views\Ticket\Index.cshtml"
-                             if (coupon.MaximumPurchaseAmount > 0)
-                            {
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                                <div");
-
-WriteLiteral(" class=\"info\"");
-
-WriteLiteral(">\r\n                                    <div");
-
-WriteLiteral(" class=\"name\"");
-
-WriteLiteral(">Maximum purchase amount</div>\r\n                                    <div");
-
-WriteLiteral(" class=\"value\"");
-
-WriteLiteral(">");
-
-            
-            #line 254 "..\..\Views\Ticket\Index.cshtml"
-                                                  Write(coupon.MaximumPurchaseAmount);
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</div>\r\n                                </div>\r\n");
-
-            
-            #line 256 "..\..\Views\Ticket\Index.cshtml"
-                            }
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                            ");
-
-            
-            #line 257 "..\..\Views\Ticket\Index.cshtml"
-                             if (coupon.BeginsFrom != null)
-                            {
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                                <div");
-
-WriteLiteral(" class=\"info\"");
-
-WriteLiteral(">\r\n                                    <div");
-
-WriteLiteral(" class=\"name\"");
-
-WriteLiteral(">Effective From</div>\r\n                                    <div");
-
-WriteLiteral(" class=\"value\"");
-
-WriteLiteral(">");
-
-            
-            #line 261 "..\..\Views\Ticket\Index.cshtml"
-                                                  Write(coupon.BeginsFrom.Value.ToString("d"));
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</div>\r\n                                </div>\r\n");
-
-            
-            #line 263 "..\..\Views\Ticket\Index.cshtml"
-                            }
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                            ");
-
-            
-            #line 264 "..\..\Views\Ticket\Index.cshtml"
-                             if (coupon.ExpiresOn != null)
-                            {
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                                <div");
-
-WriteLiteral(" class=\"info\"");
-
-WriteLiteral(">\r\n                                    <div");
-
-WriteLiteral(" class=\"name\"");
-
-WriteLiteral(">Effective From</div>\r\n                                    <div");
-
-WriteLiteral(" class=\"value\"");
-
-WriteLiteral(">");
-
-            
-            #line 268 "..\..\Views\Ticket\Index.cshtml"
-                                                  Write(coupon.ExpiresOn.Value.ToString("d"));
-
-            
-            #line default
-            #line hidden
-WriteLiteral("</div>\r\n                                </div>\r\n");
-
-            
-            #line 270 "..\..\Views\Ticket\Index.cshtml"
-                            }
-
-            
-            #line default
-            #line hidden
-WriteLiteral("                            ");
-
             
             #line 271 "..\..\Views\Ticket\Index.cshtml"
-                             if (coupon.MaximumUsage != null)
-                            {
+                     if (coupon.MinimumPurchaseAmount > 0)
+                    {
 
             
             #line default
             #line hidden
-WriteLiteral("                                <div");
+WriteLiteral("                        <div");
 
 WriteLiteral(" class=\"info\"");
 
-WriteLiteral(">\r\n                                    <div");
+WriteLiteral(">\r\n                            <div");
 
 WriteLiteral(" class=\"name\"");
 
-WriteLiteral(">Total Usage</div>\r\n                                    <div");
+WriteLiteral(">Minimum purchase amount</div>\r\n                            <div");
 
 WriteLiteral(" class=\"value\"");
 
@@ -1251,41 +1213,201 @@ WriteLiteral(">");
 
             
             #line 275 "..\..\Views\Ticket\Index.cshtml"
-                                                  Write(coupon.MaximumUsage.Value);
+                                          Write(coupon.MinimumPurchaseAmount);
 
             
             #line default
             #line hidden
-WriteLiteral("</div>\r\n                                </div>\r\n");
+WriteLiteral("</div>\r\n                        </div>\r\n");
 
             
             #line 277 "..\..\Views\Ticket\Index.cshtml"
-                            }
+                    }
 
             
             #line default
             #line hidden
-WriteLiteral("                        </div>\r\n                    </div>\r\n");
+WriteLiteral("                    ");
 
             
-            #line 280 "..\..\Views\Ticket\Index.cshtml"
-                }
+            #line 278 "..\..\Views\Ticket\Index.cshtml"
+                     if (coupon.MaximumPurchaseAmount > 0)
+                    {
 
             
             #line default
             #line hidden
-WriteLiteral("            </div>\r\n");
+WriteLiteral("                        <div");
+
+WriteLiteral(" class=\"info\"");
+
+WriteLiteral(">\r\n                            <div");
+
+WriteLiteral(" class=\"name\"");
+
+WriteLiteral(">Maximum purchase amount</div>\r\n                            <div");
+
+WriteLiteral(" class=\"value\"");
+
+WriteLiteral(">");
 
             
             #line 282 "..\..\Views\Ticket\Index.cshtml"
+                                          Write(coupon.MaximumPurchaseAmount);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</div>\r\n                        </div>\r\n");
+
+            
+            #line 284 "..\..\Views\Ticket\Index.cshtml"
+                    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                    ");
+
+            
+            #line 285 "..\..\Views\Ticket\Index.cshtml"
+                     if (coupon.BeginsFrom != null)
+                    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                        <div");
+
+WriteLiteral(" class=\"info\"");
+
+WriteLiteral(">\r\n                            <div");
+
+WriteLiteral(" class=\"name\"");
+
+WriteLiteral(">Effective From</div>\r\n                            <div");
+
+WriteLiteral(" class=\"value\"");
+
+WriteLiteral(">");
+
+            
+            #line 289 "..\..\Views\Ticket\Index.cshtml"
+                                          Write(coupon.BeginsFrom.Value.ToString("d"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</div>\r\n                        </div>\r\n");
+
+            
+            #line 291 "..\..\Views\Ticket\Index.cshtml"
+                    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                    ");
+
+            
+            #line 292 "..\..\Views\Ticket\Index.cshtml"
+                     if (coupon.ExpiresOn != null)
+                    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                        <div");
+
+WriteLiteral(" class=\"info\"");
+
+WriteLiteral(">\r\n                            <div");
+
+WriteLiteral(" class=\"name\"");
+
+WriteLiteral(">Effective From</div>\r\n                            <div");
+
+WriteLiteral(" class=\"value\"");
+
+WriteLiteral(">");
+
+            
+            #line 296 "..\..\Views\Ticket\Index.cshtml"
+                                          Write(coupon.ExpiresOn.Value.ToString("d"));
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</div>\r\n                        </div>\r\n");
+
+            
+            #line 298 "..\..\Views\Ticket\Index.cshtml"
+                    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                    ");
+
+            
+            #line 299 "..\..\Views\Ticket\Index.cshtml"
+                     if (coupon.MaximumUsage != null)
+                    {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                        <div");
+
+WriteLiteral(" class=\"info\"");
+
+WriteLiteral(">\r\n                            <div");
+
+WriteLiteral(" class=\"name\"");
+
+WriteLiteral(">Total Usage</div>\r\n                            <div");
+
+WriteLiteral(" class=\"value\"");
+
+WriteLiteral(">");
+
+            
+            #line 303 "..\..\Views\Ticket\Index.cshtml"
+                                          Write(coupon.MaximumUsage.Value);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</div>\r\n                        </div>\r\n");
+
+            
+            #line 305 "..\..\Views\Ticket\Index.cshtml"
+                    }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("                </div>\r\n            </div>\r\n");
+
+            
+            #line 308 "..\..\Views\Ticket\Index.cshtml"
         }
 
             
             #line default
             #line hidden
-WriteLiteral("    </div>\r\n</div>\r\n\r\n<script>\r\n    $(\".qrcode\").each(function() {\r\n        const" +
-" el = $(this);\r\n        const coupon = el.attr(\"data-coupon\");\r\n\r\n        el.qrc" +
-"ode({ width: 80, height: 80, text: coupon });\r\n    });\r\n</script>");
+WriteLiteral("    </div>\r\n");
+
+            
+            #line 310 "..\..\Views\Ticket\Index.cshtml"
+}
+
+            
+            #line default
+            #line hidden
+WriteLiteral("</div>\r\n</div>\r\n\r\n<script>\r\n    $(\".qrcode\").each(function() {\r\n        const el " +
+"= $(this);\r\n        const coupon = el.attr(\"data-coupon\");\r\n\r\n        el.qrcode(" +
+"{ width: 80, height: 80, text: coupon });\r\n    });\r\n</script>");
 
         }
     }

@@ -33,7 +33,6 @@ namespace ASP
     using Frapid.Framework;
     using Frapid.i18n;
     using Frapid.Messaging;
-    using Frapid.Mapper.Decorators;
     using Frapid.WebsiteBuilder;
     using MixERP.Sales;
     
@@ -82,20 +81,20 @@ WriteLiteral("\r\n\r\n<script>\r\n\r\n    const transactionMasterId = window.get
 ";\r\n\r\n    $(document).on(\"posready\", function () {\r\n        $(\"#CheckoutButton\")." +
 "unbind(\"click\").bind(\"click\", function() {\r\n            function request(model) " +
 "{\r\n                const url = \"/dashboard/sales/tasks/return/new\";\r\n           " +
-"     const data = JSON.stringify(model);\r\n\r\n                return window.getAja" +
-"xRequest(url, \"POST\", data);\r\n            };\r\n\r\n            var model = window.g" +
-"etModel();\r\n            model.TransactionMasterId = window.getQueryStringByName(" +
-"\"TransactionMasterId\");\r\n\r\n\r\n            if (!model.Details.length) {\r\n         " +
-"       window.displayMessage(\"Please select an item.\");\r\n                return;" +
-"\r\n            };\r\n\r\n            const confirmed = confirm(\"Are you sure\");\r\n\r\n  " +
-"          if (!confirmed) {\r\n                return;\r\n            };\r\n\r\n\r\n      " +
-"      $(\"#CheckoutButton\").addClass(\"loading\");\r\n\r\n            const ajax = requ" +
-"est(model);\r\n\r\n            ajax.success(function (response) {\r\n                c" +
-"onst id = response;\r\n                document.location = \"/dashboard/sales/tasks" +
-"/return\";\r\n            });\r\n\r\n            ajax.fail(function (xhr) {\r\n          " +
-"      $(\"#CheckoutButton\").removeClass(\"loading\");\r\n                window.displ" +
-"ayMessage(JSON.stringify(xhr));\r\n            });\r\n        });\r\n    })\r\n</script>" +
-"");
+"     const data = JSON.stringify(model);\r\n                alert(data);\r\n        " +
+"        return window.getAjaxRequest(url, \"POST\", data);\r\n            };\r\n\r\n    " +
+"        const model = window.getModel();\r\n            model.TransactionMasterId " +
+"= window.getQueryStringByName(\"TransactionMasterId\");\r\n\r\n\r\n            if (!mode" +
+"l.Details.length) {\r\n                window.displayMessage(\"Please select an ite" +
+"m.\");\r\n                return;\r\n            };\r\n\r\n            const confirmed = " +
+"confirm(\"Are you sure\");\r\n\r\n            if (!confirmed) {\r\n                retur" +
+"n;\r\n            };\r\n\r\n\r\n            $(\"#CheckoutButton\").addClass(\"loading\");\r\n\r" +
+"\n            const ajax = request(model);\r\n\r\n            ajax.success(function (" +
+"response) {\r\n                const id = response;\r\n                document.loca" +
+"tion = \"/dashboard/sales/tasks/return\";\r\n            });\r\n\r\n            ajax.fai" +
+"l(function (xhr) {\r\n                $(\"#CheckoutButton\").removeClass(\"loading\");" +
+"\r\n                window.displayMessage(JSON.stringify(xhr));\r\n            });\r\n" +
+"        });\r\n    })\r\n</script>");
 
         }
     }

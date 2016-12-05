@@ -39,7 +39,6 @@ namespace ASP
     using Frapid.Framework;
     using Frapid.i18n;
     using Frapid.Messaging;
-    using Frapid.Mapper.Decorators;
     using Frapid.WebsiteBuilder;
     using MixERP.Sales;
     
@@ -179,85 +178,87 @@ WriteLiteral("@media screen and (min-width: 1400px) {\r\n        #pos-container 
 "s.items .item .info.block {\r\n            width: calc(100% - 220px);\r\n           " +
 " padding: 1em;\r\n        }\r\n\r\n            .sales.items .item .info.block .price.i" +
 "nfo,\r\n            .sales.items .item .info.block .discount.info,\r\n            .s" +
-"ales.items .item .info.block .header {\r\n                display: block;\r\n       " +
-"     }\r\n\r\n            .sales.items .item .info.block .header {\r\n                " +
-"font-size: 1.5em;\r\n                font-weight: 100;\r\n                text-trans" +
-"form: uppercase;\r\n            }\r\n\r\n            .sales.items .item .info.block .p" +
-"rice.info {\r\n                padding-top: 4px;\r\n            }\r\n\r\n            .sa" +
-"les.items .item .info.block .price.info,\r\n            .sales.items .item .info.b" +
-"lock .discount.info {\r\n                font-size: 1.1em;\r\n                text-a" +
-"lign: left;\r\n                padding: 0;\r\n                text-transform: none;\r" +
-"\n                color: #fbd842;\r\n            }\r\n\r\n\r\n    .tender.info {\r\n       " +
-" background-color: #333;\r\n        width: 100%;\r\n        cursor: pointer;\r\n      " +
-"  margin: 0 0 8px 0;\r\n        padding: 6px 0;\r\n    }\r\n\r\n\r\n        .tender.info:h" +
-"over {\r\n            background-color: #3f3f3f;\r\n        }\r\n\r\n\r\n    .summary.item" +
-"s {\r\n        padding: 0.5em 1em;\r\n        display: flex;\r\n    }\r\n\r\n        .summ" +
-"ary.items > .item {\r\n            display: inline-flex;\r\n            flex-directi" +
-"on: column;\r\n            padding: 2px;\r\n        }\r\n\r\n    .three.summary.items > " +
-".item {\r\n        width: 32%;\r\n    }\r\n\r\n    .two.summary.items > .item {\r\n       " +
-" width: 48%;\r\n    }\r\n\r\n    .one.summary.items > .item {\r\n        width: 96%;\r\n  " +
-"  }\r\n\r\n    .summary.items > .item > .description {\r\n        padding-bottom: 0.5e" +
-"m;\r\n        font-size: 0.9em;\r\n        text-align: left;\r\n    }\r\n\r\n    .summary." +
-"items > .item > .money {\r\n        padding-top: 0.1em;\r\n        font-size: 3em;\r\n" +
-"    }\r\n\r\n\r\n    input.pan.number,\r\n    input.customer.name,\r\n    input.customer.a" +
-"ddress {\r\n        font-size: 12px !important;\r\n        padding: 8px !important;\r" +
-"\n    }\r\n\r\n    .customer.name.item {\r\n        width: 40% !important;\r\n    }\r\n\r\n  " +
-"  .customer.address.item {\r\n        width: 30% !important;\r\n    }\r\n\r\n    .pan.nu" +
-"mber.item {\r\n        width: 25% !important;\r\n    }\r\n\r\n    .inverted.dropdown,\r\n " +
-"   .inverted.dropdown input.search,\r\n    .inverted.dropdown .menu,\r\n    .inverte" +
-"d.dropdown .item,\r\n    .inverted.dropdown .message {\r\n        background-color: " +
-"#555 !important;\r\n        color: #eee !important;\r\n        border: 1px solid #66" +
-"6 !important;\r\n    }\r\n\r\n        .inverted.dropdown .item.selected,\r\n        .inv" +
-"erted.dropdown .item:hover {\r\n            background-color: #666 !important;\r\n  " +
-"      }\r\n\r\n    .summary.items input,\r\n    .summary.items select,\r\n    .inverted." +
-"input,\r\n    .inverted.select {\r\n        background-color: #555 !important;\r\n    " +
-"    color: #eee !important;\r\n        border: 1px solid #666 !important;\r\n       " +
-" padding: .87em;\r\n        border-radius: 0.4em;\r\n        width: 100%;\r\n        -" +
-"moz-appearance: none; /* Firefox */\r\n    }\r\n\r\n    .summary.items .dropdown {\r\n  " +
-"      padding: 1em !important;\r\n    }\r\n\r\n    select.inverted {\r\n        backgrou" +
-"nd-color: #333;\r\n        border: 1px solid #555;\r\n        width: 100%;\r\n        " +
-"padding: 0.55em 1em;\r\n        border-radius: 0.5em;\r\n        -moz-appearance: no" +
-"ne; /* Firefox */\r\n    }\r\n\r\n    #dashboard-container {\r\n        padding: 0 !impo" +
-"rtant;\r\n    }\r\n\r\n    #pos-container {\r\n        background-color: #555;\r\n    }\r\n\r" +
-"\n\r\n    .pos.tabs {\r\n        display: flex;\r\n        padding: 0;\r\n    }\r\n\r\n\r\n    " +
-"    .pos.tabs .item {\r\n            display: inline-flex;\r\n            flex-direc" +
-"tion: column;\r\n            background: #444;\r\n            margin: 0 0.5em 0 0;\r\n" +
-"            font-weight: bold;\r\n            font-size: 1.3em;\r\n            paddi" +
-"ng: 0.75em 1em;\r\n            border-radius: 0.5em 0.5em 0 0;\r\n            cursor" +
-": pointer;\r\n            text-shadow: 2px 2px 20px #222;\r\n        }\r\n\r\n          " +
-"  .pos.tabs .selected.item,\r\n            .pos.tabs .active.item,\r\n            .p" +
-"os.tabs .item:hover {\r\n                background: #C6A13D;\r\n                col" +
-"or: #eee;\r\n            }\r\n\r\n    .circular.button {\r\n        padding: 0.9em 2em !" +
-"important;\r\n    }\r\n\r\n    #pos-items {\r\n        background-color: #3a3a3a;\r\n     " +
-"   height: 100%;\r\n        padding: 1em;\r\n    }\r\n\r\n    .tabs .actions {\r\n        " +
-"background: #555;\r\n        width: 100%;\r\n        text-align: right;\r\n        mar" +
-"gin: 0 !important;\r\n    }\r\n\r\n        .tabs .actions .icon {\r\n            cursor:" +
-" pointer;\r\n        }\r\n\r\n    .ui.action.panel.inverted.segment {\r\n        backgro" +
-"und: none !important;\r\n    }\r\n\r\n    .action.panel .toolbar {\r\n        display: f" +
-"lex;\r\n        background-color: #2f2f2f;\r\n        background: linear-gradient(to" +
-" top, #222, #444);\r\n        text-align: right;\r\n    }\r\n\r\n        .action.panel ." +
-"toolbar > .item {\r\n            text-align: center;\r\n            display: inline-" +
-"flex;\r\n            flex-direction: column-reverse;\r\n            background: #3f3" +
-"f3f;\r\n            background: linear-gradient(to top, #222, #444); /* Standard s" +
-"yntax */\r\n            padding: 1em 0.6em;\r\n            border-right: 1px solid #" +
-"333;\r\n            height: 3em;\r\n            width: 2.5em;\r\n            font-size" +
-": 1.4em;\r\n            cursor: pointer;\r\n        }\r\n\r\n\r\n            .action.panel" +
-" .toolbar > .item:hover {\r\n                background: #C4A03D;\r\n               " +
-" background: linear-gradient(to bottom, #C4A03D, #C4343D); /* Standard syntax */" +
-"\r\n            }\r\n\r\n    .summary.items > .item > .description {\r\n        text-tra" +
-"nsform: uppercase;\r\n        font-weight: bold;\r\n    }\r\n\r\n    .header.items {\r\n  " +
-"      background-color: #3f3f3f;\r\n        background: linear-gradient(to top, #2" +
-"92929, #444); /* Standard syntax */\r\n        padding: 1em 1em 1.5em;\r\n    }\r\n\r\n\r" +
-"\n\r\n        .header.items .count.item,\r\n        .header.items .count.item .descri" +
-"ption {\r\n            text-align: right !important;\r\n        }\r\n\r\n            .he" +
-"ader.items .count.item .money {\r\n                color: #FBD840;\r\n            }\r" +
-"\n\r\n    .footer.items {\r\n        background-color: #3f3f3f;\r\n        background: " +
-"linear-gradient(to top, #292929, #3a3a3a); /* Standard syntax */\r\n        paddin" +
-"g: 1em;\r\n        text-align: right;\r\n    }\r\n\r\n    .action.panel.segment {\r\n     " +
-"   padding: 0;\r\n        border: 0;\r\n        margin: 0;\r\n    }\r\n\r\n    .payment.ty" +
-"pe.container {\r\n        padding-bottom: 1em;\r\n        border-bottom: 1px solid #" +
-"444;\r\n    }\r\n\r\n    .show.anchor {\r\n        padding: 1em;\r\n        color: #C4A03D" +
-";\r\n    }\r\n</style>\r\n<style>\r\n    /*Semantic UI Override*/\r\n    ");
+"ales.items .item .info.block .tax.info,\r\n            .sales.items .item .info.bl" +
+"ock .header {\r\n                display: block;\r\n            }\r\n\r\n            .sa" +
+"les.items .item .info.block .header {\r\n                font-size: 1.5em;\r\n      " +
+"          font-weight: 100;\r\n                text-transform: uppercase;\r\n       " +
+"     }\r\n\r\n            .sales.items .item .info.block .price.info {\r\n            " +
+"    padding-top: 4px;\r\n            }\r\n\r\n            .sales.items .item .info.blo" +
+"ck .price.info,\r\n            .sales.items .item .info.block .tax.info,\r\n        " +
+"    .sales.items .item .info.block .discount.info {\r\n                font-size: " +
+"1.1em;\r\n                text-align: left;\r\n                padding: 0;\r\n        " +
+"        text-transform: none;\r\n                color: #fbd842;\r\n            }\r\n\r" +
+"\n\r\n    .tender.info {\r\n        background-color: #333;\r\n        width: 100%;\r\n  " +
+"      cursor: pointer;\r\n        margin: 0 0 8px 0;\r\n        padding: 6px 0;\r\n   " +
+" }\r\n\r\n\r\n        .tender.info:hover {\r\n            background-color: #3f3f3f;\r\n  " +
+"      }\r\n\r\n\r\n    .summary.items {\r\n        padding: 0.5em 1em;\r\n        display:" +
+" flex;\r\n    }\r\n\r\n        .summary.items > .item {\r\n            display: inline-f" +
+"lex;\r\n            flex-direction: column;\r\n            padding: 2px;\r\n        }\r" +
+"\n\r\n    .three.summary.items > .item {\r\n        width: 32%;\r\n    }\r\n\r\n    .two.su" +
+"mmary.items > .item {\r\n        width: 48%;\r\n    }\r\n\r\n    .one.summary.items > .i" +
+"tem {\r\n        width: 96%;\r\n    }\r\n\r\n    .summary.items > .item > .description {" +
+"\r\n        padding-bottom: 0.5em;\r\n        font-size: 0.9em;\r\n        text-align:" +
+" left;\r\n    }\r\n\r\n    .summary.items > .item > .money {\r\n        padding-top: 0.1" +
+"em;\r\n        font-size: 3em;\r\n    }\r\n\r\n\r\n    input.pan.number,\r\n    input.custom" +
+"er.name,\r\n    input.customer.address {\r\n        font-size: 12px !important;\r\n   " +
+"     padding: 8px !important;\r\n    }\r\n\r\n    .customer.name.item {\r\n        width" +
+": 40% !important;\r\n    }\r\n\r\n    .customer.address.item {\r\n        width: 30% !im" +
+"portant;\r\n    }\r\n\r\n    .pan.number.item {\r\n        width: 25% !important;\r\n    }" +
+"\r\n\r\n    .inverted.dropdown,\r\n    .inverted.dropdown input.search,\r\n    .inverted" +
+".dropdown .menu,\r\n    .inverted.dropdown .item,\r\n    .inverted.dropdown .message" +
+" {\r\n        background-color: #555 !important;\r\n        color: #eee !important;\r" +
+"\n        border: 1px solid #666 !important;\r\n    }\r\n\r\n        .inverted.dropdown" +
+" .item.selected,\r\n        .inverted.dropdown .item:hover {\r\n            backgrou" +
+"nd-color: #666 !important;\r\n        }\r\n\r\n    .summary.items input,\r\n    .summary" +
+".items select,\r\n    .inverted.input,\r\n    .inverted.select {\r\n        background" +
+"-color: #555 !important;\r\n        color: #eee !important;\r\n        border: 1px s" +
+"olid #666 !important;\r\n        padding: .87em;\r\n        border-radius: 0.4em;\r\n " +
+"       width: 100%;\r\n        -moz-appearance: none; /* Firefox */\r\n    }\r\n\r\n    " +
+".summary.items .dropdown {\r\n        padding: 1em !important;\r\n    }\r\n\r\n    selec" +
+"t.inverted {\r\n        background-color: #333;\r\n        border: 1px solid #555;\r\n" +
+"        width: 100%;\r\n        padding: 0.55em 1em;\r\n        border-radius: 0.5em" +
+";\r\n        -moz-appearance: none; /* Firefox */\r\n    }\r\n\r\n    #dashboard-contain" +
+"er {\r\n        padding: 0 !important;\r\n    }\r\n\r\n    #pos-container {\r\n        bac" +
+"kground-color: #555;\r\n    }\r\n\r\n\r\n    .pos.tabs {\r\n        display: flex;\r\n      " +
+"  padding: 0;\r\n    }\r\n\r\n\r\n        .pos.tabs .item {\r\n            display: inline" +
+"-flex;\r\n            flex-direction: column;\r\n            background: #444;\r\n    " +
+"        margin: 0 0.5em 0 0;\r\n            font-weight: bold;\r\n            font-s" +
+"ize: 1.3em;\r\n            padding: 0.75em 1em;\r\n            border-radius: 0.5em " +
+"0.5em 0 0;\r\n            cursor: pointer;\r\n            text-shadow: 2px 2px 20px " +
+"#222;\r\n        }\r\n\r\n            .pos.tabs .selected.item,\r\n            .pos.tabs" +
+" .active.item,\r\n            .pos.tabs .item:hover {\r\n                background:" +
+" #C6A13D;\r\n                color: #eee;\r\n            }\r\n\r\n    .circular.button {" +
+"\r\n        padding: 0.9em 2em !important;\r\n    }\r\n\r\n    #pos-items {\r\n        bac" +
+"kground-color: #3a3a3a;\r\n        height: 100%;\r\n        padding: 1em;\r\n    }\r\n\r\n" +
+"    .tabs .actions {\r\n        background: #555;\r\n        width: 100%;\r\n        t" +
+"ext-align: right;\r\n        margin: 0 !important;\r\n    }\r\n\r\n        .tabs .action" +
+"s .icon {\r\n            cursor: pointer;\r\n        }\r\n\r\n    .ui.action.panel.inver" +
+"ted.segment {\r\n        background: none !important;\r\n    }\r\n\r\n    .action.panel " +
+".toolbar {\r\n        display: flex;\r\n        background-color: #2f2f2f;\r\n        " +
+"background: linear-gradient(to top, #222, #444);\r\n        text-align: right;\r\n  " +
+"  }\r\n\r\n        .action.panel .toolbar > .item {\r\n            text-align: center;" +
+"\r\n            display: inline-flex;\r\n            flex-direction: column-reverse;" +
+"\r\n            background: #3f3f3f;\r\n            background: linear-gradient(to t" +
+"op, #222, #444); /* Standard syntax */\r\n            padding: 1em 0.6em;\r\n       " +
+"     border-right: 1px solid #333;\r\n            height: 3em;\r\n            width:" +
+" 2.5em;\r\n            font-size: 1.4em;\r\n            cursor: pointer;\r\n        }\r" +
+"\n\r\n\r\n            .action.panel .toolbar > .item:hover {\r\n                backgro" +
+"und: #C4A03D;\r\n                background: linear-gradient(to bottom, #C4A03D, #" +
+"C4343D); /* Standard syntax */\r\n            }\r\n\r\n    .summary.items > .item > .d" +
+"escription {\r\n        text-transform: uppercase;\r\n        font-weight: bold;\r\n  " +
+"  }\r\n\r\n    .header.items {\r\n        background-color: #3f3f3f;\r\n        backgrou" +
+"nd: linear-gradient(to top, #292929, #444); /* Standard syntax */\r\n        paddi" +
+"ng: 1em 1em 1.5em;\r\n    }\r\n\r\n\r\n\r\n        .header.items .count.item,\r\n        .he" +
+"ader.items .count.item .description {\r\n            text-align: right !important;" +
+"\r\n        }\r\n\r\n            .header.items .count.item .money {\r\n                c" +
+"olor: #FBD840;\r\n            }\r\n\r\n    .footer.items {\r\n        background-color: " +
+"#3f3f3f;\r\n        background: linear-gradient(to top, #292929, #3a3a3a); /* Stan" +
+"dard syntax */\r\n        padding: 1em;\r\n        text-align: right;\r\n    }\r\n\r\n    " +
+".action.panel.segment {\r\n        padding: 0;\r\n        border: 0;\r\n        margin" +
+": 0;\r\n    }\r\n\r\n    .payment.type.container {\r\n        padding-bottom: 1em;\r\n    " +
+"    border-bottom: 1px solid #444;\r\n    }\r\n\r\n    .show.anchor {\r\n        padding" +
+": 1em;\r\n        color: #C4A03D;\r\n    }\r\n</style>\r\n<style>\r\n    /*Semantic UI Ove" +
+"rride*/\r\n    ");
 
 WriteLiteral(@"@media only screen and (max-width: 500px) {
         .ui.buttons {
@@ -292,8 +293,8 @@ WriteLiteral(">\r\n            <i");
 
 WriteLiteral(" class=\"ui huge loading spinner icon\"");
 
-WriteLiteral("></i>\r\n        </div>\r\n        <div>\r\n            We\'re loading things\r\n        <" +
-"/div>\r\n    </div>\r\n    <div");
+WriteLiteral("></i>\r\n        </div>\r\n        <div>\r\n            Loading Point of Sale\r\n        " +
+"</div>\r\n    </div>\r\n    <div");
 
 WriteLiteral(" class=\"layout\"");
 
@@ -356,7 +357,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                                ");
 
             
-            #line 665 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 667 "..\..\Views\Shared\POSScreen.cshtml"
                            Write(meta.OfficeName);
 
             
@@ -373,7 +374,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                                ");
 
             
-            #line 668 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 670 "..\..\Views\Shared\POSScreen.cshtml"
                            Write(meta.Name);
 
             
@@ -390,7 +391,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                                ");
 
             
-            #line 671 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 673 "..\..\Views\Shared\POSScreen.cshtml"
                            Write(meta.OfficeCode);
 
             
@@ -407,7 +408,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                                ");
 
             
-            #line 674 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 676 "..\..\Views\Shared\POSScreen.cshtml"
                            Write(meta.OfficeName);
 
             
@@ -460,7 +461,7 @@ WriteLiteral("></select>\r\n                                </div>\r\n          
 WriteLiteral("                    ");
 
             
-            #line 694 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 696 "..\..\Views\Shared\POSScreen.cshtml"
                Write(Html.PartialView("Shared/POSItemList.cshtml", TenantConvention.GetTenant()));
 
             
@@ -570,7 +571,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                            ");
 
             
-            #line 722 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 724 "..\..\Views\Shared\POSScreen.cshtml"
                        Write(Html.PartialView("Shared/SalesEntryForm.cshtml", TenantConvention.GetTenant()));
 
             
@@ -601,10 +602,16 @@ WriteLiteral(" class=\"ui next positive circular button\"");
 
 WriteLiteral(">Next</div>\r\n                            </div>\r\n                        </div>\r\n" +
 "                    </div>\r\n                </div>\r\n            </div>\r\n        " +
-"</div>\r\n    </div>\r\n</div>\r\n\r\n\r\n\r\n");
+"</div>\r\n    </div>\r\n</div>\r\n<input");
+
+WriteLiteral(" type=\"hidden\"");
+
+WriteLiteral(" id=\"SalesTaxRateHidden\"");
+
+WriteLiteral("/>\r\n\r\n\r\n");
 
             
-            #line 742 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 744 "..\..\Views\Shared\POSScreen.cshtml"
 Write(Html.PartialView("Shared/CustomerSearchModal.cshtml", TenantConvention.GetTenant()));
 
             
@@ -613,7 +620,7 @@ Write(Html.PartialView("Shared/CustomerSearchModal.cshtml", TenantConvention.Get
 WriteLiteral("\r\n");
 
             
-            #line 743 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 745 "..\..\Views\Shared\POSScreen.cshtml"
 Write(Html.PartialView("Shared/ReprintTicketModal.cshtml", TenantConvention.GetTenant()));
 
             
@@ -622,7 +629,7 @@ Write(Html.PartialView("Shared/ReprintTicketModal.cshtml", TenantConvention.GetT
 WriteLiteral("\r\n");
 
             
-            #line 744 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 746 "..\..\Views\Shared\POSScreen.cshtml"
 Write(Html.PartialView("Shared/GiftCardSerachModal.cshtml", TenantConvention.GetTenant()));
 
             
@@ -660,55 +667,61 @@ WriteLiteral("\r\n\r\n<script>\r\n    var pageLoaded = false;\r\n\r\n    $(docum
 "#ReceiptSummary div.tender .money input\").keyup(function () {\r\n        window.up" +
 "dateTotal();\r\n    });\r\n\r\n    $(\"#DiscountTypeSelect\").change(function () {\r\n    " +
 "    window.updateTotal();\r\n    });\r\n\r\n    $(\"#DiscountInputText\").keyup(function" +
-" () {\r\n        window.updateTotal();\r\n    });\r\n\r\n    function updateTotal() {\r\n " +
-"       const candidates = $(\"#SalesItems div.item\");\r\n        const amountEl = $" +
-"(\"div.amount .money\");\r\n        const countEl = $(\"div.count .money\");\r\n        " +
-"const couponDiscountType = parseInt($(\"#DiscountTypeSelect\").val());\r\n        co" +
-"nst couponDiscountRate = window.parseFloat2($(\"#DiscountInputText\").val());\r\n   " +
-"     var discount;\r\n\r\n\r\n        var totalPrice = 0;\r\n        var totalQuantity =" +
-" 0;\r\n\r\n        $.each(candidates, function () {\r\n            const el = $(this);" +
-"\r\n            const quantityEl = el.find(\"input.quantity\");\r\n            const d" +
-"iscountEl = el.find(\"input.discount\");\r\n\r\n            const quantity = window.pa" +
-"rseFloat2(quantityEl.val() || 0);\r\n            const discountRate = window.parse" +
-"Float2(discountEl.val().replace(\"%\", \"\"));\r\n            const price = window.par" +
-"seFloat2(el.find(\"input.price\").val());\r\n\r\n            const amount = price * qu" +
-"antity;\r\n            const discountedAmount = amount * ((100 - discountRate) / 1" +
-"00);\r\n\r\n            totalPrice += (discountedAmount || amount);\r\n            tot" +
-"alQuantity += quantity;\r\n        });\r\n\r\n        totalPrice = parseFloat(totalPri" +
-"ce.toFixed(2));\r\n\r\n        if (couponDiscountType === 1 && couponDiscountRate > " +
-"0 && couponDiscountRate <= 100) {\r\n            discount = totalPrice * (couponDi" +
-"scountRate / 100);\r\n            totalPrice = totalPrice - discount;\r\n        } e" +
-"lse if (couponDiscountType === 2 && couponDiscountRate > 0) {\r\n            //Dis" +
-"count amount\r\n            totalPrice = totalPrice - couponDiscountRate;\r\n       " +
-" };\r\n\r\n\r\n\r\n        amountEl.html(totalPrice.toFixed(2));\r\n        countEl.html(t" +
-"otalQuantity.toFixed(2));\r\n    };\r\n\r\n\r\n\r\n</script>\r\n<script>\r\n    $(\"#ClearScree" +
-"nButton\").unbind(\"click\").bind(\"click\", function () {\r\n        clearScreen();\r\n " +
-"   });\r\n\r\n    function clearScreen() {\r\n        $(\"#SalesItems\").html(\"\");\r\n    " +
-"    $(\"#CustomerInputText\").removeAttr(\"data-customer-id\").val(\"\");\r\n        $(\"" +
-"#TenderInputText\").val(\"\");\r\n        $(\"#ChangeInputText\").val(\"\");\r\n\r\n        w" +
-"indow.updateTotal();\r\n    };\r\n\r\n    function loadStores() {\r\n        window.disp" +
-"layFieldBinder($(\"#StoreSelect\"), \"/api/forms/inventory/stores/display-fields\", " +
-"true);\r\n    };\r\n\r\n    function loadPaymentTerms() {\r\n        window.displayField" +
-"Binder($(\"#PaymentTermSelect\"), \"/api/forms/sales/payment-terms/display-fields\"," +
-" false);\r\n    };\r\n\r\n    function loadShippers() {\r\n        window.displayFieldBi" +
-"nder($(\"#ShipperSelect\"), \"/api/forms/inventory/shippers/display-fields\", true);" +
-"\r\n    };\r\n\r\n    function loadCostCenters() {\r\n        window.displayFieldBinder(" +
-"$(\"#CostCenterSelect\"), \"/api/forms/finance/cost-centers/display-fields\", true);" +
-"\r\n    };\r\n\r\n    function loadPriceTypes() {\r\n        window.displayFieldBinder($" +
-"(\"#PriceTypeSelect\"), \"/api/forms/sales/price-types/display-fields\", true);\r\n   " +
-" };\r\n\r\n\r\n    loadStores();\r\n    loadPriceTypes();\r\n\r\n    loadCostCenters();\r\n   " +
-" loadShippers();\r\n    loadPaymentTerms();\r\n\r\n    $(\'.ui.customer.search\').search" +
-"({\r\n        apiSettings: {\r\n            url: \'/dashboard/sales/setup/customer/se" +
-"arch/{query}\'\r\n        },\r\n        fields: {\r\n            results: \'Items\',\r\n   " +
-"         title: \'CustomerCode\',\r\n            description: \'CustomerName\',\r\n     " +
-"       image: \'Photo\',\r\n            price: \'PhoneNumbers\'\r\n        },\r\n        o" +
-"nSelect: function (result) {\r\n            const customerId = result.CustomerId;\r" +
-"\n            if (!customerId) {\r\n                return;\r\n            };\r\n\r\n    " +
-"        $(\"#CustomerInputText\").attr(\"data-customer-id\", customerId);\r\n        }" +
-",\r\n        minCharacters: 1\r\n    });\r\n\r\n    $(\"#StoreSelect\").change(function ()" +
-" {\r\n        var el = $(this);\r\n\r\n        function loadCounters() {\r\n            " +
-"const storeId = el.val();\r\n            const filters = [];\r\n            filters." +
-"push(window.getAjaxColumnFilter(\"WHERE\", \"store_id\", \"int\", window.FilterConditi" +
+" () {\r\n        const rate = window.parseFloat2($(\"#DiscountInputText\").val());\r\n" +
+"        const type = window.parseInt($(\"#DiscountTypeSelect\").val());\r\n\r\n       " +
+" if (type === 1 && rate > 100) {\r\n            $(\"#DiscountInputText\").val(\"0\");\r" +
+"\n        };\r\n\r\n        window.updateTotal();\r\n        window.updateTenderInfo();" +
+"\r\n    });\r\n\r\n    function updateTotal() {\r\n        const candidates = $(\"#SalesI" +
+"tems div.item\");\r\n        const amountEl = $(\"div.amount .money\");\r\n        cons" +
+"t countEl = $(\"div.count .money\");\r\n        const couponDiscountType = parseInt(" +
+"$(\"#DiscountTypeSelect\").val());\r\n        const couponDiscountRate = window.pars" +
+"eFloat2($(\"#DiscountInputText\").val());\r\n        var discount;\r\n\r\n\r\n        var " +
+"totalPrice = 0;\r\n        var totalQuantity = 0;\r\n\r\n        $.each(candidates, fu" +
+"nction () {\r\n            const el = $(this);\r\n            const quantityEl = el." +
+"find(\"input.quantity\");\r\n            const discountEl = el.find(\"input.discount\"" +
+");\r\n\r\n            const quantity = window.parseFloat2(quantityEl.val() || 0);\r\n " +
+"           const discountRate = window.parseFloat2(discountEl.val().replace(\"%\"," +
+" \"\"));\r\n            const price = window.parseFloat2(el.find(\"input.price\").val(" +
+"));\r\n\r\n            const amount = price * quantity;\r\n            const discounte" +
+"dAmount = amount * ((100 - discountRate) / 100);\r\n            const amountPlusTa" +
+"x = window.parseFloat(el.find(\".amount-plus-tax\").html());\r\n\r\n            totalP" +
+"rice += (amountPlusTax || discountedAmount || amount);\r\n            totalQuantit" +
+"y += quantity;\r\n        });\r\n\r\n        totalPrice = parseFloat(window.round(tota" +
+"lPrice, 2));\r\n\r\n        if (couponDiscountType === 1 && couponDiscountRate > 0 &" +
+"& couponDiscountRate <= 100) {\r\n            discount = totalPrice * (couponDisco" +
+"untRate / 100);\r\n            totalPrice = totalPrice - discount;\r\n        } else" +
+" if (couponDiscountType === 2 && couponDiscountRate > 0) {\r\n            //Discou" +
+"nt amount\r\n            totalPrice = totalPrice - couponDiscountRate;\r\n        };" +
+"\r\n\r\n\r\n\r\n        amountEl.html(window.round(totalPrice, 2));\r\n        countEl.htm" +
+"l(window.round(totalQuantity, 2));\r\n    };\r\n\r\n\r\n\r\n</script>\r\n<script>\r\n    $(\"#C" +
+"learScreenButton\").unbind(\"click\").bind(\"click\", function () {\r\n        clearScr" +
+"een();\r\n    });\r\n\r\n    function clearScreen() {\r\n        $(\"#SalesItems\").html(\"" +
+"\");\r\n        $(\"#CustomerInputText\").removeAttr(\"data-customer-id\").val(\"\");\r\n  " +
+"      $(\"#TenderInputText\").val(\"\");\r\n        $(\"#ChangeInputText\").val(\"\");\r\n\r\n" +
+"        window.updateTotal();\r\n    };\r\n\r\n    function loadStores() {\r\n        wi" +
+"ndow.displayFieldBinder($(\"#StoreSelect\"), \"/api/forms/inventory/stores/display-" +
+"fields\", true);\r\n    };\r\n\r\n    function loadPaymentTerms() {\r\n        window.dis" +
+"playFieldBinder($(\"#PaymentTermSelect\"), \"/api/forms/sales/payment-terms/display" +
+"-fields\", false);\r\n    };\r\n\r\n    function loadShippers() {\r\n        window.displ" +
+"ayFieldBinder($(\"#ShipperSelect\"), \"/api/forms/inventory/shippers/display-fields" +
+"\", true);\r\n    };\r\n\r\n    function loadCostCenters() {\r\n        window.displayFie" +
+"ldBinder($(\"#CostCenterSelect\"), \"/api/forms/finance/cost-centers/display-fields" +
+"\", true);\r\n    };\r\n\r\n    function loadPriceTypes() {\r\n        window.displayFiel" +
+"dBinder($(\"#PriceTypeSelect\"), \"/api/forms/sales/price-types/display-fields\", tr" +
+"ue);\r\n    };\r\n\r\n\r\n    loadStores();\r\n    loadPriceTypes();\r\n\r\n    loadCostCenter" +
+"s();\r\n    loadShippers();\r\n    loadPaymentTerms();\r\n\r\n    $(\'.ui.customer.search" +
+"\').search({\r\n        apiSettings: {\r\n            url: \'/dashboard/sales/setup/cu" +
+"stomer/search/{query}\'\r\n        },\r\n        fields: {\r\n            results: \'Ite" +
+"ms\',\r\n            title: \'CustomerCode\',\r\n            description: \'CustomerName" +
+"\',\r\n            image: \'Photo\',\r\n            price: \'PhoneNumbers\'\r\n        },\r\n" +
+"        onSelect: function (result) {\r\n            const customerId = result.Cus" +
+"tomerId;\r\n            if (!customerId) {\r\n                return;\r\n            }" +
+";\r\n\r\n            $(\"#CustomerInputText\").attr(\"data-customer-id\", customerId);\r\n" +
+"        },\r\n        minCharacters: 1\r\n    });\r\n\r\n    $(\"#StoreSelect\").change(fu" +
+"nction () {\r\n        var el = $(this);\r\n\r\n        function loadCounters() {\r\n   " +
+"         const storeId = el.val();\r\n\r\n            if(!storeId){\r\n               " +
+" return;\r\n            };\r\n\r\n            const filters = [];\r\n            filters" +
+".push(window.getAjaxColumnFilter(\"WHERE\", \"StoreId\", \"int\", window.FilterConditi" +
 "ons.IsEqualTo, storeId));\r\n\r\n            window.displayFieldBinder($(\"#CounterSe" +
 "lect\"), \"/api/forms/inventory/counters/display-fields/get-where\", true, filters)" +
 ";\r\n        };\r\n\r\n        loadCounters();\r\n    });\r\n</script>\r\n\r\n<script>\r\n    fu" +
@@ -761,7 +774,15 @@ WriteLiteral("\r\n\r\n<script>\r\n    var pageLoaded = false;\r\n\r\n    $(docum
 "t giftCardNumber = el.val();\r\n\r\n        if (!giftCardNumber) {\r\n            retu" +
 "rn;\r\n        };\r\n\r\n        const ajax = request(giftCardNumber);\r\n\r\n        ajax" +
 ".success(function (response) {\r\n            $(\"#GiftCardNumberBalanceInputText\")" +
-".val(response);\r\n        });\r\n    });\r\n</script>\r\n");
+".val(response);\r\n        });\r\n    });\r\n</script>\r\n<script>\r\n    function getTaxR" +
+"ate() {\r\n        function request() {\r\n            const url = \"/api/forms/finan" +
+"ce/tax-setups/get-where/-1\";\r\n            const filters = [];\r\n            filte" +
+"rs.push(window.getAjaxColumnFilter(\"WHERE\", \"OfficeId\", \"int\", window.FilterCond" +
+"itions.IsEqualTo, window.metaView.OfficeId));\r\n\r\n            return window.getAj" +
+"axRequest(url, \"POST\", filters);\r\n        };\r\n\r\n        const ajax = request();\r" +
+"\n\r\n        ajax.success(function (response) {\r\n            const salesTaxRate = " +
+"window.parseFloat(response[0].SalesTaxRate);\r\n            $(\"#SalesTaxRateHidden" +
+"\").val(salesTaxRate);\r\n        });\r\n    };\r\n\r\n    getTaxRate();\r\n</script>");
 
         }
     }

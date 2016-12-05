@@ -29,5 +29,6 @@ namespace MixERP.Sales.DTO
         public decimal Tax { get; set; }
         public decimal ShippingCharge { get; set; }
         public decimal Amount { get; set; }
+        public decimal Total { get; set; }
     }
 }

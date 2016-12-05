@@ -271,6 +271,7 @@ input.invoice.number.for.reprint {
     }
 
         .sales.items .item .info.block .price.info,
+        .sales.items .item .info.block .tax.info,
         .sales.items .item .info.block .discount.info,
         .sales.items .item .info.block .header {
             display: block;
@@ -287,6 +288,7 @@ input.invoice.number.for.reprint {
         }
 
         .sales.items .item .info.block .price.info,
+        .sales.items .item .info.block .tax.info,
         .sales.items .item .info.block .discount.info {
             font-size: 1.1em;
             text-align: left;

@@ -33,7 +33,6 @@ namespace ASP
     using Frapid.Framework;
     using Frapid.i18n;
     using Frapid.Messaging;
-    using Frapid.Mapper.Decorators;
     using Frapid.WebsiteBuilder;
     using MixERP.Sales;
     
@@ -620,161 +619,164 @@ WriteLiteral(">Hide</button>\r\n            </div>\r\n        </div>\r\n    </di
 "nitId = parseInt(el.find(\"select.unit\").val());\r\n                const price = w" +
 "indow.parseFloat2(el.find(\"input.price\").val() || 0);\r\n                const dis" +
 "countRate = window.parseFloat2(el.find(\"input.discount\").val() || 0);\r\n         " +
-"       const discount = (price * quantity) * (discountRate / 100);\r\n\r\n          " +
-"      model.push({\r\n                    StoreId: $(\"#StoreSelect\").val(),\r\n     " +
-"               ItemId: itemId,\r\n                    Quantity: quantity,\r\n       " +
-"             UnitId: unitId,\r\n                    Price: price,\r\n               " +
-"     DiscountRate: discountRate,\r\n                    Discount: discount\r\n      " +
-"          });\r\n            });\r\n\r\n            return model;\r\n        };\r\n\r\n     " +
-"   //Cash\r\n        const tender = window.parseFloat2($(\"#TenderInputText\").val()" +
-");\r\n        const change = window.parseFloat2($(\"#ChangeInputText\").val());\r\n\r\n " +
-"       //Credit\r\n        const counterId = parseInt($(\"#CounterSelect\").val()) |" +
-"| null;\r\n        const paymentTermId = parseInt($(\"#PaymentTermSelect\").val()) |" +
-"| null;\r\n\r\n        //Check\r\n        const checkAmount = window.parseFloat2($(\"#C" +
-"heckAmountInputText\").val()) || null;\r\n        const bankName = $(\"#BankNameInpu" +
-"tText\").val();\r\n        const checkNumber = $(\"#CheckNumberInputText\").val();\r\n " +
-"       const checkDate = $(\"#CheckDateInputText\").datepicker(\"getDate\");\r\n\r\n    " +
-"    //Gift Card\r\n        const giftCardNumber = $(\"#GiftCardNumberInputText\").va" +
-"l();\r\n\r\n\r\n        //Discount Coupon\r\n        const couponCode = $(\"#CouponCodeIn" +
-"putText\").val();\r\n\r\n        //Discount\r\n        const discountType = $(\"#Discoun" +
-"tTypeSelect\").val();\r\n        const discount = window.parseFloat2($(\"#DiscountIn" +
-"putText\").val());\r\n\r\n        const valueDate = $(\"#ValueDateInputText\").datepick" +
-"er(\"getDate\");\r\n        const bookDate = $(\"#BookDateInputText\").datepicker(\"get" +
-"Date\");\r\n        const costCenterId = parseInt($(\"#CostCenterSelect\").val()) || " +
-"null;\r\n        const referenceNumber = $(\"#ReferenceNumberInputText\").val();\r\n  " +
-"      const statementReference = $(\"#StatementReferenceInputText\").val();\r\n     " +
-"   const customerId = parseInt($(\"#CustomerInputText\").attr(\"data-customer-id\"))" +
-" || null;\r\n        const customerName = $(\"#CustomerInputText\").val();\r\n        " +
-"const priceTypeId = $(\"#PriceTypeSelect\").val();\r\n        const shipperId = $(\"#" +
-"ShipperSelect\").val();\r\n        const storeId = $(\"#StoreSelect\").val();\r\n      " +
-"  const details = getDetails();\r\n        const quotationId = parseInt(window.get" +
-"QueryStringByName(\"QuotationId\")) || null;\r\n        const orderId = parseInt(win" +
-"dow.getQueryStringByName(\"OrderId\")) || null;\r\n\r\n        return {\r\n            T" +
-"ender: tender,\r\n            Change: change,\r\n            PaymentTermId: paymentT" +
-"ermId,\r\n            CheckAmount: checkAmount,\r\n            CheckBankName: bankNa" +
-"me,\r\n            CheckNumber: checkNumber,\r\n            CheckDate: checkDate,\r\n " +
-"           CounterId: counterId,\r\n            GiftCardNumber: giftCardNumber,\r\n " +
-"           CouponCode: couponCode,\r\n            DiscountType: discountType,\r\n   " +
-"         IsFlatDiscount: discountType === 2,\r\n            Discount: discount,\r\n " +
-"           ValueDate: valueDate,\r\n            BookDate: bookDate,\r\n            C" +
-"ostCenterId: costCenterId,\r\n            ReferenceNumber: referenceNumber,\r\n     " +
-"       StatementReference: statementReference,\r\n            CustomerId: customer" +
-"Id,\r\n            CustomerName: customerName,\r\n            PriceTypeId: priceType" +
-"Id,\r\n            ShipperId: shipperId,\r\n            StoreId: storeId,\r\n         " +
-"   Details: details,\r\n            SalesQuotationId: quotationId,\r\n            Sa" +
-"lesOrderId: orderId\r\n        };\r\n    };\r\n\r\n    function getModelById(id) {\r\n    " +
-"    const key = getLocalStorageKey(id);\r\n        const item = localStorage.getIt" +
-"em(key);\r\n\r\n        if (item) {\r\n            return JSON.parse(item);\r\n        }" +
-";\r\n\r\n        return null;\r\n    };\r\n\r\n    function removeModelById(id) {\r\n       " +
-" const key = getLocalStorageKey(id);\r\n        localStorage.removeItem(key);\r\n   " +
-" };\r\n\r\n    function clearState() {\r\n        $.each(localStorage, function (key) " +
-"{\r\n            if (key.substr(0, 6) === \"posTab\") {\r\n                localStorag" +
-"e.removeItem(key);\r\n            };\r\n        });\r\n    };\r\n    clearState();\r\n\r\n  " +
-"  function getSelectedTabId() {\r\n        const id = parseInt($(\".tabs .selected." +
-"item:not(.new)\").html());\r\n        return id;\r\n    };\r\n\r\n    function loadState(" +
-") {\r\n        const id = getSelectedTabId();\r\n\r\n        if (id) {\r\n            lo" +
-"adModelById(id);\r\n        };\r\n    };\r\n\r\n    function saveState() {\r\n        cons" +
-"t id = getSelectedTabId();\r\n\r\n        if (!id) {\r\n            window.displayMess" +
-"age(\"Please select a tab\");\r\n            return;\r\n        };\r\n\r\n        const mo" +
-"del = window.getModel();\r\n        const key = getLocalStorageKey(id);\r\n        l" +
-"ocalStorage.setItem(key, JSON.stringify(model));\r\n    };\r\n\r\n    function removeS" +
-"tate() {\r\n        const id = getSelectedTabId();\r\n\r\n        if (id) {\r\n         " +
-"   removeModelById(id);\r\n        };\r\n    };\r\n\r\n    function loadModelData(model)" +
-" {\r\n        if (!model) {\r\n            return;\r\n        };\r\n\r\n        window.cle" +
-"arScreen();\r\n\r\n\r\n        $(\"#TenderInputText\").val(model.Tender);\r\n        $(\"#C" +
-"hangeInputText\").val(model.Change);\r\n        $(\"#PaymentTermSelect\").dropdown(\"s" +
-"et selected\", model.PaymentTermId);\r\n        $(\"#CounterSelect\").dropdown(\"set s" +
-"elected\", model.CounterId);\r\n\r\n        $(\"#CheckAmountInputText\").val(model.Chec" +
-"kAmount);\r\n        $(\"#BankNameInputText\").val(model.CheckBankName);\r\n        $(" +
-"\"#CheckNumberInputText\").val(model.CheckNumber);\r\n\r\n        if (model.CheckDate)" +
-" {\r\n            $(\"#CheckDateInputText\").datepicker(\"setDate\", new Date(model.Ch" +
-"eckDate));\r\n        };\r\n\r\n\r\n        $(\"#GiftCardNumberInputText\").val(model.Gift" +
-"CardNumber).trigger(\"change\");\r\n        $(\"#CouponCodeInputText\").val(model.Coup" +
-"onCode);\r\n        $(\"#DiscountTypeSelect\").dropdown(\"set selected\", model.Discou" +
-"ntType);\r\n        $(\"#DiscountInputText\").val(model.Discount);\r\n\r\n        if (mo" +
-"del.ValueDate) {\r\n            $(\"#ValueDateInputText\").datepicker(\"setDate\", new" +
-" Date(model.ValueDate));\r\n        };\r\n\r\n        if (model.BookDate) {\r\n         " +
-"   $(\"#BookDateInputText\").datepicker(\"setDate\", new Date(model.BookDate));\r\n   " +
-"     };\r\n\r\n        $(\"#CostCenterSelect\").dropdown(\"set selected\", model.CostCen" +
-"terId);\r\n        $(\"#ReferenceNumberInputText\").val(model.ReferenceNumber);\r\n   " +
-"     $(\"#StatementReferenceInputText\").val(model.StatementReference);\r\n\r\n       " +
-" $(\"#CustomerInputText\").attr(\"data-customer-id\", model.CustomerId).val(model.Cu" +
-"stomerCode);\r\n        \r\n        if (model.PriceTypeId) {\r\n            $(\"#PriceT" +
-"ypeSelect\").dropdown(\"set selected\", model.PriceTypeId);\r\n        };\r\n\r\n        " +
-"if (model.ShipperId) {\r\n            $(\"#ShipperSelect\").dropdown(\"set selected\"," +
-" model.ShipperId);\r\n        };\r\n\r\n        if (model.StoreId) {\r\n            $(\"#" +
-"StoreSelect\").dropdown(\"set selected\", model.StoreId);\r\n        };\r\n\r\n\r\n        " +
-"$.each(model.Details, function () {\r\n            const lineItem = this;\r\n\r\n     " +
-"       const itemId = lineItem.ItemId;\r\n            const selector = \"#POSItemLi" +
-"st .item[data-item-id=\" + itemId + \"]\";\r\n            $(selector).trigger(\"click\"" +
-");\r\n        });\r\n    };\r\n\r\n    function loadModelById(id) {\r\n        const model" +
-" = getModelById(id);\r\n        loadModelData(model);\r\n    };\r\n</script>\r\n<script>" +
-"\r\n    function showTicket(id) {\r\n        const url = \"/dashboard/sales/ticket/\" " +
-"+ id;\r\n\r\n        $(\"#TicketIframe\").attr(\"src\", url);\r\n        $(\".ticket.panel\"" +
-").show();\r\n    };\r\n\r\n    $(\"#TenderInputText\").on(\"keyup\", function () {\r\n      " +
-"  const total = window.parseFloat2($(\".amount.item .money\").text());\r\n        co" +
-"nst tender = window.parseFloat2($(this).val());\r\n\r\n        var change = tender -" +
-" total;\r\n\r\n        if (change < 0) {\r\n            change = \"ERROR\";\r\n        };\r" +
-"\n\r\n        $(\"#ChangeInputText\").val(change);\r\n    });\r\n\r\n    $(\"#CheckoutButton" +
-"\").unbind(\"click\").bind(\"click\", function () {\r\n        function request(model) " +
-"{\r\n            const url = \"/dashboard/sales/tasks/entry/new\";\r\n            cons" +
-"t data = JSON.stringify(model);\r\n            return window.getAjaxRequest(url, \"" +
-"POST\", data);\r\n        };\r\n\r\n        function validate() {\r\n            var tran" +
-"sactionTotal = window.parseFloat2($(\"div.amount .money\").text());\r\n            v" +
-"ar cashTender = window.parseFloat2($(\"#TenderInputText\").val());\r\n            va" +
-"r paymentTerm = parseInt($(\"#PaymentTermSelect\").val()) || null;\r\n            va" +
-"r checkAmount = window.parseFloat2($(\"#CheckAmountInputText\").val());\r\n         " +
-"   var bankName = $(\"#BankNameInputText\").val();\r\n            var checkDate = $(" +
-"\"#CheckDateInputText\").datepicker(\"getDate\");\r\n            var checkNumber = $(\"" +
-"#CheckNumberInputText\").val();\r\n            var giftCardNumber = $(\"#GiftCardNum" +
-"berInputText\").val();\r\n            var giftCardBalance = $(\"#GiftCardNumberBalan" +
-"ceInputText\").val();\r\n\r\n            if (cashTender >= transactionTotal) {\r\n     " +
-"           //Cash Transaction\r\n\r\n                $(\"#CheckAmountInputText\").val(" +
-"\"\");\r\n                $(\"#BankNameInputText\").val(\"\");\r\n                $(\"#Chec" +
-"kDateInputText\").val(\"\");\r\n                $(\"#CheckNumberInputText\").val(\"\");\r\n" +
-"                $(\"#PaymentTermSelect\").dropdown(\"set selected\", \"Select\");\r\n   " +
-"             $(\"#GiftCardNumberInputText\").val(\"\");\r\n                $(\"#GiftCar" +
-"dNumberBalanceInputText\").val(\"\");\r\n                return true;\r\n            };" +
-"\r\n\r\n            if (checkAmount >= transactionTotal) {\r\n                //Paid v" +
-"ia Check/Cheque\r\n                if (!bankName) {\r\n                    window.di" +
-"splayMessage(\"Please enter the bank name.\");\r\n                    return false;\r" +
-"\n                };\r\n\r\n                if (!checkNumber) {\r\n                    " +
-"window.displayMessage(\"Please enter the check number.\");\r\n                    re" +
-"turn false;\r\n                };\r\n\r\n                if (!checkDate) {\r\n          " +
-"          window.displayMessage(\"Please enter the check date.\");\r\n              " +
-"      return false;\r\n                };\r\n\r\n                $(\"#TenderInputText\")" +
-".val(\"\");\r\n                $(\"#ChangeInputText\").val(\"\");\r\n                $(\"#P" +
-"aymentTermSelect\").dropdown(\"set selected\", \"Select\");\r\n                $(\"#Gift" +
-"CardNumberInputText\").val(\"\");\r\n                $(\"#GiftCardNumberBalanceInputTe" +
-"xt\").val(\"\");\r\n\r\n\r\n                return true;\r\n            };\r\n\r\n            i" +
-"f (giftCardBalance >= transactionTotal) {\r\n                //Paid via Gift Card\r" +
-"\n\r\n                if (!giftCardNumber) {\r\n                    window.displayMes" +
-"sage(\"Please enter the gift card number.\");\r\n                    return false;\r\n" +
-"                };\r\n\r\n                $(\"#TenderInputText\").val(\"\");\r\n          " +
-"      $(\"#ChangeInputText\").val(\"\");\r\n                $(\"#CheckAmountInputText\")" +
-".val(\"\");\r\n                $(\"#BankNameInputText\").val(\"\");\r\n                $(\"" +
-"#CheckDateInputText\").val(\"\");\r\n                $(\"#CheckNumberInputText\").val(\"" +
-"\");\r\n                $(\"#PaymentTermSelect\").dropdown(\"set selected\", \"Select\");" +
-"\r\n\r\n                return true;\r\n            };\r\n\r\n            //Credit transac" +
-"tion\r\n            $(\"#TenderInputText\").val(\"\");\r\n            $(\"#ChangeInputTex" +
-"t\").val(\"\");\r\n            $(\"#CheckAmountInputText\").val(\"\");\r\n            $(\"#B" +
-"ankNameInputText\").val(\"\");\r\n            $(\"#CheckDateInputText\").val(\"\");\r\n    " +
-"        $(\"#CheckNumberInputText\").val(\"\");\r\n            $(\"#GiftCardNumberInput" +
-"Text\").val(\"\");\r\n            $(\"#GiftCardNumberBalanceInputText\").val(\"\");\r\n\r\n  " +
-"          if (!paymentTerm) {\r\n                window.displayMessage(\"Please sel" +
-"ect a payment term.\");\r\n                return false;\r\n            };\r\n\r\n       " +
-"     return true;\r\n        };\r\n\r\n        const isValid = validate();\r\n\r\n        " +
-"if (!isValid) {\r\n            return;\r\n        };\r\n\r\n        const model = window" +
-".getModel();\r\n\r\n        if (!model.Details.length) {\r\n            window.display" +
-"Message(\"Please select an item.\");\r\n            return;\r\n        };\r\n\r\n        c" +
-"onst confirmed = confirm(\"Are you sure\");\r\n\r\n        if (!confirmed) {\r\n        " +
-"    return;\r\n        };\r\n\r\n\r\n        $(\"#CheckoutButton\").addClass(\"loading\");\r\n" +
-"\r\n        const ajax = request(model);\r\n\r\n        ajax.success(function (respons" +
-"e) {\r\n            const id = response;\r\n            window.clearScreen();\r\n\r\n   " +
-"         window.showTicket(id);\r\n            $(\"#CheckoutButton\").removeClass(\"l" +
-"oading\");\r\n        });\r\n\r\n        ajax.fail(function (xhr) {\r\n            $(\"#Ch" +
-"eckoutButton\").removeClass(\"loading\");\r\n            window.displayMessage(JSON.s" +
-"tringify(xhr));\r\n        });\r\n    });\r\n</script>");
+"       const discount = (price * quantity) * (discountRate / 100);\r\n            " +
+"    const tax = window.parseFloat(el.find(\".tax-amount\").html() || 0);\r\n\r\n      " +
+"          model.push({\r\n                    StoreId: $(\"#StoreSelect\").val(),\r\n " +
+"                   ItemId: itemId,\r\n                    Quantity: quantity,\r\n   " +
+"                 UnitId: unitId,\r\n                    Price: price,\r\n           " +
+"         DiscountRate: discountRate,\r\n                    Discount: discount,\r\n " +
+"                   Tax: tax\r\n                });\r\n            });\r\n\r\n           " +
+" return model;\r\n        };\r\n\r\n        //Cash\r\n        const tender = window.pars" +
+"eFloat2($(\"#TenderInputText\").val());\r\n        const change = window.parseFloat2" +
+"($(\"#ChangeInputText\").val());\r\n\r\n        //Credit\r\n        const counterId = pa" +
+"rseInt($(\"#CounterSelect\").val()) || null;\r\n        const paymentTermId = parseI" +
+"nt($(\"#PaymentTermSelect\").val()) || null;\r\n\r\n        //Check\r\n        const che" +
+"ckAmount = window.parseFloat2($(\"#CheckAmountInputText\").val()) || null;\r\n      " +
+"  const bankName = $(\"#BankNameInputText\").val();\r\n        const checkNumber = $" +
+"(\"#CheckNumberInputText\").val();\r\n        const checkDate = $(\"#CheckDateInputTe" +
+"xt\").datepicker(\"getDate\");\r\n\r\n        //Gift Card\r\n        const giftCardNumber" +
+" = $(\"#GiftCardNumberInputText\").val();\r\n\r\n\r\n        //Discount Coupon\r\n        " +
+"const couponCode = $(\"#CouponCodeInputText\").val();\r\n\r\n        //Discount\r\n     " +
+"   const discountType = $(\"#DiscountTypeSelect\").val();\r\n        const discount " +
+"= window.parseFloat2($(\"#DiscountInputText\").val());\r\n\r\n        const valueDate " +
+"= $(\"#ValueDateInputText\").datepicker(\"getDate\");\r\n        const bookDate = $(\"#" +
+"BookDateInputText\").datepicker(\"getDate\");\r\n        const costCenterId = parseIn" +
+"t($(\"#CostCenterSelect\").val()) || null;\r\n        const referenceNumber = $(\"#Re" +
+"ferenceNumberInputText\").val();\r\n        const statementReference = $(\"#Statemen" +
+"tReferenceInputText\").val();\r\n        const customerId = parseInt($(\"#CustomerIn" +
+"putText\").attr(\"data-customer-id\")) || null;\r\n        const customerName = $(\"#C" +
+"ustomerInputText\").val();\r\n        const priceTypeId = $(\"#PriceTypeSelect\").val" +
+"();\r\n        const shipperId = $(\"#ShipperSelect\").val();\r\n        const storeId" +
+" = $(\"#StoreSelect\").val();\r\n        const details = getDetails();\r\n        cons" +
+"t quotationId = parseInt(window.getQueryStringByName(\"QuotationId\")) || null;\r\n " +
+"       const orderId = parseInt(window.getQueryStringByName(\"OrderId\")) || null;" +
+"\r\n\r\n        return {\r\n            Tender: tender,\r\n            Change: change,\r\n" +
+"            PaymentTermId: paymentTermId,\r\n            CheckAmount: checkAmount," +
+"\r\n            CheckBankName: bankName,\r\n            CheckNumber: checkNumber,\r\n " +
+"           CheckDate: checkDate,\r\n            CounterId: counterId,\r\n           " +
+" GiftCardNumber: giftCardNumber,\r\n            CouponCode: couponCode,\r\n         " +
+"   DiscountType: discountType,\r\n            IsFlatDiscount: discountType === 2,\r" +
+"\n            Discount: discount,\r\n            ValueDate: valueDate,\r\n           " +
+" BookDate: bookDate,\r\n            CostCenterId: costCenterId,\r\n            Refer" +
+"enceNumber: referenceNumber,\r\n            StatementReference: statementReference" +
+",\r\n            CustomerId: customerId,\r\n            CustomerName: customerName,\r" +
+"\n            PriceTypeId: priceTypeId,\r\n            ShipperId: shipperId,\r\n     " +
+"       StoreId: storeId,\r\n            Details: details,\r\n            SalesQuotat" +
+"ionId: quotationId,\r\n            SalesOrderId: orderId\r\n        };\r\n    };\r\n\r\n  " +
+"  function getModelById(id) {\r\n        const key = getLocalStorageKey(id);\r\n    " +
+"    const item = localStorage.getItem(key);\r\n\r\n        if (item) {\r\n            " +
+"return JSON.parse(item);\r\n        };\r\n\r\n        return null;\r\n    };\r\n\r\n    func" +
+"tion removeModelById(id) {\r\n        const key = getLocalStorageKey(id);\r\n       " +
+" localStorage.removeItem(key);\r\n    };\r\n\r\n    function clearState() {\r\n        $" +
+".each(localStorage, function (key) {\r\n            if (key.substr(0, 6) === \"posT" +
+"ab\") {\r\n                localStorage.removeItem(key);\r\n            };\r\n        }" +
+");\r\n    };\r\n    clearState();\r\n\r\n    function getSelectedTabId() {\r\n        cons" +
+"t id = parseInt($(\".tabs .selected.item:not(.new)\").html());\r\n        return id;" +
+"\r\n    };\r\n\r\n    function loadState() {\r\n        const id = getSelectedTabId();\r\n" +
+"\r\n        if (id) {\r\n            loadModelById(id);\r\n        };\r\n    };\r\n\r\n    f" +
+"unction saveState() {\r\n        const id = getSelectedTabId();\r\n\r\n        if (!id" +
+") {\r\n            window.displayMessage(\"Please select a tab\");\r\n            retu" +
+"rn;\r\n        };\r\n\r\n        const model = window.getModel();\r\n        const key =" +
+" getLocalStorageKey(id);\r\n        localStorage.setItem(key, JSON.stringify(model" +
+"));\r\n    };\r\n\r\n    function removeState() {\r\n        const id = getSelectedTabId" +
+"();\r\n\r\n        if (id) {\r\n            removeModelById(id);\r\n        };\r\n    };\r\n" +
+"\r\n    function loadModelData(model) {\r\n        if (!model) {\r\n            return" +
+";\r\n        };\r\n\r\n        window.clearScreen();\r\n\r\n\r\n        $(\"#TenderInputText\"" +
+").val(model.Tender);\r\n        $(\"#ChangeInputText\").val(model.Change);\r\n        " +
+"$(\"#PaymentTermSelect\").dropdown(\"set selected\", model.PaymentTermId);\r\n        " +
+"$(\"#CounterSelect\").dropdown(\"set selected\", model.CounterId);\r\n\r\n        $(\"#Ch" +
+"eckAmountInputText\").val(model.CheckAmount);\r\n        $(\"#BankNameInputText\").va" +
+"l(model.CheckBankName);\r\n        $(\"#CheckNumberInputText\").val(model.CheckNumbe" +
+"r);\r\n\r\n        if (model.CheckDate) {\r\n            $(\"#CheckDateInputText\").date" +
+"picker(\"setDate\", new Date(model.CheckDate));\r\n        };\r\n\r\n\r\n        $(\"#GiftC" +
+"ardNumberInputText\").val(model.GiftCardNumber).trigger(\"change\");\r\n        $(\"#C" +
+"ouponCodeInputText\").val(model.CouponCode);\r\n        $(\"#DiscountTypeSelect\").dr" +
+"opdown(\"set selected\", model.DiscountType);\r\n        $(\"#DiscountInputText\").val" +
+"(model.Discount);\r\n\r\n        if (model.ValueDate) {\r\n            $(\"#ValueDateIn" +
+"putText\").datepicker(\"setDate\", new Date(model.ValueDate));\r\n        };\r\n\r\n     " +
+"   if (model.BookDate) {\r\n            $(\"#BookDateInputText\").datepicker(\"setDat" +
+"e\", new Date(model.BookDate));\r\n        };\r\n\r\n        $(\"#CostCenterSelect\").dro" +
+"pdown(\"set selected\", model.CostCenterId);\r\n        $(\"#ReferenceNumberInputText" +
+"\").val(model.ReferenceNumber);\r\n        $(\"#StatementReferenceInputText\").val(mo" +
+"del.StatementReference);\r\n\r\n        $(\"#CustomerInputText\").attr(\"data-customer-" +
+"id\", model.CustomerId).val(model.CustomerCode);\r\n        \r\n        if (model.Pri" +
+"ceTypeId) {\r\n            $(\"#PriceTypeSelect\").dropdown(\"set selected\", model.Pr" +
+"iceTypeId);\r\n        };\r\n\r\n        if (model.ShipperId) {\r\n            $(\"#Shipp" +
+"erSelect\").dropdown(\"set selected\", model.ShipperId);\r\n        };\r\n\r\n        if " +
+"(model.StoreId) {\r\n            $(\"#StoreSelect\").dropdown(\"set selected\", model." +
+"StoreId);\r\n        };\r\n\r\n\r\n        $.each(model.Details, function () {\r\n        " +
+"    const lineItem = this;\r\n\r\n            const itemId = lineItem.ItemId;\r\n     " +
+"       const selector = \"#POSItemList .item[data-item-id=\" + itemId + \"]\";\r\n    " +
+"        $(selector).trigger(\"click\");\r\n        });\r\n    };\r\n\r\n    function loadM" +
+"odelById(id) {\r\n        const model = getModelById(id);\r\n        loadModelData(m" +
+"odel);\r\n    };\r\n</script>\r\n<script>\r\n    function showTicket(id) {\r\n        cons" +
+"t url = \"/dashboard/sales/ticket/\" + id;\r\n\r\n        $(\"#TicketIframe\").attr(\"src" +
+"\", url);\r\n        $(\".ticket.panel\").show();\r\n    };\r\n\r\n    function updateTende" +
+"rInfo() {\r\n        const total = window.parseFloat2($(\".amount.item .money\").tex" +
+"t());\r\n        const tender = window.parseFloat2($(\"#TenderInputText\").val());\r\n" +
+"\r\n        var change = tender - total;\r\n\r\n        if (change < 0) {\r\n           " +
+" change = \"ERROR\";\r\n        };\r\n\r\n        $(\"#ChangeInputText\").val(change);\r\n  " +
+"  };\r\n\r\n    $(\"#TenderInputText\").on(\"keyup\", function () {\r\n        updateTende" +
+"rInfo();\r\n    });\r\n\r\n    $(\"#CheckoutButton\").unbind(\"click\").bind(\"click\", func" +
+"tion () {\r\n        function request(model) {\r\n            const url = \"/dashboar" +
+"d/sales/tasks/entry/new\";\r\n            const data = JSON.stringify(model);\r\n    " +
+"        return window.getAjaxRequest(url, \"POST\", data);\r\n        };\r\n\r\n        " +
+"function validate() {\r\n            var transactionTotal = window.parseFloat2($(\"" +
+"div.amount .money\").text());\r\n            var cashTender = window.parseFloat2($(" +
+"\"#TenderInputText\").val());\r\n            var paymentTerm = parseInt($(\"#PaymentT" +
+"ermSelect\").val()) || null;\r\n            var checkAmount = window.parseFloat2($(" +
+"\"#CheckAmountInputText\").val());\r\n            var bankName = $(\"#BankNameInputTe" +
+"xt\").val();\r\n            var checkDate = $(\"#CheckDateInputText\").datepicker(\"ge" +
+"tDate\");\r\n            var checkNumber = $(\"#CheckNumberInputText\").val();\r\n     " +
+"       var giftCardNumber = $(\"#GiftCardNumberInputText\").val();\r\n            va" +
+"r giftCardBalance = $(\"#GiftCardNumberBalanceInputText\").val();\r\n\r\n            i" +
+"f (cashTender >= transactionTotal) {\r\n                //Cash Transaction\r\n\r\n    " +
+"            $(\"#CheckAmountInputText\").val(\"\");\r\n                $(\"#BankNameInp" +
+"utText\").val(\"\");\r\n                $(\"#CheckDateInputText\").val(\"\");\r\n          " +
+"      $(\"#CheckNumberInputText\").val(\"\");\r\n                $(\"#PaymentTermSelect" +
+"\").dropdown(\"set selected\", \"Select\");\r\n                $(\"#GiftCardNumberInputT" +
+"ext\").val(\"\");\r\n                $(\"#GiftCardNumberBalanceInputText\").val(\"\");\r\n " +
+"               return true;\r\n            };\r\n\r\n            if (checkAmount >= tr" +
+"ansactionTotal) {\r\n                //Paid via Check/Cheque\r\n                if (" +
+"!bankName) {\r\n                    window.displayMessage(\"Please enter the bank n" +
+"ame.\");\r\n                    return false;\r\n                };\r\n\r\n              " +
+"  if (!checkNumber) {\r\n                    window.displayMessage(\"Please enter t" +
+"he check number.\");\r\n                    return false;\r\n                };\r\n\r\n  " +
+"              if (!checkDate) {\r\n                    window.displayMessage(\"Plea" +
+"se enter the check date.\");\r\n                    return false;\r\n                " +
+"};\r\n\r\n                $(\"#TenderInputText\").val(\"\");\r\n                $(\"#Change" +
+"InputText\").val(\"\");\r\n                $(\"#PaymentTermSelect\").dropdown(\"set sele" +
+"cted\", \"Select\");\r\n                $(\"#GiftCardNumberInputText\").val(\"\");\r\n     " +
+"           $(\"#GiftCardNumberBalanceInputText\").val(\"\");\r\n\r\n\r\n                re" +
+"turn true;\r\n            };\r\n\r\n            if (giftCardBalance >= transactionTota" +
+"l) {\r\n                //Paid via Gift Card\r\n\r\n                if (!giftCardNumbe" +
+"r) {\r\n                    window.displayMessage(\"Please enter the gift card numb" +
+"er.\");\r\n                    return false;\r\n                };\r\n\r\n               " +
+" $(\"#TenderInputText\").val(\"\");\r\n                $(\"#ChangeInputText\").val(\"\");\r" +
+"\n                $(\"#CheckAmountInputText\").val(\"\");\r\n                $(\"#BankNa" +
+"meInputText\").val(\"\");\r\n                $(\"#CheckDateInputText\").val(\"\");\r\n     " +
+"           $(\"#CheckNumberInputText\").val(\"\");\r\n                $(\"#PaymentTermS" +
+"elect\").dropdown(\"set selected\", \"Select\");\r\n\r\n                return true;\r\n   " +
+"         };\r\n\r\n            //Credit transaction\r\n            $(\"#TenderInputText" +
+"\").val(\"\");\r\n            $(\"#ChangeInputText\").val(\"\");\r\n            $(\"#CheckAm" +
+"ountInputText\").val(\"\");\r\n            $(\"#BankNameInputText\").val(\"\");\r\n        " +
+"    $(\"#CheckDateInputText\").val(\"\");\r\n            $(\"#CheckNumberInputText\").va" +
+"l(\"\");\r\n            $(\"#GiftCardNumberInputText\").val(\"\");\r\n            $(\"#Gift" +
+"CardNumberBalanceInputText\").val(\"\");\r\n\r\n            if (!paymentTerm) {\r\n      " +
+"          window.displayMessage(\"Please select a payment term.\");\r\n             " +
+"   return false;\r\n            };\r\n\r\n            return true;\r\n        };\r\n\r\n    " +
+"    const isValid = validate();\r\n\r\n        if (!isValid) {\r\n            return;\r" +
+"\n        };\r\n\r\n        const model = window.getModel();\r\n\r\n        if (!model.De" +
+"tails.length) {\r\n            window.displayMessage(\"Please select an item.\");\r\n " +
+"           return;\r\n        };\r\n\r\n        const confirmed = confirm(\"Are you sur" +
+"e\");\r\n\r\n        if (!confirmed) {\r\n            return;\r\n        };\r\n\r\n\r\n        " +
+"$(\"#CheckoutButton\").addClass(\"loading\");\r\n\r\n        const ajax = request(model)" +
+";\r\n\r\n        ajax.success(function (response) {\r\n            const id = response" +
+";\r\n            window.clearScreen();\r\n\r\n            window.showTicket(id);\r\n    " +
+"        $(\"#CheckoutButton\").removeClass(\"loading\");\r\n        });\r\n\r\n        aja" +
+"x.fail(function (xhr) {\r\n            $(\"#CheckoutButton\").removeClass(\"loading\")" +
+";\r\n            window.displayMessage(JSON.stringify(xhr));\r\n        });\r\n    });" +
+"\r\n</script>");
 
         }
     }

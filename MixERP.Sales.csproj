@@ -288,7 +288,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>GiftCardSerachModal.cshtml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Shared\POSItemList.generated.cs">
+    <Compile Include="Views\Shared\POSItemList1.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>POSItemList.cshtml</DependentUpon>
@@ -481,7 +481,7 @@
     </Content>
     <Content Include="Views\Shared\POSItemList.cshtml">
       <Generator>RazorGenerator</Generator>
-      <LastGenOutput>POSItemList.generated.cs</LastGenOutput>
+      <LastGenOutput>POSItemList1.generated.cs</LastGenOutput>
     </Content>
     <Content Include="Views\Shared\POSScreen.cshtml">
       <Generator>RazorGenerator</Generator>

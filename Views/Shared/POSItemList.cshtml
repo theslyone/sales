@@ -31,6 +31,14 @@
 			<span>&nbsp; =&nbsp; </span>
 			<span class="discounted amount"></span>
 		</div>
+		<div class ="tax info" style="display:none;">
+			<span>Add Tax </span>
+			<span class ="tax-amount"></span>
+			<span> (</span>
+			<span class ="tax-rate"></span>
+			<span>%) = </span>
+			<span class="amount-plus-tax"></span>
+		</div>
 		<div>
 			<select class="unit inverted" data-item-id="{ItemId}">
 			</select>
@@ -67,6 +75,9 @@
         var itemName = el.attr("data-item-name");
         var itemCode = el.attr("data-item-code");
         var itemId = el.attr("data-item-id");
+        var isTaxableItem = el.attr("data-is-taxable-item") === "true";
+        var taxRate = window.parseFloat($("#SalesTaxRateHidden").val());
+
         var price = window.parseFloat2(sellingPrice || 0);
 
         if (!price) {
@@ -139,7 +150,7 @@
 
         loadUnits(unitSelect, unitId, validUnits.split(','));
 
-        function updateItemTotal(el) {
+        function updateItemInfo(el) {
             const quantityEl = el.find("input.quantity");
             const discountEl = el.find("input.discount");
 
@@ -147,8 +158,8 @@
             const discountRate = window.parseFloat2(discountEl.val().replace("%", ""));
             const price = window.parseFloat2(el.find("input.price").val());
 
-            const amount = (price * quantity).toFixed(2);
-            const discountedAmount = ((price * quantity) * ((100 - discountRate) / 100)).toFixed(2);
+            const amount = window.round(price * quantity, 2);
+            const discountedAmount = window.round((price * quantity) * ((100 - discountRate) / 100), 2);
 
             el.find("span.rate:not(.discount)").html(price);
             el.find("span.quantity").html(quantity);
@@ -162,7 +173,16 @@
                 el.find("span.discounted.amount").html(discountedAmount);
             } else {
                 el.find(".discount.info").hide();
-            }
+            };
+
+            if (isTaxableItem) {
+                const tax = window.round(discountedAmount * taxRate / 100, 2);
+                const amountPlusTax = window.round(discountedAmount + tax, 2);
+                el.find(".tax.info .tax-amount").html(tax);
+                el.find(".tax.info .tax-rate").html(window.round(taxRate, 2));
+                el.find(".tax.info .amount-plus-tax").html(amountPlusTax);
+                el.find(".tax.info").show();
+            };
 
             window.updateTotal();
         };
@@ -170,7 +190,7 @@
         quantityInput.on("keyup", function () {
             const el = $(this);
             const parentInfo = el.parent().parent();
-            updateItemTotal(parentInfo);
+            updateItemInfo(parentInfo);
         });
 
         discountInput.on("keyup", function () {
@@ -183,13 +203,13 @@
             };
 
             const parentInfo = el.parent().parent();
-            updateItemTotal(parentInfo);
+            updateItemInfo(parentInfo);
         });
 
         priceInput.on("keyup", function () {
             const el = $(this);
             const parentInfo = el.parent().parent();
-            updateItemTotal(parentInfo);
+            updateItemInfo(parentInfo);
         });
 
         discountInput.on("blur", function () {
@@ -206,7 +226,7 @@
 
             el.val(el.val() + "%");
             const parentInfo = el.parent().parent();
-            updateItemTotal(parentInfo);
+            updateItemInfo(parentInfo);
         });
 
         function getPrice(el) {
@@ -426,6 +446,7 @@
             item.attr("data-valid-units", product.ValidUnits);
             item.attr("data-barcode", product.Barcode);
             item.attr("data-photo", product.Photo);
+            item.attr("data-is-taxable-item", product.IsTaxableItem);
             item.attr("data-selling-price", product.SellingPrice);
 
             if (product.HotItem) {
