@@ -13,6 +13,7 @@ namespace MixERP.Sales.DTO
         public string StoreCode { get; set; }
         public string StoreName { get; set; }
         public int ItemId { get; set; }
+        public bool IsTaxableItem { get; set; }
         public string ItemCode { get; set; }
         public string ItemName { get; set; }
         public decimal Quantity { get; set; }
@@ -25,6 +26,7 @@ namespace MixERP.Sales.DTO
         public string BaseUnitName { get; set; }
         public decimal Price { get; set; }
         public decimal Discount { get; set; }
+        public decimal Tax { get; set; }
         public decimal ShippingCharge { get; set; }
         public decimal Amount { get; set; }
     }

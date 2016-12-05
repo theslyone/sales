@@ -109,6 +109,8 @@ BEGIN
                 - 
                 inventory.checkout_details.discount 
                 + 
+                inventory.checkout_details.tax
+                + 
                 inventory.checkout_details.shipping_charge
             )
         FROM inventory.checkout_details

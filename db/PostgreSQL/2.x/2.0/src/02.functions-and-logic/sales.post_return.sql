@@ -48,11 +48,15 @@ $$
     DECLARE _cost_of_goods_sold     money_strict2;
     DECLARE _ck_id                  bigint;
     DECLARE _sales_id               bigint;
+    DECLARE _tax_total              public.money_strict2;
+    DECLARE _tax_account_id                 integer;
     DECLARE this                    RECORD;
 BEGIN
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
         RETURN 0;
     END IF;
+
+    _tax_account_id                         := finance.get_sales_tax_account_id_by_office_id(_office_id);
 
     IF(NOT sales.validate_items_for_return(_transaction_master_id, _details)) THEN
         RETURN 0;
@@ -94,6 +98,7 @@ BEGIN
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),
         discount                        public.money_strict2 DEFAULT(0),
         discount_rate                   public.decimal_strict2,
+        tax                             public.money_strict2,
         shipping_charge                 public.money_strict2,
         sales_account_id                integer,
         sales_discount_account_id       integer,
@@ -102,8 +107,8 @@ BEGIN
         cost_of_goods_sold_account_id   integer
     ) ON COMMIT DROP;
         
-    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
-    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
+    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge
     FROM explode_array(_details);
 
     UPDATE temp_checkout_details 
@@ -139,6 +144,7 @@ BEGIN
     INSERT INTO finance.transaction_master(transaction_master_id, transaction_counter, transaction_code, book, value_date, book_date, user_id, login_id, office_id, cost_center_id, reference_number, statement_reference)
     SELECT _tran_master_id, _tran_counter, _tran_code, _book_name, _value_date, _book_date, _user_id, _login_id, _office_id, _cost_center_id, _reference_number, _statement_reference;
         
+    SELECT SUM(COALESCE(tax, 0))                                INTO _tax_total FROM temp_checkout_details;
     SELECT SUM(COALESCE(discount, 0))                           INTO _discount_total FROM temp_checkout_details;
     SELECT SUM(COALESCE(price, 0) * COALESCE(quantity, 0))      INTO _grand_total FROM temp_checkout_details;
 
@@ -178,6 +184,11 @@ BEGIN
         GROUP BY sales_discount_account_id;
     END IF;
 
+    IF(COALESCE(_tax_total, 0) > 0) THEN
+        INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
+        SELECT _tran_master_id, _book_name, _office_id, _value_date, _book_date, 'Dr', _tax_account_id, _statement_reference, _default_currency_code, _tax_total, _default_currency_code, 1, _tax_total;
+    END IF;	
+
     IF(_is_credit) THEN
         INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
         SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Cr',  inventory.get_account_id_by_customer_id(_customer_id), _statement_reference, _default_currency_code, _grand_total - _discount_total, _default_currency_code, 1, _grand_total - _discount_total;
@@ -213,8 +224,8 @@ LANGUAGE plpgsql;
 --     1::integer, --_office_id                      integer,
 --     1::integer, --_user_id                        integer,
 --     1::bigint, --_login_id                       bigint,
---     '11/24/2016'::date, --_value_date                     date,
---     '11/24/2016'::date, --_book_date                      date,
+--     finance.get_value_date(1), --_value_date                     date,
+--     finance.get_value_date(1), --_book_date                      date,
 --     1::integer, --_store_id                       integer,
 --     1::integer, --_counter_id                       integer,
 --     1::integer, --_customer_id                    integer,
@@ -223,10 +234,10 @@ LANGUAGE plpgsql;
 --     ''::text, --_statement_reference            text,
 --     ARRAY
 --     [
---         ROW(1, 'Dr', 1, 1, 1,180000, 0, 200)::sales.sales_detail_type,
---         ROW(1, 'Dr', 2, 1, 7,130000, 300, 30)::sales.sales_detail_type,
---         ROW(1, 'Dr', 3, 1, 1,110000, 5000, 50)::sales.sales_detail_type
+--         ROW(1, 'Dr', 1, 1, 1,180000, 0, 10, 200)::sales.sales_detail_type,
+--         ROW(1, 'Dr', 2, 1, 7,130000, 300, 10, 30)::sales.sales_detail_type,
+--         ROW(1, 'Dr', 3, 1, 1,110000, 5000, 10, 50)::sales.sales_detail_type
 --     ]
 -- );
--- 
--- 
+
+

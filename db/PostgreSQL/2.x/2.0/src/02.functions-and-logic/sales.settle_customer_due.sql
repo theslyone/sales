@@ -40,6 +40,8 @@ BEGIN
             - 
             inventory.checkout_details.discount 
             + 
+            inventory.checkout_details.tax
+            + 
             inventory.checkout_details.shipping_charge
         ) INTO _total_sales
     FROM inventory.checkouts
@@ -66,6 +68,8 @@ BEGIN
                 (inventory.checkout_details.quantity * inventory.checkout_details.price) 
                 - 
                 inventory.checkout_details.discount 
+                + 
+                inventory.checkout_details.tax
                 + 
                 inventory.checkout_details.shipping_charge
             ) as due

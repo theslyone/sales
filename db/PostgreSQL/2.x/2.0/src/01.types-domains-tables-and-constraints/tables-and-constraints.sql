@@ -168,6 +168,7 @@ CREATE TABLE sales.quotation_details
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
     discount_rate                           public.decimal_strict2 NOT NULL DEFAULT(0),    
+    tax                                     public.money_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
     quantity                                public.decimal_strict2 NOT NULL
@@ -202,6 +203,7 @@ CREATE TABLE sales.order_details
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
     discount_rate                           public.decimal_strict2 NOT NULL DEFAULT(0),    
+    tax                                     public.money_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
     quantity                                public.decimal_strict2 NOT NULL
@@ -388,6 +390,7 @@ AS
     unit_id           	integer,
     price               public.money_strict,
     discount_rate       public.money_strict2,
+    tax                 public.money_strict2,
     shipping_charge     public.money_strict2
 );
 

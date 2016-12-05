@@ -169,6 +169,7 @@ CREATE TABLE sales.quotation_details
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
     discount_rate                           public.decimal_strict2 NOT NULL DEFAULT(0),    
+    tax                                     public.money_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
     quantity                                public.decimal_strict2 NOT NULL
@@ -203,6 +204,7 @@ CREATE TABLE sales.order_details
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
     discount_rate                           public.decimal_strict2 NOT NULL DEFAULT(0),    
+    tax                                     public.money_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
     quantity                                public.decimal_strict2 NOT NULL
@@ -389,6 +391,7 @@ AS
     unit_id           	integer,
     price               public.money_strict,
     discount_rate       public.money_strict2,
+    tax                 public.money_strict2,
     shipping_charge     public.money_strict2
 );
 
@@ -1445,6 +1448,8 @@ BEGIN
                 - 
                 inventory.checkout_details.discount 
                 + 
+                inventory.checkout_details.tax
+                + 
                 inventory.checkout_details.shipping_charge
             )
         FROM inventory.checkout_details
@@ -1862,11 +1867,15 @@ $$
     DECLARE _cost_of_goods_sold     money_strict2;
     DECLARE _ck_id                  bigint;
     DECLARE _sales_id               bigint;
+    DECLARE _tax_total              public.money_strict2;
+    DECLARE _tax_account_id                 integer;
     DECLARE this                    RECORD;
 BEGIN
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
         RETURN 0;
     END IF;
+
+    _tax_account_id                         := finance.get_sales_tax_account_id_by_office_id(_office_id);
 
     IF(NOT sales.validate_items_for_return(_transaction_master_id, _details)) THEN
         RETURN 0;
@@ -1908,6 +1917,7 @@ BEGIN
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),
         discount                        public.money_strict2 DEFAULT(0),
         discount_rate                   public.decimal_strict2,
+        tax                             public.money_strict2,
         shipping_charge                 public.money_strict2,
         sales_account_id                integer,
         sales_discount_account_id       integer,
@@ -1916,8 +1926,8 @@ BEGIN
         cost_of_goods_sold_account_id   integer
     ) ON COMMIT DROP;
         
-    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
-    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
+    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge
     FROM explode_array(_details);
 
     UPDATE temp_checkout_details 
@@ -1953,6 +1963,7 @@ BEGIN
     INSERT INTO finance.transaction_master(transaction_master_id, transaction_counter, transaction_code, book, value_date, book_date, user_id, login_id, office_id, cost_center_id, reference_number, statement_reference)
     SELECT _tran_master_id, _tran_counter, _tran_code, _book_name, _value_date, _book_date, _user_id, _login_id, _office_id, _cost_center_id, _reference_number, _statement_reference;
         
+    SELECT SUM(COALESCE(tax, 0))                                INTO _tax_total FROM temp_checkout_details;
     SELECT SUM(COALESCE(discount, 0))                           INTO _discount_total FROM temp_checkout_details;
     SELECT SUM(COALESCE(price, 0) * COALESCE(quantity, 0))      INTO _grand_total FROM temp_checkout_details;
 
@@ -1992,6 +2003,11 @@ BEGIN
         GROUP BY sales_discount_account_id;
     END IF;
 
+    IF(COALESCE(_tax_total, 0) > 0) THEN
+        INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
+        SELECT _tran_master_id, _book_name, _office_id, _value_date, _book_date, 'Dr', _tax_account_id, _statement_reference, _default_currency_code, _tax_total, _default_currency_code, 1, _tax_total;
+    END IF;	
+
     IF(_is_credit) THEN
         INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
         SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Cr',  inventory.get_account_id_by_customer_id(_customer_id), _statement_reference, _default_currency_code, _grand_total - _discount_total, _default_currency_code, 1, _grand_total - _discount_total;
@@ -2027,8 +2043,8 @@ LANGUAGE plpgsql;
 --     1::integer, --_office_id                      integer,
 --     1::integer, --_user_id                        integer,
 --     1::bigint, --_login_id                       bigint,
---     '11/24/2016'::date, --_value_date                     date,
---     '11/24/2016'::date, --_book_date                      date,
+--     finance.get_value_date(1), --_value_date                     date,
+--     finance.get_value_date(1), --_book_date                      date,
 --     1::integer, --_store_id                       integer,
 --     1::integer, --_counter_id                       integer,
 --     1::integer, --_customer_id                    integer,
@@ -2037,13 +2053,13 @@ LANGUAGE plpgsql;
 --     ''::text, --_statement_reference            text,
 --     ARRAY
 --     [
---         ROW(1, 'Dr', 1, 1, 1,180000, 0, 200)::sales.sales_detail_type,
---         ROW(1, 'Dr', 2, 1, 7,130000, 300, 30)::sales.sales_detail_type,
---         ROW(1, 'Dr', 3, 1, 1,110000, 5000, 50)::sales.sales_detail_type
+--         ROW(1, 'Dr', 1, 1, 1,180000, 0, 10, 200)::sales.sales_detail_type,
+--         ROW(1, 'Dr', 2, 1, 7,130000, 300, 10, 30)::sales.sales_detail_type,
+--         ROW(1, 'Dr', 3, 1, 1,110000, 5000, 10, 50)::sales.sales_detail_type
 --     ]
 -- );
--- 
--- 
+
+
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.post_sales.sql --<--<--
@@ -2116,15 +2132,16 @@ $$
     DECLARE _transaction_master_id          bigint;
     DECLARE _checkout_id                    bigint;
     DECLARE _checkout_detail_id             bigint;
-    DECLARE _grand_total                    money_strict;
-    DECLARE _discount_total                 money_strict2;
-    DECLARE _receivable                     money_strict2;
+    DECLARE _grand_total                    public.money_strict;
+    DECLARE _discount_total                 public.money_strict2;
+    DECLARE _receivable                     public.money_strict2;
     DECLARE _default_currency_code          national character varying(12);
     DECLARE _is_periodic                    boolean = inventory.is_periodic_inventory(_office_id);
-    DECLARE _cost_of_goods                  money_strict;
+    DECLARE _cost_of_goods                  public.money_strict;
     DECLARE _tran_counter                   integer;
     DECLARE _transaction_code               text;
-    DECLARE _shipping_charge                money_strict2;
+    DECLARE _tax_total                      public.money_strict2;
+    DECLARE _shipping_charge                public.money_strict2;
     DECLARE _cash_repository_id             integer;
     DECLARE _cash_account_id                integer;
     DECLARE _is_cash                        boolean = false;
@@ -2136,12 +2153,14 @@ $$
     DECLARE _default_discount_account_id    integer;
     DECLARE _fiscal_year_code               national character varying(12);
     DECLARE _invoice_number                 bigint;
+    DECLARE _tax_account_id                 integer;
     DECLARE this                            RECORD;
 BEGIN        
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
         RETURN 0;
     END IF;
-    
+
+    _tax_account_id                         := finance.get_sales_tax_account_id_by_office_id(_office_id);
     _default_currency_code                  := core.get_currency_code_by_office_id(_office_id);
     _cash_account_id                        := inventory.get_cash_account_id_by_store_id(_store_id);
     _cash_repository_id                     := inventory.get_cash_repository_id_by_store_id(_store_id);
@@ -2196,6 +2215,7 @@ BEGIN
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),
         discount_rate                   public.decimal_strict2,
         discount                        public.money_strict2,
+        tax                             public.money_strict2,
         shipping_charge                 public.money_strict2,
         sales_account_id                integer,
         sales_discount_account_id       integer,
@@ -2203,8 +2223,8 @@ BEGIN
         cost_of_goods_sold_account_id   integer
     ) ON COMMIT DROP;
 
-    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
-    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
+    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge
     FROM explode_array(_details);
 
     
@@ -2273,9 +2293,10 @@ BEGIN
     SELECT SUM(COALESCE(discount, 0))                           INTO _discount_total FROM temp_checkout_details;
     SELECT SUM(COALESCE(price, 0) * COALESCE(quantity, 0))      INTO _grand_total FROM temp_checkout_details;
     SELECT SUM(COALESCE(shipping_charge, 0))                    INTO _shipping_charge FROM temp_checkout_details;
+    SELECT SUM(COALESCE(tax, 0))                                INTO _tax_total FROM temp_checkout_details;
 
      
-     _receivable                    := COALESCE(_grand_total, 0) - COALESCE(_discount_total, 0)+ COALESCE(_shipping_charge, 0);
+     _receivable                    := COALESCE(_grand_total, 0) - COALESCE(_discount_total, 0) + COALESCE(_tax_total, 0) + COALESCE(_shipping_charge, 0);
         
     IF(_is_flat_discount AND _discount > _receivable) THEN
         RAISE EXCEPTION 'The discount amount cannot be greater than total amount.';
@@ -2351,6 +2372,11 @@ BEGIN
         END IF;
     END IF;
 
+    IF(COALESCE(_tax_total, 0) > 0) THEN
+        INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
+        SELECT 'Cr', _tax_account_id, _statement_reference, _default_currency_code, _tax_total, 1, _default_currency_code, _tax_total;
+    END IF;
+
     IF(COALESCE(_shipping_charge, 0) > 0) THEN
         INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
         SELECT 'Cr', inventory.get_account_id_by_shipper_id(_shipper_id), _statement_reference, _default_currency_code, _shipping_charge, 1, _default_currency_code, _shipping_charge;                
@@ -2405,8 +2431,8 @@ BEGIN
     LOOP
         _checkout_detail_id        := nextval(pg_get_serial_sequence('inventory.checkout_details', 'checkout_detail_id'));
 
-        INSERT INTO inventory.checkout_details(checkout_detail_id, value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, shipping_charge)
-        SELECT _checkout_detail_id, _value_date, _book_date, this.checkout_id, this.tran_type, this.store_id, this.item_id, this.quantity, this.unit_id, this.base_quantity, this.base_unit_id, this.price, COALESCE(this.cost_of_goods_sold, 0), this.discount, this.shipping_charge 
+        INSERT INTO inventory.checkout_details(checkout_detail_id, value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, tax, shipping_charge)
+        SELECT _checkout_detail_id, _value_date, _book_date, this.checkout_id, this.tran_type, this.store_id, this.item_id, this.quantity, this.unit_id, this.base_quantity, this.base_unit_id, this.price, COALESCE(this.cost_of_goods_sold, 0), this.discount, this.tax, this.shipping_charge 
         FROM temp_checkout_details
         WHERE id = this.id;
     END LOOP;
@@ -2464,8 +2490,8 @@ $$
 LANGUAGE plpgsql;
 
 
-
-
+-- 
+-- 
 -- SELECT * FROM sales.post_sales
 -- (
 --     1, 1, 1, 1, finance.get_value_date(1), finance.get_value_date(1), 1, 'asdf', 'Test', 
@@ -2473,13 +2499,13 @@ LANGUAGE plpgsql;
 --     inventory.get_customer_id_by_customer_code('DEF'), 1, 1, 1,
 --     null, true, 1000,
 --     ARRAY[
---     ROW(1, 'Cr', 1, 1, 1,180000, 0, 0)::sales.sales_detail_type,
---     ROW(1, 'Cr', 2, 1, 7,130000, 0, 0)::sales.sales_detail_type,
---     ROW(1, 'Cr', 3, 1, 1,110000, 0, 0)::sales.sales_detail_type],
+--     ROW(1, 'Cr', 1, 1, 1,180000, 0, 10, 0)::sales.sales_detail_type,
+--     ROW(1, 'Cr', 2, 1, 7,130000, 0, 10, 0)::sales.sales_detail_type,
+--     ROW(1, 'Cr', 3, 1, 1,110000, 0, 10, 0)::sales.sales_detail_type],
 --     NULL,
 --     NULL
 -- );
-
+-- 
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.refresh_materialized_views.sql --<--<--
@@ -2546,6 +2572,8 @@ BEGIN
             - 
             inventory.checkout_details.discount 
             + 
+            inventory.checkout_details.tax
+            + 
             inventory.checkout_details.shipping_charge
         ) INTO _total_sales
     FROM inventory.checkouts
@@ -2572,6 +2600,8 @@ BEGIN
                 (inventory.checkout_details.quantity * inventory.checkout_details.price) 
                 - 
                 inventory.checkout_details.discount 
+                + 
+                inventory.checkout_details.tax
                 + 
                 inventory.checkout_details.shipping_charge
             ) as due
@@ -2653,13 +2683,14 @@ BEGIN
         unit_id             integer,
         price               public.money_strict,
         discount_rate       public.decimal_strict2,
+        tax                 money_strict2,
         shipping_charge     money_strict2,
         root_unit_id        integer,
         base_quantity       numeric(24, 4)
     ) ON COMMIT DROP;
 
-    INSERT INTO details_temp(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
-    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
+    INSERT INTO details_temp(store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge
     FROM explode_array(_details);
 
     UPDATE details_temp
@@ -3140,6 +3171,7 @@ SELECT
     inventory.items.item_id,
     inventory.items.item_code,
     inventory.items.item_name,
+    inventory.items.is_taxable_item,
     inventory.items.barcode,
     inventory.items.item_group_id,
     inventory.item_groups.item_group_name,

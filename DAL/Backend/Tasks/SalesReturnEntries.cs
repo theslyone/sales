@@ -24,7 +24,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks
             for (int i = 0; i < details.Count; i++)
             {
                 items.Add(string.Format(CultureInfo.InvariantCulture,
-                    "ROW(@StoreId{0}, @TransactionType{0}, @ItemId{0}, @Quantity{0}, @UnitId{0}, @Price{0}, @DiscountRate{0}, @ShippingCharge{0})::sales.sales_detail_type",
+                    "ROW(@StoreId{0}, @TransactionType{0}, @ItemId{0}, @Quantity{0}, @UnitId{0}, @Price{0}, @DiscountRate{0}, @Tax{0}, @ShippingCharge{0})::sales.sales_detail_type",
                     i.ToString(CultureInfo.InvariantCulture)));
             }
 
@@ -46,6 +46,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks
                     parameters.Add(new NpgsqlParameter("@UnitId" + i, details[i].UnitId));
                     parameters.Add(new NpgsqlParameter("@Price" + i, details[i].Price));
                     parameters.Add(new NpgsqlParameter("@DiscountRate" + i, details[i].DiscountRate));
+                    parameters.Add(new NpgsqlParameter("@Tax" + i, details[i].Tax));
                     parameters.Add(new NpgsqlParameter("@ShippingCharge" + i, details[i].ShippingCharge));
                 }
             }
