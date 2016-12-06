@@ -184,81 +184,79 @@ WriteLiteral("@media screen and (min-width: 1400px) {\r\n        #pos-container 
 "          font-weight: 100;\r\n                text-transform: uppercase;\r\n       " +
 "     }\r\n\r\n            .sales.items .item .info.block .price.info {\r\n            " +
 "    padding-top: 4px;\r\n            }\r\n\r\n            .sales.items .item .info.blo" +
-"ck .price.info,\r\n            .sales.items .item .info.block .tax.info,\r\n        " +
-"    .sales.items .item .info.block .discount.info {\r\n                font-size: " +
-"1.1em;\r\n                text-align: left;\r\n                padding: 0;\r\n        " +
-"        text-transform: none;\r\n                color: #fbd842;\r\n            }\r\n\r" +
-"\n\r\n    .tender.info {\r\n        background-color: #333;\r\n        width: 100%;\r\n  " +
-"      cursor: pointer;\r\n        margin: 0 0 8px 0;\r\n        padding: 6px 0;\r\n   " +
-" }\r\n\r\n\r\n        .tender.info:hover {\r\n            background-color: #3f3f3f;\r\n  " +
-"      }\r\n\r\n\r\n    .summary.items {\r\n        padding: 0.5em 1em;\r\n        display:" +
-" flex;\r\n    }\r\n\r\n        .summary.items > .item {\r\n            display: inline-f" +
-"lex;\r\n            flex-direction: column;\r\n            padding: 2px;\r\n        }\r" +
-"\n\r\n    .three.summary.items > .item {\r\n        width: 32%;\r\n    }\r\n\r\n    .two.su" +
-"mmary.items > .item {\r\n        width: 48%;\r\n    }\r\n\r\n    .one.summary.items > .i" +
-"tem {\r\n        width: 96%;\r\n    }\r\n\r\n    .summary.items > .item > .description {" +
-"\r\n        padding-bottom: 0.5em;\r\n        font-size: 0.9em;\r\n        text-align:" +
-" left;\r\n    }\r\n\r\n    .summary.items > .item > .money {\r\n        padding-top: 0.1" +
-"em;\r\n        font-size: 3em;\r\n    }\r\n\r\n\r\n    input.pan.number,\r\n    input.custom" +
-"er.name,\r\n    input.customer.address {\r\n        font-size: 12px !important;\r\n   " +
-"     padding: 8px !important;\r\n    }\r\n\r\n    .customer.name.item {\r\n        width" +
-": 40% !important;\r\n    }\r\n\r\n    .customer.address.item {\r\n        width: 30% !im" +
-"portant;\r\n    }\r\n\r\n    .pan.number.item {\r\n        width: 25% !important;\r\n    }" +
-"\r\n\r\n    .inverted.dropdown,\r\n    .inverted.dropdown input.search,\r\n    .inverted" +
-".dropdown .menu,\r\n    .inverted.dropdown .item,\r\n    .inverted.dropdown .message" +
-" {\r\n        background-color: #555 !important;\r\n        color: #eee !important;\r" +
-"\n        border: 1px solid #666 !important;\r\n    }\r\n\r\n        .inverted.dropdown" +
-" .item.selected,\r\n        .inverted.dropdown .item:hover {\r\n            backgrou" +
-"nd-color: #666 !important;\r\n        }\r\n\r\n    .summary.items input,\r\n    .summary" +
-".items select,\r\n    .inverted.input,\r\n    .inverted.select {\r\n        background" +
-"-color: #555 !important;\r\n        color: #eee !important;\r\n        border: 1px s" +
-"olid #666 !important;\r\n        padding: .87em;\r\n        border-radius: 0.4em;\r\n " +
-"       width: 100%;\r\n        -moz-appearance: none; /* Firefox */\r\n    }\r\n\r\n    " +
-".summary.items .dropdown {\r\n        padding: 1em !important;\r\n    }\r\n\r\n    selec" +
-"t.inverted {\r\n        background-color: #333;\r\n        border: 1px solid #555;\r\n" +
-"        width: 100%;\r\n        padding: 0.55em 1em;\r\n        border-radius: 0.5em" +
-";\r\n        -moz-appearance: none; /* Firefox */\r\n    }\r\n\r\n    #dashboard-contain" +
-"er {\r\n        padding: 0 !important;\r\n    }\r\n\r\n    #pos-container {\r\n        bac" +
-"kground-color: #555;\r\n    }\r\n\r\n\r\n    .pos.tabs {\r\n        display: flex;\r\n      " +
-"  padding: 0;\r\n    }\r\n\r\n\r\n        .pos.tabs .item {\r\n            display: inline" +
-"-flex;\r\n            flex-direction: column;\r\n            background: #444;\r\n    " +
-"        margin: 0 0.5em 0 0;\r\n            font-weight: bold;\r\n            font-s" +
-"ize: 1.3em;\r\n            padding: 0.75em 1em;\r\n            border-radius: 0.5em " +
-"0.5em 0 0;\r\n            cursor: pointer;\r\n            text-shadow: 2px 2px 20px " +
-"#222;\r\n        }\r\n\r\n            .pos.tabs .selected.item,\r\n            .pos.tabs" +
-" .active.item,\r\n            .pos.tabs .item:hover {\r\n                background:" +
-" #C6A13D;\r\n                color: #eee;\r\n            }\r\n\r\n    .circular.button {" +
-"\r\n        padding: 0.9em 2em !important;\r\n    }\r\n\r\n    #pos-items {\r\n        bac" +
-"kground-color: #3a3a3a;\r\n        height: 100%;\r\n        padding: 1em;\r\n    }\r\n\r\n" +
-"    .tabs .actions {\r\n        background: #555;\r\n        width: 100%;\r\n        t" +
-"ext-align: right;\r\n        margin: 0 !important;\r\n    }\r\n\r\n        .tabs .action" +
-"s .icon {\r\n            cursor: pointer;\r\n        }\r\n\r\n    .ui.action.panel.inver" +
-"ted.segment {\r\n        background: none !important;\r\n    }\r\n\r\n    .action.panel " +
-".toolbar {\r\n        display: flex;\r\n        background-color: #2f2f2f;\r\n        " +
-"background: linear-gradient(to top, #222, #444);\r\n        text-align: right;\r\n  " +
-"  }\r\n\r\n        .action.panel .toolbar > .item {\r\n            text-align: center;" +
-"\r\n            display: inline-flex;\r\n            flex-direction: column-reverse;" +
-"\r\n            background: #3f3f3f;\r\n            background: linear-gradient(to t" +
-"op, #222, #444); /* Standard syntax */\r\n            padding: 1em 0.6em;\r\n       " +
-"     border-right: 1px solid #333;\r\n            height: 3em;\r\n            width:" +
-" 2.5em;\r\n            font-size: 1.4em;\r\n            cursor: pointer;\r\n        }\r" +
-"\n\r\n\r\n            .action.panel .toolbar > .item:hover {\r\n                backgro" +
-"und: #C4A03D;\r\n                background: linear-gradient(to bottom, #C4A03D, #" +
-"C4343D); /* Standard syntax */\r\n            }\r\n\r\n    .summary.items > .item > .d" +
-"escription {\r\n        text-transform: uppercase;\r\n        font-weight: bold;\r\n  " +
-"  }\r\n\r\n    .header.items {\r\n        background-color: #3f3f3f;\r\n        backgrou" +
-"nd: linear-gradient(to top, #292929, #444); /* Standard syntax */\r\n        paddi" +
-"ng: 1em 1em 1.5em;\r\n    }\r\n\r\n\r\n\r\n        .header.items .count.item,\r\n        .he" +
-"ader.items .count.item .description {\r\n            text-align: right !important;" +
-"\r\n        }\r\n\r\n            .header.items .count.item .money {\r\n                c" +
-"olor: #FBD840;\r\n            }\r\n\r\n    .footer.items {\r\n        background-color: " +
-"#3f3f3f;\r\n        background: linear-gradient(to top, #292929, #3a3a3a); /* Stan" +
-"dard syntax */\r\n        padding: 1em;\r\n        text-align: right;\r\n    }\r\n\r\n    " +
-".action.panel.segment {\r\n        padding: 0;\r\n        border: 0;\r\n        margin" +
-": 0;\r\n    }\r\n\r\n    .payment.type.container {\r\n        padding-bottom: 1em;\r\n    " +
-"    border-bottom: 1px solid #444;\r\n    }\r\n\r\n    .show.anchor {\r\n        padding" +
-": 1em;\r\n        color: #C4A03D;\r\n    }\r\n</style>\r\n<style>\r\n    /*Semantic UI Ove" +
-"rride*/\r\n    ");
+"ck .info{\r\n                font-size: 1.1em;\r\n                text-align: left;\r" +
+"\n                padding: 0;\r\n                text-transform: none;\r\n           " +
+"     color: #fbd842;\r\n            }\r\n\r\n\r\n    .tender.info {\r\n        background-" +
+"color: #333;\r\n        width: 100%;\r\n        cursor: pointer;\r\n        margin: 0 " +
+"0 8px 0;\r\n        padding: 6px 0;\r\n    }\r\n\r\n\r\n        .tender.info:hover {\r\n    " +
+"        background-color: #3f3f3f;\r\n        }\r\n\r\n\r\n    .summary.items {\r\n       " +
+" padding: 0.5em 1em;\r\n        display: flex;\r\n    }\r\n\r\n        .summary.items > " +
+".item {\r\n            display: inline-flex;\r\n            flex-direction: column;\r" +
+"\n            padding: 2px;\r\n        }\r\n\r\n    .three.summary.items > .item {\r\n   " +
+"     width: 32%;\r\n    }\r\n\r\n    .two.summary.items > .item {\r\n        width: 48%;" +
+"\r\n    }\r\n\r\n    .one.summary.items > .item {\r\n        width: 96%;\r\n    }\r\n\r\n    ." +
+"summary.items > .item > .description {\r\n        padding-bottom: 0.5em;\r\n        " +
+"font-size: 0.9em;\r\n        text-align: left;\r\n    }\r\n\r\n    .summary.items > .ite" +
+"m > .money {\r\n        padding-top: 0.1em;\r\n        font-size: 3em;\r\n    }\r\n\r\n\r\n " +
+"   input.pan.number,\r\n    input.customer.name,\r\n    input.customer.address {\r\n  " +
+"      font-size: 12px !important;\r\n        padding: 8px !important;\r\n    }\r\n\r\n  " +
+"  .customer.name.item {\r\n        width: 40% !important;\r\n    }\r\n\r\n    .customer." +
+"address.item {\r\n        width: 30% !important;\r\n    }\r\n\r\n    .pan.number.item {\r" +
+"\n        width: 25% !important;\r\n    }\r\n\r\n    .inverted.dropdown,\r\n    .inverted" +
+".dropdown input.search,\r\n    .inverted.dropdown .menu,\r\n    .inverted.dropdown ." +
+"item,\r\n    .inverted.dropdown .message {\r\n        background-color: #555 !import" +
+"ant;\r\n        color: #eee !important;\r\n        border: 1px solid #666 !important" +
+";\r\n    }\r\n\r\n        .inverted.dropdown .item.selected,\r\n        .inverted.dropdo" +
+"wn .item:hover {\r\n            background-color: #666 !important;\r\n        }\r\n\r\n " +
+"   .summary.items input,\r\n    .summary.items select,\r\n    .inverted.input,\r\n    " +
+".inverted.select {\r\n        background-color: #555 !important;\r\n        color: #" +
+"eee !important;\r\n        border: 1px solid #666 !important;\r\n        padding: .8" +
+"7em;\r\n        border-radius: 0.4em;\r\n        width: 100%;\r\n        -moz-appearan" +
+"ce: none; /* Firefox */\r\n    }\r\n\r\n    .summary.items .dropdown {\r\n        paddin" +
+"g: 1em !important;\r\n    }\r\n\r\n    select.inverted {\r\n        background-color: #3" +
+"33;\r\n        border: 1px solid #555;\r\n        width: 100%;\r\n        padding: 0.5" +
+"5em 1em;\r\n        border-radius: 0.5em;\r\n        -moz-appearance: none; /* Firef" +
+"ox */\r\n    }\r\n\r\n    #dashboard-container {\r\n        padding: 0 !important;\r\n    " +
+"}\r\n\r\n    #pos-container {\r\n        background-color: #555;\r\n    }\r\n\r\n\r\n    .pos." +
+"tabs {\r\n        display: flex;\r\n        padding: 0;\r\n    }\r\n\r\n\r\n        .pos.tab" +
+"s .item {\r\n            display: inline-flex;\r\n            flex-direction: column" +
+";\r\n            background: #444;\r\n            margin: 0 0.5em 0 0;\r\n            " +
+"font-weight: bold;\r\n            font-size: 1.3em;\r\n            padding: 0.75em 1" +
+"em;\r\n            border-radius: 0.5em 0.5em 0 0;\r\n            cursor: pointer;\r\n" +
+"            text-shadow: 2px 2px 20px #222;\r\n        }\r\n\r\n            .pos.tabs " +
+".selected.item,\r\n            .pos.tabs .active.item,\r\n            .pos.tabs .ite" +
+"m:hover {\r\n                background: #C6A13D;\r\n                color: #eee;\r\n " +
+"           }\r\n\r\n    .circular.button {\r\n        padding: 0.9em 2em !important;\r\n" +
+"    }\r\n\r\n    #pos-items {\r\n        background-color: #3a3a3a;\r\n        height: 1" +
+"00%;\r\n        padding: 1em;\r\n    }\r\n\r\n    .tabs .actions {\r\n        background: " +
+"#555;\r\n        width: 100%;\r\n        text-align: right;\r\n        margin: 0 !impo" +
+"rtant;\r\n    }\r\n\r\n        .tabs .actions .icon {\r\n            cursor: pointer;\r\n " +
+"       }\r\n\r\n    .ui.action.panel.inverted.segment {\r\n        background: none !i" +
+"mportant;\r\n    }\r\n\r\n    .action.panel .toolbar {\r\n        display: flex;\r\n      " +
+"  background-color: #2f2f2f;\r\n        background: linear-gradient(to top, #222, " +
+"#444);\r\n        text-align: right;\r\n    }\r\n\r\n        .action.panel .toolbar > .i" +
+"tem {\r\n            text-align: center;\r\n            display: inline-flex;\r\n     " +
+"       flex-direction: column-reverse;\r\n            background: #3f3f3f;\r\n      " +
+"      background: linear-gradient(to top, #222, #444); /* Standard syntax */\r\n  " +
+"          padding: 1em 0.6em;\r\n            border-right: 1px solid #333;\r\n      " +
+"      height: 3em;\r\n            width: 2.5em;\r\n            font-size: 1.4em;\r\n  " +
+"          cursor: pointer;\r\n        }\r\n\r\n\r\n            .action.panel .toolbar > " +
+".item:hover {\r\n                background: #C4A03D;\r\n                background:" +
+" linear-gradient(to bottom, #C4A03D, #C4343D); /* Standard syntax */\r\n          " +
+"  }\r\n\r\n    .summary.items > .item > .description {\r\n        text-transform: uppe" +
+"rcase;\r\n        font-weight: bold;\r\n    }\r\n\r\n    .header.items {\r\n        backgr" +
+"ound-color: #3f3f3f;\r\n        background: linear-gradient(to top, #292929, #444)" +
+"; /* Standard syntax */\r\n        padding: 1em 1em 1.5em;\r\n    }\r\n\r\n\r\n\r\n        ." +
+"header.items .count.item,\r\n        .header.items .count.item .description {\r\n   " +
+"         text-align: right !important;\r\n        }\r\n\r\n            .header.items ." +
+"count.item .money {\r\n                color: #FBD840;\r\n            }\r\n\r\n    .foot" +
+"er.items {\r\n        background-color: #3f3f3f;\r\n        background: linear-gradi" +
+"ent(to top, #292929, #3a3a3a); /* Standard syntax */\r\n        padding: 1em;\r\n   " +
+"     text-align: right;\r\n    }\r\n\r\n    .action.panel.segment {\r\n        padding: " +
+"0;\r\n        border: 0;\r\n        margin: 0;\r\n    }\r\n\r\n    .payment.type.container" +
+" {\r\n        padding-bottom: 1em;\r\n        border-bottom: 1px solid #444;\r\n    }\r" +
+"\n\r\n    .show.anchor {\r\n        padding: 1em;\r\n        color: #C4A03D;\r\n    }\r\n</" +
+"style>\r\n<style>\r\n    /*Semantic UI Override*/\r\n    ");
 
 WriteLiteral(@"@media only screen and (max-width: 500px) {
         .ui.buttons {
@@ -357,7 +355,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                                ");
 
             
-            #line 667 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 665 "..\..\Views\Shared\POSScreen.cshtml"
                            Write(meta.OfficeName);
 
             
@@ -374,7 +372,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                                ");
 
             
-            #line 670 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 668 "..\..\Views\Shared\POSScreen.cshtml"
                            Write(meta.Name);
 
             
@@ -391,7 +389,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                                ");
 
             
-            #line 673 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 671 "..\..\Views\Shared\POSScreen.cshtml"
                            Write(meta.OfficeCode);
 
             
@@ -408,7 +406,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                                ");
 
             
-            #line 676 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 674 "..\..\Views\Shared\POSScreen.cshtml"
                            Write(meta.OfficeName);
 
             
@@ -461,7 +459,7 @@ WriteLiteral("></select>\r\n                                </div>\r\n          
 WriteLiteral("                    ");
 
             
-            #line 696 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 694 "..\..\Views\Shared\POSScreen.cshtml"
                Write(Html.PartialView("Shared/POSItemList.cshtml", TenantConvention.GetTenant()));
 
             
@@ -571,7 +569,7 @@ WriteLiteral(">\r\n");
 WriteLiteral("                            ");
 
             
-            #line 724 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 722 "..\..\Views\Shared\POSScreen.cshtml"
                        Write(Html.PartialView("Shared/SalesEntryForm.cshtml", TenantConvention.GetTenant()));
 
             
@@ -611,7 +609,7 @@ WriteLiteral(" id=\"SalesTaxRateHidden\"");
 WriteLiteral("/>\r\n\r\n\r\n");
 
             
-            #line 744 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 742 "..\..\Views\Shared\POSScreen.cshtml"
 Write(Html.PartialView("Shared/CustomerSearchModal.cshtml", TenantConvention.GetTenant()));
 
             
@@ -620,7 +618,7 @@ Write(Html.PartialView("Shared/CustomerSearchModal.cshtml", TenantConvention.Get
 WriteLiteral("\r\n");
 
             
-            #line 745 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 743 "..\..\Views\Shared\POSScreen.cshtml"
 Write(Html.PartialView("Shared/ReprintTicketModal.cshtml", TenantConvention.GetTenant()));
 
             
@@ -629,7 +627,7 @@ Write(Html.PartialView("Shared/ReprintTicketModal.cshtml", TenantConvention.GetT
 WriteLiteral("\r\n");
 
             
-            #line 746 "..\..\Views\Shared\POSScreen.cshtml"
+            #line 744 "..\..\Views\Shared\POSScreen.cshtml"
 Write(Html.PartialView("Shared/GiftCardSerachModal.cshtml", TenantConvention.GetTenant()));
 
             
