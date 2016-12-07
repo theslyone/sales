@@ -676,111 +676,109 @@ WriteLiteral("\r\n\r\n<script>\r\n    var pageLoaded = false;\r\n\r\n    $(docum
 "eFloat2($(\"#DiscountInputText\").val());\r\n        var discount;\r\n\r\n\r\n        var " +
 "totalPrice = 0;\r\n        var totalQuantity = 0;\r\n\r\n        $.each(candidates, fu" +
 "nction () {\r\n            const el = $(this);\r\n            const quantityEl = el." +
-"find(\"input.quantity\");\r\n            const discountEl = el.find(\"input.discount\"" +
-");\r\n\r\n            const quantity = window.parseFloat2(quantityEl.val() || 0);\r\n " +
-"           const discountRate = window.parseFloat2(discountEl.val().replace(\"%\"," +
-" \"\"));\r\n            const price = window.parseFloat2(el.find(\"input.price\").val(" +
-"));\r\n\r\n            const amount = price * quantity;\r\n            const discounte" +
-"dAmount = amount * ((100 - discountRate) / 100);\r\n            const amountPlusTa" +
-"x = window.parseFloat(el.find(\".amount-plus-tax\").html());\r\n\r\n            totalP" +
-"rice += (amountPlusTax || discountedAmount || amount);\r\n            totalQuantit" +
-"y += quantity;\r\n        });\r\n\r\n        totalPrice = parseFloat(window.round(tota" +
-"lPrice, 2));\r\n\r\n        if (couponDiscountType === 1 && couponDiscountRate > 0 &" +
-"& couponDiscountRate <= 100) {\r\n            discount = totalPrice * (couponDisco" +
-"untRate / 100);\r\n            totalPrice = totalPrice - discount;\r\n        } else" +
-" if (couponDiscountType === 2 && couponDiscountRate > 0) {\r\n            //Discou" +
-"nt amount\r\n            totalPrice = totalPrice - couponDiscountRate;\r\n        };" +
-"\r\n\r\n\r\n\r\n        amountEl.html(window.round(totalPrice, 2));\r\n        countEl.htm" +
-"l(window.round(totalQuantity, 2));\r\n    };\r\n\r\n\r\n\r\n</script>\r\n<script>\r\n    $(\"#C" +
-"learScreenButton\").unbind(\"click\").bind(\"click\", function () {\r\n        clearScr" +
-"een();\r\n    });\r\n\r\n    function clearScreen() {\r\n        $(\"#SalesItems\").html(\"" +
-"\");\r\n        $(\"#CustomerInputText\").removeAttr(\"data-customer-id\").val(\"\");\r\n  " +
-"      $(\"#TenderInputText\").val(\"\");\r\n        $(\"#ChangeInputText\").val(\"\");\r\n\r\n" +
-"        window.updateTotal();\r\n    };\r\n\r\n    function loadStores() {\r\n        wi" +
-"ndow.displayFieldBinder($(\"#StoreSelect\"), \"/api/forms/inventory/stores/display-" +
-"fields\", true);\r\n    };\r\n\r\n    function loadPaymentTerms() {\r\n        window.dis" +
-"playFieldBinder($(\"#PaymentTermSelect\"), \"/api/forms/sales/payment-terms/display" +
-"-fields\", false);\r\n    };\r\n\r\n    function loadShippers() {\r\n        window.displ" +
-"ayFieldBinder($(\"#ShipperSelect\"), \"/api/forms/inventory/shippers/display-fields" +
-"\", true);\r\n    };\r\n\r\n    function loadCostCenters() {\r\n        window.displayFie" +
-"ldBinder($(\"#CostCenterSelect\"), \"/api/forms/finance/cost-centers/display-fields" +
-"\", true);\r\n    };\r\n\r\n    function loadPriceTypes() {\r\n        window.displayFiel" +
-"dBinder($(\"#PriceTypeSelect\"), \"/api/forms/sales/price-types/display-fields\", tr" +
-"ue);\r\n    };\r\n\r\n\r\n    loadStores();\r\n    loadPriceTypes();\r\n\r\n    loadCostCenter" +
-"s();\r\n    loadShippers();\r\n    loadPaymentTerms();\r\n\r\n    $(\'.ui.customer.search" +
-"\').search({\r\n        apiSettings: {\r\n            url: \'/dashboard/sales/setup/cu" +
-"stomer/search/{query}\'\r\n        },\r\n        fields: {\r\n            results: \'Ite" +
-"ms\',\r\n            title: \'CustomerCode\',\r\n            description: \'CustomerName" +
-"\',\r\n            image: \'Photo\',\r\n            price: \'PhoneNumbers\'\r\n        },\r\n" +
-"        onSelect: function (result) {\r\n            const customerId = result.Cus" +
-"tomerId;\r\n            if (!customerId) {\r\n                return;\r\n            }" +
-";\r\n\r\n            $(\"#CustomerInputText\").attr(\"data-customer-id\", customerId);\r\n" +
-"        },\r\n        minCharacters: 1\r\n    });\r\n\r\n    $(\"#StoreSelect\").change(fu" +
-"nction () {\r\n        var el = $(this);\r\n\r\n        function loadCounters() {\r\n   " +
-"         const storeId = el.val();\r\n\r\n            if(!storeId){\r\n               " +
-" return;\r\n            };\r\n\r\n            const filters = [];\r\n            filters" +
-".push(window.getAjaxColumnFilter(\"WHERE\", \"StoreId\", \"int\", window.FilterConditi" +
-"ons.IsEqualTo, storeId));\r\n\r\n            window.displayFieldBinder($(\"#CounterSe" +
-"lect\"), \"/api/forms/inventory/counters/display-fields/get-where\", true, filters)" +
-";\r\n        };\r\n\r\n        loadCounters();\r\n    });\r\n</script>\r\n\r\n<script>\r\n    fu" +
-"nction initializeTabs() {\r\n        $(\".pos.tabs .item:not(.new)\").unbind(\"click\"" +
-").bind(\"click\", function () {\r\n            window.saveState();\r\n            $(\"." +
-"pos.tabs .item\").removeClass(\"selected\");\r\n            const el = $(this);\r\n    " +
-"        el.addClass(\"selected\");\r\n            window.loadState();\r\n        });\r\n" +
-"    };\r\n\r\n    $(\".tabs .new.item\").unbind(\"click\").bind(\"click\", function () {\r\n" +
-"        var el = $(this);\r\n        window.saveState();\r\n\r\n        function creat" +
-"eTab(id) {\r\n            const item = $(\"<div class=\'item\' />\");\r\n            ite" +
-"m.attr(\"id\", \"tab-item-\" + id);\r\n            item.html(id);\r\n\r\n            el.si" +
-"blings(\".actions\").before(item);\r\n        };\r\n\r\n        var items = [];\r\n       " +
-" const candidates = $(\".tabs .item:not(.new)\");\r\n\r\n        $.each(candidates, fu" +
-"nction () {\r\n            const el = $(this);\r\n            const id = parseInt(el" +
-".text());\r\n            items.push(id);\r\n        });\r\n\r\n        const max = windo" +
-"w.Enumerable.From(items).Max(function (x) { return x; });\r\n        var nextValue" +
-" = 1;\r\n\r\n        if (max) {\r\n            nextValue = max + 1;\r\n        };\r\n\r\n   " +
-"     createTab(nextValue);\r\n\r\n\r\n        initializeTabs();\r\n        $(\".tabs .ite" +
-"m\").removeClass(\"selected\");\r\n        $(\"#tab-item-\" + nextValue).addClass(\"sele" +
-"cted\");\r\n        clearScreen();\r\n    });\r\n\r\n    $(\".tabs .actions .delete.icon\")" +
-".unbind(\"click\").bind(\"click\", function () {\r\n        const activeEl = $(\".tabs " +
-".selected.item\");\r\n        const id = parseInt(activeEl.text());\r\n\r\n        if (" +
-"activeEl.length && id > 1) {\r\n            const confirmed = window.confirm(\"Are " +
-"you sure you want to delete this tab?\");\r\n\r\n            if (!confirmed) {\r\n     " +
-"           return;\r\n            };\r\n\r\n            window.removeState();\r\n\r\n     " +
-"       const previousEl = activeEl.prev(\".item\");\r\n            previousEl.addCla" +
-"ss(\"selected\");\r\n            activeEl.remove();\r\n            window.loadState();" +
-"\r\n        };\r\n    });\r\n\r\n    initializeTabs();\r\n\r\n    $(\".toolbar .item[data-pay" +
-"ment-type]\").unbind(\"click\").bind(\"click\", function () {\r\n        const el = $(t" +
-"his);\r\n        const paymentType = el.attr(\"data-payment-type\");\r\n        $(\".pa" +
-"yment.type.container [data-payment-type]\").hide();\r\n        $(\".payment.type.con" +
-"tainer [data-payment-type=\" + paymentType + \"]\").show();\r\n    });\r\n\r\n    $(\".sho" +
-"w.more.anchor\").unbind(\"click\").bind(\"click\", function () {\r\n        const more " +
-"= $(\".tender.info.items .more\");\r\n\r\n        more.show();\r\n        $(this).hide()" +
-";\r\n    });\r\n\r\n    $(\".show.less.anchor\").unbind(\"click\").bind(\"click\", function " +
-"() {\r\n        const more = $(\".tender.info.items .more\");\r\n\r\n        more.hide()" +
-";\r\n        $(\".show.more.anchor\").show();\r\n    });\r\n\r\n    $(document).ajaxStop(f" +
-"unction () {\r\n        if (!pageLoaded) {\r\n            $(\"#pos-container .dimmer\"" +
-").hide();\r\n            $(\"#pos-container .layout\").fadeIn(500);\r\n        };\r\n\r\n " +
-"       if (!pageLoaded) {\r\n            $(document).trigger(\"posready\");\r\n       " +
-" };\r\n\r\n        pageLoaded = true;\r\n    });\r\n\r\n\r\n</script>\r\n\r\n<script>\r\n    setTi" +
-"meout(function () {\r\n        $(\".decimal\").number(true, window.currencyDecimalPl" +
-"aces, \".\", \"\");\r\n    }, 100);\r\n\r\n    //$(\"select:not(.ui)\").addClass(\"inverted f" +
-"luid\").dropdown();\r\n\r\n    window.overridePath = \"/dashboard/sales/tasks/entry\";\r" +
-"\n</script>\r\n<script>\r\n    $(\"#GiftCardNumberInputText\").on(\"change\", function ()" +
-" {\r\n        function request(giftCardNumber) {\r\n            var url = \"/dashboar" +
-"d/loyalty/tasks/gift-cards/get-balance/{giftCardNumber}\";\r\n            url = url" +
-".replace(\"{giftCardNumber}\", giftCardNumber);\r\n\r\n            return window.getAj" +
-"axRequest(url, \"POST\");\r\n        };\r\n\r\n        const el = $(this);\r\n        cons" +
-"t giftCardNumber = el.val();\r\n\r\n        if (!giftCardNumber) {\r\n            retu" +
-"rn;\r\n        };\r\n\r\n        const ajax = request(giftCardNumber);\r\n\r\n        ajax" +
-".success(function (response) {\r\n            $(\"#GiftCardNumberBalanceInputText\")" +
-".val(response);\r\n        });\r\n    });\r\n</script>\r\n<script>\r\n    function getTaxR" +
-"ate() {\r\n        function request() {\r\n            const url = \"/api/forms/finan" +
-"ce/tax-setups/get-where/-1\";\r\n            const filters = [];\r\n            filte" +
-"rs.push(window.getAjaxColumnFilter(\"WHERE\", \"OfficeId\", \"int\", window.FilterCond" +
-"itions.IsEqualTo, window.metaView.OfficeId));\r\n\r\n            return window.getAj" +
-"axRequest(url, \"POST\", filters);\r\n        };\r\n\r\n        const ajax = request();\r" +
-"\n\r\n        ajax.success(function (response) {\r\n            const salesTaxRate = " +
-"window.parseFloat(response[0].SalesTaxRate);\r\n            $(\"#SalesTaxRateHidden" +
-"\").val(salesTaxRate);\r\n        });\r\n    };\r\n\r\n    getTaxRate();\r\n</script>");
+"find(\"input.quantity\");\r\n            const quantity = window.parseFloat2(quantit" +
+"yEl.val() || 0);\r\n\r\n            const discountedAmount = window.parseFloat(el.fi" +
+"nd(\".discounted.amount\").html());\r\n            const amountPlusTax = window.pars" +
+"eFloat(el.find(\".amount-plus-tax\").html());\r\n            const lineTotal = (amou" +
+"ntPlusTax || discountedAmount);\r\n            totalPrice += lineTotal;\r\n\r\n       " +
+"     totalQuantity += quantity;\r\n        });\r\n\r\n        totalPrice = parseFloat(" +
+"window.round(totalPrice, 2));\r\n\r\n        if (couponDiscountType === 1 && couponD" +
+"iscountRate > 0 && couponDiscountRate <= 100) {\r\n            discount = totalPri" +
+"ce * (couponDiscountRate / 100);\r\n            totalPrice = totalPrice - discount" +
+";\r\n        } else if (couponDiscountType === 2 && couponDiscountRate > 0) {\r\n   " +
+"         //Discount amount\r\n            totalPrice = totalPrice - couponDiscount" +
+"Rate;\r\n        };\r\n\r\n\r\n\r\n        amountEl.html(window.round(totalPrice, 2));\r\n  " +
+"      countEl.html(window.round(totalQuantity, 2));\r\n    };\r\n\r\n\r\n\r\n</script>\r\n<s" +
+"cript>\r\n    $(\"#ClearScreenButton\").unbind(\"click\").bind(\"click\", function () {\r" +
+"\n        clearScreen();\r\n    });\r\n\r\n    function clearScreen() {\r\n        $(\"#Sa" +
+"lesItems\").html(\"\");\r\n        $(\"#CustomerInputText\").removeAttr(\"data-customer-" +
+"id\").val(\"\");\r\n        $(\"#TenderInputText\").val(\"\");\r\n        $(\"#ChangeInputTe" +
+"xt\").val(\"\");\r\n\r\n        window.updateTotal();\r\n    };\r\n\r\n    function loadStore" +
+"s() {\r\n        window.displayFieldBinder($(\"#StoreSelect\"), \"/api/forms/inventor" +
+"y/stores/display-fields\", true);\r\n    };\r\n\r\n    function loadPaymentTerms() {\r\n " +
+"       window.displayFieldBinder($(\"#PaymentTermSelect\"), \"/api/forms/sales/paym" +
+"ent-terms/display-fields\", false);\r\n    };\r\n\r\n    function loadShippers() {\r\n   " +
+"     window.displayFieldBinder($(\"#ShipperSelect\"), \"/api/forms/inventory/shippe" +
+"rs/display-fields\", true);\r\n    };\r\n\r\n    function loadCostCenters() {\r\n        " +
+"window.displayFieldBinder($(\"#CostCenterSelect\"), \"/api/forms/finance/cost-cente" +
+"rs/display-fields\", true);\r\n    };\r\n\r\n    function loadPriceTypes() {\r\n        w" +
+"indow.displayFieldBinder($(\"#PriceTypeSelect\"), \"/api/forms/sales/price-types/di" +
+"splay-fields\", true);\r\n    };\r\n\r\n\r\n    loadStores();\r\n    loadPriceTypes();\r\n\r\n " +
+"   loadCostCenters();\r\n    loadShippers();\r\n    loadPaymentTerms();\r\n\r\n    $(\'.u" +
+"i.customer.search\').search({\r\n        apiSettings: {\r\n            url: \'/dashboa" +
+"rd/sales/setup/customer/search/{query}\'\r\n        },\r\n        fields: {\r\n        " +
+"    results: \'Items\',\r\n            title: \'CustomerCode\',\r\n            descripti" +
+"on: \'CustomerName\',\r\n            image: \'Photo\',\r\n            price: \'PhoneNumbe" +
+"rs\'\r\n        },\r\n        onSelect: function (result) {\r\n            const custom" +
+"erId = result.CustomerId;\r\n            if (!customerId) {\r\n                retur" +
+"n;\r\n            };\r\n\r\n            $(\"#CustomerInputText\").attr(\"data-customer-id" +
+"\", customerId);\r\n        },\r\n        minCharacters: 1\r\n    });\r\n\r\n    $(\"#StoreS" +
+"elect\").change(function () {\r\n        var el = $(this);\r\n\r\n        function load" +
+"Counters() {\r\n            const storeId = el.val();\r\n\r\n            if(!storeId){" +
+"\r\n                return;\r\n            };\r\n\r\n            const filters = [];\r\n  " +
+"          filters.push(window.getAjaxColumnFilter(\"WHERE\", \"StoreId\", \"int\", win" +
+"dow.FilterConditions.IsEqualTo, storeId));\r\n\r\n            window.displayFieldBin" +
+"der($(\"#CounterSelect\"), \"/api/forms/inventory/counters/display-fields/get-where" +
+"\", true, filters);\r\n        };\r\n\r\n        loadCounters();\r\n    });\r\n</script>\r\n\r" +
+"\n<script>\r\n    function initializeTabs() {\r\n        $(\".pos.tabs .item:not(.new)" +
+"\").unbind(\"click\").bind(\"click\", function () {\r\n            window.saveState();\r" +
+"\n            $(\".pos.tabs .item\").removeClass(\"selected\");\r\n            const el" +
+" = $(this);\r\n            el.addClass(\"selected\");\r\n            window.loadState(" +
+");\r\n        });\r\n    };\r\n\r\n    $(\".tabs .new.item\").unbind(\"click\").bind(\"click\"" +
+", function () {\r\n        var el = $(this);\r\n        window.saveState();\r\n\r\n     " +
+"   function createTab(id) {\r\n            const item = $(\"<div class=\'item\' />\");" +
+"\r\n            item.attr(\"id\", \"tab-item-\" + id);\r\n            item.html(id);\r\n\r\n" +
+"            el.siblings(\".actions\").before(item);\r\n        };\r\n\r\n        var ite" +
+"ms = [];\r\n        const candidates = $(\".tabs .item:not(.new)\");\r\n\r\n        $.ea" +
+"ch(candidates, function () {\r\n            const el = $(this);\r\n            const" +
+" id = parseInt(el.text());\r\n            items.push(id);\r\n        });\r\n\r\n        " +
+"const max = window.Enumerable.From(items).Max(function (x) { return x; });\r\n    " +
+"    var nextValue = 1;\r\n\r\n        if (max) {\r\n            nextValue = max + 1;\r\n" +
+"        };\r\n\r\n        createTab(nextValue);\r\n\r\n\r\n        initializeTabs();\r\n    " +
+"    $(\".tabs .item\").removeClass(\"selected\");\r\n        $(\"#tab-item-\" + nextValu" +
+"e).addClass(\"selected\");\r\n        clearScreen();\r\n    });\r\n\r\n    $(\".tabs .actio" +
+"ns .delete.icon\").unbind(\"click\").bind(\"click\", function () {\r\n        const act" +
+"iveEl = $(\".tabs .selected.item\");\r\n        const id = parseInt(activeEl.text())" +
+";\r\n\r\n        if (activeEl.length && id > 1) {\r\n            const confirmed = win" +
+"dow.confirm(\"Are you sure you want to delete this tab?\");\r\n\r\n            if (!co" +
+"nfirmed) {\r\n                return;\r\n            };\r\n\r\n            window.remove" +
+"State();\r\n\r\n            const previousEl = activeEl.prev(\".item\");\r\n            " +
+"previousEl.addClass(\"selected\");\r\n            activeEl.remove();\r\n            wi" +
+"ndow.loadState();\r\n        };\r\n    });\r\n\r\n    initializeTabs();\r\n\r\n    $(\".toolb" +
+"ar .item[data-payment-type]\").unbind(\"click\").bind(\"click\", function () {\r\n     " +
+"   const el = $(this);\r\n        const paymentType = el.attr(\"data-payment-type\")" +
+";\r\n        $(\".payment.type.container [data-payment-type]\").hide();\r\n        $(\"" +
+".payment.type.container [data-payment-type=\" + paymentType + \"]\").show();\r\n    }" +
+");\r\n\r\n    $(\".show.more.anchor\").unbind(\"click\").bind(\"click\", function () {\r\n  " +
+"      const more = $(\".tender.info.items .more\");\r\n\r\n        more.show();\r\n     " +
+"   $(this).hide();\r\n    });\r\n\r\n    $(\".show.less.anchor\").unbind(\"click\").bind(\"" +
+"click\", function () {\r\n        const more = $(\".tender.info.items .more\");\r\n\r\n  " +
+"      more.hide();\r\n        $(\".show.more.anchor\").show();\r\n    });\r\n\r\n    $(doc" +
+"ument).ajaxStop(function () {\r\n        if (!pageLoaded) {\r\n            $(\"#pos-c" +
+"ontainer .dimmer\").hide();\r\n            $(\"#pos-container .layout\").fadeIn(500);" +
+"\r\n        };\r\n\r\n        if (!pageLoaded) {\r\n            $(document).trigger(\"pos" +
+"ready\");\r\n        };\r\n\r\n        pageLoaded = true;\r\n    });\r\n\r\n\r\n</script>\r\n\r\n<s" +
+"cript>\r\n    setTimeout(function () {\r\n        $(\".decimal\").number(true, window." +
+"currencyDecimalPlaces, \".\", \"\");\r\n    }, 100);\r\n\r\n    //$(\"select:not(.ui)\").add" +
+"Class(\"inverted fluid\").dropdown();\r\n\r\n    window.overridePath = \"/dashboard/sal" +
+"es/tasks/entry\";\r\n</script>\r\n<script>\r\n    $(\"#GiftCardNumberInputText\").on(\"cha" +
+"nge\", function () {\r\n        function request(giftCardNumber) {\r\n            var" +
+" url = \"/dashboard/loyalty/tasks/gift-cards/get-balance/{giftCardNumber}\";\r\n    " +
+"        url = url.replace(\"{giftCardNumber}\", giftCardNumber);\r\n\r\n            re" +
+"turn window.getAjaxRequest(url, \"POST\");\r\n        };\r\n\r\n        const el = $(thi" +
+"s);\r\n        const giftCardNumber = el.val();\r\n\r\n        if (!giftCardNumber) {\r" +
+"\n            return;\r\n        };\r\n\r\n        const ajax = request(giftCardNumber)" +
+";\r\n\r\n        ajax.success(function (response) {\r\n            $(\"#GiftCardNumberB" +
+"alanceInputText\").val(response);\r\n        });\r\n    });\r\n</script>\r\n<script>\r\n   " +
+" function getTaxRate() {\r\n        function request() {\r\n            const url = " +
+"\"/api/forms/finance/tax-setups/get-where/-1\";\r\n            const filters = [];\r\n" +
+"            filters.push(window.getAjaxColumnFilter(\"WHERE\", \"OfficeId\", \"int\", " +
+"window.FilterConditions.IsEqualTo, window.metaView.OfficeId));\r\n\r\n            re" +
+"turn window.getAjaxRequest(url, \"POST\", filters);\r\n        };\r\n\r\n        const a" +
+"jax = request();\r\n\r\n        ajax.success(function (response) {\r\n            cons" +
+"t salesTaxRate = window.parseFloat(response[0].SalesTaxRate);\r\n            $(\"#S" +
+"alesTaxRateHidden\").val(salesTaxRate);\r\n        });\r\n    };\r\n\r\n    getTaxRate();" +
+"\r\n</script>");
 
         }
     }

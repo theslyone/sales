@@ -873,17 +873,13 @@
         $.each(candidates, function () {
             const el = $(this);
             const quantityEl = el.find("input.quantity");
-            const discountEl = el.find("input.discount");
-
             const quantity = window.parseFloat2(quantityEl.val() || 0);
-            const discountRate = window.parseFloat2(discountEl.val().replace("%", ""));
-            const price = window.parseFloat2(el.find("input.price").val());
 
-            const amount = price * quantity;
-            const discountedAmount = amount * ((100 - discountRate) / 100);
+            const discountedAmount = window.parseFloat(el.find(".discounted.amount").html());
             const amountPlusTax = window.parseFloat(el.find(".amount-plus-tax").html());
+            const lineTotal = (amountPlusTax || discountedAmount);
+            totalPrice += lineTotal;
 
-            totalPrice += (amountPlusTax || discountedAmount || amount);
             totalQuantity += quantity;
         });
 

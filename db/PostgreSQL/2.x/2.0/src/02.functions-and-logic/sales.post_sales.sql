@@ -168,7 +168,7 @@ BEGIN
         tran_type                       = 'Cr',
         base_quantity                   = inventory.get_base_quantity_by_unit_id(unit_id, quantity),
         base_unit_id                    = inventory.get_root_unit_id(unit_id),
-        discount                        = (price * quantity) * (discount_rate / 100);
+        discount                        = ROUND((price * quantity) * (discount_rate / 100), 2);
 
 
     UPDATE temp_checkout_details
@@ -225,10 +225,10 @@ BEGIN
         USING ERRCODE='P3201';
     END IF;
 
-    SELECT SUM(COALESCE(discount, 0))                           INTO _discount_total FROM temp_checkout_details;
+    SELECT ROUND(SUM(COALESCE(discount, 0)), 2)                 INTO _discount_total FROM temp_checkout_details;
     SELECT SUM(COALESCE(price, 0) * COALESCE(quantity, 0))      INTO _grand_total FROM temp_checkout_details;
     SELECT SUM(COALESCE(shipping_charge, 0))                    INTO _shipping_charge FROM temp_checkout_details;
-    SELECT SUM(COALESCE(tax, 0))                                INTO _tax_total FROM temp_checkout_details;
+    SELECT ROUND(SUM(COALESCE(tax, 0)), 2)                      INTO _tax_total FROM temp_checkout_details;
 
      
      _receivable                    := COALESCE(_grand_total, 0) - COALESCE(_discount_total, 0) + COALESCE(_tax_total, 0) + COALESCE(_shipping_charge, 0);
@@ -239,10 +239,10 @@ BEGIN
         RAISE EXCEPTION 'The discount rate cannot be greater than 100.';    
     END IF;
 
-    _coupon_discount                := _discount;
+    _coupon_discount                := ROUND(_discount, 2);
 
     IF(NOT _is_flat_discount AND COALESCE(_discount, 0) > 0) THEN
-        _coupon_discount            := _receivable * (_discount/100);
+        _coupon_discount            := ROUND(_receivable * (_discount/100), 2);
     END IF;
 
     IF(COALESCE(_coupon_discount, 0) > 0) THEN

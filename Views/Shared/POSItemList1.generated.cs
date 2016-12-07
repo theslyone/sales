@@ -143,145 +143,145 @@ WriteLiteral(">\r\n</div>\r\n<script>\r\n    var itemTemplate = `<div class=\"it
 "ntityEl = el.find(\"input.quantity\");\r\n            const discountEl = el.find(\"in" +
 "put.discount\");\r\n\r\n            const quantity = window.parseFloat2(quantityEl.va" +
 "l() || 0);\r\n            const discountRate = window.parseFloat2(discountEl.val()" +
-".replace(\"%\", \"\"));\r\n            const price = window.parseFloat2(el.find(\"input" +
-".price\").val());\r\n\r\n            const amount = window.round(price * quantity, 2)" +
-";\r\n            const discountedAmount = window.round((price * quantity) * ((100 " +
-"- discountRate) / 100), 2);\r\n\r\n            el.find(\"span.rate:not(.discount)\").h" +
-"tml(price);\r\n            el.find(\"span.quantity\").html(quantity);\r\n            e" +
-"l.find(\"span.amount\").html(amount);\r\n            el.find(\"span.discount.rate\").h" +
-"tml(\"\");\r\n            el.find(\"span.discounted.amount\").html(\"\");\r\n\r\n           " +
-" if (discountRate) {\r\n                el.find(\".discount.info\").show();\r\n       " +
-"         el.find(\"span.discount.rate\").html(discountEl.val().replace(\"%\", \"\") + " +
-"\"%\");\r\n                el.find(\"span.discounted.amount\").html(discountedAmount);" +
-"\r\n            } else {\r\n                el.find(\".discount.info\").hide();\r\n     " +
-"       };\r\n\r\n            if (isTaxableItem) {\r\n                const tax = windo" +
-"w.round(discountedAmount * taxRate / 100, 2);\r\n                const amountPlusT" +
-"ax = window.round(discountedAmount + tax, 2);\r\n                el.find(\".tax.inf" +
-"o .tax-amount\").html(tax);\r\n                el.find(\".tax.info .tax-rate\").html(" +
-"window.round(taxRate, 2));\r\n                el.find(\".tax.info .amount-plus-tax\"" +
-").html(amountPlusTax);\r\n                el.find(\".tax.info\").show();\r\n          " +
-"  };\r\n\r\n            window.updateTotal();\r\n        };\r\n\r\n        quantityInput.o" +
-"n(\"keyup\", function () {\r\n            const el = $(this);\r\n            const par" +
-"entInfo = el.parent().parent();\r\n            updateItemInfo(parentInfo);\r\n      " +
-"  });\r\n\r\n        discountInput.on(\"keyup\", function () {\r\n            const el =" +
-" $(this);\r\n\r\n            const rate = window.parseFloat2(el.val());\r\n           " +
-" if (rate > 100) {\r\n                el.val(\"100\");\r\n                return;\r\n   " +
-"         };\r\n\r\n            const parentInfo = el.parent().parent();\r\n           " +
-" updateItemInfo(parentInfo);\r\n        });\r\n\r\n        priceInput.on(\"keyup\", func" +
-"tion () {\r\n            const el = $(this);\r\n            const parentInfo = el.pa" +
-"rent().parent();\r\n            updateItemInfo(parentInfo);\r\n        });\r\n\r\n      " +
-"  discountInput.on(\"blur\", function () {\r\n            const el = $(this);\r\n     " +
-"       const value = el.val();\r\n\r\n            if (!value) {\r\n                ret" +
-"urn;\r\n            };\r\n\r\n            if (value.substr(value.length - 1) === \"%\") " +
-"{\r\n                return;\r\n            };\r\n\r\n            el.val(el.val() + \"%\")" +
-";\r\n            const parentInfo = el.parent().parent();\r\n            updateItemI" +
-"nfo(parentInfo);\r\n        });\r\n\r\n        function getPrice(el) {\r\n            fu" +
-"nction request(itemId, customerId, priceTypeId, unitId) {\r\n                var u" +
-"rl = \"/dashboard/sales/tasks/selling-price/{itemId}/{customerId}/{priceTypeId}/{" +
-"unitId}\";\r\n                url = url.replace(\"{itemId}\", itemId);\r\n             " +
-"   url = url.replace(\"{customerId}\", customerId);\r\n                url = url.rep" +
-"lace(\"{priceTypeId}\", priceTypeId);\r\n                url = url.replace(\"{unitId}" +
-"\", unitId);\r\n\r\n                return window.getAjaxRequest(url);\r\n            }" +
-";\r\n\r\n            const itemId = el.attr(\"data-item-id\");\r\n            const cust" +
-"omerId = parseInt($(\"#CustomerInputText\").attr(\"data-customer-id\")) || 0;\r\n     " +
-"       const priceTypeId = parseInt($(\"#PriceTypeSelect\").val()) || 0;\r\n        " +
-"    const unitId = el.val();\r\n\r\n            $(\".action.panel.segment\").addClass(" +
-"\"loading\");\r\n            const ajax = request(itemId, customerId, priceTypeId, u" +
-"nitId);\r\n\r\n            ajax.success(function (response) {\r\n                $(\".a" +
-"ction.panel.segment\").removeClass(\"loading\");\r\n                const priceInput " +
-"= el.parent().parent().parent().find(\"input.price\");\r\n                priceInput" +
-".val(response).trigger(\"keyup\");\r\n            });\r\n\r\n            ajax.fail(funct" +
-"ion (xhr) {\r\n                $(\".action.panel.segment\").removeClass(\"loading\");\r" +
-"\n                console.log(window.getAjaxErrorMessage(xhr));\r\n            });\r" +
-"\n        };\r\n\r\n        unitSelect.on(\"change\", function () {\r\n            getPri" +
-"ce($(this));\r\n        });\r\n\r\n        item.on(\"contextmenu\", function (e) {\r\n    " +
-"        e.preventDefault();\r\n            const el = $(this);\r\n            const " +
-"inputEl = el.find(\".number.block input\");\r\n            const buttonEl = el.find(" +
-"\".number.block button\");\r\n\r\n            inputEl.toggle();\r\n            buttonEl." +
-"toggle();\r\n        });\r\n\r\n        item.appendTo(targetEl);\r\n        quantityInpu" +
-"t.trigger(\"keyup\");\r\n        window.setNumberFormat();\r\n        window.updateTot" +
-"al();\r\n\r\n        var tabId = window.getSelectedTabId();\r\n        var triggerName" +
-" = \"itemAdded\";\r\n\r\n        $(document).trigger(triggerName, [tabId, itemId]);\r\n\r" +
-"\n        if (typeof (callback) === \"function\") {\r\n            callback(el);\r\n   " +
-"     };\r\n    };\r\n\r\n    function initializeClickAndAction() {\r\n        $(\"#POSIte" +
-"mList .item\").unbind(\"click\").bind(\"click\", function () {\r\n            const el " +
-"= $(this);\r\n\r\n            defaulPOSItemClick(el);\r\n        });\r\n    };\r\n\r\n    fu" +
-"nction fetchUnits() {\r\n        function request() {\r\n            const url = \"/a" +
-"pi/forms/inventory/units/all\";\r\n            return window.getAjaxRequest(url);\r\n" +
-"        };\r\n\r\n        const ajax = request();\r\n\r\n        ajax.success(function (" +
-"response) {\r\n            window.metaUnits = response;\r\n        });\r\n    };\r\n\r\n  " +
-"  function fetchProducts() {\r\n        function request() {\r\n            const ur" +
-"l = \"/dashboard/sales/tasks/items\";\r\n            return window.getAjaxRequest(ur" +
-"l);\r\n        };\r\n\r\n        const ajax = request();\r\n\r\n        ajax.success(funct" +
-"ion (response) {\r\n            window.products = response;\r\n            $(documen" +
-"t).trigger(\"itemFetched\");\r\n        });\r\n    };\r\n\r\n    $(\".search.panel input\")." +
-"keyup(function () {\r\n        const el = $(this);\r\n        const term = el.val();" +
-"\r\n\r\n        const categoryEl = $(\".category.list .selected.category\");\r\n        " +
-"var category = \"\";\r\n\r\n        if (categoryEl.length) {\r\n            category = c" +
-"ategoryEl.text();\r\n        };\r\n\r\n        window.displayProducts(category, term);" +
-"\r\n\r\n        initializeClickAndAction();\r\n    });\r\n\r\n    $(\".search.panel input\")" +
-".keydown(function (e) {\r\n        if (e.keyCode === 13) {\r\n            const item" +
-" = $(\".item.list .item:first\");\r\n\r\n            if (item.length) {\r\n             " +
-"   item.trigger(\"click\");\r\n            };\r\n        };\r\n    });\r\n\r\n    window.fet" +
-"chUnits();\r\n    window.fetchProducts();\r\n\r\n    $(document).on(\"itemFetched\", fun" +
-"ction () {\r\n        $(\"#POSDimmer\").removeClass(\"active\");\r\n        displayProdu" +
-"cts();\r\n        displayCategories();\r\n        initializeClickAndAction();\r\n    }" +
-");\r\n\r\n    function displayCategories() {\r\n        const categories = window.Enum" +
-"erable.From(products).Distinct(function (x) { return x.ItemGroupName }).Select(f" +
-"unction (x) { return x.ItemGroupName }).ToArray();\r\n        var targetEl = $(\".c" +
-"at.filter\");\r\n        $(\".category.list\").find(\".category\").remove();\r\n\r\n       " +
-" targetEl.unbind(\"click\").bind(\"click\", function () {\r\n            displayProduc" +
-"ts();\r\n            $(\".category\").removeClass(\"selected\");\r\n            targetEl" +
-".hide();\r\n            initializeClickAndAction();\r\n        });\r\n\r\n        $.each" +
-"(categories, function () {\r\n            const category = $(\"<div class=\'category" +
-"\' />\");\r\n            category.html(this);\r\n\r\n            category.unbind(\"click\"" +
-").bind(\"click\", function () {\r\n                $(\".search.panel input\").val(\"\");" +
-"\r\n                const el = $(this);\r\n                const name = el.text();\r\n" +
-"\r\n                if (name) {\r\n                    displayProducts(name);\r\n     " +
-"               $(\".category\").removeClass(\"selected\");\r\n                    el.a" +
-"ddClass(\"selected\");\r\n\r\n                    targetEl.show();\r\n                } " +
-"else {\r\n                    targetEl.hide();\r\n                };\r\n\r\n            " +
-"    initializeClickAndAction();\r\n            });\r\n\r\n            targetEl.before(" +
-"category);\r\n        });\r\n    };\r\n\r\n    function displayProducts(category, search" +
-"Query) {\r\n        var target = $(\"#POSItemList\");\r\n\r\n        var groupItems;\r\n\r\n" +
-"        if (!category && !searchQuery) {\r\n            groupItems = products;\r\n  " +
-"      } else {\r\n            if (category && searchQuery) {\r\n                grou" +
-"pItems = window.Enumerable\r\n                    .From(products)\r\n               " +
-"     .Where(function (x) {\r\n                        return x.ItemGroupName.toLow" +
-"erCase() === category.toString().toLowerCase()\r\n                            && x" +
-".ItemName.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1;\r\n              " +
-"      }).ToArray();\r\n            } else if (!category && searchQuery) {\r\n       " +
-"         groupItems = window.Enumerable\r\n                    .From(products)\r\n  " +
-"                  .Where(function (x) {\r\n                        return x.ItemNa" +
-"me.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1;\r\n                    }" +
-").ToArray();\r\n            } else {\r\n                groupItems = window.Enumerab" +
-"le\r\n                    .From(products)\r\n                    .Where(function (x)" +
-" {\r\n                        return x.ItemGroupName.toLowerCase() === category.to" +
-"String().toLowerCase();\r\n                    }).ToArray();\r\n            };\r\n    " +
-"    };\r\n\r\n\r\n        target.html(\"\").hide();\r\n\r\n        groupItems = window.Enume" +
-"rable.From(groupItems).OrderBy(function (x) { return x.ItemId; }).ToArray();\r\n\r\n" +
-"        $.each(groupItems, function () {\r\n            const product = this;\r\n\r\n " +
-"           const item = $(\"<div class=\'item\' />\");\r\n            item.attr(\"data-" +
-"item-id\", product.ItemId);\r\n            item.attr(\"data-item-code\", product.Item" +
-"Code);\r\n            item.attr(\"data-item-name\", product.ItemName);\r\n            " +
-"item.attr(\"data-item-group\", product.ItemGroupName);\r\n            item.attr(\"dat" +
-"a-brand\", product.BrandName);\r\n            item.attr(\"data-unit-id\", product.Uni" +
-"tId);\r\n            item.attr(\"data-valid-units\", product.ValidUnits);\r\n         " +
-"   item.attr(\"data-barcode\", product.Barcode);\r\n            item.attr(\"data-phot" +
-"o\", product.Photo);\r\n            item.attr(\"data-is-taxable-item\", product.IsTax" +
-"ableItem);\r\n            item.attr(\"data-selling-price\", product.SellingPrice);\r\n" +
-"\r\n            if (product.HotItem) {\r\n                item.addClass(\"hot\");\r\n   " +
-"         };\r\n\r\n            const info = $(\"<div class=\'info\' />\");\r\n\r\n          " +
-"  const price = $(\"<div class=\'price\' />\");\r\n            price.html(product.Sell" +
-"ingPrice);\r\n\r\n            price.appendTo(info);\r\n\r\n\r\n            const photo = $" +
-"(\"<div class=\'photo\' />\");\r\n\r\n            if (product.Photo) {\r\n                " +
-"const img = $(\"<img />\");\r\n                img.attr(\"src\", product.Photo + \"?Hei" +
-"ght=200&Width=200\");\r\n\r\n                img.appendTo(photo);\r\n            };\r\n\r\n" +
-"            photo.appendTo(info);\r\n\r\n            const name = $(\"<div class=\'nam" +
-"e\' />\");\r\n            name.html(product.ItemName);\r\n\r\n            name.appendTo(" +
-"info);\r\n\r\n            info.appendTo(item);\r\n            item.appendTo(target);\r\n" +
-"        });\r\n\r\n        if (searchQuery) {\r\n            target.show();\r\n         " +
-"   return;\r\n        };\r\n\r\n        target.fadeIn(500);\r\n    };\r\n</script>\r\n");
+".replace(\"%\", \"\")) || 0;\r\n\r\n            const price = window.parseFloat2(el.find" +
+"(\"input.price\").val());\r\n\r\n            const amount = window.round(price * quant" +
+"ity, 2);\r\n            const discountedAmount = window.round((price * quantity) *" +
+" ((100 - discountRate) / 100), 2);\r\n\r\n            el.find(\"span.rate:not(.discou" +
+"nt)\").html(price);\r\n            el.find(\"span.quantity\").html(quantity);\r\n      " +
+"      el.find(\"span.amount\").html(amount);\r\n            el.find(\"span.discount.r" +
+"ate\").html(\"\");\r\n            el.find(\"span.discounted.amount\").html(\"\");\r\n\r\n    " +
+"        el.find(\"span.discount.rate\").html(discountEl.val().replace(\"%\", \"\") + \"" +
+"%\");\r\n            el.find(\"span.discounted.amount\").html(discountedAmount);\r\n\r\n " +
+"           if (discountRate) {\r\n                el.find(\".discount.info\").show()" +
+";\r\n            } else {\r\n                el.find(\".discount.info\").hide();\r\n    " +
+"        };\r\n\r\n            if (isTaxableItem) {\r\n                const tax = wind" +
+"ow.round(discountedAmount * taxRate / 100, 2);\r\n                const amountPlus" +
+"Tax = window.round(discountedAmount + tax, 2);\r\n                el.find(\".tax.in" +
+"fo .tax-amount\").html(tax);\r\n                el.find(\".tax.info .tax-rate\").html" +
+"(window.round(taxRate, 2));\r\n                el.find(\".tax.info .amount-plus-tax" +
+"\").html(amountPlusTax);\r\n                el.find(\".tax.info\").show();\r\n         " +
+"   };\r\n\r\n            window.updateTotal();\r\n        };\r\n\r\n        quantityInput." +
+"on(\"keyup\", function () {\r\n            const el = $(this);\r\n            const pa" +
+"rentInfo = el.parent().parent();\r\n            updateItemInfo(parentInfo);\r\n     " +
+"   });\r\n\r\n        discountInput.on(\"keyup\", function () {\r\n            const el " +
+"= $(this);\r\n\r\n            const rate = window.parseFloat2(el.val());\r\n          " +
+"  if (rate > 100) {\r\n                el.val(\"100\");\r\n                return;\r\n  " +
+"          };\r\n\r\n            const parentInfo = el.parent().parent();\r\n          " +
+"  updateItemInfo(parentInfo);\r\n        });\r\n\r\n        priceInput.on(\"keyup\", fun" +
+"ction () {\r\n            const el = $(this);\r\n            const parentInfo = el.p" +
+"arent().parent();\r\n            updateItemInfo(parentInfo);\r\n        });\r\n\r\n     " +
+"   discountInput.on(\"blur\", function () {\r\n            const el = $(this);\r\n    " +
+"        const value = el.val();\r\n\r\n            if (!value) {\r\n                re" +
+"turn;\r\n            };\r\n\r\n            if (value.substr(value.length - 1) === \"%\")" +
+" {\r\n                return;\r\n            };\r\n\r\n            el.val(el.val() + \"%\"" +
+");\r\n            const parentInfo = el.parent().parent();\r\n            updateItem" +
+"Info(parentInfo);\r\n        });\r\n\r\n        function getPrice(el) {\r\n            f" +
+"unction request(itemId, customerId, priceTypeId, unitId) {\r\n                var " +
+"url = \"/dashboard/sales/tasks/selling-price/{itemId}/{customerId}/{priceTypeId}/" +
+"{unitId}\";\r\n                url = url.replace(\"{itemId}\", itemId);\r\n            " +
+"    url = url.replace(\"{customerId}\", customerId);\r\n                url = url.re" +
+"place(\"{priceTypeId}\", priceTypeId);\r\n                url = url.replace(\"{unitId" +
+"}\", unitId);\r\n\r\n                return window.getAjaxRequest(url);\r\n            " +
+"};\r\n\r\n            const itemId = el.attr(\"data-item-id\");\r\n            const cus" +
+"tomerId = parseInt($(\"#CustomerInputText\").attr(\"data-customer-id\")) || 0;\r\n    " +
+"        const priceTypeId = parseInt($(\"#PriceTypeSelect\").val()) || 0;\r\n       " +
+"     const unitId = el.val();\r\n\r\n            $(\".action.panel.segment\").addClass" +
+"(\"loading\");\r\n            const ajax = request(itemId, customerId, priceTypeId, " +
+"unitId);\r\n\r\n            ajax.success(function (response) {\r\n                $(\"." +
+"action.panel.segment\").removeClass(\"loading\");\r\n                const priceInput" +
+" = el.parent().parent().parent().find(\"input.price\");\r\n                priceInpu" +
+"t.val(response).trigger(\"keyup\");\r\n            });\r\n\r\n            ajax.fail(func" +
+"tion (xhr) {\r\n                $(\".action.panel.segment\").removeClass(\"loading\");" +
+"\r\n                console.log(window.getAjaxErrorMessage(xhr));\r\n            });" +
+"\r\n        };\r\n\r\n        unitSelect.on(\"change\", function () {\r\n            getPr" +
+"ice($(this));\r\n        });\r\n\r\n        item.on(\"contextmenu\", function (e) {\r\n   " +
+"         e.preventDefault();\r\n            const el = $(this);\r\n            const" +
+" inputEl = el.find(\".number.block input\");\r\n            const buttonEl = el.find" +
+"(\".number.block button\");\r\n\r\n            inputEl.toggle();\r\n            buttonEl" +
+".toggle();\r\n        });\r\n\r\n        item.appendTo(targetEl);\r\n        quantityInp" +
+"ut.trigger(\"keyup\");\r\n        window.setNumberFormat();\r\n        window.updateTo" +
+"tal();\r\n\r\n        var tabId = window.getSelectedTabId();\r\n        var triggerNam" +
+"e = \"itemAdded\";\r\n\r\n        $(document).trigger(triggerName, [tabId, itemId]);\r\n" +
+"\r\n        if (typeof (callback) === \"function\") {\r\n            callback(el);\r\n  " +
+"      };\r\n    };\r\n\r\n    function initializeClickAndAction() {\r\n        $(\"#POSIt" +
+"emList .item\").unbind(\"click\").bind(\"click\", function () {\r\n            const el" +
+" = $(this);\r\n\r\n            defaulPOSItemClick(el);\r\n        });\r\n    };\r\n\r\n    f" +
+"unction fetchUnits() {\r\n        function request() {\r\n            const url = \"/" +
+"api/forms/inventory/units/all\";\r\n            return window.getAjaxRequest(url);\r" +
+"\n        };\r\n\r\n        const ajax = request();\r\n\r\n        ajax.success(function " +
+"(response) {\r\n            window.metaUnits = response;\r\n        });\r\n    };\r\n\r\n " +
+"   function fetchProducts() {\r\n        function request() {\r\n            const u" +
+"rl = \"/dashboard/sales/tasks/items\";\r\n            return window.getAjaxRequest(u" +
+"rl);\r\n        };\r\n\r\n        const ajax = request();\r\n\r\n        ajax.success(func" +
+"tion (response) {\r\n            window.products = response;\r\n            $(docume" +
+"nt).trigger(\"itemFetched\");\r\n        });\r\n    };\r\n\r\n    $(\".search.panel input\")" +
+".keyup(function () {\r\n        const el = $(this);\r\n        const term = el.val()" +
+";\r\n\r\n        const categoryEl = $(\".category.list .selected.category\");\r\n       " +
+" var category = \"\";\r\n\r\n        if (categoryEl.length) {\r\n            category = " +
+"categoryEl.text();\r\n        };\r\n\r\n        window.displayProducts(category, term)" +
+";\r\n\r\n        initializeClickAndAction();\r\n    });\r\n\r\n    $(\".search.panel input\"" +
+").keydown(function (e) {\r\n        if (e.keyCode === 13) {\r\n            const ite" +
+"m = $(\".item.list .item:first\");\r\n\r\n            if (item.length) {\r\n            " +
+"    item.trigger(\"click\");\r\n            };\r\n        };\r\n    });\r\n\r\n    window.fe" +
+"tchUnits();\r\n    window.fetchProducts();\r\n\r\n    $(document).on(\"itemFetched\", fu" +
+"nction () {\r\n        $(\"#POSDimmer\").removeClass(\"active\");\r\n        displayProd" +
+"ucts();\r\n        displayCategories();\r\n        initializeClickAndAction();\r\n    " +
+"});\r\n\r\n    function displayCategories() {\r\n        const categories = window.Enu" +
+"merable.From(products).Distinct(function (x) { return x.ItemGroupName }).Select(" +
+"function (x) { return x.ItemGroupName }).ToArray();\r\n        var targetEl = $(\"." +
+"cat.filter\");\r\n        $(\".category.list\").find(\".category\").remove();\r\n\r\n      " +
+"  targetEl.unbind(\"click\").bind(\"click\", function () {\r\n            displayProdu" +
+"cts();\r\n            $(\".category\").removeClass(\"selected\");\r\n            targetE" +
+"l.hide();\r\n            initializeClickAndAction();\r\n        });\r\n\r\n        $.eac" +
+"h(categories, function () {\r\n            const category = $(\"<div class=\'categor" +
+"y\' />\");\r\n            category.html(this);\r\n\r\n            category.unbind(\"click" +
+"\").bind(\"click\", function () {\r\n                $(\".search.panel input\").val(\"\")" +
+";\r\n                const el = $(this);\r\n                const name = el.text();\r" +
+"\n\r\n                if (name) {\r\n                    displayProducts(name);\r\n    " +
+"                $(\".category\").removeClass(\"selected\");\r\n                    el." +
+"addClass(\"selected\");\r\n\r\n                    targetEl.show();\r\n                }" +
+" else {\r\n                    targetEl.hide();\r\n                };\r\n\r\n           " +
+"     initializeClickAndAction();\r\n            });\r\n\r\n            targetEl.before" +
+"(category);\r\n        });\r\n    };\r\n\r\n    function displayProducts(category, searc" +
+"hQuery) {\r\n        var target = $(\"#POSItemList\");\r\n\r\n        var groupItems;\r\n\r" +
+"\n        if (!category && !searchQuery) {\r\n            groupItems = products;\r\n " +
+"       } else {\r\n            if (category && searchQuery) {\r\n                gro" +
+"upItems = window.Enumerable\r\n                    .From(products)\r\n              " +
+"      .Where(function (x) {\r\n                        return x.ItemGroupName.toLo" +
+"werCase() === category.toString().toLowerCase()\r\n                            && " +
+"x.ItemName.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1;\r\n             " +
+"       }).ToArray();\r\n            } else if (!category && searchQuery) {\r\n      " +
+"          groupItems = window.Enumerable\r\n                    .From(products)\r\n " +
+"                   .Where(function (x) {\r\n                        return x.ItemN" +
+"ame.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1;\r\n                    " +
+"}).ToArray();\r\n            } else {\r\n                groupItems = window.Enumera" +
+"ble\r\n                    .From(products)\r\n                    .Where(function (x" +
+") {\r\n                        return x.ItemGroupName.toLowerCase() === category.t" +
+"oString().toLowerCase();\r\n                    }).ToArray();\r\n            };\r\n   " +
+"     };\r\n\r\n\r\n        target.html(\"\").hide();\r\n\r\n        groupItems = window.Enum" +
+"erable.From(groupItems).OrderBy(function (x) { return x.ItemId; }).ToArray();\r\n\r" +
+"\n        $.each(groupItems, function () {\r\n            const product = this;\r\n\r\n" +
+"            const item = $(\"<div class=\'item\' />\");\r\n            item.attr(\"data" +
+"-item-id\", product.ItemId);\r\n            item.attr(\"data-item-code\", product.Ite" +
+"mCode);\r\n            item.attr(\"data-item-name\", product.ItemName);\r\n           " +
+" item.attr(\"data-item-group\", product.ItemGroupName);\r\n            item.attr(\"da" +
+"ta-brand\", product.BrandName);\r\n            item.attr(\"data-unit-id\", product.Un" +
+"itId);\r\n            item.attr(\"data-valid-units\", product.ValidUnits);\r\n        " +
+"    item.attr(\"data-barcode\", product.Barcode);\r\n            item.attr(\"data-pho" +
+"to\", product.Photo);\r\n            item.attr(\"data-is-taxable-item\", product.IsTa" +
+"xableItem);\r\n            item.attr(\"data-selling-price\", product.SellingPrice);\r" +
+"\n\r\n            if (product.HotItem) {\r\n                item.addClass(\"hot\");\r\n  " +
+"          };\r\n\r\n            const info = $(\"<div class=\'info\' />\");\r\n\r\n         " +
+"   const price = $(\"<div class=\'price\' />\");\r\n            price.html(product.Sel" +
+"lingPrice);\r\n\r\n            price.appendTo(info);\r\n\r\n\r\n            const photo = " +
+"$(\"<div class=\'photo\' />\");\r\n\r\n            if (product.Photo) {\r\n               " +
+" const img = $(\"<img />\");\r\n                img.attr(\"src\", product.Photo + \"?He" +
+"ight=200&Width=200\");\r\n\r\n                img.appendTo(photo);\r\n            };\r\n\r" +
+"\n            photo.appendTo(info);\r\n\r\n            const name = $(\"<div class=\'na" +
+"me\' />\");\r\n            name.html(product.ItemName);\r\n\r\n            name.appendTo" +
+"(info);\r\n\r\n            info.appendTo(item);\r\n            item.appendTo(target);\r" +
+"\n        });\r\n\r\n        if (searchQuery) {\r\n            target.show();\r\n        " +
+"    return;\r\n        };\r\n\r\n        target.fadeIn(500);\r\n    };\r\n</script>\r\n");
 
         }
     }

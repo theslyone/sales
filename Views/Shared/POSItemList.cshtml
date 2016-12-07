@@ -155,7 +155,8 @@
             const discountEl = el.find("input.discount");
 
             const quantity = window.parseFloat2(quantityEl.val() || 0);
-            const discountRate = window.parseFloat2(discountEl.val().replace("%", ""));
+            const discountRate = window.parseFloat2(discountEl.val().replace("%", "")) || 0;
+
             const price = window.parseFloat2(el.find("input.price").val());
 
             const amount = window.round(price * quantity, 2);
@@ -167,10 +168,11 @@
             el.find("span.discount.rate").html("");
             el.find("span.discounted.amount").html("");
 
+            el.find("span.discount.rate").html(discountEl.val().replace("%", "") + "%");
+            el.find("span.discounted.amount").html(discountedAmount);
+
             if (discountRate) {
                 el.find(".discount.info").show();
-                el.find("span.discount.rate").html(discountEl.val().replace("%", "") + "%");
-                el.find("span.discounted.amount").html(discountedAmount);
             } else {
                 el.find(".discount.info").hide();
             };
