@@ -53,7 +53,7 @@ CREATE TABLE sales.late_fee
     late_fee_name                           national character varying(500) NOT NULL,
     is_flat_amount                          boolean NOT NULL DEFAULT(false),
     rate                                    numeric(24,4) NOT NULL,
-	account_id 								bigint NOT NULL REFERENCES finance.accounts,
+	account_id 								integer NOT NULL REFERENCES finance.accounts,
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
 	deleted									boolean DEFAULT(false)
@@ -271,7 +271,7 @@ CREATE TABLE sales.sales
     check_cleared                           boolean,    
     check_clear_date                        date,   
     check_clearing_memo                     national character varying(1000),
-    check_clearing_transaction_master_id    integer REFERENCES finance.transaction_master,
+    check_clearing_transaction_master_id    bigint REFERENCES finance.transaction_master,
 	reward_points							numeric(24, 4) NOT NULL DEFAULT(0)
 );
 

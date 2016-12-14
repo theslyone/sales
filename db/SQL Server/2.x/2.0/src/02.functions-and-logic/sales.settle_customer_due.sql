@@ -1,16 +1,21 @@
-﻿DROP FUNCTION IF EXISTS sales.settle_customer_due(_customer_id bigint, _office_id integer);
+﻿IF OBJECT_ID('sales.settle_customer_due') IS NOT NULL
+DROP PROCEDURE sales.settle_customer_due;
 
-CREATE FUNCTION sales.settle_customer_due(_customer_id bigint, _office_id integer)
-RETURNS void
-STRICT VOLATILE
+GO
+
+CREATE PROCEDURE sales.settle_customer_due(@customer_id bigint, @office_id integer)
 AS
-$$
-    DECLARE _settled_transactions           bigint[];
-    DECLARE _settling_amount                numeric;
-    DECLARE _closing_balance                numeric;
-    DECLARE _total_sales                    numeric;
-    DECLARE _customer_account_id            integer = inventory.get_account_id_by_customer_id(_customer_id);
 BEGIN   
+    DECLARE @settled_transactions TABLE
+    (
+        transaction_master_id               bigint
+    );
+
+    DECLARE @settling_amount                numeric(24, 23);
+    DECLARE @closing_balance                numeric(24, 23);
+    DECLARE @total_sales                    numeric(24, 23);
+    DECLARE @customer_account_id            integer = inventory.get_account_id_by_customer_id(@customer_id);
+
     --Closing balance of the customer
     SELECT
         SUM
@@ -19,18 +24,18 @@ BEGIN
             THEN amount_in_local_currency 
             ELSE amount_in_local_currency  * -1 
             END
-        ) INTO _closing_balance
+        ) INTO @closing_balance
     FROM finance.transaction_details
     INNER JOIN finance.transaction_master
     ON finance.transaction_master.transaction_master_id = finance.transaction_details.transaction_master_id
     WHERE finance.transaction_master.verification_status_id > 0
-    AND NOT finance.transaction_master.deleted
-    AND finance.transaction_master.office_id = _office_id
-    AND finance.transaction_details.account_id = _customer_account_id;
+    AND finance.transaction_master.deleted = 0
+    AND finance.transaction_master.office_id = @office_id
+    AND finance.transaction_details.account_id = @customer_account_id;
 
 
     --Since customer account is receivable, change the balance to debit
-    _closing_balance := _closing_balance * -1;
+    @closing_balance = @closing_balance * -1;
 
     --Sum of total sales amount
     SELECT 
@@ -43,7 +48,7 @@ BEGIN
             inventory.checkout_details.tax
             + 
             inventory.checkout_details.shipping_charge
-        ) INTO _total_sales
+        ) INTO @total_sales
     FROM inventory.checkouts
     INNER JOIN sales.sales
     ON sales.sales.checkout_id = inventory.checkouts.checkout_id
@@ -52,11 +57,11 @@ BEGIN
     INNER JOIN finance.transaction_master
     ON inventory.checkouts.transaction_master_id = finance.transaction_master.transaction_master_id
     WHERE finance.transaction_master.verification_status_id > 0
-    AND finance.transaction_master.office_id = _office_id
-    AND sales.sales.customer_id = _customer_id;
+    AND finance.transaction_master.office_id = @office_id
+    AND sales.sales.customer_id = @customer_id;
 
 
-    _settling_amount := _total_sales - _closing_balance;
+    @settling_amount = @total_sales - @closing_balance;
 
     WITH all_sales
     AS
@@ -80,10 +85,10 @@ BEGIN
         ON inventory.checkouts.checkout_id = inventory.checkout_details.checkout_id
         INNER JOIN finance.transaction_master
         ON inventory.checkouts.transaction_master_id = finance.transaction_master.transaction_master_id
-        WHERE finance.transaction_master.book = ANY(ARRAY['Sales.Direct', 'Sales.Delivery'])
-        AND finance.transaction_master.office_id = _office_id
+        WHERE finance.transaction_master.book IN('Sales.Direct', 'Sales.Delivery')
+        AND finance.transaction_master.office_id = @office_id
         AND finance.transaction_master.verification_status_id > 0      --Approved
-        AND sales.sales.customer_id = _customer_id                     --of this customer
+        AND sales.sales.customer_id = @customer_id                     --of this customer
         GROUP BY inventory.checkouts.transaction_master_id
     ),
     sales_summary
@@ -96,15 +101,18 @@ BEGIN
         FROM all_sales
     )
 
-    SELECT 
-        ARRAY_AGG(transaction_master_id) INTO _settled_transactions
+    INSERT INTO @settled_transactions
+    SELECT transaction_master_id
     FROM sales_summary
-    WHERE cumulative_due <= _settling_amount;
+    WHERE cumulative_due <= @settling_amount;
 
     UPDATE sales.sales
-    SET credit_settled = true
-    WHERE transaction_master_id = ANY(_settled_transactions);
-END
-$$
-LANGUAGE plpgsql;
+    SET credit_settled = 1
+    WHERE transaction_master_id IN
+    (
+        SELECT transaction_master_id 
+        FROM @settled_transactions
+    );
+END;
 
+GO

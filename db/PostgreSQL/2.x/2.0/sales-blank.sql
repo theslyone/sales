@@ -54,7 +54,7 @@ CREATE TABLE sales.late_fee
     late_fee_name                           national character varying(500) NOT NULL,
     is_flat_amount                          boolean NOT NULL DEFAULT(false),
     rate                                    numeric(24,4) NOT NULL,
-	account_id 								bigint NOT NULL REFERENCES finance.accounts,
+	account_id 								integer NOT NULL REFERENCES finance.accounts,
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
 	deleted									boolean DEFAULT(false)
@@ -272,7 +272,7 @@ CREATE TABLE sales.sales
     check_cleared                           boolean,    
     check_clear_date                        date,   
     check_clearing_memo                     national character varying(1000),
-    check_clearing_transaction_master_id    integer REFERENCES finance.transaction_master,
+    check_clearing_transaction_master_id    bigint REFERENCES finance.transaction_master,
 	reward_points							numeric(24, 4) NOT NULL DEFAULT(0)
 );
 
@@ -1372,9 +1372,9 @@ BEGIN
         rate                            numeric(24, 4),
         due_amount                      public.money_strict2,
         late_fee                        public.money_strict2,
-        customer_id                        bigint,
-        customer_account_id                bigint,
-        late_fee_account_id             bigint,
+        customer_id                     bigint,
+        customer_account_id             integer,
+        late_fee_account_id             integer,
         due_date                        date
     ) ON COMMIT DROP;
 
@@ -2541,7 +2541,7 @@ $$
     DECLARE _settling_amount                numeric;
     DECLARE _closing_balance                numeric;
     DECLARE _total_sales                    numeric;
-    DECLARE _customer_account_id            bigint = inventory.get_account_id_by_customer_id(_customer_id);
+    DECLARE _customer_account_id            integer = inventory.get_account_id_by_customer_id(_customer_id);
 BEGIN   
     --Closing balance of the customer
     SELECT
