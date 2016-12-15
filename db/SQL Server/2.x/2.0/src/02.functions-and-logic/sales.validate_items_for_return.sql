@@ -6,32 +6,48 @@ GO
 CREATE FUNCTION sales.validate_items_for_return
 (
     @transaction_master_id                  bigint, 
-    @details                                sales.sales_detail_type
+    @details                                sales.sales_detail_type READONLY
 )
-RETURNS bit
+RETURNS @result TABLE
+(
+    is_valid                                bit,
+    error_message                           national character varying(2000)
+)
 AS
 BEGIN        
     DECLARE @checkout_id                    bigint = 0;
     DECLARE @is_purchase                    bit = 0;
     DECLARE @item_id                        integer = 0;
-    DECLARE @factor_to_base_unit            numeric(24, 4);
+    DECLARE @factor_to_base_unit            numeric(30, 6);
     DECLARE @returned_in_previous_batch     dbo.decimal_strict2 = 0;
     DECLARE @in_verification_queue          dbo.decimal_strict2 = 0;
     DECLARE @actual_price_in_root_unit      dbo.money_strict2 = 0;
     DECLARE @price_in_root_unit             dbo.money_strict2 = 0;
     DECLARE @item_in_stock                  dbo.decimal_strict2 = 0;
     DECLARE @error_item_id                  integer;
-    DECLARE @error_quantity                 decimal;
-    DECLARE @error_amount                   decimal;
-    DECLARE this                            RECORD; 
+    DECLARE @error_quantity                 decimal(30, 6);
+    DECLARE @error_amount                   decimal(30, 6);
+    DECLARE @error_message                  national character varying(MAX);
 
-    @checkout_id                            = inventory.get_checkout_id_by_transaction_master_id(@transaction_master_id);
+    DECLARE @total_rows                     integer = 0;
+    DECLARE @counter                        integer = 0;
+    DECLARE @loop_id                        integer;
+    DECLARE @loop_item_id                   integer;
+    DECLARE @loop_price                     dbo.money_strict;
+    DECLARE @loop_base_quantity             numeric(30, 6);
+
+    SET @checkout_id                        = inventory.get_checkout_id_by_transaction_master_id(@transaction_master_id);
+
+    INSERT INTO @result(is_valid, error_message)
+    SELECT 0, '';
+
 
     DECLARE @details_temp TABLE
     (
+        id                  integer IDENTITY,
         store_id            integer,
         item_id             integer,
-        item_in_stock       numeric(24, 4),
+        item_in_stock       numeric(30, 6),
         quantity            dbo.decimal_strict,        
         unit_id             integer,
         price               dbo.money_strict,
@@ -39,7 +55,7 @@ BEGIN
         tax                 dbo.money_strict2,
         shipping_charge     dbo.money_strict2,
         root_unit_id        integer,
-        base_quantity       numeric(24, 4)
+        base_quantity       numeric(30, 6)
     ) ;
 
     INSERT INTO @details_temp(store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge)
@@ -63,10 +79,10 @@ BEGIN
         store_id                    integer,
         item_id                     integer,
         root_unit_id                integer,
-        returned_quantity           numeric(24, 4),
-        actual_quantity             numeric(24, 4),
-        returned_in_previous_batch  numeric(24, 4),
-        in_verification_queue       numeric(24, 4)
+        returned_quantity           numeric(30, 6),
+        actual_quantity             numeric(30, 6),
+        returned_in_previous_batch  numeric(30, 6),
+        in_verification_queue       numeric(30, 6)
     ) ;
     
     INSERT INTO @item_summary(store_id, item_id, root_unit_id, returned_quantity)
@@ -87,8 +103,9 @@ BEGIN
         SELECT SUM(base_quantity)
         FROM inventory.checkout_details
         WHERE inventory.checkout_details.checkout_id = @checkout_id
-        AND inventory.checkout_details.item_id = @item_summary.item_id
-    );
+        AND inventory.checkout_details.item_id = item_summary.item_id
+    )
+    FROM @item_summary AS item_summary;
 
     UPDATE @item_summary
     SET returned_in_previous_batch = 
@@ -111,8 +128,9 @@ BEGIN
                 WHERE transaction_master_id = @transaction_master_id
             )
         )
-        AND item_id = @item_summary.item_id
-    );
+        AND item_id = item_summary.item_id
+    )
+    FROM @item_summary AS item_summary;
 
     UPDATE @item_summary
     SET in_verification_queue =
@@ -135,15 +153,16 @@ BEGIN
                 WHERE transaction_master_id = @transaction_master_id
             )
         )
-        AND item_id = @item_summary.item_id
-    );
+        AND item_id = item_summary.item_id
+    )
+    FROM @item_summary AS item_summary;
     
     --Determine whether the price of the returned item(s) is less than or equal to the same on the actual transaction
     DECLARE @cumulative_pricing TABLE
     (
         item_id                     integer,
-        base_price                  numeric(24, 4),
-        allowed_returns             numeric(24, 4)
+        base_price                  numeric(30, 6),
+        allowed_returns             numeric(30, 6)
     ) ;
 
     INSERT INTO @cumulative_pricing
@@ -157,27 +176,48 @@ BEGIN
 
     IF EXISTS(SELECT 0 FROM @details_temp WHERE store_id IS NULL OR store_id <= 0)
     BEGIN
-        RAISERROR('Invalid store.', 10, 1);
+        UPDATE @result 
+        SET 
+            is_valid = 0, 
+            error_message = 'Invalid store.';
+        RETURN;
     END;    
 
     IF EXISTS(SELECT 0 FROM @details_temp WHERE item_id IS NULL OR item_id <= 0)
     BEGIN
-        RAISERROR('Invalid item.', 10, 1);
+        UPDATE @result 
+        SET 
+            is_valid = 0, 
+            error_message = 'Invalid item.';
+
+        RETURN;
     END;
 
     IF EXISTS(SELECT 0 FROM @details_temp WHERE unit_id IS NULL OR unit_id <= 0)
     BEGIN
-        RAISERROR('Invalid unit.', 10, 1);
+        UPDATE @result 
+        SET 
+            is_valid = 0, 
+            error_message = 'Invalid unit.';
+        RETURN;
     END;
 
     IF EXISTS(SELECT 0 FROM @details_temp WHERE quantity IS NULL OR quantity <= 0)
     BEGIN
-        RAISERROR('Invalid quantity.', 10, 1)
+        UPDATE @result 
+        SET 
+            is_valid = 0, 
+            error_message = 'Invalid quantity.';
+        RETURN;
     END;
 
     IF(@checkout_id  IS NULL OR @checkout_id  <= 0)
     BEGIN
-        RAISERROR('Invalid transaction id.', 10, 1);
+        UPDATE @result 
+        SET 
+            is_valid = 0, 
+            error_message = 'Invalid transaction id.';
+        RETURN;
     END;
 
     IF NOT EXISTS
@@ -187,10 +227,14 @@ BEGIN
         AND verification_status_id > 0
     )
     BEGIN
-        RAISERROR('Invalid or rejected transaction.', 10, 1);
+        UPDATE @result 
+        SET 
+            is_valid = 0, 
+            error_message = 'Invalid or rejected transaction.';
+        RETURN;
     END;
         
-    SELECT item_id INTO @item_id
+    SELECT @item_id = item_id
     FROM @details_temp
     WHERE item_id NOT IN
     (
@@ -200,7 +244,13 @@ BEGIN
 
     IF(COALESCE(@item_id, 0) != 0)
     BEGIN
-        RAISERROR('The item %s is not associated with this transaction.', 10, 1, inventory.get_item_name_by_item_id(@item_id));
+        SET @error_message = FORMATMESSAGE('The item %s is not associated with this transaction.', inventory.get_item_name_by_item_id(1));
+
+        UPDATE @result 
+        SET 
+            is_valid = 0, 
+            error_message = @error_message;
+        RETURN;
     END;
 
 
@@ -213,7 +263,11 @@ BEGIN
         AND inventory.get_root_unit_id(details_temp.unit_id) = inventory.get_root_unit_id(inventory.checkout_details.unit_id)
     )
     BEGIN
-        RAISERROR('Invalid or incompatible unit specified.', 10, 1);
+        UPDATE @result 
+        SET 
+            is_valid = 0, 
+            error_message = 'Invalid or incompatible unit specified.';
+        RETURN;
     END;
 
     SELECT TOP 1
@@ -223,43 +277,73 @@ BEGIN
     WHERE returned_quantity + returned_in_previous_batch + in_verification_queue > actual_quantity;
 
     IF(@error_item_id IS NOT NULL)
-    BEGIN    
-        RAISERROR('The returned quantity (%s) of %s is greater than actual quantity.', 10, 1, @error_quantity, inventory.get_item_name_by_item_id(@error_item_id));
+    BEGIN
+        SET @error_message = FORMATMESSAGE('The returned quantity (%s) of %s is greater than actual quantity.', CAST(@error_quantity AS varchar(30)), inventory.get_item_name_by_item_id(@error_item_id));
+
+        UPDATE @result 
+        SET 
+            is_valid = 0, 
+            error_message = @error_message;
+        RETURN;
     END;
 
-    FOR this IN
-    SELECT item_id, base_quantity, CAST((price / base_quantity * quantity) AS numeric(24, 4)) as price
-    FROM @details_temp
-    LOOP
+
+    SELECT @total_rows=MAX(id) FROM @details_temp;
+
+    WHILE @counter<@total_rows
+    BEGIN
+
+        SELECT TOP 1
+            @loop_id                = id,
+            @loop_item_id           = item_id,
+            @loop_price             = CAST((price / base_quantity * quantity) AS numeric(30, 6)),
+            @loop_base_quantity     = base_quantity
+        FROM @details_temp
+        WHERE id >= @counter
+        ORDER BY id;
+
+        IF(@loop_id IS NOT NULL)
+        BEGIN
+            SET @counter = @loop_id + 1;        
+        END
+        ELSE
+        BEGIN
+            BREAK;
+        END;
+
+
         SELECT TOP 1
             @error_item_id = item_id,
             @error_amount = base_price
         FROM @cumulative_pricing
-        WHERE item_id = this.item_id
-        AND base_price <  this.price
-        AND allowed_returns >= this.base_quantity;
+        WHERE item_id = @loop_item_id
+        AND base_price <  @loop_price
+        AND allowed_returns >= @loop_base_quantity;
         
         IF (@error_item_id IS NOT NULL)
         BEGIN
-            RAISERROR('The returned base amount %s of %s cannot be greater than actual amount %s.', 10, 1, this.price, inventory.get_item_name_by_item_id(@error_item_id), @error_amount);
+            SET @error_message = FORMATMESSAGE
+            (
+                'The returned base amount %s of %s cannot be greater than actual amount %s.', 
+                CAST(@loop_price AS varchar(30)), 
+                inventory.get_item_name_by_item_id(@error_item_id), 
+                CAST(@error_amount AS varchar(30))
+            );
+
+            UPDATE @result 
+            SET 
+                is_valid = 0, 
+                error_message = @error_message;
+        RETURN;
         END;
-    END LOOP;
+    END;
     
-    RETURN 1;
+    UPDATE @result 
+    SET 
+        is_valid = 1, 
+        error_message = '';
+    RETURN;
 END;
 
-
-
--- SELECT * FROM sales.validate_items_for_return
--- (
---     6,
---     ARRAY[
---         ROW(1, 'Dr', 1, 1, 1,180000, 0, 200),
---         ROW(1, 'Dr', 2, 1, 7,130000, 300, 30),
---         ROW(1, 'Dr', 3, 1, 1,110000, 5000, 50)
---     ]
--- );
--- 
-
-
 GO
+

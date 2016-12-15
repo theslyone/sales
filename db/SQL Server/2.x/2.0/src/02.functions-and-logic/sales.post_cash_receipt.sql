@@ -25,20 +25,29 @@ CREATE PROCEDURE sales.post_cash_receipt
     @receivable                                 dbo.money_strict2,
     @tender                                     dbo.money_strict2,
     @change                                     dbo.money_strict2,
-    @cascading_tran_id                          bigint
+    @cascading_tran_id                          bigint,
+    @transaction_master_id                      bigint OUTPUT
 )
 AS
 BEGIN
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
-    DECLARE @transaction_master_id              bigint;
     DECLARE @debit                              dbo.money_strict2;
     DECLARE @credit                             dbo.money_strict2;
     DECLARE @lc_debit                           dbo.money_strict2;
     DECLARE @lc_credit                          dbo.money_strict2;
 
-    IF NOT finance.can_post_transaction(@login_id, @user_id, @office_id, @book, @value_date)
+    DECLARE @can_post_transaction           bit;
+    DECLARE @error_message                  national character varying(MAX);
+
+    SELECT
+        @can_post_transaction   = can_post_transaction,
+        @error_message          = error_message
+    FROM finance.can_post_transaction(@login_id, @user_id, @office_id, @book, @value_date);
+
+    IF(@can_post_transaction = 0)
     BEGIN
-        RETURN 0;
+        RAISERROR(@error_message, 10, 1);
+        RETURN;
     END;
 
     IF(@tender < @receivable)
@@ -46,15 +55,14 @@ BEGIN
         RAISERROR('The tendered amount must be greater than or equal to sales amount', 10, 1);
     END;
     
-    @debit                                  = @receivable;
-    @lc_debit                               = @receivable * @exchange_rate_debit;
+    SET @debit                                  = @receivable;
+    SET @lc_debit                               = @receivable * @exchange_rate_debit;
 
-    @credit                                 = @receivable * (@exchange_rate_debit/ @exchange_rate_credit);
-    @lc_credit                              = @receivable * @exchange_rate_debit;
-    
+    SET @credit                                 = @receivable * (@exchange_rate_debit/ @exchange_rate_credit);
+    SET @lc_credit                              = @receivable * @exchange_rate_debit;
+
     INSERT INTO finance.transaction_master
     (
-        transaction_master_id, 
         transaction_counter, 
         transaction_code, 
         book, 
@@ -70,7 +78,6 @@ BEGIN
         cascading_tran_id
     )
     SELECT 
-        nextval(pg_get_integer IDENTITY_sequence('finance.transaction_master', 'transaction_master_id')), 
         finance.get_new_transaction_counter(@value_date), 
         finance.get_transaction_code(@value_date, @office_id, @user_id, @login_id),
         @book,
@@ -85,8 +92,9 @@ BEGIN
         @user_id,
         @cascading_tran_id;
 
+    SET @transaction_master_id = SCOPE_IDENTITY();
 
-    @transaction_master_id = currval(pg_get_integer IDENTITY_sequence('finance.transaction_master', 'transaction_master_id'));
+
 
     --Debit
     INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, cash_repository_id, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency, audit_user_id)

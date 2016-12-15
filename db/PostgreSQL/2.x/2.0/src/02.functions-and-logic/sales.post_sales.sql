@@ -82,9 +82,9 @@ $$
     DECLARE _is_cash                        boolean = false;
     DECLARE _is_credit                      boolean = false;
     DECLARE _gift_card_id                   integer;
-    DECLARE _gift_card_balance              decimal(24, 4);
+    DECLARE _gift_card_balance              numeric(30, 6);
     DECLARE _coupon_id                      integer;
-    DECLARE _coupon_discount                decimal(24, 4); 
+    DECLARE _coupon_discount                numeric(30, 6); 
     DECLARE _default_discount_account_id    integer;
     DECLARE _fiscal_year_code               national character varying(12);
     DECLARE _invoice_number                 bigint;
@@ -115,7 +115,7 @@ BEGIN
         RAISE EXCEPTION 'Please select a customer.';
     END IF;
 
-    IF(COALESCE(_coupon_code, '') != '' AND COALESCE(_discount) > 0) THEN
+    IF(COALESCE(_coupon_code, '') != '' AND COALESCE(_discount, 0) > 0) THEN
         RAISE EXCEPTION 'Please do not specify discount rate when you mention coupon code.';
     END IF;
     --TODO: VALIDATE COUPON CODE AND POST DISCOUNT
@@ -144,7 +144,7 @@ BEGIN
         item_id                         integer, 
         quantity                        public.decimal_strict,        
         unit_id                         integer,
-        base_quantity                   decimal,
+        base_quantity                   decimal(30, 6),
         base_unit_id                    integer,                
         price                           public.money_strict,
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),
@@ -184,8 +184,8 @@ BEGIN
         item_id             integer,
         base_unit_id        integer,
         store_id            integer,
-        total_sales         numeric,
-        in_stock            numeric,
+        total_sales         numeric(30, 6),
+        in_stock            numeric(30, 6),
         maintain_inventory      boolean
     ) ON COMMIT DROP;
 

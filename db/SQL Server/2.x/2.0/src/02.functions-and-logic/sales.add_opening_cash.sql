@@ -6,10 +6,10 @@ GO
 CREATE PROCEDURE sales.add_opening_cash
 (
     @user_id                                integer,
-    @transaction_date                        TIMESTAMP,
-    @amount                                    decimal(24, 4),
+    @transaction_date                       DATETIMEOFFSET,
+    @amount                                 numeric(30, 6),
     @provided_by                            national character varying(1000),
-    @memo                                    national character varying(4000)
+    @memo                                   national character varying(4000)
 )
 AS
 BEGIN

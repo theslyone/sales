@@ -6,8 +6,8 @@ AS
 $$
     DECLARE _price              public.money_strict2;
     DECLARE _costing_unit_id    integer;
-    DECLARE _factor             decimal;
-    DECLARE _tax_rate           decimal;
+    DECLARE _factor             decimal(30, 6);
+    DECLARE _tax_rate           decimal(30, 6);
     DECLARE _includes_tax       boolean;
     DECLARE _tax                public.money_strict2;
 BEGIN

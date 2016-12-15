@@ -11,20 +11,20 @@ BEGIN
         transaction_master_id               bigint
     );
 
-    DECLARE @settling_amount                numeric(24, 23);
-    DECLARE @closing_balance                numeric(24, 23);
-    DECLARE @total_sales                    numeric(24, 23);
+    DECLARE @settling_amount                numeric(30, 6);
+    DECLARE @closing_balance                numeric(30, 6);
+    DECLARE @total_sales                    numeric(30, 6);
     DECLARE @customer_account_id            integer = inventory.get_account_id_by_customer_id(@customer_id);
 
     --Closing balance of the customer
     SELECT
-        SUM
+        @closing_balance = SUM
         (
             CASE WHEN tran_type = 'Cr' 
             THEN amount_in_local_currency 
             ELSE amount_in_local_currency  * -1 
             END
-        ) INTO @closing_balance
+        )
     FROM finance.transaction_details
     INNER JOIN finance.transaction_master
     ON finance.transaction_master.transaction_master_id = finance.transaction_details.transaction_master_id
@@ -35,11 +35,11 @@ BEGIN
 
 
     --Since customer account is receivable, change the balance to debit
-    @closing_balance = @closing_balance * -1;
+    SET @closing_balance = @closing_balance * -1;
 
     --Sum of total sales amount
     SELECT 
-        SUM
+        @total_sales = SUM
         (
             (inventory.checkout_details.quantity * inventory.checkout_details.price) 
             - 
@@ -48,7 +48,7 @@ BEGIN
             inventory.checkout_details.tax
             + 
             inventory.checkout_details.shipping_charge
-        ) INTO @total_sales
+        )
     FROM inventory.checkouts
     INNER JOIN sales.sales
     ON sales.sales.checkout_id = inventory.checkouts.checkout_id
@@ -61,7 +61,7 @@ BEGIN
     AND sales.sales.customer_id = @customer_id;
 
 
-    @settling_amount = @total_sales - @closing_balance;
+    SET @settling_amount = @total_sales - @closing_balance;
 
     WITH all_sales
     AS

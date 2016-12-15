@@ -97,7 +97,7 @@ BEGIN
         _cost_center_id,
         _reference_number,
         _statement_reference,
-        _audit_user_id,
+        _user_id,
         _cascading_tran_id;
 
 

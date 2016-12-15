@@ -2,7 +2,7 @@
 (
 	_user_id								integer,
 	_transaction_date						TIMESTAMP,
-	_amount									decimal(24, 4),
+	_amount									numeric(30, 6),
 	_provided_by							national character varying(1000),
 	_memo									national character varying(4000)
 );
@@ -11,7 +11,7 @@ CREATE FUNCTION sales.add_opening_cash
 (
 	_user_id								integer,
 	_transaction_date						TIMESTAMP,
-	_amount									decimal(24, 4),
+	_amount									numeric(30, 6),
 	_provided_by							national character varying(1000),
 	_memo									national character varying(4000)
 )

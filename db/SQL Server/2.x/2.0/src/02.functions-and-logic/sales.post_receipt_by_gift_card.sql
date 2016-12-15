@@ -23,12 +23,12 @@ CREATE PROCEDURE sales.post_receipt_by_gift_card
     @gift_card_id                               integer,
     @gift_card_number                           national character varying(100),
     @amount                                     dbo.money_strict,
-    @cascading_tran_id                          bigint
+    @cascading_tran_id                          bigint,
+    @transaction_master_id                      bigint OUTPUT
 )
 AS
 BEGIN        
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
-    DECLARE @transaction_master_id              bigint;
     DECLARE @debit                              dbo.money_strict2;
     DECLARE @credit                             dbo.money_strict2;
     DECLARE @lc_debit                           dbo.money_strict2;
@@ -36,21 +36,29 @@ BEGIN
     DECLARE @is_cash                            bit;
     DECLARE @gift_card_payable_account_id       integer;
 
-    IF NOT finance.can_post_transaction(@login_id, @user_id, @office_id, @book, @value_date)
+    DECLARE @can_post_transaction           bit;
+    DECLARE @error_message                  national character varying(MAX);
+
+    SELECT
+        @can_post_transaction   = can_post_transaction,
+        @error_message          = error_message
+    FROM finance.can_post_transaction(@login_id, @user_id, @office_id, @book, @value_date);
+
+    IF(@can_post_transaction = 0)
     BEGIN
-        RETURN 0;
+        RAISERROR(@error_message, 10, 1);
+        RETURN;
     END;
 
-    @gift_card_payable_account_id           = sales.get_payable_account_for_gift_card(@gift_card_id);
-    @debit                                  = @amount;
-    @lc_debit                               = @amount * @exchange_rate_debit;
+    SET @gift_card_payable_account_id           = sales.get_payable_account_for_gift_card(@gift_card_id);
+    SET @debit                                  = @amount;
+    SET @lc_debit                               = @amount * @exchange_rate_debit;
 
-    @credit                                 = @amount * (@exchange_rate_debit/ @exchange_rate_credit);
-    @lc_credit                              = @amount * @exchange_rate_debit;
+    SET @credit                                 = @amount * (@exchange_rate_debit/ @exchange_rate_credit);
+    SET @lc_credit                              = @amount * @exchange_rate_debit;
     
     INSERT INTO finance.transaction_master
     (
-        transaction_master_id, 
         transaction_counter, 
         transaction_code, 
         book, 
@@ -66,7 +74,6 @@ BEGIN
         cascading_tran_id
     )
     SELECT 
-        nextval(pg_get_integer IDENTITY_sequence('finance.transaction_master', 'transaction_master_id')), 
         finance.get_new_transaction_counter(@value_date), 
         finance.get_transaction_code(@value_date, @office_id, @user_id, @login_id),
         @book,
@@ -82,7 +89,7 @@ BEGIN
         @cascading_tran_id;
 
 
-    @transaction_master_id = currval(pg_get_integer IDENTITY_sequence('finance.transaction_master', 'transaction_master_id'));
+    SET @transaction_master_id = SCOPE_IDENTITY();
 
     --Debit
     INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, cash_repository_id, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency, audit_user_id)

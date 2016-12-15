@@ -6,9 +6,9 @@ STRICT VOLATILE
 AS
 $$
     DECLARE _settled_transactions           bigint[];
-    DECLARE _settling_amount                numeric;
-    DECLARE _closing_balance                numeric;
-    DECLARE _total_sales                    numeric;
+    DECLARE _settling_amount                numeric(30, 6);
+    DECLARE _closing_balance                numeric(30, 6);
+    DECLARE _total_sales                    numeric(30, 6);
     DECLARE _customer_account_id            integer = inventory.get_account_id_by_customer_id(_customer_id);
 BEGIN   
     --Closing balance of the customer

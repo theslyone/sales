@@ -30,7 +30,7 @@ BEGIN
         late_fee_code                   text,
         late_fee_name                   text,
         is_flat_amount                  boolean,
-        rate                            numeric(24, 4),
+        rate                            numeric(30, 6),
         due_amount                      public.money_strict2,
         late_fee                        public.money_strict2,
         customer_id                     bigint,
@@ -205,7 +205,7 @@ BEGIN
             _default_currency_code,
             this.late_fee;
 
-        INSERT INTO  sales.late_fee(transaction_master_id, customer_id, value_date, late_fee_tran_id, amount)
+        INSERT INTO  sales.late_fee_postings(transaction_master_id, customer_id, value_date, late_fee_tran_id, amount)
         SELECT this.transaction_master_id, this.customer_id, _value_date, _transaction_master_id, this.late_fee;
     END LOOP;
 END

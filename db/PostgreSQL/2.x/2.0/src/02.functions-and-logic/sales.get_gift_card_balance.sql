@@ -1,11 +1,11 @@
 ﻿DROP FUNCTION IF EXISTS sales.get_gift_card_balance(_gift_card_id integer, _value_date date);
 
 CREATE FUNCTION sales.get_gift_card_balance(_gift_card_id integer, _value_date date)
-RETURNS decimal(24, 4)
+RETURNS numeric(30, 6)
 AS
 $$
-    DECLARE _debit          decimal(24, 4);
-    DECLARE _credit         decimal(24, 4);
+    DECLARE _debit          numeric(30, 6);
+    DECLARE _credit         numeric(30, 6);
 BEGIN
     SELECT SUM(COALESCE(sales.gift_card_transactions.amount, 0))
     INTO _debit

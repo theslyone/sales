@@ -53,7 +53,7 @@ CREATE TABLE sales.late_fee
     late_fee_code                           national character varying(24) NOT NULL,
     late_fee_name                           national character varying(500) NOT NULL,
     is_flat_amount                          boolean NOT NULL DEFAULT(false),
-    rate                                    numeric(24,4) NOT NULL,
+    rate                                    numeric(30, 6) NOT NULL,
 	account_id 								integer NOT NULL REFERENCES finance.accounts,
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
@@ -262,8 +262,8 @@ CREATE TABLE sales.sales
     is_credit                               boolean NOT NULL DEFAULT(false),
 	credit_settled							boolean,
     payment_term_id                         integer REFERENCES sales.payment_terms,
-    tender                                  decimal(24, 4) NOT NULL,
-    change                                  decimal(24, 4) NOT NULL,
+    tender                                  numeric(30, 6) NOT NULL,
+    change                                  numeric(30, 6) NOT NULL,
     gift_card_id                            integer REFERENCES sales.gift_cards,
     check_number                            national character varying(100),
     check_date                              date,
@@ -273,7 +273,7 @@ CREATE TABLE sales.sales
     check_clear_date                        date,   
     check_clearing_memo                     national character varying(1000),
     check_clearing_transaction_master_id    bigint REFERENCES finance.transaction_master,
-	reward_points							numeric(24, 4) NOT NULL DEFAULT(0)
+	reward_points							numeric(30, 6) NOT NULL DEFAULT(0)
 );
 
 CREATE UNIQUE INDEX sales_invoice_number_fiscal_year_uix
@@ -335,7 +335,7 @@ CREATE TABLE sales.opening_cash
 	opening_cash_id						    BIGSERIAL PRIMARY KEY,
 	user_id									integer NOT NULL REFERENCES account.users,
 	transaction_date						date NOT NULL,
-	amount									decimal(24, 4) NOT NULL,
+	amount									numeric(30, 6) NOT NULL,
 	provided_by								national character varying(1000) NOT NULL DEFAULT(''),
 	memo									national character varying(4000) DEFAULT(''),
 	closed									boolean NOT NULL DEFAULT(false),
@@ -352,8 +352,8 @@ CREATE TABLE sales.closing_cash
 	closing_cash_id							BIGSERIAL PRIMARY KEY,
 	user_id									integer NOT NULL REFERENCES account.users,
 	transaction_date						date NOT NULL,
-	opening_cash							decimal(24, 4) NOT NULL,
-	total_cash_sales						decimal(24, 4) NOT NULL,
+	opening_cash							numeric(30, 6) NOT NULL,
+	total_cash_sales						numeric(30, 6) NOT NULL,
 	submitted_to							national character varying(1000) NOT NULL DEFAULT(''),
 	memo									national character varying(4000) NOT NULL DEFAULT(''),
 	deno1000								integer DEFAULT(0),
@@ -368,8 +368,8 @@ CREATE TABLE sales.closing_cash
 	deno5									integer DEFAULT(0),
 	deno2									integer DEFAULT(0),
 	deno1									integer DEFAULT(0),
-	coins									decimal(24, 4) DEFAULT(0),
-	submitted_cash							decimal(24, 4) NOT NULL,
+	coins									numeric(30, 6) DEFAULT(0),
+	submitted_cash							numeric(30, 6) NOT NULL,
 	approved_by								integer REFERENCES account.users,
 	approval_memo							national character varying(4000),
     audit_user_id                           integer REFERENCES account.users,
@@ -504,7 +504,7 @@ DROP FUNCTION IF EXISTS sales.add_opening_cash
 (
 	_user_id								integer,
 	_transaction_date						TIMESTAMP,
-	_amount									decimal(24, 4),
+	_amount									numeric(30, 6),
 	_provided_by							national character varying(1000),
 	_memo									national character varying(4000)
 );
@@ -513,7 +513,7 @@ CREATE FUNCTION sales.add_opening_cash
 (
 	_user_id								integer,
 	_transaction_date						TIMESTAMP,
-	_amount									decimal(24, 4),
+	_amount									numeric(30, 6),
 	_provided_by							national character varying(1000),
 	_memo									national character varying(4000)
 )
@@ -672,11 +672,11 @@ LANGUAGE plpgsql;
 DROP FUNCTION IF EXISTS sales.get_gift_card_balance(_gift_card_id integer, _value_date date);
 
 CREATE FUNCTION sales.get_gift_card_balance(_gift_card_id integer, _value_date date)
-RETURNS decimal(24, 4)
+RETURNS numeric(30, 6)
 AS
 $$
-    DECLARE _debit          decimal(24, 4);
-    DECLARE _credit         decimal(24, 4);
+    DECLARE _debit          numeric(30, 6);
+    DECLARE _credit         numeric(30, 6);
 BEGIN
     SELECT SUM(COALESCE(sales.gift_card_transactions.amount, 0))
     INTO _debit
@@ -729,8 +729,8 @@ AS
 $$
     DECLARE _price              public.money_strict2;
     DECLARE _costing_unit_id    integer;
-    DECLARE _factor             decimal;
-    DECLARE _tax_rate           decimal;
+    DECLARE _factor             decimal(30, 6);
+    DECLARE _tax_rate           decimal(30, 6);
     DECLARE _includes_tax       boolean;
     DECLARE _tax                public.money_strict2;
 BEGIN
@@ -1311,7 +1311,7 @@ BEGIN
         _cost_center_id,
         _reference_number,
         _statement_reference,
-        _audit_user_id,
+        _user_id,
         _cascading_tran_id;
 
 
@@ -1369,7 +1369,7 @@ BEGIN
         late_fee_code                   text,
         late_fee_name                   text,
         is_flat_amount                  boolean,
-        rate                            numeric(24, 4),
+        rate                            numeric(30, 6),
         due_amount                      public.money_strict2,
         late_fee                        public.money_strict2,
         customer_id                     bigint,
@@ -1544,7 +1544,7 @@ BEGIN
             _default_currency_code,
             this.late_fee;
 
-        INSERT INTO  sales.late_fee(transaction_master_id, customer_id, value_date, late_fee_tran_id, amount)
+        INSERT INTO  sales.late_fee_postings(transaction_master_id, customer_id, value_date, late_fee_tran_id, amount)
         SELECT this.transaction_master_id, this.customer_id, _value_date, _transaction_master_id, this.late_fee;
     END LOOP;
 END
@@ -1854,7 +1854,6 @@ RETURNS bigint
 AS
 $$
     DECLARE _book_name              national character varying = 'Sales Return';
-    DECLARE _customer_id            bigint;
     DECLARE _cost_center_id         bigint;
     DECLARE _tran_master_id         bigint;
     DECLARE _tran_counter           integer;
@@ -1911,7 +1910,7 @@ BEGIN
         item_id                         integer, 
         quantity                        integer_strict,        
         unit_id                         integer,
-        base_quantity                   decimal,
+        base_quantity                   decimal(30, 6),
         base_unit_id                    integer,                
         price                           public.money_strict,
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),
@@ -1998,7 +1997,7 @@ BEGIN
 
     IF(_discount_total IS NOT NULL AND _discount_total > 0) THEN
         INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
-        SELECT _tran_master_id, _book_name, _office_id, _value_date, _book_date, 'Cr', sales_discount_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(discount, 0)), _default_currency_code, 1, SUM(COALESCE(discount, 0))
+        SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Cr', sales_discount_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(discount, 0)), _default_currency_code, 1, SUM(COALESCE(discount, 0))
         FROM temp_checkout_details
         GROUP BY sales_discount_account_id;
     END IF;
@@ -2147,9 +2146,9 @@ $$
     DECLARE _is_cash                        boolean = false;
     DECLARE _is_credit                      boolean = false;
     DECLARE _gift_card_id                   integer;
-    DECLARE _gift_card_balance              decimal(24, 4);
+    DECLARE _gift_card_balance              numeric(30, 6);
     DECLARE _coupon_id                      integer;
-    DECLARE _coupon_discount                decimal(24, 4); 
+    DECLARE _coupon_discount                numeric(30, 6); 
     DECLARE _default_discount_account_id    integer;
     DECLARE _fiscal_year_code               national character varying(12);
     DECLARE _invoice_number                 bigint;
@@ -2180,7 +2179,7 @@ BEGIN
         RAISE EXCEPTION 'Please select a customer.';
     END IF;
 
-    IF(COALESCE(_coupon_code, '') != '' AND COALESCE(_discount) > 0) THEN
+    IF(COALESCE(_coupon_code, '') != '' AND COALESCE(_discount, 0) > 0) THEN
         RAISE EXCEPTION 'Please do not specify discount rate when you mention coupon code.';
     END IF;
     --TODO: VALIDATE COUPON CODE AND POST DISCOUNT
@@ -2209,7 +2208,7 @@ BEGIN
         item_id                         integer, 
         quantity                        public.decimal_strict,        
         unit_id                         integer,
-        base_quantity                   decimal,
+        base_quantity                   decimal(30, 6),
         base_unit_id                    integer,                
         price                           public.money_strict,
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),
@@ -2249,8 +2248,8 @@ BEGIN
         item_id             integer,
         base_unit_id        integer,
         store_id            integer,
-        total_sales         numeric,
-        in_stock            numeric,
+        total_sales         numeric(30, 6),
+        in_stock            numeric(30, 6),
         maintain_inventory      boolean
     ) ON COMMIT DROP;
 
@@ -2538,9 +2537,9 @@ STRICT VOLATILE
 AS
 $$
     DECLARE _settled_transactions           bigint[];
-    DECLARE _settling_amount                numeric;
-    DECLARE _closing_balance                numeric;
-    DECLARE _total_sales                    numeric;
+    DECLARE _settling_amount                numeric(30, 6);
+    DECLARE _closing_balance                numeric(30, 6);
+    DECLARE _total_sales                    numeric(30, 6);
     DECLARE _customer_account_id            integer = inventory.get_account_id_by_customer_id(_customer_id);
 BEGIN   
     --Closing balance of the customer
@@ -2660,15 +2659,15 @@ $$
     DECLARE _checkout_id                    bigint = 0;
     DECLARE _is_purchase                    boolean = false;
     DECLARE _item_id                        integer = 0;
-    DECLARE _factor_to_base_unit            numeric(24, 4);
+    DECLARE _factor_to_base_unit            numeric(30, 6);
     DECLARE _returned_in_previous_batch     public.decimal_strict2 = 0;
     DECLARE _in_verification_queue          public.decimal_strict2 = 0;
     DECLARE _actual_price_in_root_unit      public.money_strict2 = 0;
     DECLARE _price_in_root_unit             public.money_strict2 = 0;
     DECLARE _item_in_stock                  public.decimal_strict2 = 0;
     DECLARE _error_item_id                  integer;
-    DECLARE _error_quantity                 decimal;
-    DECLARE _error_amount                   decimal;
+    DECLARE _error_quantity                 decimal(30, 6);
+    DECLARE _error_amount                   decimal(30, 6);
     DECLARE this                            RECORD; 
 BEGIN        
     _checkout_id                            := inventory.get_checkout_id_by_transaction_master_id(_transaction_master_id);
@@ -2678,7 +2677,7 @@ BEGIN
     (
         store_id            integer,
         item_id             integer,
-        item_in_stock       numeric(24, 4),
+        item_in_stock       numeric(30, 6),
         quantity            public.decimal_strict,        
         unit_id             integer,
         price               public.money_strict,
@@ -2686,7 +2685,7 @@ BEGIN
         tax                 money_strict2,
         shipping_charge     money_strict2,
         root_unit_id        integer,
-        base_quantity       numeric(24, 4)
+        base_quantity       numeric(30, 6)
     ) ON COMMIT DROP;
 
     INSERT INTO details_temp(store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge)
@@ -2711,10 +2710,10 @@ BEGIN
         store_id                    integer,
         item_id                     integer,
         root_unit_id                integer,
-        returned_quantity           numeric(24, 4),
-        actual_quantity             numeric(24, 4),
-        returned_in_previous_batch  numeric(24, 4),
-        in_verification_queue       numeric(24, 4)
+        returned_quantity           numeric(30, 6),
+        actual_quantity             numeric(30, 6),
+        returned_in_previous_batch  numeric(30, 6),
+        in_verification_queue       numeric(30, 6)
     ) ON COMMIT DROP;
     
     INSERT INTO item_summary_temp(store_id, item_id, root_unit_id, returned_quantity)
@@ -2791,8 +2790,8 @@ BEGIN
     CREATE TEMPORARY TABLE cumulative_pricing_temp
     (
         item_id                     integer,
-        base_price                  numeric(24, 4),
-        allowed_returns             numeric(24, 4)
+        base_price                  numeric(30, 6),
+        allowed_returns             numeric(30, 6)
     ) ON COMMIT DROP;
 
     INSERT INTO cumulative_pricing_temp
@@ -2883,7 +2882,7 @@ BEGIN
     END IF;
 
     FOR this IN
-    SELECT item_id, base_quantity, (price / base_quantity * quantity)::numeric(24, 4) as price
+    SELECT item_id, base_quantity, (price / base_quantity * quantity)::numeric(30, 6) as price
     FROM details_temp
     LOOP
         SELECT 

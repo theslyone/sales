@@ -15,15 +15,15 @@ $$
     DECLARE _checkout_id                    bigint = 0;
     DECLARE _is_purchase                    boolean = false;
     DECLARE _item_id                        integer = 0;
-    DECLARE _factor_to_base_unit            numeric(24, 4);
+    DECLARE _factor_to_base_unit            numeric(30, 6);
     DECLARE _returned_in_previous_batch     public.decimal_strict2 = 0;
     DECLARE _in_verification_queue          public.decimal_strict2 = 0;
     DECLARE _actual_price_in_root_unit      public.money_strict2 = 0;
     DECLARE _price_in_root_unit             public.money_strict2 = 0;
     DECLARE _item_in_stock                  public.decimal_strict2 = 0;
     DECLARE _error_item_id                  integer;
-    DECLARE _error_quantity                 decimal;
-    DECLARE _error_amount                   decimal;
+    DECLARE _error_quantity                 decimal(30, 6);
+    DECLARE _error_amount                   decimal(30, 6);
     DECLARE this                            RECORD; 
 BEGIN        
     _checkout_id                            := inventory.get_checkout_id_by_transaction_master_id(_transaction_master_id);
@@ -33,7 +33,7 @@ BEGIN
     (
         store_id            integer,
         item_id             integer,
-        item_in_stock       numeric(24, 4),
+        item_in_stock       numeric(30, 6),
         quantity            public.decimal_strict,        
         unit_id             integer,
         price               public.money_strict,
@@ -41,7 +41,7 @@ BEGIN
         tax                 money_strict2,
         shipping_charge     money_strict2,
         root_unit_id        integer,
-        base_quantity       numeric(24, 4)
+        base_quantity       numeric(30, 6)
     ) ON COMMIT DROP;
 
     INSERT INTO details_temp(store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge)
@@ -66,10 +66,10 @@ BEGIN
         store_id                    integer,
         item_id                     integer,
         root_unit_id                integer,
-        returned_quantity           numeric(24, 4),
-        actual_quantity             numeric(24, 4),
-        returned_in_previous_batch  numeric(24, 4),
-        in_verification_queue       numeric(24, 4)
+        returned_quantity           numeric(30, 6),
+        actual_quantity             numeric(30, 6),
+        returned_in_previous_batch  numeric(30, 6),
+        in_verification_queue       numeric(30, 6)
     ) ON COMMIT DROP;
     
     INSERT INTO item_summary_temp(store_id, item_id, root_unit_id, returned_quantity)
@@ -146,8 +146,8 @@ BEGIN
     CREATE TEMPORARY TABLE cumulative_pricing_temp
     (
         item_id                     integer,
-        base_price                  numeric(24, 4),
-        allowed_returns             numeric(24, 4)
+        base_price                  numeric(30, 6),
+        allowed_returns             numeric(30, 6)
     ) ON COMMIT DROP;
 
     INSERT INTO cumulative_pricing_temp
@@ -238,7 +238,7 @@ BEGIN
     END IF;
 
     FOR this IN
-    SELECT item_id, base_quantity, (price / base_quantity * quantity)::numeric(24, 4) as price
+    SELECT item_id, base_quantity, (price / base_quantity * quantity)::numeric(30, 6) as price
     FROM details_temp
     LOOP
         SELECT 

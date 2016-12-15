@@ -34,8 +34,8 @@ CREATE PROCEDURE sales.post_receipt
     @check_date                                 date,
 
     @gift_card_number                           national character varying(100),
-    @store_id                                   integer DEFAULT NULL,
-    @cascading_tran_id                          bigint DEFAULT NULL
+    @store_id                                   integer,
+    @cascading_tran_id                          bigint
 )
 AS
 BEGIN
@@ -52,21 +52,30 @@ BEGIN
     DECLARE @gift_card_id                       integer;
     DECLARE @receivable_account_id              integer;
 
-    IF NOT finance.can_post_transaction(@login_id, @user_id, @office_id, @book, @value_date)
+    DECLARE @can_post_transaction           bit;
+    DECLARE @error_message                  national character varying(MAX);
+
+    SELECT
+        @can_post_transaction   = can_post_transaction,
+        @error_message          = error_message
+    FROM finance.can_post_transaction(@login_id, @user_id, @office_id, @book, @value_date);
+
+    IF(@can_post_transaction = 0)
     BEGIN
-        RETURN 0;
+        RAISERROR(@error_message, 10, 1);
+        RETURN;
     END;
 
     IF(@cash_repository_id > 0 AND @cash_account_id > 0)
     BEGIN
-        @is_cash                            = 1;
+        SET @is_cash                            = 1;
     END;
 
-    @receivable_account_id                  = sales.get_receivable_account_for_check_receipts(@store_id);
-    @gift_card_id                           = sales.get_gift_card_id_by_gift_card_number(@gift_card_number);
-    @customer_account_id                    = inventory.get_account_id_by_customer_id(@customer_id);    
-    @local_currency_code                    = core.get_currency_code_by_office_id(@office_id);
-    @base_currency_code                     = inventory.get_currency_code_by_customer_id(@customer_id);
+    SET @receivable_account_id                  = sales.get_receivable_account_for_check_receipts(@store_id);
+    SET @gift_card_id                           = sales.get_gift_card_id_by_gift_card_number(@gift_card_number);
+    SET @customer_account_id                    = inventory.get_account_id_by_customer_id(@customer_id);    
+    SET @local_currency_code                    = core.get_currency_code_by_office_id(@office_id);
+    SET @base_currency_code                     = inventory.get_currency_code_by_customer_id(@customer_id);
 
 
     IF(@local_currency_code = @currency_code AND @exchange_rate_debit != 1)
@@ -82,15 +91,18 @@ BEGIN
     
     IF(@tender >= @receipt_amount)
     BEGIN
-        @transaction_master_id              = sales.post_cash_receipt(@user_id, @office_id, @login_id, @customer_id, @customer_account_id, @currency_code, @local_currency_code, @base_currency_code, @exchange_rate_debit, @exchange_rate_credit, @reference_number, @statement_reference, @cost_center_id, @cash_account_id, @cash_repository_id, @value_date, @book_date, @receipt_amount, @tender, @change, @cascading_tran_id);
+        EXECUTE sales.post_cash_receipt @user_id, @office_id, @login_id, @customer_id, @customer_account_id, @currency_code, @local_currency_code, @base_currency_code, @exchange_rate_debit, @exchange_rate_credit, @reference_number, @statement_reference, @cost_center_id, @cash_account_id, @cash_repository_id, @value_date, @book_date, @receipt_amount, @tender, @change, @cascading_tran_id,
+        @transaction_master_id = @transaction_master_id OUTPUT;
     END
     ELSE IF(@check_amount >= @receipt_amount)
     BEGIN
-        @transaction_master_id              = sales.post_check_receipt(@user_id, @office_id, @login_id, @customer_id, @customer_account_id, @receivable_account_id, @currency_code, @local_currency_code, @base_currency_code, @exchange_rate_debit, @exchange_rate_credit, @reference_number, @statement_reference, @cost_center_id, @value_date, @book_date, @check_amount, @check_bank_name, @check_number, @check_date, @cascading_tran_id);
+        EXECUTE sales.post_check_receipt @user_id, @office_id, @login_id, @customer_id, @customer_account_id, @receivable_account_id, @currency_code, @local_currency_code, @base_currency_code, @exchange_rate_debit, @exchange_rate_credit, @reference_number, @statement_reference, @cost_center_id, @value_date, @book_date, @check_amount, @check_bank_name, @check_number, @check_date, @cascading_tran_id,
+        @transaction_master_id = @transaction_master_id OUTPUT;
     END
     ELSE IF(@gift_card_id > 0)
     BEGIN
-        @transaction_master_id              = sales.post_receipt_by_gift_card(@user_id, @office_id, @login_id, @customer_id, @customer_account_id, @currency_code, @local_currency_code, @base_currency_code, @exchange_rate_debit, @exchange_rate_credit, @reference_number, @statement_reference, @cost_center_id, @value_date, @book_date, @gift_card_id, @gift_card_number, @receipt_amount, @cascading_tran_id);
+        EXECUTE sales.post_receipt_by_gift_card @user_id, @office_id, @login_id, @customer_id, @customer_account_id, @currency_code, @local_currency_code, @base_currency_code, @exchange_rate_debit, @exchange_rate_credit, @reference_number, @statement_reference, @cost_center_id, @value_date, @book_date, @gift_card_id, @gift_card_number, @receipt_amount, @cascading_tran_id,
+        @transaction_master_id = @transaction_master_id OUTPUT;
     END
     ELSE
     BEGIN
@@ -99,15 +111,11 @@ BEGIN
 
     
     EXECUTE finance.auto_verify @transaction_master_id, @office_id;
+
     EXECUTE sales.settle_customer_due @customer_id, @office_id;
     SELECT @transaction_master_id;
 END;
 
 
-
-
---SELECT * FROM sales.post_receipt(1, 1, 1,inventory.get_customer_id_by_customer_code('APP'), 'USD', 1, 1, '', '', 1, 1, 1, '1-1-2020', '1-1-2020', 100, 0, 1000, '', '', null, '', null);
---SELECT * FROM sales.post_receipt(1,1,1,inventory.get_customer_id_by_customer_code('DEF'),'USD',1,1,'','', 1, 1, 1, '1-1-2020', '1-1-2020', 2000, 0, 0, 0, '', '', null, '123456', 1, null);
-
-
 GO
+

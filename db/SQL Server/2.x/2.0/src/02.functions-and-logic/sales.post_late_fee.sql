@@ -6,37 +6,45 @@ GO
 CREATE PROCEDURE sales.post_late_fee(@user_id integer, @login_id bigint, @office_id integer, @value_date date)
 AS
 BEGIN
-    DECLARE this                        RECORD;
-    DECLARE @transaction_master_id      bigint;
-    DECLARE @tran_counter               integer;
-    DECLARE @transaction_code national character varying(50);
-    DECLARE @default_currency_code      national character varying(12);
-    DECLARE @book_name                  national character varying(100) = 'Late Fee';
+    DECLARE @transaction_master_id          bigint;
+    DECLARE @tran_counter                   integer;
+    DECLARE @transaction_code               national character varying(50);
+    DECLARE @default_currency_code          national character varying(12);
+    DECLARE @book_name                      national character varying(100) = 'Late Fee';
+
+    DECLARE @total_rows                     integer = 0;
+    DECLARE @counter                        integer = 0;
+    DECLARE @loop_transaction_master_id     bigint;
+    DECLARE @loop_late_fee_name             national character varying(1000)
+    DECLARE @loop_late_fee_account_id       integer;
+    DECLARE @loop_customer_id               integer;
+    DECLARE @loop_late_fee                  dbo.money_strict2;
+    DECLARE @loop_customer_account_id       integer;
 
 
     DECLARE @temp_late_fee TABLE
     (
-        transaction_master_id           bigint,
-        value_date                      date,
-        payment_term_id                 integer,
-        payment_term_code national character varying(50),
-        payment_term_name               national character varying(1000),        
-        due_on_date                     bit,
-        due_days                        integer,
-        due_frequency_id                integer,
-        grace_period                    integer,
-        late_fee_id                     integer,
-        late_fee_posting_frequency_id   integer,
-        late_fee_code national character varying(50),
-        late_fee_name                   national character varying(1000),
-        is_flat_amount                  bit,
-        rate                            numeric(24, 4),
-        due_amount                      dbo.money_strict2,
-        late_fee                        dbo.money_strict2,
-        customer_id                     bigint,
-        customer_account_id             integer,
-        late_fee_account_id             integer,
-        due_date                        date
+        transaction_master_id               bigint,
+        value_date                          date,
+        payment_term_id                     integer,
+        payment_term_code                   national character varying(50),
+        payment_term_name                   national character varying(1000),        
+        due_on_date                         bit,
+        due_days                            integer,
+        due_frequency_id                    integer,
+        grace_period                        integer,
+        late_fee_id                         integer,
+        late_fee_posting_frequency_id       integer,
+        late_fee_code                       national character varying(50),
+        late_fee_name                       national character varying(1000),
+        is_flat_amount                      bit,
+        rate                                numeric(30, 6),
+        due_amount                          dbo.money_strict2,
+        late_fee                            dbo.money_strict2,
+        customer_id                         bigint,
+        customer_account_id                 integer,
+        late_fee_account_id                 integer,
+        due_date                            date
     ) ;
 
     WITH unpaid_invoices
@@ -87,9 +95,9 @@ BEGIN
     AS
     (
         SELECT *, 
-        CASE WHEN unpaid_invoices.due_on_date
-        THEN unpaid_invoices.value_date + unpaid_invoices.due_days + unpaid_invoices.grace_period
-        ELSE finance.get_frequency_end_date(unpaid_invoices.due_frequency_id, unpaid_invoices.value_date) +  unpaid_invoices.grace_period END as due_date
+        CASE WHEN unpaid_invoices.due_on_date = 1
+        THEN DATEADD(day, unpaid_invoices.due_days + unpaid_invoices.grace_period, unpaid_invoices.value_date)
+        ELSE DATEADD(day, unpaid_invoices.grace_period, finance.get_frequency_end_date(unpaid_invoices.due_frequency_id, unpaid_invoices.value_date)) END as due_date
         FROM unpaid_invoices
     )
 
@@ -121,27 +129,49 @@ BEGIN
 
     UPDATE @temp_late_fee
     SET late_fee = rate
-    WHERE is_flat_amount;
+    WHERE is_flat_amount = 1;
 
     UPDATE @temp_late_fee
     SET late_fee = due_amount * rate / 100
     WHERE is_flat_amount = 0;
 
-    @default_currency_code                  =  core.get_currency_code_by_office_id(@office_id);
+    SET @default_currency_code                  =  core.get_currency_code_by_office_id(@office_id);
 
-    FOR this IN
-    SELECT * FROM @temp_late_fee
-    WHERE late_fee > 0
-    AND customer_account_id IS NOT NULL
-    AND late_fee_account_id IS NOT NULL
-    LOOP
-        @transaction_master_id  = nextval(pg_get_integer IDENTITY_sequence(' finance.transaction_master', 'transaction_master_id'));
-        @tran_counter           =  finance.get_new_transaction_counter(@value_date);
-        @transaction_code       =  finance.get_transaction_code(@value_date, @office_id, @user_id, @login_id);
+    DELETE FROM @temp_late_fee
+    WHERE late_fee <= 0
+    AND customer_account_id IS NULL
+    AND late_fee_account_id IS NULL;
+
+
+    SELECT @total_rows=MAX(transaction_master_id) FROM @temp_late_fee;
+
+    WHILE @counter<@total_rows
+    BEGIN
+        SELECT TOP 1 
+            @loop_transaction_master_id = transaction_master_id,
+            @loop_late_fee_name = late_fee_name,
+            @loop_late_fee_account_id = late_fee_account_id,
+            @loop_customer_id = customer_id,
+            @loop_late_fee = late_fee,
+            @loop_customer_account_id = customer_account_id
+        FROM @temp_late_fee
+        WHERE transaction_master_id >= @counter
+        ORDER BY transaction_master_id;
+
+        IF(@loop_transaction_master_id IS NOT NULL)
+        BEGIN
+            SET @counter = @loop_transaction_master_id + 1;        
+        END
+        ELSE
+        BEGIN
+            BREAK;
+        END;
+
+        SET @tran_counter           = finance.get_new_transaction_counter(@value_date);
+        SET @transaction_code       = finance.get_transaction_code(@value_date, @office_id, @user_id, @login_id);
 
         INSERT INTO  finance.transaction_master
         (
-            transaction_master_id, 
             transaction_counter, 
             transaction_code, 
             book, 
@@ -155,18 +185,20 @@ BEGIN
             verification_reason
         ) 
         SELECT            
-            @transaction_master_id, 
             @tran_counter, 
             @transaction_code, 
             @book_name, 
             @value_date, 
             @user_id, 
             @office_id,             
-            CAST(this.transaction_master_id AS varchar(100)) AS reference_number,
-            this.late_fee_name AS statement_reference,
+            CAST(@loop_transaction_master_id AS varchar(100)) AS reference_number,
+            @loop_late_fee_name AS statement_reference,
             1,
             @user_id,
             'Automatically verified by workflow.';
+
+        SET @transaction_master_id = SCOPE_IDENTITY();
+
 
         INSERT INTO  finance.transaction_details
         (
@@ -185,35 +217,39 @@ BEGIN
             @transaction_master_id,
             @value_date,
             'Cr',
-            this.late_fee_account_id,
-            this.late_fee_name + ' (' + core.get_customer_code_by_customer_id(this.customer_id) + ')',
+            @loop_late_fee_account_id,
+            @loop_late_fee_name + ' (' + core.get_customer_code_by_customer_id(@loop_customer_id) + ')',
             @default_currency_code, 
-            this.late_fee, 
+            @loop_late_fee, 
             1 AS exchange_rate,
             @default_currency_code,
-            this.late_fee
+            @loop_late_fee
         UNION ALL
         SELECT
             @transaction_master_id,
             @value_date,
             'Dr',
-            this.customer_account_id,
-            this.late_fee_name,
+            @loop_customer_account_id,
+            @loop_late_fee_name,
             @default_currency_code, 
-            this.late_fee, 
+            @loop_late_fee, 
             1 AS exchange_rate,
             @default_currency_code,
-            this.late_fee;
+            @loop_late_fee;
 
-        INSERT INTO  sales.late_fee(transaction_master_id, customer_id, value_date, late_fee_tran_id, amount)
-        SELECT this.transaction_master_id, this.customer_id, @value_date, @transaction_master_id, this.late_fee;
-    END LOOP;
+        INSERT INTO  sales.late_fee_postings(transaction_master_id, customer_id, value_date, late_fee_tran_id, amount)
+        SELECT @loop_transaction_master_id, @loop_customer_id, @value_date, @transaction_master_id, @loop_late_fee;
+    END;
 END;
 
 
 
-SELECT  finance.create_routine('POST-LF', ' sales.post_late_fee', 250);
 
 --SELECT * FROM  sales.post_late_fee(2, 5, 2,  finance.get_value_date(2));
 
 GO
+
+EXECUTE finance.create_routine 'POST-LF', ' sales.post_late_fee', 250;
+
+GO
+

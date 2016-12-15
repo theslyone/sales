@@ -14,7 +14,7 @@ BEGIN
     DECLARE @total_amount                   dbo.money_strict;
     DECLARE @customer_id                    integer;
 
-    DECLARE @temp_coupons
+    DECLARE @temp_coupons TABLE
     (
         coupon_id                           integer,
         maximum_usage                       dbo.integer_strict,
@@ -22,18 +22,14 @@ BEGIN
     );
     
     SELECT
-        sales.sales.price_type_id,
-        sales.sales.total_amount,
-        sales.sales.customer_id
-    INTO
-        @price_type_id,
-        @total_amount,
-        @customer_id
+        @price_type_id = sales.sales.price_type_id,
+        @total_amount = sales.sales.total_amount,
+        @customer_id = sales.sales.customer_id        
     FROM sales.sales
     WHERE sales.sales.transaction_master_id = @tran_id;
 
 
-    INSERT INTO @temp_coupons
+    INSERT INTO @temp_coupons(coupon_id, maximum_usage)
     SELECT sales.coupons.coupon_id, sales.coupons.maximum_usage
     FROM sales.coupons
     WHERE sales.coupons.deleted = 0
@@ -45,7 +41,7 @@ BEGIN
     AND COALESCE(sales.coupons.for_ticket_having_maximum_amount, 0) = 0
     AND sales.coupons.for_ticket_of_unknown_customers_only IS NULL;
 
-    INSERT INTO @temp_coupons
+    INSERT INTO @temp_coupons(coupon_id, maximum_usage)
     SELECT sales.coupons.coupon_id, sales.coupons.maximum_usage
     FROM sales.coupons
     WHERE sales.coupons.deleted = 0
@@ -59,7 +55,7 @@ BEGIN
 
     IF(COALESCE(@customer_id, 0) > 0)
     BEGIN
-        INSERT INTO @temp_coupons
+        INSERT INTO @temp_coupons(coupon_id, maximum_usage)
         SELECT sales.coupons.coupon_id, sales.coupons.maximum_usage
         FROM sales.coupons
         WHERE sales.coupons.deleted = 0
@@ -73,7 +69,7 @@ BEGIN
     END
     ELSE
     BEGIN
-        INSERT INTO @temp_coupons
+        INSERT INTO @temp_coupons(coupon_id, maximum_usage)
         SELECT sales.coupons.coupon_id, sales.coupons.maximum_usage
         FROM sales.coupons
         WHERE sales.coupons.deleted = 0
@@ -83,7 +79,7 @@ BEGIN
         AND (sales.coupons.for_ticket_of_price_type_id IS NULL OR for_ticket_of_price_type_id = @price_type_id)
         AND (sales.coupons.for_ticket_having_minimum_amount IS NULL OR sales.coupons.for_ticket_having_minimum_amount <= @total_amount)
         AND (sales.coupons.for_ticket_having_maximum_amount IS NULL OR sales.coupons.for_ticket_having_maximum_amount >= @total_amount)
-        AND sales.coupons.for_ticket_of_unknown_customers_only;    
+        AND sales.coupons.for_ticket_of_unknown_customers_only = 1;    
     END;
 
     UPDATE @temp_coupons

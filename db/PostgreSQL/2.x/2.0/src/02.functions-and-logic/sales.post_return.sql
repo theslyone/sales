@@ -35,7 +35,6 @@ RETURNS bigint
 AS
 $$
     DECLARE _book_name              national character varying = 'Sales Return';
-    DECLARE _customer_id            bigint;
     DECLARE _cost_center_id         bigint;
     DECLARE _tran_master_id         bigint;
     DECLARE _tran_counter           integer;
@@ -92,7 +91,7 @@ BEGIN
         item_id                         integer, 
         quantity                        integer_strict,        
         unit_id                         integer,
-        base_quantity                   decimal,
+        base_quantity                   decimal(30, 6),
         base_unit_id                    integer,                
         price                           public.money_strict,
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),
@@ -179,7 +178,7 @@ BEGIN
 
     IF(_discount_total IS NOT NULL AND _discount_total > 0) THEN
         INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
-        SELECT _tran_master_id, _book_name, _office_id, _value_date, _book_date, 'Cr', sales_discount_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(discount, 0)), _default_currency_code, 1, SUM(COALESCE(discount, 0))
+        SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Cr', sales_discount_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(discount, 0)), _default_currency_code, 1, SUM(COALESCE(discount, 0))
         FROM temp_checkout_details
         GROUP BY sales_discount_account_id;
     END IF;

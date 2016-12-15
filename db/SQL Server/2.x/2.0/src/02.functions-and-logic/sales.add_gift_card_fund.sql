@@ -24,13 +24,11 @@ BEGIN
     DECLARE @payable_account_id                 integer;
     DECLARE @currency_code                      national character varying(12);
 
-    @currency_code                              = core.get_currency_code_by_office_id(@office_id);
-    @payable_account_id                         = sales.get_payable_account_id_by_gift_card_id(@gift_card_id);
-    @transaction_master_id                      = nextval(pg_get_integer IDENTITY_sequence('finance.transaction_master', 'transaction_master_id'));
+    SET @currency_code                              = core.get_currency_code_by_office_id(@office_id);
+    SET @payable_account_id                         = sales.get_payable_account_id_by_gift_card_id(@gift_card_id);
 
-    INSERT INTO finance.transaction_master(transaction_master_id, transaction_counter, transaction_code, book, value_date, book_date, login_id, user_id, office_id, cost_center_id, reference_number, statement_reference)
+    INSERT INTO finance.transaction_master(transaction_counter, transaction_code, book, value_date, book_date, login_id, user_id, office_id, cost_center_id, reference_number, statement_reference)
     SELECT
-        @transaction_master_id,
         finance.get_new_transaction_counter(@value_date),
         finance.get_transaction_code(@value_date, @office_id, @user_id, @login_id),
         @book_name,
@@ -42,6 +40,8 @@ BEGIN
         @cost_center_id,
         @reference_number,
         @statement_reference;
+
+    SET @transaction_master_id = SCOPE_IDENTITY();
 
     INSERT INTO finance.transaction_details(transaction_master_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency, office_id, audit_user_id)
     SELECT

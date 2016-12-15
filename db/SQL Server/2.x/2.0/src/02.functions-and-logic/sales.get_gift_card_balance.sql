@@ -4,14 +4,13 @@ DROP FUNCTION sales.get_gift_card_balance;
 GO
 
 CREATE FUNCTION sales.get_gift_card_balance(@gift_card_id integer, @value_date date)
-RETURNS decimal(24, 4)
+RETURNS numeric(30, 6)
 AS
 BEGIN
-    DECLARE @debit          decimal(24, 4);
-    DECLARE @credit         decimal(24, 4);
+    DECLARE @debit          numeric(30, 6);
+    DECLARE @credit         numeric(30, 6);
 
-    SELECT SUM(COALESCE(sales.gift_card_transactions.amount, 0))
-    INTO @debit
+    SELECT @debit = SUM(COALESCE(sales.gift_card_transactions.amount, 0))
     FROM sales.gift_card_transactions
     INNER JOIN finance.transaction_master
     ON finance.transaction_master.transaction_master_id = sales.gift_card_transactions.transaction_master_id
@@ -19,8 +18,7 @@ BEGIN
     AND sales.gift_card_transactions.transaction_type = 'Dr'
     AND finance.transaction_master.value_date <= @value_date;
 
-    SELECT SUM(COALESCE(sales.gift_card_transactions.amount, 0))
-    INTO @credit
+    SELECT @credit = SUM(COALESCE(sales.gift_card_transactions.amount, 0))
     FROM sales.gift_card_transactions
     INNER JOIN finance.transaction_master
     ON finance.transaction_master.transaction_master_id = sales.gift_card_transactions.transaction_master_id

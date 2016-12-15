@@ -57,7 +57,7 @@ SELECT
     sales.sales.fiscal_year_code,
     sales.sales.invoice_number,
     sales.sales.total_amount,
-    sales.sales.tEND;er,
+    sales.sales.tender,
     sales.sales.change,
     sales.sales.check_number,
     sales.sales.check_date,
