@@ -5,7 +5,9 @@ GO
 
 CREATE PROCEDURE sales.settle_customer_due(@customer_id bigint, @office_id integer)
 AS
-BEGIN   
+BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @settled_transactions TABLE
     (
         transaction_master_id               bigint

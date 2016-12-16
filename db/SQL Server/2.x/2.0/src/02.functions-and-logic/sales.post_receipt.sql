@@ -39,6 +39,8 @@ CREATE PROCEDURE sales.post_receipt
 )
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @book                               national character varying(50);
     DECLARE @transaction_master_id              bigint;
     DECLARE @base_currency_code                 national character varying(12);

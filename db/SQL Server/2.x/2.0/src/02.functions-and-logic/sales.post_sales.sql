@@ -35,7 +35,9 @@ CREATE PROCEDURE sales.post_sales
     @transaction_master_id                  bigint OUTPUT
 )
 AS
-BEGIN        
+BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @book_name                      national character varying(48) = 'Sales Entry';
     DECLARE @checkout_id                    bigint;
     DECLARE @grand_total                    decimal(30, 6);

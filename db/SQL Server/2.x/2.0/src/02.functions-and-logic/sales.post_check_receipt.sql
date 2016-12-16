@@ -30,7 +30,9 @@ CREATE PROCEDURE sales.post_check_receipt
     @transaction_master_id                      bigint OUTPUT
 )
 AS
-BEGIN            
+BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
     DECLARE @debit                              decimal(30, 6);
     DECLARE @credit                             decimal(30, 6);

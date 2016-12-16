@@ -22,6 +22,8 @@ CREATE PROCEDURE sales.post_return
 )
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @book_name              national character varying = 'Sales Return';
     DECLARE @cost_center_id         bigint;
     DECLARE @tran_counter           integer;

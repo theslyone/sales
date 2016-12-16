@@ -6,6 +6,8 @@ GO
 CREATE PROCEDURE sales.post_late_fee(@user_id integer, @login_id bigint, @office_id integer, @value_date date)
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @transaction_master_id          bigint;
     DECLARE @tran_counter                   integer;
     DECLARE @transaction_code               national character varying(50);

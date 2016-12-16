@@ -30,6 +30,8 @@ CREATE PROCEDURE sales.post_cash_receipt
 )
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
     DECLARE @debit                              decimal(30, 6);
     DECLARE @credit                             decimal(30, 6);

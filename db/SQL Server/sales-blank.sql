@@ -426,6 +426,8 @@ CREATE PROCEDURE sales.add_gift_card_fund
 )
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @transaction_master_id              bigint;
     DECLARE @book_name                          national character varying(50) = 'Gift Card Fund Sales';
     DECLARE @payable_account_id                 integer;
@@ -513,6 +515,8 @@ CREATE PROCEDURE sales.add_opening_cash
 )
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     IF NOT EXISTS
     (
         SELECT 1
@@ -1150,6 +1154,8 @@ CREATE PROCEDURE sales.post_cash_receipt
 )
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
     DECLARE @debit                              decimal(30, 6);
     DECLARE @credit                             decimal(30, 6);
@@ -1270,7 +1276,9 @@ CREATE PROCEDURE sales.post_check_receipt
     @transaction_master_id                      bigint OUTPUT
 )
 AS
-BEGIN            
+BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
     DECLARE @debit                              decimal(30, 6);
     DECLARE @credit                             decimal(30, 6);
@@ -1361,6 +1369,8 @@ GO
 CREATE PROCEDURE sales.post_late_fee(@user_id integer, @login_id bigint, @office_id integer, @value_date date)
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @transaction_master_id          bigint;
     DECLARE @tran_counter                   integer;
     DECLARE @transaction_code               national character varying(50);
@@ -1652,6 +1662,8 @@ CREATE PROCEDURE sales.post_receipt
 )
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @book                               national character varying(50);
     DECLARE @transaction_master_id              bigint;
     DECLARE @base_currency_code                 national character varying(12);
@@ -1764,7 +1776,9 @@ CREATE PROCEDURE sales.post_receipt_by_gift_card
     @transaction_master_id                      bigint OUTPUT
 )
 AS
-BEGIN        
+BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
     DECLARE @debit                              decimal(30, 6);
     DECLARE @credit                             decimal(30, 6);
@@ -1875,6 +1889,8 @@ CREATE PROCEDURE sales.post_return
 )
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @book_name              national character varying = 'Sales Return';
     DECLARE @cost_center_id         bigint;
     DECLARE @tran_counter           integer;
@@ -2109,7 +2125,9 @@ CREATE PROCEDURE sales.post_sales
     @transaction_master_id                  bigint OUTPUT
 )
 AS
-BEGIN        
+BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @book_name                      national character varying(48) = 'Sales Entry';
     DECLARE @checkout_id                    bigint;
     DECLARE @grand_total                    decimal(30, 6);
@@ -2554,7 +2572,9 @@ GO
 
 CREATE PROCEDURE sales.settle_customer_due(@customer_id bigint, @office_id integer)
 AS
-BEGIN   
+BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @settled_transactions TABLE
     (
         transaction_master_id               bigint

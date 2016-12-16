@@ -13,6 +13,8 @@ CREATE PROCEDURE sales.add_opening_cash
 )
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     IF NOT EXISTS
     (
         SELECT 1
