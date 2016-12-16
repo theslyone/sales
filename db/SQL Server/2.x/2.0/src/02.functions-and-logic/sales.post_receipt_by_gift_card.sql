@@ -13,8 +13,8 @@ CREATE PROCEDURE sales.post_receipt_by_gift_card
     @currency_code                              national character varying(12),
     @local_currency_code                        national character varying(12),
     @base_currency_code                         national character varying(12),
-    @exchange_rate_debit                        dbo.decimal_strict, 
-    @exchange_rate_credit                       dbo.decimal_strict,
+    @exchange_rate_debit                        decimal(30, 6), 
+    @exchange_rate_credit                       decimal(30, 6),
     @reference_number                           national character varying(24), 
     @statement_reference                        national character varying(2000), 
     @cost_center_id                             integer,
@@ -22,17 +22,17 @@ CREATE PROCEDURE sales.post_receipt_by_gift_card
     @book_date                                  date,
     @gift_card_id                               integer,
     @gift_card_number                           national character varying(100),
-    @amount                                     dbo.money_strict,
+    @amount                                     decimal(30, 6),
     @cascading_tran_id                          bigint,
     @transaction_master_id                      bigint OUTPUT
 )
 AS
 BEGIN        
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
-    DECLARE @debit                              dbo.money_strict2;
-    DECLARE @credit                             dbo.money_strict2;
-    DECLARE @lc_debit                           dbo.money_strict2;
-    DECLARE @lc_credit                          dbo.money_strict2;
+    DECLARE @debit                              decimal(30, 6);
+    DECLARE @credit                             decimal(30, 6);
+    DECLARE @lc_debit                           decimal(30, 6);
+    DECLARE @lc_credit                          decimal(30, 6);
     DECLARE @is_cash                            bit;
     DECLARE @gift_card_payable_account_id       integer;
 

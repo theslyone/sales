@@ -11,9 +11,9 @@ CREATE PROCEDURE sales.post_receipt
     
     @customer_id                                integer,
     @currency_code                              national character varying(12), 
-    @exchange_rate_debit                        dbo.decimal_strict, 
+    @exchange_rate_debit                        decimal(30, 6), 
 
-    @exchange_rate_credit                       dbo.decimal_strict,
+    @exchange_rate_credit                       decimal(30, 6),
     @reference_number                           national character varying(24), 
     @statement_reference                        national character varying(2000), 
 
@@ -23,11 +23,11 @@ CREATE PROCEDURE sales.post_receipt
 
     @value_date                                 date,
     @book_date                                  date,
-    @receipt_amount                             dbo.money_strict,
+    @receipt_amount                             decimal(30, 6),
 
-    @tender                                     dbo.money_strict2,
-    @change                                     dbo.money_strict2,
-    @check_amount                               dbo.money_strict2,
+    @tender                                     decimal(30, 6),
+    @change                                     decimal(30, 6),
+    @check_amount                               decimal(30, 6),
 
     @check_bank_name                            national character varying(1000),
     @check_number                               national character varying(100),
@@ -44,10 +44,10 @@ BEGIN
     DECLARE @base_currency_code                 national character varying(12);
     DECLARE @local_currency_code                national character varying(12);
     DECLARE @customer_account_id                integer;
-    DECLARE @debit                              dbo.money_strict2;
-    DECLARE @credit                             dbo.money_strict2;
-    DECLARE @lc_debit                           dbo.money_strict2;
-    DECLARE @lc_credit                          dbo.money_strict2;
+    DECLARE @debit                              decimal(30, 6);
+    DECLARE @credit                             decimal(30, 6);
+    DECLARE @lc_debit                           decimal(30, 6);
+    DECLARE @lc_credit                          decimal(30, 6);
     DECLARE @is_cash                            bit;
     DECLARE @gift_card_id                       integer;
     DECLARE @receivable_account_id              integer;

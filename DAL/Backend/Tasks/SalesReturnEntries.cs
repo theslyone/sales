@@ -1,102 +1,37 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Linq;
+using System;
 using System.Threading.Tasks;
-using Frapid.Configuration;
-using Frapid.Framework.Extensions;
+using Frapid.Configuration.Db;
+using Frapid.Mapper.Database;
+using MixERP.Sales.DAL.Backend.Tasks.ReturnEntry;
 using MixERP.Sales.ViewModels;
-using Npgsql;
-using Frapid.DataAccess.Extensions;
 
 namespace MixERP.Sales.DAL.Backend.Tasks
 {
     public static class SalesReturnEntries
     {
-        public static string GetParametersForDetails(List<SalesDetailType> details)
+        private static IReturnEntry LocateService(string tenant)
         {
-            if (details == null)
+            string providerName = DbProvider.GetProviderName(tenant);
+            var type = DbProvider.GetDbType(providerName);
+
+            if (type == DatabaseType.PostgreSQL)
             {
-                return "NULL::sales.sales_detail_type";
+                return new PostgreSQL();
             }
 
-            var items = new Collection<string>();
-            for (int i = 0; i < details.Count; i++)
+            if (type == DatabaseType.SqlServer)
             {
-                items.Add(string.Format(CultureInfo.InvariantCulture,
-                    "ROW(@StoreId{0}, @TransactionType{0}, @ItemId{0}, @Quantity{0}, @UnitId{0}, @Price{0}, @DiscountRate{0}, @Tax{0}, @ShippingCharge{0})::sales.sales_detail_type",
-                    i.ToString(CultureInfo.InvariantCulture)));
+                return new SqlServer();
             }
 
-            return string.Join(",", items);
-        }
-
-        public static IEnumerable<NpgsqlParameter> AddParametersForDetails(List<SalesDetailType> details)
-        {
-            var parameters = new List<NpgsqlParameter>();
-
-            if (details != null)
-            {
-                for (int i = 0; i < details.Count; i++)
-                {
-                    parameters.Add(new NpgsqlParameter("@StoreId" + i, details[i].StoreId));
-                    parameters.Add(new NpgsqlParameter("@TransactionType" + i, "Cr"));//Inventory is decreased
-                    parameters.Add(new NpgsqlParameter("@ItemId" + i, details[i].ItemId));
-                    parameters.Add(new NpgsqlParameter("@Quantity" + i, details[i].Quantity));
-                    parameters.Add(new NpgsqlParameter("@UnitId" + i, details[i].UnitId));
-                    parameters.Add(new NpgsqlParameter("@Price" + i, details[i].Price));
-                    parameters.Add(new NpgsqlParameter("@DiscountRate" + i, details[i].DiscountRate));
-                    parameters.Add(new NpgsqlParameter("@Tax" + i, details[i].Tax));
-                    parameters.Add(new NpgsqlParameter("@ShippingCharge" + i, details[i].ShippingCharge));
-                }
-            }
-
-            return parameters;
+            throw new NotImplementedException();
         }
 
         public static async Task<long> PostAsync(string tenant, SalesReturn model)
         {
-            string connectionString = FrapidDbServer.GetConnectionString(tenant);
-            string sql = @"SELECT * FROM sales.post_return
-                            (
-                                @TransactionMasterId::bigint, @OfficeId::integer, @UserId::integer, @LoginId::bigint, 
-                                @ValueDate::date, @BookDate::date, 
-                                @StoreId::integer, @CounterId::integer, @CustomerId, @PriceTypeId::integer,
-                                @ReferenceNumber::national character varying(24), @StatementReference::text, 
-                                ARRAY[{0}]
-                            );";
-            sql = string.Format(sql, GetParametersForDetails(model.Details));
+            var entry = LocateService(tenant);
 
-            using (var connection = new NpgsqlConnection(connectionString))
-            {
-                using (var command = new NpgsqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithNullableValue("@TransactionMasterId", model.TransactionMasterId);
-                    command.Parameters.AddWithNullableValue("@OfficeId", model.OfficeId);
-                    command.Parameters.AddWithNullableValue("@UserId", model.UserId);
-                    command.Parameters.AddWithNullableValue("@LoginId", model.LoginId);
-                    command.Parameters.AddWithNullableValue("@ValueDate", model.ValueDate);
-                    command.Parameters.AddWithNullableValue("@BookDate", model.BookDate);
-
-                    command.Parameters.AddWithNullableValue("@StoreId", model.StoreId);
-                    command.Parameters.AddWithNullableValue("@CounterId", model.CounterId);
-                    command.Parameters.AddWithNullableValue("@CustomerId", model.CustomerId);
-                    command.Parameters.AddWithNullableValue("@PriceTypeId", model.PriceTypeId);
-
-                    command.Parameters.AddWithNullableValue("@ReferenceNumber", model.ReferenceNumber);
-                    command.Parameters.AddWithNullableValue("@StatementReference", model.StatementReference);
-
-
-                    command.Parameters.AddRange(AddParametersForDetails(model.Details).ToArray());
-
-                    connection.Open();
-                    var awaiter = await command.ExecuteScalarAsync().ConfigureAwait(false);
-                    return awaiter.To<long>();
-                }
-            }
-
-
-
+            return await entry.PostAsync(tenant, model).ConfigureAwait(false);
         }
     }
 }

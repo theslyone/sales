@@ -167,8 +167,14 @@
     <Compile Include="DAL\Backend\Tasks\GiftCardFunds.cs" />
     <Compile Include="DAL\Backend\Tasks\Orders.cs" />
     <Compile Include="DAL\Backend\Tasks\Quotations.cs" />
+    <Compile Include="DAL\Backend\Tasks\ReturnEntry\PostgreSQL.cs" />
+    <Compile Include="DAL\Backend\Tasks\ReturnEntry\SqlServer.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntries.cs" />
     <Compile Include="DAL\Backend\Service\Items.cs" />
+    <Compile Include="DAL\Backend\Tasks\ReturnEntry\ISalesEntry.cs" />
+    <Compile Include="DAL\Backend\Tasks\SalesEntry\ISalesEntry.cs" />
+    <Compile Include="DAL\Backend\Tasks\SalesEntry\PostgreSQL.cs" />
+    <Compile Include="DAL\Backend\Tasks\SalesEntry\SqlServer.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesReturnEntries.cs" />
     <Compile Include="DAL\Backend\Tasks\Ticket.cs" />
     <Compile Include="DTO\CheckoutDetailView.cs" />

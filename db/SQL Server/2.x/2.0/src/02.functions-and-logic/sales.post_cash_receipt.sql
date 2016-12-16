@@ -13,8 +13,8 @@ CREATE PROCEDURE sales.post_cash_receipt
     @currency_code                              national character varying(12),
     @local_currency_code                        national character varying(12),
     @base_currency_code                         national character varying(12),
-    @exchange_rate_debit                        dbo.decimal_strict, 
-    @exchange_rate_credit                       dbo.decimal_strict,
+    @exchange_rate_debit                        decimal(30, 6), 
+    @exchange_rate_credit                       decimal(30, 6),
     @reference_number                           national character varying(24), 
     @statement_reference                        national character varying(2000), 
     @cost_center_id                             integer,
@@ -22,19 +22,19 @@ CREATE PROCEDURE sales.post_cash_receipt
     @cash_repository_id                         integer,
     @value_date                                 date,
     @book_date                                  date,
-    @receivable                                 dbo.money_strict2,
-    @tender                                     dbo.money_strict2,
-    @change                                     dbo.money_strict2,
+    @receivable                                 decimal(30, 6),
+    @tender                                     decimal(30, 6),
+    @change                                     decimal(30, 6),
     @cascading_tran_id                          bigint,
     @transaction_master_id                      bigint OUTPUT
 )
 AS
 BEGIN
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
-    DECLARE @debit                              dbo.money_strict2;
-    DECLARE @credit                             dbo.money_strict2;
-    DECLARE @lc_debit                           dbo.money_strict2;
-    DECLARE @lc_credit                          dbo.money_strict2;
+    DECLARE @debit                              decimal(30, 6);
+    DECLARE @credit                             decimal(30, 6);
+    DECLARE @lc_debit                           decimal(30, 6);
+    DECLARE @lc_credit                          decimal(30, 6);
 
     DECLARE @can_post_transaction           bit;
     DECLARE @error_message                  national character varying(MAX);

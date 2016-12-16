@@ -4,15 +4,15 @@ DROP FUNCTION sales.get_item_selling_price;
 GO
 
 CREATE FUNCTION sales.get_item_selling_price(@item_id integer, @customer_type_id integer, @price_type_id integer, @unit_id integer)
-RETURNS dbo.money_strict2
+RETURNS decimal(30, 6)
 AS
 BEGIN
-    DECLARE @price              dbo.money_strict2;
+    DECLARE @price              decimal(30, 6);
     DECLARE @costing_unit_id    integer;
     DECLARE @factor             decimal(30, 6);
     DECLARE @tax_rate           decimal(30, 6);
     DECLARE @includes_tax       bit;
-    DECLARE @tax                dbo.money_strict2;
+    DECLARE @tax                decimal(30, 6);
 
     --Fist pick the catalog price which matches all these fields:
     --Item, Customer Type, Price Type, and Unit.

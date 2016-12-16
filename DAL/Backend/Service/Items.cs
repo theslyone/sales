@@ -15,7 +15,7 @@ namespace MixERP.Sales.DAL.Backend.Service
         {
             using (var db = DbProvider.Get(FrapidDbServer.GetConnectionString(tenant), tenant).GetDatabase())
             {
-                var sql = new Sql("SELECT * FROM sales.item_view");
+                var sql = new Sql("SELECT * FROM sales.item_view;");
                 return await db.SelectAsync<ItemView>(sql).ConfigureAwait(false);
             }
         }

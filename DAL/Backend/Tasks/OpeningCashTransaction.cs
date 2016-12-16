@@ -19,13 +19,8 @@ namespace MixERP.Sales.DAL.Backend.Tasks
 
         public static async Task AddAsync(string tenant, OpeningCash model)
         {
-            string sql = FrapidDbServer.GetProcedureCommand(tenant, "sales.add_opening_cash",
-                new[] { "@0", "@1", "@2", "@3", "@4" });
-
-            await
-                Factory.NonQueryAsync(tenant, sql, model.UserId, model.TransactionDate.Date, model.Amount, model.ProvidedBy,
-                    model.Memo.Or(""))
-                    .ConfigureAwait(false);
+            string sql = FrapidDbServer.GetProcedureCommand(tenant, "sales.add_opening_cash", new[] { "@0", "@1", "@2", "@3", "@4" });
+            await Factory.NonQueryAsync(tenant, sql, model.UserId, model.TransactionDate.Date, model.Amount, model.ProvidedBy, model.Memo.Or("")).ConfigureAwait(false);
         }
     }
 }

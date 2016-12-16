@@ -5,6 +5,7 @@ using Frapid.Configuration;
 using Frapid.Configuration.Db;
 using Frapid.DataAccess;
 using Frapid.Framework.Extensions;
+using Frapid.Mapper.Database;
 using Frapid.Mapper.Query.Insert;
 using MixERP.Sales.DTO;
 using MixERP.Sales.QueryModels;
@@ -32,8 +33,12 @@ namespace MixERP.Sales.DAL.Backend.Tasks
 
         public static async Task<List<QuotationResultview>> GetQuotationResultViewAsync(string tenant, QuotationQueryModel query)
         {
-            //Todo: The following query is incompatible with sql server
-            const string sql = "SELECT * FROM sales.get_quotation_view(@0::integer,@1::integer,@2,@3::date,@4::date,@5::date,@6::date,@7::bigint,@8,@9,@10,@11,@12);";
+            string sql = "SELECT * FROM sales.get_quotation_view(@0::integer,@1::integer,@2,@3::date,@4::date,@5::date,@6::date,@7::bigint,@8,@9,@10,@11,@12);";
+
+            if (DbProvider.GetDbType(DbProvider.GetProviderName(tenant)) == DatabaseType.SqlServer)
+            {
+                sql = "SELECT * FROM sales.get_quotation_view(@0,@1,@2,@3,@4,@5,@6,@7,@8,@9,@10,@11,@12);";
+            }
 
             var awaiter = await
                 Factory.GetAsync<QuotationResultview>(tenant, sql, query.UserId, query.OfficeId, query.Customer.Or(""), query.From, query.To,

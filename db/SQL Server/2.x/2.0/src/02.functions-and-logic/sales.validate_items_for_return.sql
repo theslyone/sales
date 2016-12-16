@@ -19,11 +19,11 @@ BEGIN
     DECLARE @is_purchase                    bit = 0;
     DECLARE @item_id                        integer = 0;
     DECLARE @factor_to_base_unit            numeric(30, 6);
-    DECLARE @returned_in_previous_batch     dbo.decimal_strict2 = 0;
-    DECLARE @in_verification_queue          dbo.decimal_strict2 = 0;
-    DECLARE @actual_price_in_root_unit      dbo.money_strict2 = 0;
-    DECLARE @price_in_root_unit             dbo.money_strict2 = 0;
-    DECLARE @item_in_stock                  dbo.decimal_strict2 = 0;
+    DECLARE @returned_in_previous_batch     decimal(30, 6) = 0;
+    DECLARE @in_verification_queue          decimal(30, 6) = 0;
+    DECLARE @actual_price_in_root_unit      decimal(30, 6) = 0;
+    DECLARE @price_in_root_unit             decimal(30, 6) = 0;
+    DECLARE @item_in_stock                  decimal(30, 6) = 0;
     DECLARE @error_item_id                  integer;
     DECLARE @error_quantity                 decimal(30, 6);
     DECLARE @error_amount                   decimal(30, 6);
@@ -33,7 +33,7 @@ BEGIN
     DECLARE @counter                        integer = 0;
     DECLARE @loop_id                        integer;
     DECLARE @loop_item_id                   integer;
-    DECLARE @loop_price                     dbo.money_strict;
+    DECLARE @loop_price                     decimal(30, 6);
     DECLARE @loop_base_quantity             numeric(30, 6);
 
     SET @checkout_id                        = inventory.get_checkout_id_by_transaction_master_id(@transaction_master_id);
@@ -48,12 +48,12 @@ BEGIN
         store_id            integer,
         item_id             integer,
         item_in_stock       numeric(30, 6),
-        quantity            dbo.decimal_strict,        
+        quantity            decimal(30, 6),        
         unit_id             integer,
-        price               dbo.money_strict,
-        discount_rate       dbo.decimal_strict2,
-        tax                 dbo.money_strict2,
-        shipping_charge     dbo.money_strict2,
+        price               decimal(30, 6),
+        discount_rate       decimal(30, 6),
+        tax                 decimal(30, 6),
+        shipping_charge     decimal(30, 6),
         root_unit_id        integer,
         base_quantity       numeric(30, 6)
     ) ;

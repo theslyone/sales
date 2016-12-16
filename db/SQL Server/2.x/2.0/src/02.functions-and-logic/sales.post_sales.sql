@@ -14,10 +14,10 @@ CREATE PROCEDURE sales.post_sales
     @cost_center_id                         integer,
     @reference_number                       national character varying(24),
     @statement_reference                    national character varying(2000),
-    @tender                                 dbo.money_strict2,
-    @change                                 dbo.money_strict2,
+    @tender                                 decimal(30, 6),
+    @change                                 decimal(30, 6),
     @payment_term_id                        integer,
-    @check_amount                           dbo.money_strict2,
+    @check_amount                           decimal(30, 6),
     @check_bank_name                        national character varying(1000),
     @check_number                           national character varying(100),
     @check_date                             date,
@@ -28,7 +28,7 @@ CREATE PROCEDURE sales.post_sales
     @store_id                               integer,
     @coupon_code                            national character varying(100),
     @is_flat_discount                       bit,
-    @discount                               dbo.money_strict2,
+    @discount                               decimal(30, 6),
     @details                                sales.sales_detail_type READONLY,
     @sales_quotation_id                     bigint,
     @sales_order_id                         bigint,
@@ -38,16 +38,16 @@ AS
 BEGIN        
     DECLARE @book_name                      national character varying(48) = 'Sales Entry';
     DECLARE @checkout_id                    bigint;
-    DECLARE @grand_total                    dbo.money_strict;
-    DECLARE @discount_total                 dbo.money_strict2;
-    DECLARE @receivable                     dbo.money_strict2;
+    DECLARE @grand_total                    decimal(30, 6);
+    DECLARE @discount_total                 decimal(30, 6);
+    DECLARE @receivable                     decimal(30, 6);
     DECLARE @default_currency_code          national character varying(12);
     DECLARE @is_periodic                    bit = inventory.is_periodic_inventory(@office_id);
-    DECLARE @cost_of_goods                    dbo.money_strict;
+    DECLARE @cost_of_goods                    decimal(30, 6);
     DECLARE @tran_counter                   integer;
     DECLARE @transaction_code               national character varying(50);
-    DECLARE @tax_total                      dbo.money_strict2;
-    DECLARE @shipping_charge                dbo.money_strict2;
+    DECLARE @tax_total                      decimal(30, 6);
+    DECLARE @shipping_charge                decimal(30, 6);
     DECLARE @cash_repository_id             integer;
     DECLARE @cash_account_id                integer;
     DECLARE @is_cash                        bit = 0;
@@ -68,15 +68,15 @@ BEGIN
     DECLARE @loop_tran_type                 national character varying(2)
     DECLARE @loop_store_id                  integer;
     DECLARE @loop_item_id                   integer;
-    DECLARE @loop_quantity                  dbo.decimal_strict;
+    DECLARE @loop_quantity                  decimal(30, 6);
     DECLARE @loop_unit_id                   integer;
     DECLARE @loop_base_quantity             decimal(30, 6);
     DECLARE @loop_base_unit_id              integer;
-    DECLARE @loop_price                     dbo.money_strict;
-    DECLARE @loop_cost_of_goods_sold        dbo.money_strict2;
-    DECLARE @loop_discount                  dbo.money_strict2;
-    DECLARE @loop_tax                       dbo.money_strict2;
-    DECLARE @loop_shipping_charge           dbo.money_strict2;
+    DECLARE @loop_price                     decimal(30, 6);
+    DECLARE @loop_cost_of_goods_sold        decimal(30, 6);
+    DECLARE @loop_discount                  decimal(30, 6);
+    DECLARE @loop_tax                       decimal(30, 6);
+    DECLARE @loop_shipping_charge           decimal(30, 6);
 
 
     DECLARE @can_post_transaction           bit;
@@ -142,16 +142,16 @@ BEGIN
         tran_type                       national character varying(2), 
         store_id                        integer,
         item_id                         integer, 
-        quantity                        dbo.decimal_strict,        
+        quantity                        decimal(30, 6),        
         unit_id                         integer,
         base_quantity                   decimal(30, 6),
         base_unit_id                    integer,                
-        price                           dbo.money_strict,
-        cost_of_goods_sold              dbo.money_strict2 DEFAULT(0),
-        discount_rate                   dbo.decimal_strict2,
-        discount                        dbo.money_strict2,
-        tax                             dbo.money_strict2,
-        shipping_charge                 dbo.money_strict2,
+        price                           decimal(30, 6),
+        cost_of_goods_sold              decimal(30, 6) DEFAULT(0),
+        discount_rate                   decimal(30, 6),
+        discount                        decimal(30, 6),
+        tax                             decimal(30, 6),
+        shipping_charge                 decimal(30, 6),
         sales_account_id                integer,
         sales_discount_account_id       integer,
         inventory_account_id            integer,
@@ -286,10 +286,10 @@ BEGIN
         statement_reference         national character varying(2000), 
         cash_repository_id          integer, 
         currency_code               national character varying(12), 
-        amount_in_currency          dbo.money_strict NOT NULL, 
+        amount_in_currency          decimal(30, 6) NOT NULL, 
         local_currency_code         national character varying(12), 
-        er                          dbo.decimal_strict, 
-        amount_in_local_currency    dbo.money_strict
+        er                          decimal(30, 6), 
+        amount_in_local_currency    decimal(30, 6)
     ) ;
 
 
@@ -377,8 +377,8 @@ BEGIN
     ORDER BY tran_type DESC;
 
 
-    INSERT INTO inventory.checkouts(transaction_book, value_date, book_date, checkout_id, transaction_master_id, shipper_id, posted_by, office_id, discount)
-    SELECT @book_name, @value_date, @book_date, @checkout_id, @transaction_master_id, @shipper_id, @user_id, @office_id, @coupon_discount;
+    INSERT INTO inventory.checkouts(transaction_book, value_date, book_date, transaction_master_id, shipper_id, posted_by, office_id, discount)
+    SELECT @book_name, @value_date, @book_date, @transaction_master_id, @shipper_id, @user_id, @office_id, @coupon_discount;
 
     SET @checkout_id              = SCOPE_IDENTITY();    
     

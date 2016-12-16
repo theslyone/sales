@@ -1,5 +1,8 @@
 using System.Threading.Tasks;
+using Frapid.Configuration;
+using Frapid.Configuration.Db;
 using Frapid.DataAccess;
+using Frapid.Mapper.Database;
 using MixERP.Sales.ViewModels;
 
 namespace MixERP.Sales.DAL.Backend.Tasks
@@ -14,8 +17,14 @@ namespace MixERP.Sales.DAL.Backend.Tasks
 
         public static async Task<long> AddAsync(string tenant, GiftCardFund model)
         {
-            const string sql =
+            string sql =
                 @"SELECT * FROM sales.add_gift_card_fund(@0::integer, @1::integer, @2::bigint, sales.get_gift_card_id_by_gift_card_number(@3), @4::date, @5::date, @6::integer, @7::public.money_strict, @8::integer, @9, @10);";
+
+            if (DbProvider.GetDbType(DbProvider.GetProviderName(tenant)) == DatabaseType.SqlServer)
+            {
+                sql = FrapidDbServer.GetProcedureCommand(tenant, "sales.add_gift_card_fund", new[] {"@0", "@1", "@2", "@3", "@4", "@5", "@6", "@7", "@8", "@9", "@10"});
+            }
+
             return
                 await
                     Factory.ScalarAsync<long>(tenant, sql, model.UserId, model.OfficeId, model.LoginId, model.GiftCardNumber, model.ValueDate, model.BookDate, model.AccountId, model.Amount,

@@ -18,7 +18,7 @@ BEGIN
     DECLARE @loop_late_fee_name             national character varying(1000)
     DECLARE @loop_late_fee_account_id       integer;
     DECLARE @loop_customer_id               integer;
-    DECLARE @loop_late_fee                  dbo.money_strict2;
+    DECLARE @loop_late_fee                  decimal(30, 6);
     DECLARE @loop_customer_account_id       integer;
 
 
@@ -39,8 +39,8 @@ BEGIN
         late_fee_name                       national character varying(1000),
         is_flat_amount                      bit,
         rate                                numeric(30, 6),
-        due_amount                          dbo.money_strict2,
-        late_fee                            dbo.money_strict2,
+        due_amount                          decimal(30, 6),
+        late_fee                            decimal(30, 6),
         customer_id                         bigint,
         customer_account_id                 integer,
         late_fee_account_id                 integer,

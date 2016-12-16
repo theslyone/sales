@@ -27,14 +27,14 @@ BEGIN
     DECLARE @tran_counter           integer;
     DECLARE @tran_code              national character varying(50);
     DECLARE @checkout_id            bigint;
-    DECLARE @grand_total            dbo.money_strict;
-    DECLARE @discount_total         dbo.money_strict2;
+    DECLARE @grand_total            decimal(30, 6);
+    DECLARE @discount_total         decimal(30, 6);
     DECLARE @is_credit              bit;
     DECLARE @default_currency_code  national character varying(12);
-    DECLARE @cost_of_goods_sold     dbo.money_strict2;
+    DECLARE @cost_of_goods_sold     decimal(30, 6);
     DECLARE @ck_id                  bigint;
     DECLARE @sales_id               bigint;
-    DECLARE @tax_total              dbo.money_strict2;
+    DECLARE @tax_total              decimal(30, 6);
     DECLARE @tax_account_id         integer;
 
 
@@ -82,16 +82,16 @@ BEGIN
         tran_type                       national character varying(2), 
         store_id                        integer,
         item_id                         integer, 
-        quantity                        dbo.decimal_strict2,        
+        quantity                        decimal(30, 6),        
         unit_id                         integer,
         base_quantity                   decimal(30, 6),
         base_unit_id                    integer,                
-        price                           dbo.money_strict,
-        cost_of_goods_sold              dbo.money_strict2 DEFAULT(0),
-        discount                        dbo.money_strict2 DEFAULT(0),
-        discount_rate                   dbo.decimal_strict2,
-        tax                             dbo.money_strict2,
-        shipping_charge                 dbo.money_strict2,
+        price                           decimal(30, 6),
+        cost_of_goods_sold              decimal(30, 6) DEFAULT(0),
+        discount                        decimal(30, 6) DEFAULT(0),
+        discount_rate                   decimal(30, 6),
+        tax                             decimal(30, 6),
+        shipping_charge                 decimal(30, 6),
         sales_account_id                integer,
         sales_discount_account_id       integer,
         sales_return_account_id         integer,

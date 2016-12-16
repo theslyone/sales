@@ -45,7 +45,7 @@ CREATE TABLE sales.gift_card_transactions
     transaction_master_id                   bigint NOT NULL REFERENCES finance.transaction_master,
     transaction_type                        national character varying(2) NOT NULL
                                             CHECK(transaction_type IN('Dr', 'Cr')),
-    amount                                  dbo.money_strict
+    amount                                  decimal(30, 6)
 );
 
 CREATE TABLE sales.late_fee
@@ -67,7 +67,7 @@ CREATE TABLE sales.late_fee_postings
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     value_date                              date NOT NULL,
     late_fee_tran_id                        bigint NOT NULL REFERENCES finance.transaction_master,
-    amount                                  dbo.money_strict
+    amount                                  decimal(30, 6)
 );
 
 CREATE TABLE sales.price_types
@@ -88,7 +88,7 @@ CREATE TABLE sales.item_selling_prices
     customer_type_id                        integer REFERENCES inventory.customer_types,
     price_type_id                           integer REFERENCES sales.price_types,
     includes_tax                            bit NOT NULL DEFAULT(0),
-    price                                   dbo.money_strict NOT NULL,
+    price                                   decimal(30, 6) NOT NULL,
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETDATE()),
     deleted                                    bit DEFAULT(0)
@@ -100,7 +100,7 @@ CREATE TABLE sales.payment_terms
     payment_term_code                       national character varying(24) NOT NULL,
     payment_term_name                       national character varying(500) NOT NULL,
     due_on_date                             bit NOT NULL DEFAULT(0),
-    due_days                                dbo.integer_strict2 NOT NULL DEFAULT(0),
+    due_days                                integer NOT NULL DEFAULT(0),
     due_frequency_id                        integer REFERENCES finance.frequencies,
     grace_period                            integer NOT NULL DEFAULT(0),
     late_fee_id                             integer REFERENCES sales.late_fee,
@@ -169,12 +169,12 @@ CREATE TABLE sales.quotation_details
     quotation_id                            bigint NOT NULL REFERENCES sales.quotations,
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
-    price                                   dbo.money_strict NOT NULL,
-    discount_rate                           dbo.decimal_strict2 NOT NULL DEFAULT(0),    
-    tax                                     dbo.money_strict2 NOT NULL DEFAULT(0),    
-    shipping_charge                         dbo.money_strict2 NOT NULL DEFAULT(0),    
+    price                                   decimal(30, 6) NOT NULL,
+    discount_rate                           decimal(30, 6) NOT NULL DEFAULT(0),    
+    tax                                     decimal(30, 6) NOT NULL DEFAULT(0),    
+    shipping_charge                         decimal(30, 6) NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
-    quantity                                dbo.decimal_strict2 NOT NULL
+    quantity                                decimal(30, 6) NOT NULL
 );
 
 
@@ -204,12 +204,12 @@ CREATE TABLE sales.order_details
     order_id                                bigint NOT NULL REFERENCES sales.orders,
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
-    price                                   dbo.money_strict NOT NULL,
-    discount_rate                           dbo.decimal_strict2 NOT NULL DEFAULT(0),    
-    tax                                     dbo.money_strict2 NOT NULL DEFAULT(0),    
-    shipping_charge                         dbo.money_strict2 NOT NULL DEFAULT(0),    
+    price                                   decimal(30, 6) NOT NULL,
+    discount_rate                           decimal(30, 6) NOT NULL DEFAULT(0),    
+    tax                                     decimal(30, 6) NOT NULL DEFAULT(0),    
+    shipping_charge                         decimal(30, 6) NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
-    quantity                                dbo.decimal_strict2 NOT NULL
+    quantity                                decimal(30, 6) NOT NULL
 );
 
 
@@ -218,19 +218,19 @@ CREATE TABLE sales.coupons
     coupon_id                                   integer IDENTITY PRIMARY KEY,
     coupon_name                                 national character varying(100) NOT NULL,
     coupon_code                                 national character varying(100) NOT NULL,
-    discount_rate                               dbo.decimal_strict NOT NULL,
+    discount_rate                               decimal(30, 6) NOT NULL,
     is_percentage                               bit NOT NULL DEFAULT(0),
-    maximum_discount_amount                     dbo.decimal_strict,
+    maximum_discount_amount                     decimal(30, 6),
     associated_price_type_id                    integer REFERENCES sales.price_types,
-    minimum_purchase_amount                     dbo.decimal_strict2,
-    maximum_purchase_amount                     dbo.decimal_strict2,
+    minimum_purchase_amount                     decimal(30, 6),
+    maximum_purchase_amount                     decimal(30, 6),
     begins_from                                 date,
     expires_on                                  date,
-    maximum_usage                               dbo.integer_strict,
+    maximum_usage                               integer,
     enable_ticket_printing                      bit,
     for_ticket_of_price_type_id                 integer REFERENCES sales.price_types,
-    for_ticket_having_minimum_amount            dbo.decimal_strict2,
-    for_ticket_having_maximum_amount            dbo.decimal_strict2,
+    for_ticket_having_minimum_amount            decimal(30, 6),
+    for_ticket_having_maximum_amount            decimal(30, 6),
     for_ticket_of_unknown_customers_only        bit,
     audit_user_id                               integer REFERENCES account.users,
     audit_ts                                    DATETIMEOFFSET DEFAULT(GETDATE()),
@@ -256,11 +256,11 @@ CREATE TABLE sales.sales
     counter_id                              integer NOT NULL REFERENCES inventory.counters,
     customer_id                             integer REFERENCES inventory.customers,
     salesperson_id                            integer REFERENCES account.users,
-    total_amount                            dbo.money_strict NOT NULL,
+    total_amount                            decimal(30, 6) NOT NULL,
     coupon_id                                integer REFERENCES sales.coupons,
     is_flat_discount                        bit,
-    discount                                dbo.decimal_strict2,
-    total_discount_amount                    dbo.decimal_strict2,    
+    discount                                decimal(30, 6),
+    total_discount_amount                    decimal(30, 6),    
     is_credit                               bit NOT NULL DEFAULT(0),
     credit_settled                            bit,
     payment_term_id                         integer REFERENCES sales.payment_terms,
@@ -270,7 +270,7 @@ CREATE TABLE sales.sales
     check_number                            national character varying(100),
     check_date                              date,
     check_bank_name                         national character varying(1000),
-    check_amount                            dbo.money_strict2,
+    check_amount                            decimal(30, 6),
     check_cleared                           bit,    
     check_clear_date                        date,   
     check_clearing_memo                     national character varying(1000),
@@ -288,13 +288,13 @@ CREATE TABLE sales.customer_receipts
     transaction_master_id                   bigint NOT NULL REFERENCES finance.transaction_master,
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     currency_code                           national character varying(12) NOT NULL REFERENCES core.currencies,
-    er_debit                                dbo.decimal_strict NOT NULL,
-    er_credit                               dbo.decimal_strict NOT NULL,
+    er_debit                                decimal(30, 6) NOT NULL,
+    er_credit                               decimal(30, 6) NOT NULL,
     cash_repository_id                      integer NULL REFERENCES finance.cash_repositories,
     posted_date                             date NULL,
-    tender                                  dbo.money_strict2,
-    change                                  dbo.money_strict2,
-    check_amount                            dbo.money_strict2,
+    tender                                  decimal(30, 6),
+    change                                  decimal(30, 6),
+    check_amount                            decimal(30, 6),
     bank_name                               national character varying(1000),
     check_number                            national character varying(100),
     check_date                              date,
@@ -389,12 +389,12 @@ AS TABLE
     store_id            integer,
     transaction_type    national character varying(2),
     item_id               integer,
-    quantity            dbo.decimal_strict,
+    quantity            decimal(30, 6),
     unit_id               integer,
-    price               dbo.money_strict,
-    discount_rate       dbo.money_strict2,
-    tax                 dbo.money_strict2,
-    shipping_charge     dbo.money_strict2
+    price               decimal(30, 6),
+    discount_rate       decimal(30, 6),
+    tax                 decimal(30, 6),
+    shipping_charge     decimal(30, 6)
 );
 
 

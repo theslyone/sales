@@ -11,13 +11,13 @@ RETURNS @result TABLE
 AS
 BEGIN
     DECLARE @price_type_id                  integer;
-    DECLARE @total_amount                   dbo.money_strict;
+    DECLARE @total_amount                   decimal(30, 6);
     DECLARE @customer_id                    integer;
 
     DECLARE @temp_coupons TABLE
     (
         coupon_id                           integer,
-        maximum_usage                       dbo.integer_strict,
+        maximum_usage                       integer,
         total_used                          integer
     );
     
