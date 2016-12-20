@@ -23,6 +23,7 @@ CREATE PROCEDURE sales.post_return
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @book_name              national character varying = 'Sales Return';
     DECLARE @cost_center_id         bigint;

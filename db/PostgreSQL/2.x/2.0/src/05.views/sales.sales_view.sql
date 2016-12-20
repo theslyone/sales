@@ -11,7 +11,7 @@ SELECT
     finance.transaction_master.book_date,
     finance.transaction_master.transaction_ts,
     finance.transaction_master.verification_status_id,
-    finance.verification_statuses.verification_status_name,
+    core.verification_statuses.verification_status_name,
     finance.transaction_master.verified_by_user_id,
     account.get_name_by_user_id(finance.transaction_master.verified_by_user_id) AS verified_by,
     sales.sales.checkout_id,
@@ -80,8 +80,8 @@ LEFT JOIN sales.payment_terms
 ON sales.payment_terms.payment_term_id = sales.sales.payment_term_id
 LEFT JOIN sales.coupons
 ON sales.coupons.coupon_id = sales.sales.coupon_id
-LEFT JOIN finance.verification_statuses
-ON finance.verification_statuses.verification_status_id = finance.transaction_master.verification_status_id
+LEFT JOIN core.verification_statuses
+ON core.verification_statuses.verification_status_id = finance.transaction_master.verification_status_id
 WHERE NOT finance.transaction_master.deleted;
 
 

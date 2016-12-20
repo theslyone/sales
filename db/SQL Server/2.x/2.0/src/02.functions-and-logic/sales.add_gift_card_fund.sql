@@ -20,6 +20,7 @@ CREATE PROCEDURE sales.add_gift_card_fund
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @transaction_master_id              bigint;
     DECLARE @book_name                          national character varying(50) = 'Gift Card Fund Sales';

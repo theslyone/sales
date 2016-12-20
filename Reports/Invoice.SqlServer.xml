@@ -102,7 +102,7 @@
         finance.transaction_master.statement_reference,
         inventory.customers.customer_name,
         CASE 
-            WHEN sales.sales.is_credit THEN 'Credit'
+            WHEN sales.sales.is_credit = 1 THEN 'Credit'
             WHEN sales.sales.tender > 0 THEN 'Cash'
             WHEN sales.sales.check_amount > 0 THEN 'Check'
         END AS sales_type

@@ -37,6 +37,7 @@ CREATE PROCEDURE sales.post_sales
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @book_name                      national character varying(48) = 'Sales Entry';
     DECLARE @checkout_id                    bigint;

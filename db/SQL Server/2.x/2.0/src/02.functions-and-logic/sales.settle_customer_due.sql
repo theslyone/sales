@@ -7,6 +7,7 @@ CREATE PROCEDURE sales.settle_customer_due(@customer_id bigint, @office_id integ
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @settled_transactions TABLE
     (

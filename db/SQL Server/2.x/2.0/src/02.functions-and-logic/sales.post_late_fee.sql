@@ -7,6 +7,7 @@ CREATE PROCEDURE sales.post_late_fee(@user_id integer, @login_id bigint, @office
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @transaction_master_id          bigint;
     DECLARE @tran_counter                   integer;

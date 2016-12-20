@@ -14,6 +14,7 @@ CREATE PROCEDURE sales.add_opening_cash
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     IF NOT EXISTS
     (

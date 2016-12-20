@@ -427,6 +427,7 @@ CREATE PROCEDURE sales.add_gift_card_fund
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @transaction_master_id              bigint;
     DECLARE @book_name                          national character varying(50) = 'Gift Card Fund Sales';
@@ -516,6 +517,7 @@ CREATE PROCEDURE sales.add_opening_cash
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     IF NOT EXISTS
     (
@@ -1155,6 +1157,7 @@ CREATE PROCEDURE sales.post_cash_receipt
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
     DECLARE @debit                              decimal(30, 6);
@@ -1278,6 +1281,7 @@ CREATE PROCEDURE sales.post_check_receipt
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
     DECLARE @debit                              decimal(30, 6);
@@ -1370,6 +1374,7 @@ CREATE PROCEDURE sales.post_late_fee(@user_id integer, @login_id bigint, @office
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @transaction_master_id          bigint;
     DECLARE @tran_counter                   integer;
@@ -1663,6 +1668,7 @@ CREATE PROCEDURE sales.post_receipt
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @book                               national character varying(50);
     DECLARE @transaction_master_id              bigint;
@@ -1778,6 +1784,7 @@ CREATE PROCEDURE sales.post_receipt_by_gift_card
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
     DECLARE @debit                              decimal(30, 6);
@@ -1890,6 +1897,7 @@ CREATE PROCEDURE sales.post_return
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @book_name              national character varying = 'Sales Return';
     DECLARE @cost_center_id         bigint;
@@ -2127,6 +2135,7 @@ CREATE PROCEDURE sales.post_sales
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @book_name                      national character varying(48) = 'Sales Entry';
     DECLARE @checkout_id                    bigint;
@@ -2574,6 +2583,7 @@ CREATE PROCEDURE sales.settle_customer_due(@customer_id bigint, @office_id integ
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     DECLARE @settled_transactions TABLE
     (
@@ -3296,7 +3306,7 @@ finance.transaction_master.book_date,
 account.users.name AS entered_by,
 sales.gift_cards.first_name + ' ' + sales.gift_cards.middle_name + ' ' + sales.gift_cards.last_name AS customer_name,
 sales.gift_card_transactions.amount,
-finance.verification_statuses.verification_status_name AS status,
+core.verification_statuses.verification_status_name AS status,
 verified_by_user.name AS verified_by,
 finance.transaction_master.verification_reason,
 finance.transaction_master.last_verified_on,
@@ -3317,8 +3327,8 @@ INNER JOIN account.users
 ON finance.transaction_master.user_id = account.users.user_id
 LEFT JOIN sales.gift_cards
 ON sales.gift_card_transactions.gift_card_id = sales.gift_cards.gift_card_id
-INNER JOIN finance.verification_statuses
-ON finance.transaction_master.verification_status_id = finance.verification_statuses.verification_status_id
+INNER JOIN core.verification_statuses
+ON finance.transaction_master.verification_status_id = core.verification_statuses.verification_status_id
 LEFT JOIN account.users AS verified_by_user
 ON finance.transaction_master.verified_by_user_id = verified_by_user.user_id;
 
@@ -3393,7 +3403,7 @@ SELECT
     finance.transaction_master.book_date,
     finance.transaction_master.transaction_ts,
     finance.transaction_master.verification_status_id,
-    finance.verification_statuses.verification_status_name,
+    core.verification_statuses.verification_status_name,
     finance.transaction_master.verified_by_user_id,
     account.get_name_by_user_id(finance.transaction_master.verified_by_user_id) AS verified_by,
     sales.sales.checkout_id,
@@ -3462,8 +3472,8 @@ LEFT JOIN sales.payment_terms
 ON sales.payment_terms.payment_term_id = sales.sales.payment_term_id
 LEFT JOIN sales.coupons
 ON sales.coupons.coupon_id = sales.sales.coupon_id
-LEFT JOIN finance.verification_statuses
-ON finance.verification_statuses.verification_status_id = finance.transaction_master.verification_status_id
+LEFT JOIN core.verification_statuses
+ON core.verification_statuses.verification_status_id = finance.transaction_master.verification_status_id
 WHERE finance.transaction_master.deleted = 0;
 
 
