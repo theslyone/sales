@@ -646,14 +646,14 @@ WriteLiteral("                                ");
 
             
             #line 200 "..\..\Views\Ticket\Index.cshtml"
-                           Write(item.Quantity);
+                           Write(item.Quantity.ToString("N"));
 
             
             #line default
             #line hidden
             
             #line 200 "..\..\Views\Ticket\Index.cshtml"
-                                         Write(item.UnitCode);
+                                                       Write(item.UnitCode);
 
             
             #line default
@@ -662,7 +662,7 @@ WriteLiteral(" x ");
 
             
             #line 200 "..\..\Views\Ticket\Index.cshtml"
-                                                          Write(item.Price.ToString("N2"));
+                                                                        Write(item.Price.ToString("N2"));
 
             
             #line default
@@ -671,14 +671,14 @@ WriteLiteral(" = ");
 
             
             #line 200 "..\..\Views\Ticket\Index.cshtml"
-                                                                                       Write(currenySymbol);
+                                                                                                     Write(currenySymbol);
 
             
             #line default
             #line hidden
             
             #line 200 "..\..\Views\Ticket\Index.cshtml"
-                                                                                                      Write((item.Quantity * item.Price).ToString("N2"));
+                                                                                                                    Write((item.Quantity * item.Price).ToString("N2"));
 
             
             #line default

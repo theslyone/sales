@@ -197,7 +197,7 @@
                             <div class="item info">
                                 @item.ItemName
 
-                                @item.Quantity@item.UnitCode x @item.Price.ToString("N2") = @currenySymbol@((item.Quantity * item.Price).ToString("N2"))
+                                @item.Quantity.ToString("N")@item.UnitCode x @item.Price.ToString("N2") = @currenySymbol@((item.Quantity * item.Price).ToString("N2"))
                             </div>
                             @if (item.Discount > 0)
                 {
