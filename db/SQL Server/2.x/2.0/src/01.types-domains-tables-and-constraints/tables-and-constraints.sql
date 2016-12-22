@@ -26,7 +26,7 @@ CREATE TABLE sales.gift_cards
     phone_numbers                           national character varying(100),
     fax                                     national character varying(100),    
     audit_user_id                           integer REFERENCES account.users,
-    audit_ts                                DATETIMEOFFSET DEFAULT(GETDATE()),
+    audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)    
 );
 
@@ -57,7 +57,7 @@ CREATE TABLE sales.late_fee
     rate                                    numeric(30, 6) NOT NULL,
     account_id                                 integer NOT NULL REFERENCES finance.accounts,
     audit_user_id                           integer REFERENCES account.users,
-    audit_ts                                DATETIMEOFFSET DEFAULT(GETDATE()),
+    audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)
 );
 
@@ -76,7 +76,7 @@ CREATE TABLE sales.price_types
     price_type_code                         national character varying(24) NOT NULL,
     price_type_name                         national character varying(500) NOT NULL,
     audit_user_id                           integer REFERENCES account.users,
-    audit_ts                                DATETIMEOFFSET DEFAULT(GETDATE()),
+    audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)
 );
 
@@ -90,7 +90,7 @@ CREATE TABLE sales.item_selling_prices
     includes_tax                            bit NOT NULL DEFAULT(0),
     price                                   decimal(30, 6) NOT NULL,
     audit_user_id                           integer REFERENCES account.users,
-    audit_ts                                DATETIMEOFFSET DEFAULT(GETDATE()),
+    audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)
 );
 
@@ -106,7 +106,7 @@ CREATE TABLE sales.payment_terms
     late_fee_id                             integer REFERENCES sales.late_fee,
     late_fee_posting_frequency_id           integer REFERENCES finance.frequencies,
     audit_user_id                           integer REFERENCES account.users,
-    audit_ts                                DATETIMEOFFSET DEFAULT(GETDATE()),
+    audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)    
 );
 
@@ -122,7 +122,7 @@ CREATE TABLE sales.cashiers
     valid_till                              date NOT NULL,
                                             CHECK(valid_till >= valid_from),
     audit_user_id                           integer REFERENCES account.users,
-    audit_ts                                DATETIMEOFFSET DEFAULT(GETDATE()),
+    audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)
 );
 
@@ -138,7 +138,7 @@ CREATE TABLE sales.cashier_login_info
     ip_address                              national character varying(1000),
     user_agent                              national character varying(1000),    
     audit_user_id                           integer REFERENCES account.users,
-    audit_ts                                DATETIMEOFFSET DEFAULT(GETDATE()),
+    audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)
 );
 
@@ -149,7 +149,7 @@ CREATE TABLE sales.quotations
     quotation_id                            bigint IDENTITY PRIMARY KEY,
     value_date                              date NOT NULL,
     expected_delivery_date                    date NOT NULL,
-    transaction_timestamp                   DATETIMEOFFSET NOT NULL DEFAULT(GETDATE()),
+    transaction_timestamp                   DATETIMEOFFSET NOT NULL DEFAULT(GETUTCDATE()),
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     price_type_id                           integer NOT NULL REFERENCES sales.price_types,
     shipper_id                                integer REFERENCES inventory.shippers,
@@ -159,7 +159,7 @@ CREATE TABLE sales.quotations
     terms                                    national character varying(500),
     internal_memo                           national character varying(500),
     audit_user_id                           integer REFERENCES account.users,
-    audit_ts                                DATETIMEOFFSET DEFAULT(GETDATE()),
+    audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)
 );
 
@@ -184,7 +184,7 @@ CREATE TABLE sales.orders
     quotation_id                            bigint REFERENCES sales.quotations,
     value_date                              date NOT NULL,
     expected_delivery_date                    date NOT NULL,
-    transaction_timestamp                   DATETIMEOFFSET NOT NULL DEFAULT(GETDATE()),
+    transaction_timestamp                   DATETIMEOFFSET NOT NULL DEFAULT(GETUTCDATE()),
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     price_type_id                           integer NOT NULL REFERENCES sales.price_types,
     shipper_id                                integer REFERENCES inventory.shippers,
@@ -194,7 +194,7 @@ CREATE TABLE sales.orders
     terms                                   national character varying(500),
     internal_memo                           national character varying(500),
     audit_user_id                           integer REFERENCES account.users,
-    audit_ts                                DATETIMEOFFSET DEFAULT(GETDATE()),
+    audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)
 );
 
@@ -233,7 +233,7 @@ CREATE TABLE sales.coupons
     for_ticket_having_maximum_amount            decimal(30, 6),
     for_ticket_of_unknown_customers_only        bit,
     audit_user_id                               integer REFERENCES account.users,
-    audit_ts                                    DATETIMEOFFSET DEFAULT(GETDATE()),
+    audit_ts                                    DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                        bit DEFAULT(0)    
 );
 
@@ -342,7 +342,7 @@ CREATE TABLE sales.opening_cash
     memo                                    national character varying(4000) DEFAULT(''),
     closed                                    bit NOT NULL DEFAULT(0),
     audit_user_id                           integer REFERENCES account.users,
-    audit_ts                                DATETIMEOFFSET NULL DEFAULT(GETDATE()),
+    audit_ts                                DATETIMEOFFSET NULL DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)
 );
 
@@ -375,7 +375,7 @@ CREATE TABLE sales.closing_cash
     approved_by                                integer REFERENCES account.users,
     approval_memo                            national character varying(4000),
     audit_user_id                           integer REFERENCES account.users,
-    audit_ts                                DATETIMEOFFSET NULL DEFAULT(GETDATE()),
+    audit_ts                                DATETIMEOFFSET NULL DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)
 );
 

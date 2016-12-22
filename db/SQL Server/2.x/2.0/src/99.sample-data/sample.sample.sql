@@ -16,8 +16,7 @@ SELECT '123456', finance.get_account_id_by_account_number('20100'), 'John', '', 
 
 
 INSERT INTO sales.coupons(coupon_name, coupon_code, discount_rate, is_percentage, maximum_discount_amount, minimum_purchase_amount, begins_from, expires_on, maximum_usage, enable_ticket_printing, for_ticket_having_minimum_amount, for_ticket_having_maximum_amount, for_ticket_of_unknown_customers_only)
-SELECT 'Christmas Coupon', 'MERRY-XMAS', 20, 1, 5, 10, CAST(GETDATE() AS date), NULL, 10, 1, 10, NULL, 0;
-
-
+SELECT 'Christmas Coupon', 'MERRY-XMAS', 20, 1, 5, 10, CAST(GETUTCDATE() AS date), NULL, 10, 1, 10, NULL, 0;
 
 GO
+

@@ -13,8 +13,8 @@ BEGIN
 	    SELECT sales.coupons.coupon_id
 	    FROM sales.coupons
 	    WHERE sales.coupons.coupon_code = @coupon_code
-	    AND COALESCE(sales.coupons.begins_from, CAST(GETDATE() AS date)) >= CAST(GETDATE() AS date)
-	    AND COALESCE(sales.coupons.expires_on, CAST(GETDATE() AS date)) <= CAST(GETDATE() AS date)
+	    AND COALESCE(sales.coupons.begins_from, CAST(GETUTCDATE() AS date)) >= CAST(GETUTCDATE() AS date)
+	    AND COALESCE(sales.coupons.expires_on, CAST(GETUTCDATE() AS date)) <= CAST(GETUTCDATE() AS date)
 	    AND sales.coupons.deleted = 0
     );
 END;

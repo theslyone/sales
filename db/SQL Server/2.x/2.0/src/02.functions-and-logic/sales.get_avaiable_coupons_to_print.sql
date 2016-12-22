@@ -34,8 +34,8 @@ BEGIN
     FROM sales.coupons
     WHERE sales.coupons.deleted = 0
     AND sales.coupons.enable_ticket_printing = 1
-    AND (sales.coupons.begins_from IS NULL OR sales.coupons.begins_from >= CAST(GETDATE() AS date))
-    AND (sales.coupons.expires_on IS NULL OR sales.coupons.expires_on <= CAST(GETDATE() AS date))
+    AND (sales.coupons.begins_from IS NULL OR sales.coupons.begins_from >= CAST(GETUTCDATE() AS date))
+    AND (sales.coupons.expires_on IS NULL OR sales.coupons.expires_on <= CAST(GETUTCDATE() AS date))
     AND sales.coupons.for_ticket_of_price_type_id IS NULL
     AND COALESCE(sales.coupons.for_ticket_having_minimum_amount, 0) = 0
     AND COALESCE(sales.coupons.for_ticket_having_maximum_amount, 0) = 0
@@ -46,8 +46,8 @@ BEGIN
     FROM sales.coupons
     WHERE sales.coupons.deleted = 0
     AND sales.coupons.enable_ticket_printing = 1
-    AND (sales.coupons.begins_from IS NULL OR sales.coupons.begins_from >= CAST(GETDATE() AS date))
-    AND (sales.coupons.expires_on IS NULL OR sales.coupons.expires_on <= CAST(GETDATE() AS date))
+    AND (sales.coupons.begins_from IS NULL OR sales.coupons.begins_from >= CAST(GETUTCDATE() AS date))
+    AND (sales.coupons.expires_on IS NULL OR sales.coupons.expires_on <= CAST(GETUTCDATE() AS date))
     AND (sales.coupons.for_ticket_of_price_type_id IS NULL OR for_ticket_of_price_type_id = @price_type_id)
     AND (sales.coupons.for_ticket_having_minimum_amount IS NULL OR sales.coupons.for_ticket_having_minimum_amount <= @total_amount)
     AND (sales.coupons.for_ticket_having_maximum_amount IS NULL OR sales.coupons.for_ticket_having_maximum_amount >= @total_amount)
@@ -60,8 +60,8 @@ BEGIN
         FROM sales.coupons
         WHERE sales.coupons.deleted = 0
         AND sales.coupons.enable_ticket_printing = 1
-        AND (sales.coupons.begins_from IS NULL OR sales.coupons.begins_from >= CAST(GETDATE() AS date))
-        AND (sales.coupons.expires_on IS NULL OR sales.coupons.expires_on <= CAST(GETDATE() AS date))
+        AND (sales.coupons.begins_from IS NULL OR sales.coupons.begins_from >= CAST(GETUTCDATE() AS date))
+        AND (sales.coupons.expires_on IS NULL OR sales.coupons.expires_on <= CAST(GETUTCDATE() AS date))
         AND (sales.coupons.for_ticket_of_price_type_id IS NULL OR for_ticket_of_price_type_id = @price_type_id)
         AND (sales.coupons.for_ticket_having_minimum_amount IS NULL OR sales.coupons.for_ticket_having_minimum_amount <= @total_amount)
         AND (sales.coupons.for_ticket_having_maximum_amount IS NULL OR sales.coupons.for_ticket_having_maximum_amount >= @total_amount)
@@ -74,8 +74,8 @@ BEGIN
         FROM sales.coupons
         WHERE sales.coupons.deleted = 0
         AND sales.coupons.enable_ticket_printing = 1
-        AND (sales.coupons.begins_from IS NULL OR sales.coupons.begins_from >= CAST(GETDATE() AS date))
-        AND (sales.coupons.expires_on IS NULL OR sales.coupons.expires_on <= CAST(GETDATE() AS date))
+        AND (sales.coupons.begins_from IS NULL OR sales.coupons.begins_from >= CAST(GETUTCDATE() AS date))
+        AND (sales.coupons.expires_on IS NULL OR sales.coupons.expires_on <= CAST(GETUTCDATE() AS date))
         AND (sales.coupons.for_ticket_of_price_type_id IS NULL OR for_ticket_of_price_type_id = @price_type_id)
         AND (sales.coupons.for_ticket_having_minimum_amount IS NULL OR sales.coupons.for_ticket_having_minimum_amount <= @total_amount)
         AND (sales.coupons.for_ticket_having_maximum_amount IS NULL OR sales.coupons.for_ticket_having_maximum_amount >= @total_amount)

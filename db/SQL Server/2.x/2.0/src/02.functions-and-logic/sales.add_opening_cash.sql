@@ -25,7 +25,7 @@ BEGIN
     )
     BEGIN
         INSERT INTO sales.opening_cash(user_id, transaction_date, amount, provided_by, memo, audit_user_id, audit_ts, deleted)
-        SELECT @user_id, @transaction_date, @amount, @provided_by, @memo, @user_id, GETDATE(), 0;
+        SELECT @user_id, @transaction_date, @amount, @provided_by, @memo, @user_id, GETUTCDATE(), 0;
     END
     ELSE
     BEGIN
@@ -36,13 +36,12 @@ BEGIN
             memo = @memo,
             user_id = @user_id,
             audit_user_id = @user_id,
-            audit_ts = GETDATE(),
+            audit_ts = GETUTCDATE(),
             deleted = 0
         WHERE user_id = @user_id
         AND transaction_date = @transaction_date;
     END;
 END
 
-
-
 GO
+
