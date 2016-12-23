@@ -1867,11 +1867,17 @@ $$
     DECLARE _ck_id                  bigint;
     DECLARE _sales_id               bigint;
     DECLARE _tax_total              public.money_strict2;
-    DECLARE _tax_account_id                 integer;
+    DECLARE _tax_account_id         integer;
+    DECLARE _original_store_id      integer;
     DECLARE this                    RECORD;
 BEGIN
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
         RETURN 0;
+    END IF;
+
+    IF(_original_store_id != _store_id) THEN
+        RAISE EXCEPTION 'Invalid store.'
+        USING ERRCODE='P3012';
     END IF;
 
     _tax_account_id                         := finance.get_sales_tax_account_id_by_office_id(_office_id);
@@ -2012,7 +2018,7 @@ BEGIN
         SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Cr',  inventory.get_account_id_by_customer_id(_customer_id), _statement_reference, _default_currency_code, _grand_total - _discount_total, _default_currency_code, 1, _grand_total - _discount_total;
     ELSE
         INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
-        SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Cr',  sales_return_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)) - SUM(COALESCE(discount, 0)), _default_currency_code, 1, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)) - SUM(COALESCE(discount, 0))
+        SELECT _tran_master_id, _office_id, _value_date, _book_date, 'Cr',  sales_return_account_id, _statement_reference, _default_currency_code, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)) - SUM(COALESCE(discount, 0)), _default_currency_code, 1, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)) - SUM(COALESCE(discount, 0)) + SUM(COALESCE(tax, 0))
         FROM temp_checkout_details
         GROUP BY sales_return_account_id;
     END IF;
@@ -2806,7 +2812,7 @@ BEGIN
     IF EXISTS(SELECT 0 FROM details_temp WHERE store_id IS NULL OR store_id <= 0) THEN
         RAISE EXCEPTION 'Invalid store.'
         USING ERRCODE='P3012';
-    END IF;    
+    END IF;
 
     IF EXISTS(SELECT 0 FROM details_temp WHERE item_id IS NULL OR item_id <= 0) THEN
         RAISE EXCEPTION 'Invalid item.'

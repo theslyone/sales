@@ -2033,7 +2033,6 @@ BEGIN
     DECLARE @tax_total              decimal(30, 6);
     DECLARE @tax_account_id         integer;
 
-
     DECLARE @can_post_transaction   bit;
     DECLARE @error_message          national character varying(MAX);
 
@@ -2197,7 +2196,7 @@ BEGIN
         ELSE
         BEGIN
             INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
-            SELECT @tran_master_id, @office_id, @value_date, @book_date, 'Cr',  sales_return_account_id, @statement_reference, @default_currency_code, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)) - SUM(COALESCE(discount, 0)), @default_currency_code, 1, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)) - SUM(COALESCE(discount, 0))
+            SELECT @tran_master_id, @office_id, @value_date, @book_date, 'Cr',  sales_return_account_id, @statement_reference, @default_currency_code, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)) - SUM(COALESCE(discount, 0)), @default_currency_code, 1, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)) - SUM(COALESCE(discount, 0)) + SUM(COALESCE(tax, 0))
             FROM @checkout_details
             GROUP BY sales_return_account_id;
         END;

@@ -37,7 +37,6 @@
             function request(model) {
                 const url = "/dashboard/sales/tasks/return/new";
                 const data = JSON.stringify(model);
-                alert(data);
                 return window.getAjaxRequest(url, "POST", data);
             };
 

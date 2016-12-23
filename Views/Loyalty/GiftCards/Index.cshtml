@@ -16,7 +16,8 @@
     scrudFactory.formAPI = "/api/forms/sales/gift-cards";
     scrudFactory.formTableName = "sales.gift_cards";
 
-    scrudFactory.excludedColumns = ["AuditUserId", "AuditTs"];
+    scrudFactory.excludedColumns = ["AuditUserId", "AuditTs", "Deleted"];
+
 
     scrudFactory.allowDelete = true;
     scrudFactory.allowEdit = true;

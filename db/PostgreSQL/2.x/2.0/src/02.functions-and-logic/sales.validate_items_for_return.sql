@@ -162,7 +162,7 @@ BEGIN
     IF EXISTS(SELECT 0 FROM details_temp WHERE store_id IS NULL OR store_id <= 0) THEN
         RAISE EXCEPTION 'Invalid store.'
         USING ERRCODE='P3012';
-    END IF;    
+    END IF;
 
     IF EXISTS(SELECT 0 FROM details_temp WHERE item_id IS NULL OR item_id <= 0) THEN
         RAISE EXCEPTION 'Invalid item.'
