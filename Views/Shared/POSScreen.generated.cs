@@ -287,8 +287,8 @@ WriteLiteral(">\r\n            <i");
 
 WriteLiteral(" class=\"ui huge loading spinner icon\"");
 
-WriteLiteral("></i>\r\n        </div>\r\n        <div>\r\n            Loading Point of Sale\r\n        " +
-"</div>\r\n    </div>\r\n    <div");
+WriteLiteral("></i>\r\n        </div>\r\n        <div>\r\n            Loading Items\r\n        </div>\r\n" +
+"    </div>\r\n    <div");
 
 WriteLiteral(" class=\"layout\"");
 
@@ -773,8 +773,9 @@ WriteLiteral("\r\n\r\n<script>\r\n    var pageLoaded = false;\r\n\r\n    $(docum
 "turn window.getAjaxRequest(url, \"POST\", filters);\r\n        };\r\n\r\n        const a" +
 "jax = request();\r\n\r\n        ajax.success(function (response) {\r\n            cons" +
 "t salesTaxRate = window.parseFloat(response[0].SalesTaxRate);\r\n            $(\"#S" +
-"alesTaxRateHidden\").val(salesTaxRate);\r\n        });\r\n    };\r\n\r\n    getTaxRate();" +
-"\r\n</script>");
+"alesTaxRateHidden\").val(salesTaxRate);\r\n        });\r\n    };\r\n\r\n    if (window.me" +
+"taView) {\r\n        getTaxRate();\r\n    } else {\r\n        $(document).on(\"metaread" +
+"y\", function () {\r\n            getTaxRate();\r\n        });\r\n    };\r\n</script>");
 
         }
     }

@@ -753,5 +753,11 @@
         });
     };
 
-    getTaxRate();
+    if (window.metaView) {
+        getTaxRate();
+    } else {
+        $(document).on("metaready", function () {
+            getTaxRate();
+        });
+    };
 </script>

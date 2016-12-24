@@ -7,7 +7,7 @@ using Frapid.Dashboard;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
-    public class EntryController : SalesDashboardController
+    public sealed class EntryController : SalesDashboardController
     {
         [Route("dashboard/sales/tasks/entry/checklist/{tranId}")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/entry")]

@@ -150,6 +150,7 @@
     <Compile Include="Controllers\Backend\Tasks\OpeningCashController.cs" />
     <Compile Include="Controllers\Backend\Tasks\OrderController.cs" />
     <Compile Include="Controllers\Backend\Tasks\QuotationController.cs" />
+    <Compile Include="Controllers\Backend\Summary\SalesSummaryController.cs" />
     <Compile Include="Controllers\Backend\Tasks\SalesTicketController.cs" />
     <Compile Include="Controllers\SalesDashboardController.cs" />
     <Compile Include="Controllers\Backend\Setups\CashierController.cs" />
@@ -169,6 +170,7 @@
     <Compile Include="DAL\Backend\Tasks\Quotations.cs" />
     <Compile Include="DAL\Backend\Tasks\ReturnEntry\PostgreSQL.cs" />
     <Compile Include="DAL\Backend\Tasks\ReturnEntry\SqlServer.cs" />
+    <Compile Include="DAL\Backend\Summary\Sales.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntries.cs" />
     <Compile Include="DAL\Backend\Service\Items.cs" />
     <Compile Include="DAL\Backend\Tasks\ReturnEntry\ISalesEntry.cs" />
