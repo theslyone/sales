@@ -367,7 +367,7 @@
                 padding-top: 4px;
             }
 
-            .sales.items .item .info.block .info{
+            .sales.items .item .info.block .info {
                 font-size: 1.1em;
                 text-align: left;
                 padding: 0;
@@ -629,6 +629,16 @@
                 margin-bottom: 0.5em !important;
             }
     }
+
+    #pos-items {
+        display: flex;
+    }
+
+        #pos-items .checkout.items {
+            width: 700px;
+            overflow: auto;
+            padding: 0 1em;
+        }
 </style>
 
 <div id="pos-container" class="ui attached pos sales inverted segment">
@@ -653,78 +663,76 @@
             </div>
         </div>
         <div id="pos-items">
-            <div class="ui stackable grid">
-                <div class="eleven wide column">
-                    <div class="status head">
-                        <div class="left">
-                            <span class="office info" title="Current Branch Office">
-                                @meta.OfficeName
-                            </span>
-                            <span class="user info" title="You">
-                                @meta.Name
-                            </span>
-                            <span class="area info" title="Current Area">
-                                @meta.OfficeCode
-                            </span>
-                            <span class="office info" title="Office Name">
-                                @meta.OfficeName
-                            </span>
-                        </div>
-
-                        <div class="right">
-                            <div class="three inline blocks">
-                                <div class="item">
-                                    <select class="ui inverted fluid dropdown" id="PriceTypeSelect"></select>
-                                </div>
-                                <div class="item">
-                                    <select class="ui inverted fluid dropdown" id="StoreSelect"></select>
-                                </div>
-                                <div class="item">
-                                    <select class="ui inverted fluid dropdown" id="CounterSelect"></select>
-                                </div>
-                            </div>
-                        </div>
-
+            <div class="all items">
+                <div class="status head">
+                    <div class="left">
+                        <span class="office info" title="Current Branch Office">
+                            @meta.OfficeName
+                        </span>
+                        <span class="user info" title="You">
+                            @meta.Name
+                        </span>
+                        <span class="area info" title="Current Area">
+                            @meta.OfficeCode
+                        </span>
+                        <span class="office info" title="Office Name">
+                            @meta.OfficeName
+                        </span>
                     </div>
 
-                    @Html.PartialView("Shared/POSItemList.cshtml", TenantConvention.GetTenant())
-                </div>
-                <div class="five wide column">
-                    <div class="ui action panel inverted segment">
-                        <div class="toolbar">
-                            <div class="toggle view item" title="Toggle View">
-                                <i class="toggle off icon"></i>
+                    <div class="right">
+                        <div class="three inline blocks">
+                            <div class="item">
+                                <select class="ui inverted fluid dropdown" id="PriceTypeSelect"></select>
                             </div>
-                            <div class="item" data-payment-type="credit" title="Credit">
-                                <i class="tags icon"></i>
+                            <div class="item">
+                                <select class="ui inverted fluid dropdown" id="StoreSelect"></select>
                             </div>
-                            <div class="item" data-payment-type="cash" title="Cash">
-                                <i class="money icon"></i>
-                            </div>
-                            <div class="item" data-payment-type="check" title="Pay by Check">
-                                <i class="newspaper icon"></i>
-                            </div>
-                            <div class="item" data-payment-type="gift-card" title="Pay by Gift Card">
-                                <i class="gift icon"></i>
-                            </div>
-                            <div class="item" id="SearchCustomerAction" title="Search Customer">
-                                <i class="search icon"></i>
-                            </div>
-                            <div class="reprint ticket item" onclick="$('.reprint.ticket.modal').modal('show');" title="Reprint Ticket">
-                                <i class="print icon"></i>
+                            <div class="item">
+                                <select class="ui inverted fluid dropdown" id="CounterSelect"></select>
                             </div>
                         </div>
-                        <div class="action container">
-                            @Html.PartialView("Shared/SalesEntryForm.cshtml", TenantConvention.GetTenant())
+                    </div>
 
-                            <div id="SalesItems" class="sales items">
+                </div>
+
+                @Html.PartialView("Shared/POSItemList.cshtml", TenantConvention.GetTenant())
+            </div>
+            <div class="checkout items">
+                <div class="ui action panel">
+                    <div class="toolbar">
+                        <div class="toggle view item" title="Toggle View">
+                            <i class="toggle off icon"></i>
+                        </div>
+                        <div class="item" data-payment-type="credit" title="Credit">
+                            <i class="tags icon"></i>
+                        </div>
+                        <div class="item" data-payment-type="cash" title="Cash">
+                            <i class="money icon"></i>
+                        </div>
+                        <div class="item" data-payment-type="check" title="Pay by Check">
+                            <i class="newspaper icon"></i>
+                        </div>
+                        <div class="item" data-payment-type="gift-card" title="Pay by Gift Card">
+                            <i class="gift icon"></i>
+                        </div>
+                        <div class="item" id="SearchCustomerAction" title="Search Customer">
+                            <i class="search icon"></i>
+                        </div>
+                        <div class="reprint ticket item" onclick="$('.reprint.ticket.modal').modal('show');" title="Reprint Ticket">
+                            <i class="print icon"></i>
+                        </div>
+                    </div>
+                    <div class="action container">
+                        @Html.PartialView("Shared/SalesEntryForm.cshtml", TenantConvention.GetTenant())
+
+                        <div id="SalesItems" class="sales items">
+                        </div>
+                        <div class="footer items" style="display: none;">
+                            <div class="ui clear negative circular button" id="ClearScreenButton">
+                                Clear Screen
                             </div>
-                            <div class="footer items" style="display: none;">
-                                <div class="ui clear negative circular button" id="ClearScreenButton">
-                                    Clear Screen
-                                </div>
-                                <div class="ui next positive circular button">Next</div>
-                            </div>
+                            <div class="ui next positive circular button">Next</div>
                         </div>
                     </div>
                 </div>
@@ -732,7 +740,7 @@
         </div>
     </div>
 </div>
-<input type="hidden" id="SalesTaxRateHidden"/>
+<input type="hidden" id="SalesTaxRateHidden" />
 
 
 @Html.PartialView("Shared/CustomerSearchModal.cshtml", TenantConvention.GetTenant())
@@ -825,9 +833,9 @@
         $(".footer.items").hide();
         $(".sales.items").hide();
 
-        if(salesItemState) {
+        if (salesItemState) {
             $(".tender.info.items").show();
-        }else {
+        } else {
             $(".footer.items").show();
             $(".sales.items").show();
         };
@@ -968,7 +976,7 @@
         function loadCounters() {
             const storeId = el.val();
 
-            if(!storeId){
+            if (!storeId) {
                 return;
             };
 
