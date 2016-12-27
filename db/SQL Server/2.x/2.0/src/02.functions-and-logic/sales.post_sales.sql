@@ -472,7 +472,8 @@ BEGIN
                 @check_date,
                 @gift_card_number,
                 @store_id,
-                @transaction_master_id;
+                @transaction_master_id,--CASCADING TRAN ID
+				NULL;
         END
         ELSE
         BEGIN

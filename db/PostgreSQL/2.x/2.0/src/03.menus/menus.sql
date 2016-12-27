@@ -46,12 +46,12 @@ SELECT * FROM core.create_menu('Sales', 'Payment Terms', '/dashboard/sales/setup
 SELECT * FROM core.create_menu('Sales', 'Cashiers', '/dashboard/sales/setup/cashiers', 'male', 'Setup');
 
 SELECT * FROM core.create_menu('Sales', 'Reports', '', 'block layout', '');
-SELECT * FROM core.create_menu('Sales', 'All Gift Cards', '/dashboard/sales/reports/gift-cards/account-statement', 'certificate', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Gift Card Usage Statement', '/dashboard/sales/reports/gift-cards/account-statement', 'columns', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Customer Account Statement', '/dashboard/sales/reports/customer/account-statement', 'content', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Credit Statement', '/dashboard/sales/reports/credit-statement', 'newspaper', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Top Selling Items', '/dashboard/sales/reports/sales-account-statement', 'map signs', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Sales by Office', '/dashboard/sales/reports/sales-account-statement', 'building', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Account Receivables', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountReceivables.xml', 'certificate', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'All Gift Cards', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AllGiftCards.xml', 'certificate', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Gift Card Usage Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/GiftCardUsageStatement.xml', 'columns', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Customer Account Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerAccountStatement.xml', 'content', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports');
 
 
 SELECT * FROM auth.create_app_menu_policy

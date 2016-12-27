@@ -46,12 +46,12 @@ EXECUTE core.create_menu 'Sales', 'Payment Terms', '/dashboard/sales/setup/payme
 EXECUTE core.create_menu 'Sales', 'Cashiers', '/dashboard/sales/setup/cashiers', 'male', 'Setup';
 
 EXECUTE core.create_menu 'Sales', 'Reports', '', 'block layout', '';
-EXECUTE core.create_menu 'Sales', 'All Gift Cards', '/dashboard/sales/reports/gift-cards/account-statement', 'certificate', 'Reports';
-EXECUTE core.create_menu 'Sales', 'Gift Card Usage Statement', '/dashboard/sales/reports/gift-cards/account-statement', 'columns', 'Reports';
-EXECUTE core.create_menu 'Sales', 'Customer Account Statement', '/dashboard/sales/reports/customer/account-statement', 'content', 'Reports';
-EXECUTE core.create_menu 'Sales', 'Credit Statement', '/dashboard/sales/reports/credit-statement', 'newspaper', 'Reports';
-EXECUTE core.create_menu 'Sales', 'Top Selling Items', '/dashboard/sales/reports/sales-account-statement', 'map signs', 'Reports';
-EXECUTE core.create_menu 'Sales', 'Sales by Office', '/dashboard/sales/reports/sales-account-statement', 'building', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Account Receivables', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountReceivables.xml', 'certificate', 'Reports';
+EXECUTE core.create_menu 'Sales', 'All Gift Cards', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AllGiftCards.xml', 'certificate', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Gift Card Usage Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/GiftCardUsageStatement.xml', 'columns', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Customer Account Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerAccountStatement.xml', 'content', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports';
 
 
 DECLARE @office_id integer = core.get_office_id_by_office_name('Default');

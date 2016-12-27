@@ -1082,6 +1082,60 @@ LANGUAGE plpgsql;
 
 
 
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_top_selling_products_of_all_time.sql --<--<--
+DROP FUNCTION IF EXISTS sales.get_top_selling_products_of_all_time(_office_id int);
+
+CREATE FUNCTION sales.get_top_selling_products_of_all_time(_office_id int)
+RETURNS TABLE
+(
+    id              integer,
+    item_id         integer,
+    item_code       text,
+    item_name       text,
+    total_sales     numeric
+)
+AS
+$$
+BEGIN
+    CREATE TEMPORARY TABLE IF NOT EXISTS top_selling_products_of_all_time
+    (
+        id              integer,
+        item_id         integer,
+        item_code       text,
+        item_name       text,
+        total_sales     numeric
+    ) ON COMMIT DROP;
+
+    INSERT INTO top_selling_products_of_all_time(id, item_id, total_sales)
+    SELECT ROW_NUMBER() OVER(), *
+    FROM
+    (
+        SELECT         
+                inventory.verified_checkout_view.item_id, 
+                SUM((price * quantity) - discount + tax) AS sales_amount
+        FROM inventory.verified_checkout_view
+        WHERE inventory.verified_checkout_view.office_id = _office_id
+        AND inventory.verified_checkout_view.book ILIKE 'sales%'
+        GROUP BY inventory.verified_checkout_view.item_id
+        ORDER BY 2 DESC
+        LIMIT 10
+    ) t;
+
+    UPDATE top_selling_products_of_all_time AS t
+    SET 
+        item_code = inventory.items.item_code,
+        item_name = inventory.items.item_name
+    FROM inventory.items
+    WHERE t.item_id = inventory.items.item_id;
+    
+    RETURN QUERY
+    SELECT * FROM top_selling_products_of_all_time;
+END
+$$
+LANGUAGE plpgsql;
+
+--SELECT * FROM sales.get_top_selling_products_of_all_time(1);
+
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.post_cash_receipt.sql --<--<--
 DROP FUNCTION IF EXISTS sales.post_cash_receipt
 (
@@ -2977,12 +3031,12 @@ SELECT * FROM core.create_menu('Sales', 'Payment Terms', '/dashboard/sales/setup
 SELECT * FROM core.create_menu('Sales', 'Cashiers', '/dashboard/sales/setup/cashiers', 'male', 'Setup');
 
 SELECT * FROM core.create_menu('Sales', 'Reports', '', 'block layout', '');
-SELECT * FROM core.create_menu('Sales', 'All Gift Cards', '/dashboard/sales/reports/gift-cards/account-statement', 'certificate', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Gift Card Usage Statement', '/dashboard/sales/reports/gift-cards/account-statement', 'columns', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Customer Account Statement', '/dashboard/sales/reports/customer/account-statement', 'content', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Credit Statement', '/dashboard/sales/reports/credit-statement', 'newspaper', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Top Selling Items', '/dashboard/sales/reports/sales-account-statement', 'map signs', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'Sales by Office', '/dashboard/sales/reports/sales-account-statement', 'building', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Account Receivables', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountReceivables.xml', 'certificate', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'All Gift Cards', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AllGiftCards.xml', 'certificate', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Gift Card Usage Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/GiftCardUsageStatement.xml', 'columns', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Customer Account Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerAccountStatement.xml', 'content', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports');
 
 
 SELECT * FROM auth.create_app_menu_policy

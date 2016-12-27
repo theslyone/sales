@@ -1137,6 +1137,53 @@ END;
 GO
 
 
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_top_selling_products_of_all_time.sql --<--<--
+IF OBJECT_ID('sales.get_top_selling_products_of_all_time') IS NOT NULL
+DROP FUNCTION sales.get_top_selling_products_of_all_time;
+
+GO
+
+CREATE FUNCTION sales.get_top_selling_products_of_all_time(@office_id int)
+RETURNS @result TABLE
+(
+    id              integer,
+    item_id         integer,
+    item_code       text,
+    item_name       text,
+    total_sales     numeric(30, 6)
+)
+AS
+BEGIN
+    INSERT INTO @result(id, item_id, total_sales)
+    SELECT ROW_NUMBER() OVER(ORDER BY sales_amount DESC), *
+    FROM
+    (
+        SELECT
+		TOP 10      
+                inventory.verified_checkout_view.item_id, 
+                SUM((price * quantity) - discount + tax) AS sales_amount
+        FROM inventory.verified_checkout_view
+        WHERE inventory.verified_checkout_view.office_id = @office_id
+        AND inventory.verified_checkout_view.book LIKE 'Sales%'
+        GROUP BY inventory.verified_checkout_view.item_id
+        ORDER BY 2 DESC
+    ) t;
+
+    UPDATE result
+    SET 
+        item_code = inventory.items.item_code,
+        item_name = inventory.items.item_name
+    FROM @result AS result
+	INNER JOIN inventory.items
+    ON result.item_id = inventory.items.item_id;
+	
+	RETURN;
+END
+
+GO
+
+--SELECT * FROM sales.get_top_selling_products_of_all_time(1);
+
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.post_cash_receipt.sql --<--<--
 IF OBJECT_ID('sales.post_cash_receipt') IS NOT NULL
 DROP PROCEDURE sales.post_cash_receipt;
@@ -2712,7 +2759,8 @@ BEGIN
                 @check_date,
                 @gift_card_number,
                 @store_id,
-                @transaction_master_id;
+                @transaction_master_id,--CASCADING TRAN ID
+				NULL;
         END
         ELSE
         BEGIN
@@ -3265,12 +3313,12 @@ EXECUTE core.create_menu 'Sales', 'Payment Terms', '/dashboard/sales/setup/payme
 EXECUTE core.create_menu 'Sales', 'Cashiers', '/dashboard/sales/setup/cashiers', 'male', 'Setup';
 
 EXECUTE core.create_menu 'Sales', 'Reports', '', 'block layout', '';
-EXECUTE core.create_menu 'Sales', 'All Gift Cards', '/dashboard/sales/reports/gift-cards/account-statement', 'certificate', 'Reports';
-EXECUTE core.create_menu 'Sales', 'Gift Card Usage Statement', '/dashboard/sales/reports/gift-cards/account-statement', 'columns', 'Reports';
-EXECUTE core.create_menu 'Sales', 'Customer Account Statement', '/dashboard/sales/reports/customer/account-statement', 'content', 'Reports';
-EXECUTE core.create_menu 'Sales', 'Credit Statement', '/dashboard/sales/reports/credit-statement', 'newspaper', 'Reports';
-EXECUTE core.create_menu 'Sales', 'Top Selling Items', '/dashboard/sales/reports/sales-account-statement', 'map signs', 'Reports';
-EXECUTE core.create_menu 'Sales', 'Sales by Office', '/dashboard/sales/reports/sales-account-statement', 'building', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Account Receivables', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountReceivables.xml', 'certificate', 'Reports';
+EXECUTE core.create_menu 'Sales', 'All Gift Cards', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AllGiftCards.xml', 'certificate', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Gift Card Usage Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/GiftCardUsageStatement.xml', 'columns', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Customer Account Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerAccountStatement.xml', 'content', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports';
 
 
 DECLARE @office_id integer = core.get_office_id_by_office_name('Default');

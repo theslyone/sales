@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<FrapidReport>
+  <Header />
+  <Title>Top Selling Products</Title>
+  <TopSection>
+    <Charts>
+      <Chart ID="Chart1" GridViewIndex="0" HideGridView="false" Type="Doughnut" BorderColor="transparent" Width="500" Height="300"
+                TitleColumnIndex="3" ValueColumnIndex="4">
+      </Chart>
+    </Charts>
+  </TopSection>
+  <Body>
+    <GridViews>
+      <GridView>
+        <GridViewDataSource Index="0">
+        </GridViewDataSource>
+      </GridView>
+    </GridViews>
+  </Body>
+  <DataSources>
+    <DataSource>
+      <Query>
+        SELECT * FROM sales.get_top_selling_products_of_all_time(1);
+      </Query>
+    </DataSource>
+  </DataSources>
+</FrapidReport>
