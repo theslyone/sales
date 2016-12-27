@@ -63,7 +63,7 @@ CREATE TABLE sales.late_fee
 CREATE TABLE sales.late_fee_postings
 (
 	transaction_master_id               	bigint PRIMARY KEY REFERENCES finance.transaction_master,
-	customer_id                         	bigint NOT NULL REFERENCES inventory.customers,
+	customer_id                         	integer NOT NULL REFERENCES inventory.customers,
 	value_date                          	date NOT NULL,
 	late_fee_tran_id                    	bigint NOT NULL REFERENCES finance.transaction_master,
 	amount                              	public.money_strict
@@ -250,6 +250,7 @@ CREATE TABLE sales.sales
 	sales_order_id							bigint REFERENCES sales.orders,
 	sales_quotation_id					    bigint REFERENCES sales.quotations,
 	transaction_master_id					bigint NOT NULL REFERENCES finance.transaction_master,
+	receipt_transaction_master_id			bigint REFERENCES finance.transaction_master,
     checkout_id                             bigint NOT NULL REFERENCES inventory.checkouts,
     counter_id                              integer NOT NULL REFERENCES inventory.counters,
     customer_id                             integer REFERENCES inventory.customers,
@@ -269,10 +270,6 @@ CREATE TABLE sales.sales
     check_date                              date,
     check_bank_name                         national character varying(1000),
     check_amount                            public.money_strict2,
-    check_cleared                           boolean,    
-    check_clear_date                        date,   
-    check_clearing_memo                     national character varying(1000),
-    check_clearing_transaction_master_id    bigint REFERENCES finance.transaction_master,
 	reward_points							numeric(30, 6) NOT NULL DEFAULT(0)
 );
 
@@ -284,7 +281,7 @@ CREATE TABLE sales.customer_receipts
 (
     receipt_id                              BIGSERIAL PRIMARY KEY,
     transaction_master_id                   bigint NOT NULL REFERENCES finance.transaction_master,
-    customer_id                             bigint NOT NULL REFERENCES inventory.customers,
+    customer_id                             integer NOT NULL REFERENCES inventory.customers,
     currency_code                           national character varying(12) NOT NULL REFERENCES core.currencies,
     er_debit                                decimal_strict NOT NULL,
     er_credit                               decimal_strict NOT NULL,
@@ -292,10 +289,14 @@ CREATE TABLE sales.customer_receipts
     posted_date                             date NULL,
     tender                                  public.money_strict2,
     change                                  public.money_strict2,
-    check_amount                            public.money_strict2,
-    bank_name                               national character varying(1000),
     check_number                            national character varying(100),
     check_date                              date,
+    check_bank_name                         national character varying(1000),
+    check_amount                            public.money_strict2,
+    check_cleared                           boolean,    
+    check_clear_date                        date,   
+    check_clearing_memo                     national character varying(1000),
+    check_clearing_transaction_master_id    bigint REFERENCES finance.transaction_master,
     gift_card_number                        national character varying(100)
 );
 
@@ -1380,7 +1381,7 @@ BEGIN
     SELECT _transaction_master_id, _office_id, _value_date, _book_date, 'Cr', _customer_account_id, _statement_reference, NULL, _base_currency_code, _credit, _local_currency_code, _exchange_rate_credit, _lc_credit, _user_id;
     
     
-    INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, posted_date, check_amount, bank_name, check_number, check_date)
+    INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, posted_date, check_amount, check_bank_name, check_number, check_date)
     SELECT _transaction_master_id, _customer_id, _currency_code, _exchange_rate_debit, _exchange_rate_credit, _value_date, _check_amount, _check_bank_name, _check_number, _check_date;
 
     RETURN _transaction_master_id;
@@ -1426,7 +1427,7 @@ BEGIN
         rate                            numeric(30, 6),
         due_amount                      public.money_strict2,
         late_fee                        public.money_strict2,
-        customer_id                     bigint,
+        customer_id                     integer,
         customer_account_id             integer,
         late_fee_account_id             integer,
         due_date                        date
@@ -2213,6 +2214,7 @@ $$
     DECLARE _fiscal_year_code               national character varying(12);
     DECLARE _invoice_number                 bigint;
     DECLARE _tax_account_id                 integer;
+    DECLARE _receipt_transaction_master_id  bigint;
     DECLARE this                            RECORD;
 BEGIN        
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
@@ -2504,13 +2506,9 @@ BEGIN
     FROM sales.sales
     WHERE sales.sales.fiscal_year_code = _fiscal_year_code;
     
-    INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
-    SELECT _fiscal_year_code, _invoice_number, _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id;
-    
-    PERFORM finance.auto_verify(_transaction_master_id, _office_id);
 
     IF(NOT _is_credit) THEN
-        PERFORM sales.post_receipt
+        SELECT sales.post_receipt
         (
             _user_id, 
             _office_id, 
@@ -2536,12 +2534,17 @@ BEGIN
             _gift_card_number,
             _store_id,
             _transaction_master_id
-        );
+        ) INTO _receipt_transaction_master_id;
 
-        
+        PERFORM finance.auto_verify(_receipt_transaction_master_id, _office_id);        
     ELSE
         PERFORM sales.settle_customer_due(_customer_id, _office_id);
     END IF;
+
+    INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id, receipt_transaction_master_id)
+    SELECT _fiscal_year_code, _invoice_number, _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id, _receipt_transaction_master_id;
+    
+    PERFORM finance.auto_verify(_transaction_master_id, _office_id);
 
     RETURN _transaction_master_id;
 END
@@ -2589,9 +2592,9 @@ SELECT finance.create_routine('REF-MV', 'sales.refresh_materialized_views', 1000
 --SELECT * FROM sales.refresh_materialized_views(1, 1, 1, '1-1-2000')
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.settle_customer_due.sql --<--<--
-DROP FUNCTION IF EXISTS sales.settle_customer_due(_customer_id bigint, _office_id integer);
+DROP FUNCTION IF EXISTS sales.settle_customer_due(_customer_id integer, _office_id integer);
 
-CREATE FUNCTION sales.settle_customer_due(_customer_id bigint, _office_id integer)
+CREATE FUNCTION sales.settle_customer_due(_customer_id integer, _office_id integer)
 RETURNS void
 STRICT VOLATILE
 AS
@@ -3037,6 +3040,7 @@ SELECT * FROM core.create_menu('Sales', 'Gift Card Usage Statement', '/dashboard
 SELECT * FROM core.create_menu('Sales', 'Customer Account Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerAccountStatement.xml', 'content', 'Reports');
 SELECT * FROM core.create_menu('Sales', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports');
 SELECT * FROM core.create_menu('Sales', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Customer Receipts', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerReceipts.xml', 'building', 'Reports');
 
 
 SELECT * FROM auth.create_app_menu_policy

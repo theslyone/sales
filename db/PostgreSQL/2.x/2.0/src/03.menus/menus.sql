@@ -52,6 +52,7 @@ SELECT * FROM core.create_menu('Sales', 'Gift Card Usage Statement', '/dashboard
 SELECT * FROM core.create_menu('Sales', 'Customer Account Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerAccountStatement.xml', 'content', 'Reports');
 SELECT * FROM core.create_menu('Sales', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports');
 SELECT * FROM core.create_menu('Sales', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Customer Receipts', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerReceipts.xml', 'building', 'Reports');
 
 
 SELECT * FROM auth.create_app_menu_policy

@@ -62,7 +62,7 @@ CREATE TABLE sales.late_fee
 CREATE TABLE sales.late_fee_postings
 (
 	transaction_master_id               	bigint PRIMARY KEY REFERENCES finance.transaction_master,
-	customer_id                         	bigint NOT NULL REFERENCES inventory.customers,
+	customer_id                         	integer NOT NULL REFERENCES inventory.customers,
 	value_date                          	date NOT NULL,
 	late_fee_tran_id                    	bigint NOT NULL REFERENCES finance.transaction_master,
 	amount                              	public.money_strict
@@ -249,6 +249,7 @@ CREATE TABLE sales.sales
 	sales_order_id							bigint REFERENCES sales.orders,
 	sales_quotation_id					    bigint REFERENCES sales.quotations,
 	transaction_master_id					bigint NOT NULL REFERENCES finance.transaction_master,
+	receipt_transaction_master_id			bigint REFERENCES finance.transaction_master,
     checkout_id                             bigint NOT NULL REFERENCES inventory.checkouts,
     counter_id                              integer NOT NULL REFERENCES inventory.counters,
     customer_id                             integer REFERENCES inventory.customers,
@@ -268,10 +269,6 @@ CREATE TABLE sales.sales
     check_date                              date,
     check_bank_name                         national character varying(1000),
     check_amount                            public.money_strict2,
-    check_cleared                           boolean,    
-    check_clear_date                        date,   
-    check_clearing_memo                     national character varying(1000),
-    check_clearing_transaction_master_id    bigint REFERENCES finance.transaction_master,
 	reward_points							numeric(30, 6) NOT NULL DEFAULT(0)
 );
 
@@ -283,7 +280,7 @@ CREATE TABLE sales.customer_receipts
 (
     receipt_id                              BIGSERIAL PRIMARY KEY,
     transaction_master_id                   bigint NOT NULL REFERENCES finance.transaction_master,
-    customer_id                             bigint NOT NULL REFERENCES inventory.customers,
+    customer_id                             integer NOT NULL REFERENCES inventory.customers,
     currency_code                           national character varying(12) NOT NULL REFERENCES core.currencies,
     er_debit                                decimal_strict NOT NULL,
     er_credit                               decimal_strict NOT NULL,
@@ -291,10 +288,14 @@ CREATE TABLE sales.customer_receipts
     posted_date                             date NULL,
     tender                                  public.money_strict2,
     change                                  public.money_strict2,
-    check_amount                            public.money_strict2,
-    bank_name                               national character varying(1000),
     check_number                            national character varying(100),
     check_date                              date,
+    check_bank_name                         national character varying(1000),
+    check_amount                            public.money_strict2,
+    check_cleared                           boolean,    
+    check_clear_date                        date,   
+    check_clearing_memo                     national character varying(1000),
+    check_clearing_transaction_master_id    bigint REFERENCES finance.transaction_master,
     gift_card_number                        national character varying(100)
 );
 

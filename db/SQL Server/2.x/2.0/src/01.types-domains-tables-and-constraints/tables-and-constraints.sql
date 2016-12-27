@@ -251,6 +251,7 @@ CREATE TABLE sales.sales
     price_type_id                            integer NOT NULL REFERENCES sales.price_types,
     sales_order_id                            bigint REFERENCES sales.orders,
     sales_quotation_id                        bigint REFERENCES sales.quotations,
+	receipt_transaction_master_id			bigint REFERENCES finance.transaction_master,
     transaction_master_id                    bigint NOT NULL REFERENCES finance.transaction_master,
     checkout_id                             bigint NOT NULL REFERENCES inventory.checkouts,
     counter_id                              integer NOT NULL REFERENCES inventory.counters,
@@ -271,10 +272,6 @@ CREATE TABLE sales.sales
     check_date                              date,
     check_bank_name                         national character varying(1000),
     check_amount                            decimal(30, 6),
-    check_cleared                           bit,    
-    check_clear_date                        date,   
-    check_clearing_memo                     national character varying(1000),
-    check_clearing_transaction_master_id    bigint REFERENCES finance.transaction_master,
     reward_points                            numeric(30, 6) NOT NULL DEFAULT(0)
 );
 
@@ -294,10 +291,14 @@ CREATE TABLE sales.customer_receipts
     posted_date                             date NULL,
     tender                                  decimal(30, 6),
     change                                  decimal(30, 6),
-    check_amount                            decimal(30, 6),
-    bank_name                               national character varying(1000),
     check_number                            national character varying(100),
     check_date                              date,
+    check_bank_name                         national character varying(1000),
+    check_amount                            decimal(30, 6),
+    check_cleared                           bit,    
+    check_clear_date                        date,   
+    check_clearing_memo                     national character varying(1000),
+    check_clearing_transaction_master_id    bigint REFERENCES finance.transaction_master,
     gift_card_number                        national character varying(100)
 );
 

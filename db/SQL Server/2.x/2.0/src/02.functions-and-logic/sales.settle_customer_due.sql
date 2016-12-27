@@ -3,7 +3,7 @@ DROP PROCEDURE sales.settle_customer_due;
 
 GO
 
-CREATE PROCEDURE sales.settle_customer_due(@customer_id bigint, @office_id integer)
+CREATE PROCEDURE sales.settle_customer_due(@customer_id integer, @office_id integer)
 AS
 BEGIN
     SET NOCOUNT ON;

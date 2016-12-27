@@ -33,7 +33,7 @@ BEGIN
         rate                            numeric(30, 6),
         due_amount                      public.money_strict2,
         late_fee                        public.money_strict2,
-        customer_id                     bigint,
+        customer_id                     integer,
         customer_account_id             integer,
         late_fee_account_id             integer,
         due_date                        date

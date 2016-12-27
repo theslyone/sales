@@ -52,6 +52,7 @@ EXECUTE core.create_menu 'Sales', 'Gift Card Usage Statement', '/dashboard/repor
 EXECUTE core.create_menu 'Sales', 'Customer Account Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerAccountStatement.xml', 'content', 'Reports';
 EXECUTE core.create_menu 'Sales', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports';
 EXECUTE core.create_menu 'Sales', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Customer Receipts', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerReceipts.xml', 'building', 'Reports';
 
 
 DECLARE @office_id integer = core.get_office_id_by_office_name('Default');

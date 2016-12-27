@@ -63,6 +63,7 @@ BEGIN
     DECLARE @fiscal_year_code               national character varying(12);
     DECLARE @invoice_number                 bigint;
     DECLARE @tax_account_id                 integer;
+    DECLARE @receipt_transaction_master_id  bigint;
 
     DECLARE @total_rows                     integer = 0;
     DECLARE @counter                        integer = 0;
@@ -441,10 +442,6 @@ BEGIN
         FROM sales.sales
         WHERE sales.sales.fiscal_year_code = @fiscal_year_code;
         
-        INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
-        SELECT @fiscal_year_code, @invoice_number, @price_type_id, @counter_id, @receivable, @cash_repository_id, @sales_order_id, @sales_quotation_id, @transaction_master_id, @checkout_id, @customer_id, @user_id, @coupon_id, @is_flat_discount, @discount, @discount_total, @is_credit, @payment_term_id, @tender, @change, @check_number, @check_date, @check_bank_name, @check_amount, @gift_card_id;
-        
-        EXECUTE finance.auto_verify @transaction_master_id, @office_id;
 
         IF(@is_credit = 0)
         BEGIN
@@ -473,12 +470,19 @@ BEGIN
                 @gift_card_number,
                 @store_id,
                 @transaction_master_id,--CASCADING TRAN ID
-				NULL;
+				@receipt_transaction_master_id OUTPUT;
+			
+			EXECUTE finance.auto_verify @receipt_transaction_master_id, @office_id;
         END
         ELSE
         BEGIN
             EXECUTE sales.settle_customer_due @customer_id, @office_id;
         END;
+
+        INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id, receipt_transaction_master_id)
+        SELECT @fiscal_year_code, @invoice_number, @price_type_id, @counter_id, @receivable, @cash_repository_id, @sales_order_id, @sales_quotation_id, @transaction_master_id, @checkout_id, @customer_id, @user_id, @coupon_id, @is_flat_discount, @discount, @discount_total, @is_credit, @payment_term_id, @tender, @change, @check_number, @check_date, @check_bank_name, @check_amount, @gift_card_id, @receipt_transaction_master_id;
+        
+        EXECUTE finance.auto_verify @transaction_master_id, @office_id;
 
         IF(@tran_count = 0)
         BEGIN

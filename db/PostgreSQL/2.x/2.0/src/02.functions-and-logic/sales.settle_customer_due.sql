@@ -1,6 +1,6 @@
-﻿DROP FUNCTION IF EXISTS sales.settle_customer_due(_customer_id bigint, _office_id integer);
+﻿DROP FUNCTION IF EXISTS sales.settle_customer_due(_customer_id integer, _office_id integer);
 
-CREATE FUNCTION sales.settle_customer_due(_customer_id bigint, _office_id integer)
+CREATE FUNCTION sales.settle_customer_due(_customer_id integer, _office_id integer)
 RETURNS void
 STRICT VOLATILE
 AS

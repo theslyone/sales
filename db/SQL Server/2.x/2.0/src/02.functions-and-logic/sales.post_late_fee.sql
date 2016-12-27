@@ -44,7 +44,7 @@ BEGIN
         rate                                numeric(30, 6),
         due_amount                          decimal(30, 6),
         late_fee                            decimal(30, 6),
-        customer_id                         bigint,
+        customer_id                         integer,
         customer_account_id                 integer,
         late_fee_account_id                 integer,
         due_date                            date

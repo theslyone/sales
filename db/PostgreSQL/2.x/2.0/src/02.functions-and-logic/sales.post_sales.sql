@@ -89,6 +89,7 @@ $$
     DECLARE _fiscal_year_code               national character varying(12);
     DECLARE _invoice_number                 bigint;
     DECLARE _tax_account_id                 integer;
+    DECLARE _receipt_transaction_master_id  bigint;
     DECLARE this                            RECORD;
 BEGIN        
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
@@ -380,13 +381,9 @@ BEGIN
     FROM sales.sales
     WHERE sales.sales.fiscal_year_code = _fiscal_year_code;
     
-    INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
-    SELECT _fiscal_year_code, _invoice_number, _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id;
-    
-    PERFORM finance.auto_verify(_transaction_master_id, _office_id);
 
     IF(NOT _is_credit) THEN
-        PERFORM sales.post_receipt
+        SELECT sales.post_receipt
         (
             _user_id, 
             _office_id, 
@@ -412,12 +409,17 @@ BEGIN
             _gift_card_number,
             _store_id,
             _transaction_master_id
-        );
+        ) INTO _receipt_transaction_master_id;
 
-        
+        PERFORM finance.auto_verify(_receipt_transaction_master_id, _office_id);        
     ELSE
         PERFORM sales.settle_customer_due(_customer_id, _office_id);
     END IF;
+
+    INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id, receipt_transaction_master_id)
+    SELECT _fiscal_year_code, _invoice_number, _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id, _receipt_transaction_master_id;
+    
+    PERFORM finance.auto_verify(_transaction_master_id, _office_id);
 
     RETURN _transaction_master_id;
 END

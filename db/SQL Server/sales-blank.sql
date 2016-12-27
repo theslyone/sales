@@ -252,6 +252,7 @@ CREATE TABLE sales.sales
     price_type_id                            integer NOT NULL REFERENCES sales.price_types,
     sales_order_id                            bigint REFERENCES sales.orders,
     sales_quotation_id                        bigint REFERENCES sales.quotations,
+	receipt_transaction_master_id			bigint REFERENCES finance.transaction_master,
     transaction_master_id                    bigint NOT NULL REFERENCES finance.transaction_master,
     checkout_id                             bigint NOT NULL REFERENCES inventory.checkouts,
     counter_id                              integer NOT NULL REFERENCES inventory.counters,
@@ -272,10 +273,6 @@ CREATE TABLE sales.sales
     check_date                              date,
     check_bank_name                         national character varying(1000),
     check_amount                            decimal(30, 6),
-    check_cleared                           bit,    
-    check_clear_date                        date,   
-    check_clearing_memo                     national character varying(1000),
-    check_clearing_transaction_master_id    bigint REFERENCES finance.transaction_master,
     reward_points                            numeric(30, 6) NOT NULL DEFAULT(0)
 );
 
@@ -295,10 +292,14 @@ CREATE TABLE sales.customer_receipts
     posted_date                             date NULL,
     tender                                  decimal(30, 6),
     change                                  decimal(30, 6),
-    check_amount                            decimal(30, 6),
-    bank_name                               national character varying(1000),
     check_number                            national character varying(100),
     check_date                              date,
+    check_bank_name                         national character varying(1000),
+    check_amount                            decimal(30, 6),
+    check_cleared                           bit,    
+    check_clear_date                        date,   
+    check_clearing_memo                     national character varying(1000),
+    check_clearing_transaction_master_id    bigint REFERENCES finance.transaction_master,
     gift_card_number                        national character varying(100)
 );
 
@@ -1438,7 +1439,7 @@ BEGIN
         SELECT @transaction_master_id, @office_id, @value_date, @book_date, 'Cr', @customer_account_id, @statement_reference, NULL, @base_currency_code, @credit, @local_currency_code, @exchange_rate_credit, @lc_credit, @user_id;
         
         
-        INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, posted_date, check_amount, bank_name, check_number, check_date)
+        INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, posted_date, check_amount, check_bank_name, check_number, check_date)
         SELECT @transaction_master_id, @customer_id, @currency_code, @exchange_rate_debit, @exchange_rate_credit, @value_date, @check_amount, @check_bank_name, @check_number, @check_date;
 
         IF(@tran_count = 0)
@@ -1512,7 +1513,7 @@ BEGIN
         rate                                numeric(30, 6),
         due_amount                          decimal(30, 6),
         late_fee                            decimal(30, 6),
-        customer_id                         bigint,
+        customer_id                         integer,
         customer_account_id                 integer,
         late_fee_account_id                 integer,
         due_date                            date
@@ -2350,6 +2351,7 @@ BEGIN
     DECLARE @fiscal_year_code               national character varying(12);
     DECLARE @invoice_number                 bigint;
     DECLARE @tax_account_id                 integer;
+    DECLARE @receipt_transaction_master_id  bigint;
 
     DECLARE @total_rows                     integer = 0;
     DECLARE @counter                        integer = 0;
@@ -2728,10 +2730,6 @@ BEGIN
         FROM sales.sales
         WHERE sales.sales.fiscal_year_code = @fiscal_year_code;
         
-        INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id)
-        SELECT @fiscal_year_code, @invoice_number, @price_type_id, @counter_id, @receivable, @cash_repository_id, @sales_order_id, @sales_quotation_id, @transaction_master_id, @checkout_id, @customer_id, @user_id, @coupon_id, @is_flat_discount, @discount, @discount_total, @is_credit, @payment_term_id, @tender, @change, @check_number, @check_date, @check_bank_name, @check_amount, @gift_card_id;
-        
-        EXECUTE finance.auto_verify @transaction_master_id, @office_id;
 
         IF(@is_credit = 0)
         BEGIN
@@ -2760,12 +2758,19 @@ BEGIN
                 @gift_card_number,
                 @store_id,
                 @transaction_master_id,--CASCADING TRAN ID
-				NULL;
+				@receipt_transaction_master_id OUTPUT;
+			
+			EXECUTE finance.auto_verify @receipt_transaction_master_id, @office_id;
         END
         ELSE
         BEGIN
             EXECUTE sales.settle_customer_due @customer_id, @office_id;
         END;
+
+        INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id, receipt_transaction_master_id)
+        SELECT @fiscal_year_code, @invoice_number, @price_type_id, @counter_id, @receivable, @cash_repository_id, @sales_order_id, @sales_quotation_id, @transaction_master_id, @checkout_id, @customer_id, @user_id, @coupon_id, @is_flat_discount, @discount, @discount_total, @is_credit, @payment_term_id, @tender, @change, @check_number, @check_date, @check_bank_name, @check_amount, @gift_card_id, @receipt_transaction_master_id;
+        
+        EXECUTE finance.auto_verify @transaction_master_id, @office_id;
 
         IF(@tran_count = 0)
         BEGIN
@@ -2794,7 +2799,7 @@ DROP PROCEDURE sales.settle_customer_due;
 
 GO
 
-CREATE PROCEDURE sales.settle_customer_due(@customer_id bigint, @office_id integer)
+CREATE PROCEDURE sales.settle_customer_due(@customer_id integer, @office_id integer)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -3319,6 +3324,7 @@ EXECUTE core.create_menu 'Sales', 'Gift Card Usage Statement', '/dashboard/repor
 EXECUTE core.create_menu 'Sales', 'Customer Account Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerAccountStatement.xml', 'content', 'Reports';
 EXECUTE core.create_menu 'Sales', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports';
 EXECUTE core.create_menu 'Sales', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Customer Receipts', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerReceipts.xml', 'building', 'Reports';
 
 
 DECLARE @office_id integer = core.get_office_id_by_office_name('Default');
