@@ -36,7 +36,7 @@
         };
     });
 
-    $("[reprint-ticket-button]").unbind("click").bind("click", function () {
+    $("[reprint-ticket-button]").off("click").on("click", function () {
         reprintTicket();
     });
 </script>

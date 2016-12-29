@@ -75,7 +75,7 @@
         $(".ui.gift.card.modal").modal("hide");
     };
 
-    $("#SearchButton").unbind("click").bind("click", function () {
+    $("#SearchButton").off("click").on("click", function () {
         function displayResult(model) {
             function getCell(html) {
                 const cell = $("<td />");

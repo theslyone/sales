@@ -65,7 +65,7 @@
     });
 
 
-    $("#SaveButton").unbind("click").bind("click", function () {
+    $("#SaveButton").off("click").on("click", function () {
         function request(model) {
             const url = "/dashboard/sales/tasks/opening-cash";
             const data = JSON.stringify(model);

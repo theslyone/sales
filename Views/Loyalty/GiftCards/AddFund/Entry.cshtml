@@ -90,7 +90,7 @@
 
     window.validator.initialize(segment);
 
-    $("#SaveButton").unbind("click").bind("click", function () {
+    $("#SaveButton").off("click").on("click", function () {
         function request(model) {
             const url = "/dashboard/loyalty/tasks/gift-cards/add-fund/entry";
             const data = JSON.stringify(model);

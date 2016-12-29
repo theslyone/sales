@@ -292,7 +292,7 @@
     };
 
     function initializeClickAndAction() {
-        $("#POSItemList .item").unbind("click").bind("click", function () {
+        $("#POSItemList .item").off("click").on("click", function () {
             const el = $(this);
 
             defaulPOSItemClick(el);
@@ -367,7 +367,7 @@
         var targetEl = $(".cat.filter");
         $(".category.list").find(".category").remove();
 
-        targetEl.unbind("click").bind("click", function () {
+        targetEl.off("click").on("click", function () {
             displayProducts();
             $(".category").removeClass("selected");
             targetEl.hide();
@@ -378,7 +378,7 @@
             const category = $("<div class='category' />");
             category.html(this);
 
-            category.unbind("click").bind("click", function () {
+            category.off("click").on("click", function () {
                 $(".search.panel input").val("");
                 const el = $(this);
                 const name = el.text();

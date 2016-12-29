@@ -445,7 +445,7 @@
         updateTenderInfo();
     });
 
-    $("#CheckoutButton").unbind("click").bind("click", function () {
+    $("#CheckoutButton").off("click").on("click", function () {
         function request(model) {
             const url = "/dashboard/sales/tasks/entry/new";
             const data = JSON.stringify(model);

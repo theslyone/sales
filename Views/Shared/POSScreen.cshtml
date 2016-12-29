@@ -830,7 +830,7 @@
     };
 
 
-    $(".toggle.view.item, .next.button").unbind("click").bind("click", function () {
+    $(".toggle.view.item, .next.button").off("click").on("click", function () {
         const salesItemState = $(".sales.items").is(":visible");
 
         $(".tender.info.items").hide();
@@ -911,7 +911,7 @@
 
 </script>
 <script>
-    $("#ClearScreenButton").unbind("click").bind("click", function () {
+    $("#ClearScreenButton").off("click").on("click", function () {
         clearScreen();
     });
 
@@ -996,7 +996,7 @@
 
 <script>
     function initializeTabs() {
-        $(".pos.tabs .item:not(.new)").unbind("click").bind("click", function () {
+        $(".pos.tabs .item:not(.new)").off("click").on("click", function () {
             window.saveState();
             $(".pos.tabs .item").removeClass("selected");
             const el = $(this);
@@ -1005,7 +1005,7 @@
         });
     };
 
-    $(".tabs .new.item").unbind("click").bind("click", function () {
+    $(".tabs .new.item").off("click").on("click", function () {
         var el = $(this);
         window.saveState();
 
@@ -1042,7 +1042,7 @@
         clearScreen();
     });
 
-    $(".tabs .actions .delete.icon").unbind("click").bind("click", function () {
+    $(".tabs .actions .delete.icon").off("click").on("click", function () {
         const activeEl = $(".tabs .selected.item");
         const id = parseInt(activeEl.text());
 
@@ -1064,21 +1064,21 @@
 
     initializeTabs();
 
-    $(".toolbar .item[data-payment-type]").unbind("click").bind("click", function () {
+    $(".toolbar .item[data-payment-type]").off("click").on("click", function () {
         const el = $(this);
         const paymentType = el.attr("data-payment-type");
         $(".payment.type.container [data-payment-type]").hide();
         $(".payment.type.container [data-payment-type=" + paymentType + "]").show();
     });
 
-    $(".show.more.anchor").unbind("click").bind("click", function () {
+    $(".show.more.anchor").off("click").on("click", function () {
         const more = $(".tender.info.items .more");
 
         more.show();
         $(this).hide();
     });
 
-    $(".show.less.anchor").unbind("click").bind("click", function () {
+    $(".show.less.anchor").off("click").on("click", function () {
         const more = $(".tender.info.items .more");
 
         more.hide();

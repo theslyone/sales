@@ -371,7 +371,7 @@
         window.setNumberFormat();
     });
 
-    $("#SaveButton").unbind("click").bind("click", function() {
+    $("#SaveButton").off("click").on("click", function() {
         function request(model) {
             const url = "/dashboard/sales/tasks/eod";
             const data = JSON.stringify(model);
