@@ -6,9 +6,11 @@ using Frapid.ApplicationState.Cache;
 using Frapid.Dashboard;
 using MixERP.Finance.DAL;
 using MixERP.Finance.ViewModels;
+using Frapid.Areas.CSRF;
 
 namespace MixERP.Sales.Controllers.Backend.Loyalty
 {
+    [AntiForgery]
     public class GiftCardFundVerificationController : SalesDashboardController
     {
         [Route("dashboard/loyalty/tasks/gift-cards/add-fund/verification")]

@@ -8,9 +8,11 @@ using MixERP.Finance.Cache;
 using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.DTO;
 using MixERP.Sales.ViewModels;
+using Frapid.Areas.CSRF;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
+    [AntiForgery]
     public sealed class ClosingCashController : SalesDashboardController
     {
         [Route("dashboard/sales/tasks/eod")]

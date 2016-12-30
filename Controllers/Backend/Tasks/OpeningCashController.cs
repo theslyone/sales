@@ -7,9 +7,11 @@ using Frapid.Dashboard;
 using MixERP.Finance.Cache;
 using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.ViewModels;
+using Frapid.Areas.CSRF;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
+    [AntiForgery]
     public sealed class OpeningCashController : SalesDashboardController
     {
         [Route("dashboard/sales/tasks/opening-cash")]
