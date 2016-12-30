@@ -8,9 +8,11 @@ using MixERP.Sales.DAL.Backend.Service;
 using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.QueryModels;
 using MixERP.Sales.ViewModels;
+using Frapid.Areas.CSRF;
 
 namespace MixERP.Sales.Controllers.Backend.Loyalty
 {
+    [AntiForgery]
     public class GiftCardController : SalesDashboardController
     {
         [Route("dashboard/sales/loyalty/gift-cards")]

@@ -7,9 +7,11 @@ using Frapid.Dashboard;
 using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.DTO;
 using MixERP.Sales.QueryModels;
+using Frapid.Areas.CSRF;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
+    [AntiForgery]
     public class QuotationController : SalesDashboardController
     {
         [Route("dashboard/sales/tasks/quotation/checklist/{tranId}")]
