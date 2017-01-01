@@ -62,17 +62,17 @@
   <DataSources>
     <DataSource>
       <Query>
-		SELECT
-			sales.quotations.quotation_id,
-			sales.quotations.transaction_timestamp,
-			sales.quotations.value_date,
-			account.get_name_by_user_id(sales.quotations.user_id) AS entered_by,
-			core.get_office_name_by_office_id(sales.quotations.office_id) AS office_name,
-			sales.quotations.terms,
-			sales.quotations.internal_memo,
-			inventory.get_customer_name_by_customer_id(sales.quotations.customer_id) AS customer_name    
-		FROM sales.quotations
-		WHERE sales.quotations.quotation_id = @quotation_id;
+    		SELECT
+    			sales.quotations.quotation_id,
+    			sales.quotations.transaction_timestamp,
+    			sales.quotations.value_date,
+    			account.get_name_by_user_id(sales.quotations.user_id) AS entered_by,
+    			core.get_office_name_by_office_id(sales.quotations.office_id) AS office_name,
+    			sales.quotations.terms,
+    			sales.quotations.internal_memo,
+    			inventory.get_customer_name_by_customer_id(sales.quotations.customer_id) AS customer_name    
+    		FROM sales.quotations
+    		WHERE sales.quotations.quotation_id = @quotation_id;
       </Query>
       <Parameters>
         <Parameter Name="@quotation_id" Type="long" />
@@ -80,25 +80,26 @@
     </DataSource>
     <DataSource>
       <Query>
-		SELECT
-			sales.quotation_details.item_id,
-			inventory.items.item_code,
-			inventory.items.item_name,
-			sales.quotation_details.price,
-			sales.quotation_details.quantity,
-			inventory.get_unit_name_by_unit_id(sales.quotation_details.unit_id) AS unit,
-			sales.quotation_details.price * sales.quotation_details.quantity AS amount,
-			sales.quotation_details.discount_rate,
-			sales.quotation_details.tax,
-			ROUND(
-			(
-			(sales.quotation_details.price + sales.quotation_details.tax)
-			* ((100 - sales.quotation_details.discount_rate)/100)			
-			* 
-			sales.quotation_details.quantity) , 4) AS total
-		FROM sales.quotation_details
-		INNER JOIN inventory.items
-		ON inventory.items.item_id = sales.quotation_details.item_id
+    		SELECT
+    			sales.quotation_details.item_id,
+    			inventory.items.item_code,
+    			inventory.items.item_name,
+    			sales.quotation_details.price,
+    			sales.quotation_details.quantity,
+    			inventory.get_unit_name_by_unit_id(sales.quotation_details.unit_id) AS unit,
+    			sales.quotation_details.price * sales.quotation_details.quantity AS amount,
+    			sales.quotation_details.discount_rate,
+    			sales.quotation_details.tax,
+    			ROUND(
+    			(
+    			(sales.quotation_details.price + sales.quotation_details.tax)
+    			* ((100 - sales.quotation_details.discount_rate)/100)			
+    			* 
+    			sales.quotation_details.quantity) , 4) AS total
+    		FROM sales.quotation_details
+    		INNER JOIN inventory.items
+    		ON inventory.items.item_id = sales.quotation_details.item_id
+        WHERE sales.quotation_details.quotation_id = @quotation_id;
       </Query>
       <Parameters>
         <Parameter Name="@quotation_id" Type="long" />

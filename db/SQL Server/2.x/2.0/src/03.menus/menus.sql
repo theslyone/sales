@@ -1,4 +1,4 @@
-﻿DELETE FROM auth.menu_access_policy
+DELETE FROM auth.menu_access_policy
 WHERE menu_id IN
 (
     SELECT menu_id FROM core.menus
@@ -53,6 +53,10 @@ EXECUTE core.create_menu 'Sales', 'Customer Account Statement', '/dashboard/repo
 EXECUTE core.create_menu 'Sales', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports';
 EXECUTE core.create_menu 'Sales', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports';
 EXECUTE core.create_menu 'Sales', 'Customer Receipts', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerReceipts.xml', 'building', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Detailed Payament Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/DetailedPayamentReport.xml', 'bar chart', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Gift Card(s) Summary', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/GiftCardSummary.xml', 'list', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Quotation Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/QuotationStatus.xml', 'list', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Order Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/OrderStatus.xml', 'bar chart', 'Reports';
 
 
 DECLARE @office_id integer = core.get_office_id_by_office_name('Default');

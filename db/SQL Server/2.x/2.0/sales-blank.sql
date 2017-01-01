@@ -4,9 +4,6 @@ GO
 CREATE SCHEMA sales;
 GO
 
-
---TODO: CREATE UNIQUE INDEXES
-
 CREATE TABLE sales.gift_cards
 (
     gift_card_id                            integer IDENTITY PRIMARY KEY,
@@ -111,6 +108,14 @@ CREATE TABLE sales.payment_terms
     deleted                                    bit DEFAULT(0)    
 );
 
+CREATE UNIQUE INDEX payment_terms_payment_term_code_uix
+ON sales.payment_terms(payment_term_code)
+WHERE deleted = 0;
+
+CREATE UNIQUE INDEX payment_terms_payment_term_name_uix
+ON sales.payment_terms(payment_term_name)
+WHERE deleted = 0;
+
 
 CREATE TABLE sales.cashiers
 (
@@ -127,6 +132,10 @@ CREATE TABLE sales.cashiers
     deleted                                    bit DEFAULT(0)
 );
 
+CREATE UNIQUE INDEX cashiers_cashier_code_uix
+ON sales.cashiers(cashier_code)
+WHERE deleted = 0;
+
 CREATE TABLE sales.cashier_login_info
 (
     cashier_login_info_id                   uniqueidentifier PRIMARY KEY DEFAULT(NEWID()),
@@ -142,7 +151,6 @@ CREATE TABLE sales.cashier_login_info
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)
 );
-
 
 
 CREATE TABLE sales.quotations
@@ -241,8 +249,6 @@ CREATE TABLE sales.coupons
 CREATE UNIQUE INDEX coupons_coupon_code_uix
 ON sales.coupons(coupon_code);
 
-
-
 CREATE TABLE sales.sales
 (
     sales_id                                bigint IDENTITY PRIMARY KEY,
@@ -317,7 +323,6 @@ ON sales.customer_receipts(cash_repository_id);
 
 CREATE INDEX customer_receipts_posted_date_inx
 ON sales.customer_receipts(posted_date);
-
 
 
 CREATE TABLE sales.returns
@@ -3325,6 +3330,10 @@ EXECUTE core.create_menu 'Sales', 'Customer Account Statement', '/dashboard/repo
 EXECUTE core.create_menu 'Sales', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports';
 EXECUTE core.create_menu 'Sales', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports';
 EXECUTE core.create_menu 'Sales', 'Customer Receipts', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerReceipts.xml', 'building', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Detailed Payament Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/DetailedPayamentReport.xml', 'bar chart', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Gift Card(s) Summary', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/GiftCardSummary.xml', 'list', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Quotation Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/QuotationStatus.xml', 'list', 'Reports';
+EXECUTE core.create_menu 'Sales', 'Order Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/OrderStatus.xml', 'bar chart', 'Reports';
 
 
 DECLARE @office_id integer = core.get_office_id_by_office_name('Default');

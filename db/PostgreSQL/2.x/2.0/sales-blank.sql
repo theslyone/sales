@@ -3,8 +3,6 @@ DROP SCHEMA IF EXISTS sales CASCADE;
 
 CREATE SCHEMA sales;
 
---TODO: CREATE UNIQUE INDEXES
-
 CREATE TABLE sales.gift_cards
 (
     gift_card_id                            SERIAL PRIMARY KEY,
@@ -109,6 +107,13 @@ CREATE TABLE sales.payment_terms
 	deleted									boolean DEFAULT(false)    
 );
 
+CREATE UNIQUE INDEX payment_terms_payment_term_code_uix
+ON sales.payment_terms(UPPER(payment_term_code))
+WHERE NOT deleted;
+
+CREATE UNIQUE INDEX payment_terms_payment_term_name_uix
+ON sales.payment_terms(UPPER(payment_term_name))
+WHERE NOT deleted;
 
 CREATE TABLE sales.cashiers
 (
@@ -123,6 +128,10 @@ CREATE TABLE sales.cashiers
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
 	deleted									boolean DEFAULT(false)
 );
+
+CREATE UNIQUE INDEX cashiers_cashier_code_uix
+ON sales.cashiers(UPPER(cashier_code))
+WHERE NOT deleted;
 
 CREATE TABLE sales.cashier_login_info
 (
@@ -3041,6 +3050,10 @@ SELECT * FROM core.create_menu('Sales', 'Customer Account Statement', '/dashboar
 SELECT * FROM core.create_menu('Sales', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports');
 SELECT * FROM core.create_menu('Sales', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports');
 SELECT * FROM core.create_menu('Sales', 'Customer Receipts', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerReceipts.xml', 'building', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Detailed Payment Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/DetailedPaymentReport.xml', 'bar chart', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Gift Card(s) Summary', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/GiftCardSummary.xml', 'list', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Quotation Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/QuotationStatus.xml', 'list', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Order Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/OrderStatus.xml', 'bar chart', 'Reports');
 
 
 SELECT * FROM auth.create_app_menu_policy
