@@ -53,6 +53,10 @@ SELECT * FROM core.create_menu('Sales', 'Customer Account Statement', '/dashboar
 SELECT * FROM core.create_menu('Sales', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports');
 SELECT * FROM core.create_menu('Sales', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports');
 SELECT * FROM core.create_menu('Sales', 'Customer Receipts', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerReceipts.xml', 'building', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Detailed Payment Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/DetailedPaymentReport.xml', 'bar chart', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Gift Card(s) Summary', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/GiftCardSummary.xml', 'list', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Quotation Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/QuotationStatus.xml', 'list', 'Reports');
+SELECT * FROM core.create_menu('Sales', 'Order Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/OrderStatus.xml', 'bar chart', 'Reports');
 
 
 SELECT * FROM auth.create_app_menu_policy

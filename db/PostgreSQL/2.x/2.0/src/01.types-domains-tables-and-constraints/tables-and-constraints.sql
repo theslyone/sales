@@ -2,8 +2,6 @@
 
 CREATE SCHEMA sales;
 
---TODO: CREATE UNIQUE INDEXES
-
 CREATE TABLE sales.gift_cards
 (
     gift_card_id                            SERIAL PRIMARY KEY,
@@ -108,6 +106,13 @@ CREATE TABLE sales.payment_terms
 	deleted									boolean DEFAULT(false)    
 );
 
+CREATE UNIQUE INDEX payment_terms_payment_term_code_uix
+ON sales.payment_terms(UPPER(payment_term_code))
+WHERE NOT deleted;
+
+CREATE UNIQUE INDEX payment_terms_payment_term_name_uix
+ON sales.payment_terms(UPPER(payment_term_name))
+WHERE NOT deleted;
 
 CREATE TABLE sales.cashiers
 (
@@ -122,6 +127,10 @@ CREATE TABLE sales.cashiers
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
 	deleted									boolean DEFAULT(false)
 );
+
+CREATE UNIQUE INDEX cashiers_cashier_code_uix
+ON sales.cashiers(UPPER(cashier_code))
+WHERE NOT deleted;
 
 CREATE TABLE sales.cashier_login_info
 (
