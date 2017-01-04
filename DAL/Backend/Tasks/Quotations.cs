@@ -9,6 +9,7 @@ using Frapid.Mapper.Database;
 using Frapid.Mapper.Query.Insert;
 using MixERP.Sales.DTO;
 using MixERP.Sales.QueryModels;
+using MixERP.Sales.ViewModels;
 
 namespace MixERP.Sales.DAL.Backend.Tasks
 {
@@ -29,6 +30,21 @@ namespace MixERP.Sales.DAL.Backend.Tasks
 
                 return quotationId;
             }
+        }
+
+        public static async Task<QuotationMergeViewModel> GetMergeModelAsync(string tenant, long quotationId)
+        {
+            string sql = "SELECT *, inventory.get_customer_code_by_customer_id(sales.quotations.customer_id) AS customer_name FROM sales.quotations WHERE quotation_id=@0;";
+            var quotation = await Factory.GetAsync<QuotationInfo>(tenant, sql, quotationId).ConfigureAwait(false);
+
+            sql = "SELECT * FROM sales.quotation_details WHERE quotation_id=@0;";
+            var details = await Factory.GetAsync<QuotationDetail>(tenant, sql, quotationId).ConfigureAwait(false);
+
+            return new QuotationMergeViewModel
+            {
+                Quotation = quotation.FirstOrDefault(),
+                Details = details
+            };
         }
 
         public static async Task<List<QuotationResultview>> GetQuotationResultViewAsync(string tenant, QuotationQueryModel query)

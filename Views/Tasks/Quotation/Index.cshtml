@@ -133,6 +133,16 @@
         function getActionCell(id) {
             const cell = $("<td />");
 
+            const covertToOrderAnchor = $("<a title='Convert to Order'><i class='arrow circle right icon'></i></a>");
+            const convertToOrderUrl = "/dashboard/sales/tasks/order/new?QuotationId={id}";
+            covertToOrderAnchor.attr("href", convertToOrderUrl.replace("{id}", id));
+
+
+            const covertToSalesAnchor = $("<a title='Convert to Sales'><i class='chevron circle right icon'></i></a>");
+            const convertToSalesUrl = "/dashboard/sales/tasks/entry/new?QuotationId={id}";
+            covertToSalesAnchor.attr("href", convertToSalesUrl.replace("{id}", id));
+
+
             const checklistAnchor = $("<a title='Checklist Window'><i class='list icon'></i></a>");
             const checklistUrl = "/dashboard/sales/tasks/quotation/checklist/{id}";
             checklistAnchor.attr("href", checklistUrl.replace("{id}", id));
@@ -142,6 +152,8 @@
             journalAdviceAnchor.attr("href", "javascript:void(0);");
             journalAdviceAnchor.attr("onclick", "showQuotation(" + id + ");");
 
+            cell.append(covertToOrderAnchor);
+            cell.append(covertToSalesAnchor);
             cell.append(checklistAnchor);
             cell.append(journalAdviceAnchor);
 

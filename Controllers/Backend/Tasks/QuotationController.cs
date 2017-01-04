@@ -3,11 +3,11 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Frapid.ApplicationState.Cache;
+using Frapid.Areas.CSRF;
 using Frapid.Dashboard;
 using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.DTO;
 using MixERP.Sales.QueryModels;
-using Frapid.Areas.CSRF;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
@@ -19,6 +19,13 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
         public ActionResult CheckList(long tranId)
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Quotation/CheckList.cshtml", this.Tenant), tranId);
+        }
+
+        [Route("dashboard/sales/tasks/quotation/merge-model/{quotationId}")]
+        public async Task<ActionResult> GetMergeModelAsync(long quotationId)
+        {
+            var model = await Quotations.GetMergeModelAsync(this.Tenant, quotationId).ConfigureAwait(true);
+            return this.Ok(model);
         }
 
         [Route("dashboard/sales/tasks/quotation/view")]

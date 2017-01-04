@@ -10,6 +10,56 @@
 
 
 <script>
+    function mergeInfo(model) {
+        $("#CustomerSelect").val(model.CustomerId);
+        $("#PriceTypeSelect").val(model.PriceTypeId);
+        $("#ShipperSelect").val(model.ShipperId);
+        $("#ReferenceNumberInputText").val(model.ReferenceNumber);
+        $("#TermsInputText").val(model.Terms);
+        $("#InternalMemoInputText").val(model.InternalMemo);
+    };
+
+    function mergeDetails(model) {
+        $(document).off("itemAdded").on("itemAdded", function (e, itemId, el) {
+            const item = window.Enumerable.From(model).Where(function (x) {
+                return x.ItemId === window.parseInt(itemId);
+            }).FirstOrDefault();
+
+            const quantityInput = el.find("input.quantity");
+            const priceInput = el.find("input.price");
+            const discountInput = el.find("input.discount");
+            const unitSelect = el.find("select.unit");
+
+            unitSelect.val(item.UnitId).trigger("change");
+            priceInput.val(item.Price).trigger("keyup");
+            discountInput.val(item.DiscountRate).trigger("keyup").trigger("blur");
+
+            setTimeout(function () {
+                quantityInput.val(item.Quantity).trigger("keyup");
+            }, 1000);
+        });
+
+        $.each(model, function () {
+            $("#POSItemList [data-item-id='" + this.ItemId + "']").trigger("click");
+        });
+    };
+
+    function mergeQuotation(quotationId) {
+        function request() {
+            var url = "/dashboard/sales/tasks/quotation/merge-model/{quotationId}";
+            url = url.replace("{quotationId}", quotationId);
+
+            return window.getAjaxRequest(url);
+        };
+
+        const ajax = request();
+
+        ajax.success(function (response) {
+            window.mergeInfo(response.Quotation);
+            window.mergeDetails(response.Details);
+        });
+    };
+
     function initializeUI() {
         const template = `<div class="one summary items">
                             <div class="terms item">
@@ -43,12 +93,17 @@
         $(".cost.center.item").remove();
         $(".store.item").remove();
 
-        //window.loadDatepicker();
+        $(document).on("itemFetched", function () {
+            const quotationId = window.getQueryStringByName("QuotationId");
+            if (quotationId) {
+                mergeQuotation(quotationId);
+            };
+        });
     };
 
     initializeUI();
 
-    $("#CheckoutButton").off("click").on("click", function() {
+    $("#CheckoutButton").off("click").on("click", function () {
         function request(model) {
             const url = "/dashboard/sales/tasks/order/new";
             const data = JSON.stringify(model);
@@ -60,7 +115,7 @@
                 const items = $("#SalesItems .item");
                 var model = [];
 
-                $.each(items, function() {
+                $.each(items, function () {
                     const el = $(this);
                     const itemId = parseInt(el.attr("data-item-id"));
                     const quantity = parseInt(el.find("input.quantity").val());
@@ -124,12 +179,12 @@
 
         const ajax = request(model);
 
-        ajax.success(function(response) {
+        ajax.success(function (response) {
             const id = response;
             document.location = `/dashboard/sales/tasks/order/checklist/${id}`;
         });
 
-        ajax.fail(function(xhr) {
+        ajax.fail(function (xhr) {
             $("#CheckoutButton").removeClass("loading");
             window.logAjaxErrorMessage(xhr);
         });

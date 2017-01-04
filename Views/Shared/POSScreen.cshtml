@@ -754,7 +754,7 @@
 <script>
     var pageLoaded = false;
 
-    $(document).on("itemAdded", function (e, tabId, itemId) {
+    $(document).off("itemAdded").on("itemAdded", function (e, tabId, itemId) {
         const model = window.getModelById(tabId);
         if (!model) {
             return;
@@ -793,10 +793,7 @@
         };
 
         discountInput.trigger("keyup");
-
     });
-
-
 
     $("#SalesItems .item").on("contextmenu", function (e) {
         e.preventDefault();
@@ -1138,14 +1135,15 @@
         function request() {
             const url = "/api/forms/finance/tax-setups/get-where/-1";
             const filters = [];
-            filters.push(window.getAjaxColumnFilter("WHERE", "OfficeId", "int", window.FilterConditions.IsEqualTo, window.metaView.OfficeId));
+            filters.push(window.getAjaxColumnFilter("WHERE", "OfficeId", "int", window.FilterConditions.IsEqualTo,
+                window.metaView.OfficeId));
 
             return window.getAjaxRequest(url, "POST", filters);
         };
 
         const ajax = request();
 
-        ajax.success(function (response) {
+        ajax.success(function(response) {
             const salesTaxRate = window.parseFloat(response[0].SalesTaxRate);
             $("#SalesTaxRateHidden").val(salesTaxRate);
         });
@@ -1154,7 +1152,7 @@
     if (window.metaView) {
         getTaxRate();
     } else {
-        $(document).on("metaready", function () {
+        $(document).on("metaready", function() {
             getTaxRate();
         });
     };

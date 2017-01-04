@@ -186,9 +186,11 @@
     <Compile Include="DTO\ItemView.cs" />
     <Compile Include="DTO\Order.cs" />
     <Compile Include="DTO\OrderDetail.cs" />
+    <Compile Include="DTO\OrderInfo.cs" />
     <Compile Include="DTO\OrderResultview.cs" />
     <Compile Include="DTO\Quotation.cs" />
     <Compile Include="DTO\QuotationDetail.cs" />
+    <Compile Include="DTO\QuotationInfo.cs" />
     <Compile Include="DTO\QuotationResultview.cs" />
     <Compile Include="DTO\SalesView.cs" />
     <Compile Include="Extensions\PartialViewExtensions.cs" />
@@ -201,6 +203,8 @@
     <Compile Include="ViewModels\OpeningCash.cs" />
     <Compile Include="ViewModels\CustomerSearchViewModel.cs" />
     <Compile Include="ViewModels\GiftCardFund.cs" />
+    <Compile Include="ViewModels\OrderMergeViewModel.cs" />
+    <Compile Include="ViewModels\QuotationMergeViewModel.cs" />
     <Compile Include="ViewModels\Sales.cs" />
     <Compile Include="ViewModels\SalesDetailType.cs" />
     <Compile Include="ViewModels\CustomerSearchResult.cs" />

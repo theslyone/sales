@@ -21,6 +21,13 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Order/CheckList.cshtml", this.Tenant), tranId);
         }
 
+        [Route("dashboard/sales/tasks/order/merge-model/{orderId}")]
+        public async Task<ActionResult> GetMergeModelAsync(long orderId)
+        {
+            var model = await Orders.GetMergeModelAsync(this.Tenant, orderId).ConfigureAwait(true);
+            return this.Ok(model);
+        }
+
         [Route("dashboard/sales/tasks/order/view")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/order")]
         public async Task<ActionResult> ViewAsync(OrderQueryModel query)

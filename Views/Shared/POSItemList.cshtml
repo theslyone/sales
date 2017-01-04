@@ -284,10 +284,14 @@
         var tabId = window.getSelectedTabId();
         var triggerName = "itemAdded";
 
-        $(document).trigger(triggerName, [tabId, itemId]);
+        $(document).trigger(triggerName, [tabId, itemId, item]);
 
         if (typeof (callback) === "function") {
             callback(el);
+        };
+
+        if (typeof (window.itemClickCallBack) === "function") {
+            window.itemClickCallBack(itemId, item);
         };
     };
 

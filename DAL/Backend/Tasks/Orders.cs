@@ -10,6 +10,7 @@ using Frapid.Mapper.Database;
 using Frapid.Mapper.Query.Insert;
 using MixERP.Sales.DTO;
 using MixERP.Sales.QueryModels;
+using MixERP.Sales.ViewModels;
 
 namespace MixERP.Sales.DAL.Backend.Tasks
 {
@@ -41,6 +42,22 @@ namespace MixERP.Sales.DAL.Backend.Tasks
                     throw;
                 }
             }
+        }
+
+
+        public static async Task<OrderMergeViewModel> GetMergeModelAsync(string tenant, long orderId)
+        {
+            string sql = "SELECT *, inventory.get_customer_code_by_customer_id(customer_id) AS customer_name FROM sales.orders WHERE order_id=@0;";
+            var quotation = await Factory.GetAsync<OrderInfo>(tenant, sql, orderId).ConfigureAwait(false);
+
+            sql = "SELECT * FROM sales.order_details WHERE order_id=@0;";
+            var details = await Factory.GetAsync<OrderDetail>(tenant, sql, orderId).ConfigureAwait(false);
+
+            return new OrderMergeViewModel
+            {
+                Order = quotation.FirstOrDefault(),
+                Details = details
+            };
         }
 
         public static async Task<List<OrderResultview>> GetOrderResultViewAsync(string tenant, OrderQueryModel query)

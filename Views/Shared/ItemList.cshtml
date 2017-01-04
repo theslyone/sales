@@ -147,17 +147,15 @@
 <input type="hidden" id="SalesTaxRateHidden" />
 
 <script>
-    $("#SalesItems .item")
-        .on("contextmenu",
-            function (e) {
-                e.preventDefault();
-                const el = $(this);
-                const defaultMenu = el.find(".info.block, .number.block");
-                const contextMenu = el.find(".context.menu");
+    $("#SalesItems .item").on("contextmenu", function (e) {
+        e.preventDefault();
+        const el = $(this);
+        const defaultMenu = el.find(".info.block, .number.block");
+        const contextMenu = el.find(".context.menu");
 
-                defaultMenu.toggle();
-                contextMenu.toggle();
-            });
+        defaultMenu.toggle();
+        contextMenu.toggle();
+    });
 </script>
 
 <script>
@@ -458,10 +456,11 @@
             });
 
             function getPrice(el) {
-                function request(itemId, customerId, unitId) {
-                    var url = "/dashboard/sales/tasks/selling-price/{itemId}/{customerId}/{unitId}";
+                function request(itemId, customerId, priceTypeId, unitId) {
+                    var url = "/dashboard/sales/tasks/selling-price/{itemId}/{customerId}/{priceTypeId}/{unitId}";
                     url = url.replace("{itemId}", itemId);
                     url = url.replace("{customerId}", customerId);
+                    url = url.replace("{priceTypeId}", priceTypeId);
                     url = url.replace("{unitId}", unitId);
 
                     return window.getAjaxRequest(url);
@@ -469,10 +468,11 @@
 
                 const itemId = el.attr("data-item-id");
                 const customerId = parseInt($("#CustomerSelect").val() || 0);
+                const priceTypeId = parseInt($("#PriceTypeSelect").val() || 0);
                 const unitId = el.val();
 
                 $(".pos.sales.segment").addClass("loading");
-                const ajax = request(itemId, customerId, unitId);
+                const ajax = request(itemId, customerId, priceTypeId, unitId);
 
                 ajax.success(function (response) {
                     $(".pos.sales.segment").removeClass("loading");
@@ -503,6 +503,8 @@
             item.appendTo(targetEl);
             quantityInput.trigger("keyup");
             window.updateTotal();
+
+            $(document).trigger("itemAdded", [itemId, item]);
         });
     };
 
@@ -667,12 +669,9 @@
 </script>
 
 <script>
-    $("#ClearScreenButton")
-        .unbind("click")
-        .bind("click",
-            function () {
-                clearScreen();
-            });
+    $("#ClearScreenButton").unbind("click").bind("click", function () {
+        clearScreen();
+    });
 
     function clearScreen() {
         $("#SalesItems").html("");
@@ -731,7 +730,7 @@
 </script>
 
 <script>
-    setTimeout(function() {
+    setTimeout(function () {
         $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
     }, 100);
 </script>
