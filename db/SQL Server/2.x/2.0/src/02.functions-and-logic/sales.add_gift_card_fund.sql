@@ -8,7 +8,7 @@ CREATE PROCEDURE sales.add_gift_card_fund
     @user_id                                    integer, 
     @office_id                                  integer, 
     @login_id                                   bigint,
-    @gift_card_id                               integer,
+    @gift_card_number                           national character varying(500),
     @value_date                                 date,
     @book_date                                  date,
     @debit_account_id                           integer,
@@ -21,6 +21,13 @@ AS
 BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
+
+	DECLARE @gift_card_id						integer;
+
+	SELECT TOP 1 @gift_card_id = sales.gift_cards.gift_card_id
+	FROM sales.gift_cards
+	WHERE sales.gift_cards.gift_card_number = @gift_card_number
+	AND sales.gift_cards.deleted = 0;
 
     DECLARE @transaction_master_id              bigint;
     DECLARE @book_name                          national character varying(50) = 'Gift Card Fund Sales';

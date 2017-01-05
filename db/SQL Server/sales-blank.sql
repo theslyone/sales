@@ -365,25 +365,25 @@ CREATE TABLE sales.closing_cash
     total_cash_sales                        numeric(30, 6) NOT NULL,
     submitted_to                            national character varying(1000) NOT NULL DEFAULT(''),
     memo                                    national character varying(4000) NOT NULL DEFAULT(''),
-    deno1000                                integer DEFAULT(0),
-    deno500                                    integer DEFAULT(0),
-    deno250                                    integer DEFAULT(0),
-    deno200                                    integer DEFAULT(0),
-    deno100                                    integer DEFAULT(0),
-    deno50                                    integer DEFAULT(0),
-    deno25                                    integer DEFAULT(0),
-    deno20                                    integer DEFAULT(0),
-    deno10                                    integer DEFAULT(0),
-    deno5                                    integer DEFAULT(0),
-    deno2                                    integer DEFAULT(0),
-    deno1                                    integer DEFAULT(0),
-    coins                                    numeric(30, 6) DEFAULT(0),
-    submitted_cash                            numeric(30, 6) NOT NULL,
-    approved_by                                integer REFERENCES account.users,
-    approval_memo                            national character varying(4000),
-    audit_user_id                           integer REFERENCES account.users,
+    deno_1000                               integer DEFAULT(0),
+    deno_500                                integer DEFAULT(0),
+    deno_250                                integer DEFAULT(0),
+    deno_200                                integer DEFAULT(0),
+    deno_100                                integer DEFAULT(0),
+    deno_50                                 integer DEFAULT(0),
+    deno_25                                 integer DEFAULT(0),
+    deno_20                                 integer DEFAULT(0),
+    deno_10                                 integer DEFAULT(0),
+    deno_5                                  integer DEFAULT(0),
+    deno_2                                  integer DEFAULT(0),
+    deno_1                                  integer DEFAULT(0),
+    coins                                   numeric(30, 6) DEFAULT(0),
+    submitted_cash                          numeric(30, 6) NOT NULL,
+    approved_by                             integer REFERENCES account.users,
+    approval_memo                           national character varying(4000),
+    audit_user_id                          	integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET NULL DEFAULT(GETUTCDATE()),
-    deleted                                    bit DEFAULT(0)
+    deleted                                 bit DEFAULT(0)
 );
 
 CREATE UNIQUE INDEX closing_cash_transaction_date_user_id_uix
@@ -421,7 +421,7 @@ CREATE PROCEDURE sales.add_gift_card_fund
     @user_id                                    integer, 
     @office_id                                  integer, 
     @login_id                                   bigint,
-    @gift_card_id                               integer,
+    @gift_card_number                           national character varying(500),
     @value_date                                 date,
     @book_date                                  date,
     @debit_account_id                           integer,
@@ -434,6 +434,13 @@ AS
 BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
+
+	DECLARE @gift_card_id						integer;
+
+	SELECT TOP 1 @gift_card_id = sales.gift_cards.gift_card_id
+	FROM sales.gift_cards
+	WHERE sales.gift_cards.gift_card_number = @gift_card_number
+	AND sales.gift_cards.deleted = 0;
 
     DECLARE @transaction_master_id              bigint;
     DECLARE @book_name                          national character varying(50) = 'Gift Card Fund Sales';
@@ -3718,6 +3725,29 @@ EXEC sp_addrolemember  @rolename = 'db_owner', @membername  = 'frapid_db_user'
 
 EXEC sp_addrolemember  @rolename = 'db_datareader', @membername  = 'report_user'
 
+
+GO
+
+
+DECLARE @proc sysname
+DECLARE @cmd varchar(8000)
+
+DECLARE cur CURSOR FOR 
+SELECT '[' + schema_name(schema_id) + '].[' + name + ']' FROM sys.objects
+WHERE type IN('FN')
+AND is_ms_shipped = 0
+ORDER BY 1
+OPEN cur
+FETCH next from cur into @proc
+WHILE @@FETCH_STATUS = 0
+BEGIN
+     SET @cmd = 'GRANT EXEC ON ' + @proc + ' TO report_user';
+     EXEC (@cmd)
+
+     FETCH next from cur into @proc
+END
+CLOSE cur
+DEALLOCATE cur
 
 GO
 

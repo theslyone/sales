@@ -237,11 +237,15 @@
                     <label>Today's Beginning Cash</label>
                     <input id="BodCashInputText" class="decimal" disabled="disabled" type="text" value="@Model.OpeningCashInfo.Amount.ToString("N2")">
                 </div>
+                <div class="field">
+                    <label>Your Cash Sales</label>
+                    <input id="CashSalesInputText" disabled="disabled" type="text" value="@total.ToString("N2")">
+                </div>
             </div>
             <div class="two fields">
                 <div class="field">
                     <label>Total</label>
-                    <input id="TotalInputText" disabled="disabled" type="text" value="@total.ToString("N2")">
+                    <input id="TotalInputText" disabled="disabled" type="text" value="@((Model.OpeningCashInfo.Amount + total).ToString("N2"))">
                 </div>
                 <div class="field">
                     <label>Submitted Cash</label>
@@ -385,7 +389,7 @@
         };
 
         const model = window.serializeForm($(".eod.cash"));
-        const total = parseFloat($("#TotalInputText").val());
+        const total = window.parseFloat2($("#TotalInputText").val());
 
         if (parseFloat(model.SubmittedCash) !== total) {
             window.displayMessage("The submitted amount must be equal to total amount.");

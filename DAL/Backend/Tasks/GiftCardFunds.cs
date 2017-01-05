@@ -22,12 +22,10 @@ namespace MixERP.Sales.DAL.Backend.Tasks
 
             if (DbProvider.GetDbType(DbProvider.GetProviderName(tenant)) == DatabaseType.SqlServer)
             {
-                sql = FrapidDbServer.GetProcedureCommand(tenant, "sales.add_gift_card_fund", new[] {"@0", "@1", "@2", "@3", "@4", "@5", "@6", "@7", "@8", "@9", "@10"});
+                sql = FrapidDbServer.GetProcedureCommand(tenant, "sales.add_gift_card_fund", new[] { "@0", "@1", "@2", "@3", "@4", "@5", "@6", "@7", "@8", "@9", "@10" });
             }
 
-            return
-                await
-                    Factory.ScalarAsync<long>(tenant, sql, model.UserId, model.OfficeId, model.LoginId, model.GiftCardNumber, model.ValueDate, model.BookDate, model.AccountId, model.Amount,
+            return await Factory.ScalarAsync<long>(tenant, sql, model.UserId, model.OfficeId, model.LoginId, model.GiftCardNumber, model.ValueDate, model.BookDate, model.AccountId, model.Amount,
                         model.CostCenterId, model.ReferenceNumber, model.StatementReference).ConfigureAwait(false);
         }
     }
