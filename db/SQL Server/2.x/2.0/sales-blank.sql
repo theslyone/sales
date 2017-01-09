@@ -3358,12 +3358,12 @@ GO
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/05.reports/sales.get_account_receivables_report.sql --<--<--
-IF OBJECT_ID('purchase.get_account_payables_report') IS NOT NULL
-DROP FUNCTION purchase.get_account_payables_report;
+IF OBJECT_ID('sales.get_account_receivables_report') IS NOT NULL
+DROP FUNCTION sales.get_account_receivables_report;
 
 GO
 
-CREATE FUNCTION purchase.get_account_payables_report(@office_id integer, @from date)
+CREATE FUNCTION sales.get_account_receivables_report(@office_id integer, @from date)
 RETURNS @results TABLE
 (
     office_id                   integer,
@@ -3378,7 +3378,7 @@ RETURNS @results TABLE
 AS
 BEGIN
     INSERT INTO @results(office_id, office_name, account_id)
-    SELECT DISTINCT inventory.suppliers.account_id, core.get_office_name_by_office_id(@office_id), @office_id FROM inventory.suppliers;
+    SELECT DISTINCT inventory.customers.account_id, core.get_office_name_by_office_id(@office_id), @office_id FROM inventory.customers;
 
     UPDATE @results
     SET
@@ -3441,7 +3441,7 @@ END
 
 GO
 
---SELECT * FROM purchase.get_account_payables_report(1, '1-1-2000');
+--SELECT * FROM sales.get_account_receivables_report(1, '1-1-2000');
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/05.scrud-views/sales.cashier_scrud_view.sql --<--<--
