@@ -154,9 +154,9 @@ BEGIN
         AND late_fee_account_id IS NULL;
 
 
-        SELECT @total_rows=MAX(transaction_master_id) FROM @temp_late_fee;
+        SELECT @total_rows = MAX(transaction_master_id) FROM @temp_late_fee;
 
-        WHILE @counter<@total_rows
+        WHILE @counter <= @total_rows
         BEGIN
             SELECT TOP 1 
                 @loop_transaction_master_id = transaction_master_id,
