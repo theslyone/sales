@@ -66,7 +66,6 @@ $$
     DECLARE _book_name                      national character varying(48) = 'Sales Entry';
     DECLARE _transaction_master_id          bigint;
     DECLARE _checkout_id                    bigint;
-    DECLARE _checkout_detail_id             bigint;
     DECLARE _grand_total                    public.money_strict;
     DECLARE _discount_total                 public.money_strict2;
     DECLARE _receivable                     public.money_strict2;
@@ -363,16 +362,9 @@ BEGIN
     INSERT INTO inventory.checkouts(transaction_book, value_date, book_date, checkout_id, transaction_master_id, shipper_id, posted_by, office_id, discount)
     SELECT _book_name, _value_date, _book_date, _checkout_id, _transaction_master_id, _shipper_id, _user_id, _office_id, _coupon_discount;
 
-    FOR this IN SELECT * FROM temp_checkout_details ORDER BY id
-    LOOP
-        _checkout_detail_id        := nextval(pg_get_serial_sequence('inventory.checkout_details', 'checkout_detail_id'));
-
-        INSERT INTO inventory.checkout_details(checkout_detail_id, value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, tax, shipping_charge)
-        SELECT _checkout_detail_id, _value_date, _book_date, this.checkout_id, this.tran_type, this.store_id, this.item_id, this.quantity, this.unit_id, this.base_quantity, this.base_unit_id, this.price, COALESCE(this.cost_of_goods_sold, 0), this.discount, this.tax, this.shipping_charge 
-        FROM temp_checkout_details
-        WHERE id = this.id;
-    END LOOP;
-
+    INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, tax, shipping_charge)
+    SELECT _value_date, _book_date, this.checkout_id, this.tran_type, this.store_id, this.item_id, this.quantity, this.unit_id, this.base_quantity, this.base_unit_id, this.price, COALESCE(this.cost_of_goods_sold, 0), this.discount, this.tax, this.shipping_charge 
+    FROM temp_checkout_details;
 
     SELECT
         COALESCE(MAX(invoice_number), 0) + 1

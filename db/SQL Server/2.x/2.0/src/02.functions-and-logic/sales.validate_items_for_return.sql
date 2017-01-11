@@ -288,9 +288,9 @@ BEGIN
     END;
 
 
-    SELECT @total_rows=MAX(id) FROM @details_temp;
+    SELECT @total_rows = MAX(id) FROM @details_temp;
 
-    WHILE @counter<@total_rows
+    WHILE @counter <= @total_rows
     BEGIN
 
         SELECT TOP 1

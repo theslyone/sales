@@ -1635,9 +1635,9 @@ BEGIN
         AND late_fee_account_id IS NULL;
 
 
-        SELECT @total_rows=MAX(transaction_master_id) FROM @temp_late_fee;
+        SELECT @total_rows = MAX(transaction_master_id) FROM @temp_late_fee;
 
-        WHILE @counter<@total_rows
+        WHILE @counter <= @total_rows
         BEGIN
             SELECT TOP 1 
                 @loop_transaction_master_id = transaction_master_id,
@@ -2367,21 +2367,6 @@ BEGIN
 
     DECLARE @total_rows                     integer = 0;
     DECLARE @counter                        integer = 0;
-    DECLARE @loop_id                        integer;
-    DECLARE @loop_checkout_id               bigint
-    DECLARE @loop_tran_type                 national character varying(2)
-    DECLARE @loop_store_id                  integer;
-    DECLARE @loop_item_id                   integer;
-    DECLARE @loop_quantity                  decimal(30, 6);
-    DECLARE @loop_unit_id                   integer;
-    DECLARE @loop_base_quantity             decimal(30, 6);
-    DECLARE @loop_base_unit_id              integer;
-    DECLARE @loop_price                     decimal(30, 6);
-    DECLARE @loop_cost_of_goods_sold        decimal(30, 6);
-    DECLARE @loop_discount                  decimal(30, 6);
-    DECLARE @loop_tax                       decimal(30, 6);
-    DECLARE @loop_shipping_charge           decimal(30, 6);
-
 
     DECLARE @can_post_transaction           bit;
     DECLARE @error_message                  national character varying(MAX);
@@ -2499,7 +2484,6 @@ BEGIN
         SELECT store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge
         FROM @details;
 
-        
         UPDATE @checkout_details 
         SET
             tran_type                       = 'Cr',
@@ -2699,43 +2683,9 @@ BEGIN
         UPDATE @checkout_details
         SET checkout_id             = @checkout_id;
 
-        SELECT @total_rows=MAX(id) FROM @checkout_details;
-
-        WHILE @counter<@total_rows
-        BEGIN
-            SELECT TOP 1 
-                @loop_id                    = id,
-                @loop_checkout_id           = checkout_id,
-                @loop_tran_type             = tran_type,
-                @loop_store_id              = store_id,
-                @loop_item_id               = item_id,
-                @loop_quantity              = quantity,
-                @loop_unit_id               = unit_id,
-                @loop_base_quantity         = base_quantity,
-                @loop_base_unit_id          = base_unit_id,
-                @loop_price                 = price,
-                @loop_cost_of_goods_sold    = cost_of_goods_sold,
-                @loop_discount              = discount,
-                @loop_tax                   = tax,
-                @loop_shipping_charge       = shipping_charge
-            FROM @checkout_details
-            WHERE id >= @counter
-            ORDER BY id;
-
-            IF(@loop_id IS NOT NULL)
-            BEGIN
-                SET @counter = @loop_id + 1;        
-            END
-            ELSE
-            BEGIN
-                BREAK;
-            END;
-
-            INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, tax, shipping_charge)
-            SELECT @value_date, @book_date, @loop_checkout_id, @loop_tran_type, @loop_store_id, @loop_item_id, @loop_quantity, @loop_unit_id, @loop_base_quantity, @loop_base_unit_id, @loop_price, COALESCE(@loop_cost_of_goods_sold, 0), @loop_discount, @loop_tax, @loop_shipping_charge 
-            FROM @checkout_details
-            WHERE id = @loop_id;
-        END;
+        INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, tax, shipping_charge)
+        SELECT @value_date, @book_date, checkout_id, tran_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, COALESCE(cost_of_goods_sold, 0), discount, tax, shipping_charge 
+        FROM @checkout_details;
 
 
         SELECT @invoice_number = COALESCE(MAX(invoice_number), 0) + 1
@@ -3220,9 +3170,9 @@ BEGIN
     END;
 
 
-    SELECT @total_rows=MAX(id) FROM @details_temp;
+    SELECT @total_rows = MAX(id) FROM @details_temp;
 
-    WHILE @counter<@total_rows
+    WHILE @counter <= @total_rows
     BEGIN
 
         SELECT TOP 1
