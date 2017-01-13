@@ -88,9 +88,16 @@ BEGIN
 
         SET @tax_account_id                         = finance.get_sales_tax_account_id_by_office_id(@office_id);
 
-        IF(sales.validate_items_for_return(@transaction_master_id, @details) = 0)
+		DECLARE @is_valid_transaction	bit;
+		SELECT
+			@is_valid_transaction	=	is_valid,
+			@error_message			=	[error_message]
+		FROM sales.validate_items_for_return(@transaction_master_id, @details);
+
+        IF(@is_valid_transaction = 0)
         BEGIN
-            RETURN 0;
+            RAISERROR(@error_message, 16, 1);
+            RETURN;
         END;
 
         SET @default_currency_code          = core.get_currency_code_by_office_id(@office_id);

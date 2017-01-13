@@ -238,13 +238,13 @@ BEGIN
     FROM @details_temp
     WHERE item_id NOT IN
     (
-        SELECT TOP 1 item_id FROM inventory.checkout_details
+        SELECT item_id FROM inventory.checkout_details
         WHERE checkout_id = @checkout_id
     );
 
     IF(COALESCE(@item_id, 0) != 0)
     BEGIN
-        SET @error_message = FORMATMESSAGE('The item %s is not associated with this transaction.', inventory.get_item_name_by_item_id(1));
+        SET @error_message = FORMATMESSAGE('The item %s is not associated with this transaction.', inventory.get_item_name_by_item_id(@item_id));
 
         UPDATE @result 
         SET 
