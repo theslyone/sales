@@ -34,7 +34,7 @@ CREATE FUNCTION sales.post_return
 RETURNS bigint
 AS
 $$
-    DECLARE _book_name              national character varying = 'Sales Return';
+    DECLARE _book_name              national character varying(50) = 'Sales Return';
     DECLARE _cost_center_id         bigint;
     DECLARE _tran_master_id         bigint;
     DECLARE _tran_counter           integer;

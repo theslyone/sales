@@ -25,7 +25,7 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
-    DECLARE @book_name              national character varying = 'Sales Return';
+    DECLARE @book_name              national character varying(50) = 'Sales Return';
     DECLARE @cost_center_id         bigint;
     DECLARE @tran_counter           integer;
     DECLARE @tran_code              national character varying(50);
