@@ -852,8 +852,8 @@
     });
 
     $("#DiscountInputText").keyup(function () {
-        const rate = window.parseFloat2($("#DiscountInputText").val());
-        const type = window.parseInt($("#DiscountTypeSelect").val());
+        const rate = parseFloat($("#DiscountInputText").val()) || 0;
+        const type = window.parseInt($("#DiscountTypeSelect").val()) || 0;
 
         if (type === 1 && rate > 100) {
             $("#DiscountInputText").val("0");
@@ -868,7 +868,7 @@
         const amountEl = $("div.amount .money");
         const countEl = $("div.count .money");
         const couponDiscountType = parseInt($("#DiscountTypeSelect").val());
-        const couponDiscountRate = window.parseFloat2($("#DiscountInputText").val());
+        const couponDiscountRate = parseFloat($("#DiscountInputText").val()) || 0;
         var discount;
 
 
@@ -878,17 +878,17 @@
         $.each(candidates, function () {
             const el = $(this);
             const quantityEl = el.find("input.quantity");
-            const quantity = window.parseFloat2(quantityEl.val() || 0);
+            const quantity = parseFloat(quantityEl.val()) || 0;
 
-            const discountedAmount = window.parseFloat(el.find(".discounted.amount").html());
-            const amountPlusTax = window.parseFloat(el.find(".amount-plus-tax").html());
+            const discountedAmount = window.parseFloat2(el.find(".discounted.amount").html());
+            const amountPlusTax = window.parseFloat2(el.find(".amount-plus-tax").html());
             const lineTotal = (amountPlusTax || discountedAmount);
             totalPrice += lineTotal;
 
             totalQuantity += quantity;
         });
 
-        totalPrice = parseFloat(window.round(totalPrice, 2));
+        totalPrice = parseFloat(window.round(totalPrice, 2)) || 0;
 
         if (couponDiscountType === 1 && couponDiscountRate > 0 && couponDiscountRate <= 100) {
             discount = totalPrice * (couponDiscountRate / 100);
@@ -899,9 +899,8 @@
         };
 
 
-
-        amountEl.html(window.round(totalPrice, 2));
-        countEl.html(window.round(totalQuantity, 2));
+        amountEl.html(window.getFormattedNumber(window.round(totalPrice, 2)));
+        countEl.html(window.getFormattedNumber(window.round(totalQuantity, 2)));
     };
 
 
@@ -1144,7 +1143,7 @@
         const ajax = request();
 
         ajax.success(function(response) {
-            const salesTaxRate = window.parseFloat(response[0].SalesTaxRate);
+            const salesTaxRate = parseFloat(response[0].SalesTaxRate) || 0;
             $("#SalesTaxRateHidden").val(salesTaxRate);
         });
     };

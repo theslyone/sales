@@ -12,7 +12,7 @@
 <div class="item list" id="POSItemList">
 </div>
 <script>
-    var itemTemplate = `<div class="item" id="pos-{ItemId}" data-selling-price="{SellingPrice}" data-photo="{Photo}" data-unit-id="{UnitId}" data-valid-units="{ValidUnits}" data-brand="{BrandName}" data-item-group="{ItemGroupName}" data-item-name="{ItemName}" data-item-code="{ItemCode}" data-item-id="{ItemId}" data-price="{Price}">
+    var itemTemplate = `<div class="item" id="pos-{ItemId}" data-selling-price="{InvariantCultureSellingPrice}" data-photo="{Photo}" data-unit-id="{UnitId}" data-valid-units="{ValidUnits}" data-brand="{BrandName}" data-item-group="{ItemGroupName}" data-item-name="{ItemName}" data-item-code="{ItemCode}" data-item-id="{ItemId}" data-price="{Price}">
 	<div class="photo block">
 		<img src="{Photo}">
 	</div>
@@ -64,7 +64,7 @@
         $(".footer.items").show();
         targetEl.show();
 
-        var sellingPrice = el.attr("data-selling-price");
+        var sellingPrice = parseFloat(el.attr("data-selling-price")) || 0;
         var photo = el.attr("data-photo");
 
         var barCode = el.attr("data-barcode");
@@ -76,9 +76,9 @@
         var itemCode = el.attr("data-item-code");
         var itemId = el.attr("data-item-id");
         var isTaxableItem = el.attr("data-is-taxable-item") === "true";
-        var taxRate = window.parseFloat($("#SalesTaxRateHidden").val());
+        var taxRate = parseFloat($("#SalesTaxRateHidden").val()) || 0;
 
-        var price = window.parseFloat2(sellingPrice || 0);
+        var price = sellingPrice;
 
         if (!price) {
             window.displayMessage("Cannot add item because the price is zero.");
@@ -94,7 +94,7 @@
             var existingQuantitySpan = existingEl.find("span.quantity");
             var existingQuantityInput = existingEl.find("input.quantity");
 
-            var quantity = window.parseFloat2(existingQuantitySpan.text() || 0);
+            var quantity = window.parseFloat2(existingQuantitySpan.text()) || 0;
             quantity++;
 
             existingQuantitySpan.text(quantity);
@@ -105,9 +105,10 @@
         };
 
         var template = itemTemplate;
-
+        
         template = template.replace(/{ItemId}/g, itemId);
-        template = template.replace(/{SellingPrice}/g, sellingPrice);
+        template = template.replace(/{SellingPrice}/g, window.getFormattedNumber(sellingPrice));
+        template = template.replace(/{InvariantCultureSellingPrice}/g, sellingPrice);
         template = template.replace(/{Photo}/g, photo);
         template = template.replace(/{BarCode}/g, barCode);
         template = template.replace(/{BrandName}/g, brand);
@@ -151,25 +152,26 @@
         loadUnits(unitSelect, unitId, validUnits.split(','));
 
         function updateItemInfo(el) {
+            window.setNumberFormat();
             const quantityEl = el.find("input.quantity");
             const discountEl = el.find("input.discount");
 
-            const quantity = window.parseFloat2(quantityEl.val() || 0);
-            const discountRate = window.parseFloat2(discountEl.val().replace("%", "")) || 0;
+            const quantity = parseFloat(quantityEl.val()) || 0;
+            const discountRate = parseFloat(discountEl.val()) || 0;
 
-            const price = window.parseFloat2(el.find("input.price").val());
+            const price = parseFloat(el.find("input.price").val()) || 0;
 
             const amount = window.round(price * quantity, 2);
             const discountedAmount = window.round((price * quantity) * ((100 - discountRate) / 100), 2);
 
-            el.find("span.rate:not(.discount)").html(price);
-            el.find("span.quantity").html(quantity);
-            el.find("span.amount").html(amount);
+            el.find("span.rate:not(.discount)").html(window.getFormattedNumber(price));
+            el.find("span.quantity").html(window.getFormattedNumber(quantity));
+            el.find("span.amount").html(window.getFormattedNumber(amount));
             el.find("span.discount.rate").html("");
             el.find("span.discounted.amount").html("");
 
-            el.find("span.discount.rate").html(discountEl.val().replace("%", "") + "%");
-            el.find("span.discounted.amount").html(discountedAmount);
+            el.find("span.discount.rate").html(window.getFormattedNumber(discountEl.val().replace("%", "")) + "%");
+            el.find("span.discounted.amount").html(window.getFormattedNumber(discountedAmount));
 
             if (discountRate) {
                 el.find(".discount.info").show();
@@ -180,9 +182,9 @@
             if (isTaxableItem) {
                 const tax = window.round(discountedAmount * taxRate / 100, 2);
                 const amountPlusTax = window.round(discountedAmount + tax, 2);
-                el.find(".tax.info .tax-amount").html(tax);
-                el.find(".tax.info .tax-rate").html(window.round(taxRate, 2));
-                el.find(".tax.info .amount-plus-tax").html(amountPlusTax);
+                el.find(".tax.info .tax-amount").html(window.getFormattedNumber(tax));
+                el.find(".tax.info .tax-rate").html(window.getFormattedNumber(window.round(taxRate, 2)));
+                el.find(".tax.info .amount-plus-tax").html(window.getFormattedNumber(amountPlusTax));
                 el.find(".tax.info").show();
             };
 
@@ -198,7 +200,7 @@
         discountInput.on("keyup", function () {
             const el = $(this);
 
-            const rate = window.parseFloat2(el.val());
+            const rate = parseFloat(el.val()) || 0;
             if (rate > 100) {
                 el.val("100");
                 return;
@@ -462,7 +464,7 @@
             const info = $("<div class='info' />");
 
             const price = $("<div class='price' />");
-            price.html(product.SellingPrice);
+            price.html(window.getFormattedNumber(product.SellingPrice));
 
             price.appendTo(info);
 

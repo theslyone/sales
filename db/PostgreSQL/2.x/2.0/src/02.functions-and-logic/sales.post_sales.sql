@@ -363,7 +363,7 @@ BEGIN
     SELECT _book_name, _value_date, _book_date, _checkout_id, _transaction_master_id, _shipper_id, _user_id, _office_id, _coupon_discount;
 
     INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, tax, shipping_charge)
-    SELECT _value_date, _book_date, this.checkout_id, this.tran_type, this.store_id, this.item_id, this.quantity, this.unit_id, this.base_quantity, this.base_unit_id, this.price, COALESCE(this.cost_of_goods_sold, 0), this.discount, this.tax, this.shipping_charge 
+    SELECT _value_date, _book_date, checkout_id, tran_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, COALESCE(cost_of_goods_sold, 0), discount, tax, shipping_charge 
     FROM temp_checkout_details;
 
     SELECT
@@ -419,13 +419,13 @@ $$
 LANGUAGE plpgsql;
 
 
--- 
--- 
+
+
 -- SELECT * FROM sales.post_sales
 -- (
 --     1, 1, 1, 1, finance.get_value_date(1), finance.get_value_date(1), 1, 'asdf', 'Test', 
 --     500000,2000, null, null, null, null, null, null,
---     inventory.get_customer_id_by_customer_code('DEF'), 1, 1, 1,
+--     inventory.get_customer_id_by_customer_code('JOTAY'), 1, 1, 1,
 --     null, true, 1000,
 --     ARRAY[
 --     ROW(1, 'Cr', 1, 1, 1,180000, 0, 10, 0)::sales.sales_detail_type,

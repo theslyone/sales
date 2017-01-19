@@ -210,26 +210,6 @@
     <Compile Include="ViewModels\CustomerSearchResult.cs" />
     <Compile Include="ViewModels\SalesReturn.cs" />
     <Compile Include="ViewModels\TicketViewModel.cs" />
-    <Compile Include="Views\Loyalty\GiftCards\AddFund\Checklist.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Checklist.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Loyalty\GiftCards\AddFund\Entry.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Entry.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Loyalty\GiftCards\AddFund\Index.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Index.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Loyalty\GiftCards\AddFund\Verification.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Verification.cshtml</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -258,24 +238,12 @@
     <Content Include="Views\Tasks\Entry\Checklist.cshtml" />
     <Content Include="Views\Tasks\Entry\Verification.cshtml" />
     <Content Include="Views\Loyalty\Coupons\Index.cshtml" />
-    <Content Include="Views\Loyalty\GiftCards\AddFund\Entry.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>Entry.generated.cs</LastGenOutput>
-    </Content>
+    <Content Include="Views\Loyalty\GiftCards\AddFund\Entry.cshtml" />
     <Content Include="Views\Loyalty\Points\Index.cshtml" />
     <Content Include="Views\Ticket\Index.cshtml" />
-    <Content Include="Views\Loyalty\GiftCards\AddFund\Index.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>Index.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Views\Loyalty\GiftCards\AddFund\Checklist.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>Checklist.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Views\Loyalty\GiftCards\AddFund\Verification.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>Verification.generated.cs</LastGenOutput>
-    </Content>
+    <Content Include="Views\Loyalty\GiftCards\AddFund\Index.cshtml" />
+    <Content Include="Views\Loyalty\GiftCards\AddFund\Checklist.cshtml" />
+    <Content Include="Views\Loyalty\GiftCards\AddFund\Verification.cshtml" />
     <Content Include="Views\Shared\GiftCardSerachModal.cshtml" />
     <Content Include="Views\Shared\ReprintTicketModal.cshtml" />
     <Content Include="Views\Shared\CustomerSearchModal.cshtml" />

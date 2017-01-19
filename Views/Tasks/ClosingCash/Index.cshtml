@@ -346,7 +346,7 @@
         $.each(candidates, function() {
             const el = $(this);
             const value = parseInt(el.attr("data-value")) || 0;
-            const number = window.parseFloat2(el.val());
+            const number = parseFloat(el.val()) || 0;
 
             const result = value * number;
 
@@ -354,7 +354,7 @@
         });
 
         $("#SubmittedCashInputText").val(total).addClass("selected");
-        $(".submitted.Amount").html(total);
+        $(".submitted.Amount").html(window.getFormattedNumber(total));
     };
 
     (function() {
@@ -389,9 +389,9 @@
         };
 
         const model = window.serializeForm($(".eod.cash"));
-        const total = window.parseFloat2($("#TotalInputText").val());
+        const total = parseFloat($("#TotalInputText").val()) || 0;
 
-        if (parseFloat(model.SubmittedCash) !== total) {
+        if (model.SubmittedCash !== total) {
             window.displayMessage("The submitted amount must be equal to total amount.");
             return;
         };
@@ -412,7 +412,7 @@
     $(".denomination .ui.input.field:not(.total) input").keyup(function() {
         const el = $(this);
         const value = parseInt(el.attr("data-value")) || 0;
-        const number = window.parseFloat2(el.val()) || 0;
+        const number = parseFloat(el.val()) || 0;
         const result = value * number;
 
         const target = el.parent().parent().find(".ui.input.total.field input");
