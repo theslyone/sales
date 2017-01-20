@@ -21,12 +21,14 @@ EXECUTE core.create_app 'Sales', 'Sales', '1.0', 'MixERP Inc.', 'December 1, 201
 EXECUTE core.create_menu 'Sales', 'Tasks', '', 'lightning', '';
 EXECUTE core.create_menu 'Sales', 'Opening Cash', '/dashboard/sales/tasks/opening-cash', 'money', 'Tasks';
 EXECUTE core.create_menu 'Sales', 'Sales Entry', '/dashboard/sales/tasks/entry', 'write', 'Tasks';
+EXECUTE core.create_menu 'Sales', 'Receipt', '/dashboard/sales/tasks/receipt', 'checkmark box', 'Tasks';
 EXECUTE core.create_menu 'Sales', 'Sales Returns', '/dashboard/sales/tasks/return', 'minus square', 'Tasks';
 EXECUTE core.create_menu 'Sales', 'Sales Quotation', '/dashboard/sales/tasks/quotation', 'quote left', 'Tasks';
 EXECUTE core.create_menu 'Sales', 'Sales Orders', '/dashboard/sales/tasks/order', 'file national character varying(1000) outline', 'Tasks';
 EXECUTE core.create_menu 'Sales', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks';
+EXECUTE core.create_menu 'Sales', 'Receipt Verification', '/dashboard/sales/tasks/receipt/verification', 'checkmark', 'Tasks';
 EXECUTE core.create_menu 'Sales', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks';
---EXECUTE core.create_menu 'Sales', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks';
+EXECUTE core.create_menu 'Sales', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks';
 EXECUTE core.create_menu 'Sales', 'EOD', '/dashboard/sales/tasks/eod', 'money', 'Tasks';
 
 EXECUTE core.create_menu 'Sales', 'Customer Loyalty', 'square outline', 'user', '';

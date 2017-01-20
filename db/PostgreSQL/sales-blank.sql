@@ -2497,7 +2497,7 @@ BEGIN
     SELECT _book_name, _value_date, _book_date, _checkout_id, _transaction_master_id, _shipper_id, _user_id, _office_id, _coupon_discount;
 
     INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, tax, shipping_charge)
-    SELECT _value_date, _book_date, this.checkout_id, this.tran_type, this.store_id, this.item_id, this.quantity, this.unit_id, this.base_quantity, this.base_unit_id, this.price, COALESCE(this.cost_of_goods_sold, 0), this.discount, this.tax, this.shipping_charge 
+    SELECT _value_date, _book_date, checkout_id, tran_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, COALESCE(cost_of_goods_sold, 0), discount, tax, shipping_charge 
     FROM temp_checkout_details;
 
     SELECT
@@ -2553,13 +2553,13 @@ $$
 LANGUAGE plpgsql;
 
 
--- 
--- 
+
+
 -- SELECT * FROM sales.post_sales
 -- (
 --     1, 1, 1, 1, finance.get_value_date(1), finance.get_value_date(1), 1, 'asdf', 'Test', 
 --     500000,2000, null, null, null, null, null, null,
---     inventory.get_customer_id_by_customer_code('DEF'), 1, 1, 1,
+--     inventory.get_customer_id_by_customer_code('JOTAY'), 1, 1, 1,
 --     null, true, 1000,
 --     ARRAY[
 --     ROW(1, 'Cr', 1, 1, 1,180000, 0, 10, 0)::sales.sales_detail_type,
@@ -3010,12 +3010,14 @@ SELECT * FROM core.create_app('Sales', 'Sales', '1.0', 'MixERP Inc.', 'December 
 SELECT * FROM core.create_menu('Sales', 'Tasks', '', 'lightning', '');
 SELECT * FROM core.create_menu('Sales', 'Opening Cash', '/dashboard/sales/tasks/opening-cash', 'money', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Entry', '/dashboard/sales/tasks/entry', 'write', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'Receipt', '/dashboard/sales/tasks/receipt', 'checkmark box', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Returns', '/dashboard/sales/tasks/return', 'minus square', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Quotation', '/dashboard/sales/tasks/quotation', 'quote left', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Orders', '/dashboard/sales/tasks/order', 'file text outline', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'Receipt Verification', '/dashboard/sales/tasks/receipt/verification', 'checkmark', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks');
---SELECT * FROM core.create_menu('Sales', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');
+SELECT * FROM core.create_menu('Sales', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');
 SELECT * FROM core.create_menu('Sales', 'EOD', '/dashboard/sales/tasks/eod', 'money', 'Tasks');
 
 SELECT * FROM core.create_menu('Sales', 'Customer Loyalty', 'square outline', 'user', '');
