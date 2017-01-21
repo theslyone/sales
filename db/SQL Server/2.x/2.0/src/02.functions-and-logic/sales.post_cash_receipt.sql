@@ -56,13 +56,13 @@ BEGIN
 
         IF(@can_post_transaction = 0)
         BEGIN
-            RAISERROR(@error_message, 10, 1);
+            RAISERROR(@error_message, 13, 1);
             RETURN;
         END;
 
         IF(@tender < @receivable)
         BEGIN
-            RAISERROR('The tendered amount must be greater than or equal to sales amount', 10, 1);
+            RAISERROR('The tendered amount must be greater than or equal to sales amount', 13, 1);
         END;
         
         SET @debit                                  = @receivable;

@@ -133,7 +133,7 @@ BEGIN
 
         IF(@can_post_transaction = 0)
         BEGIN
-            RAISERROR(@error_message, 10, 1);
+            RAISERROR(@error_message, 13, 1);
             RETURN;
         END;
 
@@ -154,12 +154,12 @@ BEGIN
 
         IF(COALESCE(@customer_id, 0) = 0)
         BEGIN
-            RAISERROR('Please select a customer.', 10, 1);
+            RAISERROR('Please select a customer.', 13, 1);
         END;
 
         IF(COALESCE(@coupon_code, '') != '' AND COALESCE(@discount, 0) > 0)
         BEGIN
-            RAISERROR('Please do not specify discount rate when you mention coupon code.', 10, 1);
+            RAISERROR('Please do not specify discount rate when you mention coupon code.', 13, 1);
         END;
         --TODO: VALIDATE COUPON CODE AND POST DISCOUNT
 
@@ -170,7 +170,7 @@ BEGIN
 
         IF(@is_credit = 0 AND @is_cash = 0)
         BEGIN
-            RAISERROR('Cannot post sales. Invalid cash account mapping on store.', 10, 1);
+            RAISERROR('Cannot post sales. Invalid cash account mapping on store.', 13, 1);
         END;
 
        
@@ -223,7 +223,7 @@ BEGIN
             AND maintain_inventory = 1     
         )
         BEGIN
-            RAISERROR('Insufficient item quantity', 10, 1);
+            RAISERROR('Insufficient item quantity', 13, 1);
         END;
         
         IF EXISTS
@@ -232,7 +232,7 @@ BEGIN
             WHERE inventory.is_valid_unit_id(details.unit_id, details.item_id) = 0
         )
         BEGIN
-            RAISERROR('Item/unit mismatch.', 10, 1);
+            RAISERROR('Item/unit mismatch.', 13, 1);
         END;
 
         SELECT @discount_total  = ROUND(SUM(COALESCE(discount, 0)), 2) FROM @checkout_details;
@@ -245,11 +245,11 @@ BEGIN
             
         IF(@is_flat_discount = 1 AND @discount > @receivable)
         BEGIN
-            RAISERROR('The discount amount cannot be greater than total amount.', 10, 1);
+            RAISERROR('The discount amount cannot be greater than total amount.', 13, 1);
         END
         ELSE IF(@is_flat_discount = 0 AND @discount > 100)
         BEGIN
-            RAISERROR('The discount rate cannot be greater than 100.', 10, 1);
+            RAISERROR('The discount rate cannot be greater than 100.', 13, 1);
         END;
 
         SET @coupon_discount                = ROUND(@discount, 2);
@@ -270,7 +270,7 @@ BEGIN
             IF(@tender < @receivable)
             BEGIN
                 SET @error_message = FORMATMESSAGE('The tender amount must be greater than or equal to %s.', CAST(@receivable AS varchar(30)));
-                RAISERROR(@error_message, 10, 1);
+                RAISERROR(@error_message, 13, 1);
             END;
         END
         ELSE IF(@check_amount > 0)
@@ -278,7 +278,7 @@ BEGIN
             IF(@check_amount < @receivable )
             BEGIN
                 SET @error_message = FORMATMESSAGE('The check amount must be greater than or equal to %s.', CAST(@receivable AS varchar(30)));
-                RAISERROR(@error_message, 10, 1);
+                RAISERROR(@error_message, 13, 1);
             END;
         END
         ELSE IF(COALESCE(@gift_card_number, '') != '')
@@ -286,7 +286,7 @@ BEGIN
             IF(@gift_card_balance < @receivable )
             BEGIN
                 SET @error_message = FORMATMESSAGE('The gift card must have a balance of at least %s.', CAST(@receivable AS varchar(30)));
-                RAISERROR(@error_message, 10, 1);
+                RAISERROR(@error_message, 13, 1);
             END;
         END;
         
@@ -432,7 +432,7 @@ BEGIN
         INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id, receipt_transaction_master_id)
         SELECT @fiscal_year_code, @invoice_number, @price_type_id, @counter_id, @receivable, @cash_repository_id, @sales_order_id, @sales_quotation_id, @transaction_master_id, @checkout_id, @customer_id, @user_id, @coupon_id, @is_flat_discount, @discount, @discount_total, @is_credit, @payment_term_id, @tender, @change, @check_number, @check_date, @check_bank_name, @check_amount, @gift_card_id, @receipt_transaction_master_id;
         
-        EXECUTE finance.auto_verify @transaction_master_id, @office_id;
+		EXECUTE finance.auto_verify @transaction_master_id, @office_id;
 
         IF(@tran_count = 0)
         BEGIN

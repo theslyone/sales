@@ -11,7 +11,7 @@ CREATE FUNCTION sales.validate_items_for_return
 RETURNS @result TABLE
 (
     is_valid                                bit,
-    error_message                           national character varying(2000)
+    "error_message"                         national character varying(2000)
 )
 AS
 BEGIN        
@@ -38,7 +38,7 @@ BEGIN
 
     SET @checkout_id                        = inventory.get_checkout_id_by_transaction_master_id(@transaction_master_id);
 
-    INSERT INTO @result(is_valid, error_message)
+    INSERT INTO @result(is_valid, "error_message")
     SELECT 0, '';
 
 
@@ -179,7 +179,7 @@ BEGIN
         UPDATE @result 
         SET 
             is_valid = 0, 
-            error_message = 'Invalid store.';
+            "error_message" = 'Invalid store.';
         RETURN;
     END;    
 
@@ -188,7 +188,7 @@ BEGIN
         UPDATE @result 
         SET 
             is_valid = 0, 
-            error_message = 'Invalid item.';
+            "error_message" = 'Invalid item.';
 
         RETURN;
     END;
@@ -198,7 +198,7 @@ BEGIN
         UPDATE @result 
         SET 
             is_valid = 0, 
-            error_message = 'Invalid unit.';
+            "error_message" = 'Invalid unit.';
         RETURN;
     END;
 
@@ -207,7 +207,7 @@ BEGIN
         UPDATE @result 
         SET 
             is_valid = 0, 
-            error_message = 'Invalid quantity.';
+            "error_message" = 'Invalid quantity.';
         RETURN;
     END;
 
@@ -216,7 +216,7 @@ BEGIN
         UPDATE @result 
         SET 
             is_valid = 0, 
-            error_message = 'Invalid transaction id.';
+            "error_message" = 'Invalid transaction id.';
         RETURN;
     END;
 
@@ -230,7 +230,7 @@ BEGIN
         UPDATE @result 
         SET 
             is_valid = 0, 
-            error_message = 'Invalid or rejected transaction.';
+            "error_message" = 'Invalid or rejected transaction.' ;
         RETURN;
     END;
         
@@ -249,7 +249,7 @@ BEGIN
         UPDATE @result 
         SET 
             is_valid = 0, 
-            error_message = @error_message;
+            "error_message" = @error_message;
         RETURN;
     END;
 
@@ -266,7 +266,7 @@ BEGIN
         UPDATE @result 
         SET 
             is_valid = 0, 
-            error_message = 'Invalid or incompatible unit specified.';
+            "error_message" = 'Invalid or incompatible unit specified.';
         RETURN;
     END;
 
@@ -283,7 +283,7 @@ BEGIN
         UPDATE @result 
         SET 
             is_valid = 0, 
-            error_message = @error_message;
+            "error_message" = @error_message;
         RETURN;
     END;
 
@@ -333,7 +333,7 @@ BEGIN
             UPDATE @result 
             SET 
                 is_valid = 0, 
-                error_message = @error_message;
+                "error_message" = @error_message;
         RETURN;
         END;
     END;
@@ -341,7 +341,7 @@ BEGIN
     UPDATE @result 
     SET 
         is_valid = 1, 
-        error_message = '';
+        "error_message" = '';
     RETURN;
 END;
 

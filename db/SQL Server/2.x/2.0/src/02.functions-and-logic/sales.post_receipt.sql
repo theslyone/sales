@@ -72,7 +72,7 @@ BEGIN
 
         IF(@can_post_transaction = 0)
         BEGIN
-            RAISERROR(@error_message, 10, 1);
+            RAISERROR(@error_message, 13, 1);
             RETURN;
         END;
 
@@ -90,12 +90,12 @@ BEGIN
 
         IF(@local_currency_code = @currency_code AND @exchange_rate_debit != 1)
         BEGIN
-            RAISERROR('Invalid exchange rate.', 10, 1);
+            RAISERROR('Invalid exchange rate.', 13, 1);
         END;
 
         IF(@base_currency_code = @currency_code AND @exchange_rate_credit != 1)
         BEGIN
-            RAISERROR('Invalid exchange rate.', 10, 1);
+            RAISERROR('Invalid exchange rate.', 13, 1);
         END;
 
         
@@ -116,7 +116,7 @@ BEGIN
         END
         ELSE
         BEGIN
-            RAISERROR('Cannot post receipt. Please enter the tender amount.', 10, 1);
+            RAISERROR('Cannot post receipt. Please enter the tender amount.', 13, 1);
         END;
 
         

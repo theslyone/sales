@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <FrapidReport>
 <Header />
-  <Title>Quatation Status</Title>
+  <Title>Quotation Status</Title>
   <Body>
     <Content>
       <h5>Duration: {DataSource[0].from_date} to {DataSource[0].to_date}</h5>

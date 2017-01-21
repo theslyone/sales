@@ -67,6 +67,7 @@ input.invoice.number.for.reprint {
 .inline.blocks > .item {
     display: inline-block !important;
     padding: 2px;
+	min-width: 12em;
 }
 
 .two.inline.blocks > .item {

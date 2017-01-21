@@ -82,7 +82,7 @@ BEGIN
 
         IF(@can_post_transaction = 0)
         BEGIN
-            RAISERROR(@error_message, 10, 1);
+            RAISERROR(@error_message, 13, 1);
             RETURN;
         END;
 
@@ -91,7 +91,7 @@ BEGIN
 		DECLARE @is_valid_transaction	bit;
 		SELECT
 			@is_valid_transaction	=	is_valid,
-			@error_message			=	[error_message]
+			@error_message			=	"error_message"
 		FROM sales.validate_items_for_return(@transaction_master_id, @details);
 
         IF(@is_valid_transaction = 0)
@@ -141,7 +141,7 @@ BEGIN
             WHERE inventory.is_valid_unit_id(details.unit_id, details.item_id) = 0
         )
         BEGIN
-            RAISERROR('Item/unit mismatch.', 10, 1);
+            RAISERROR('Item/unit mismatch.', 13, 1);
         END;
 
 
