@@ -7,28 +7,5 @@
 }
 @Html.FinancePartialView("Shared/JournalView.cshtml", TenantConvention.GetTenant())
 
-<script>
-    window.prepareView({
-        Title: "Sales Returns",
-        Book: "Sales Return",
-        ChecklistUrl : "/dashboard/sales/tasks/return/checklist/{tranId}",
-        AdviceButtons: [
-            {
-                Title: "View Sales Return",
-                Href: "javascript:void(0);",
-                OnClick: "showReturn({tranId});"
-            }
-        ]
-    });
+<script src="/Areas/MixERP.Sales/scripts/tasks/return/index.js"></script>
 
-    function showReturn(tranId) {
-        $(".advice.modal iframe").attr("src", "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Return.xml?transaction_master_id=" + tranId);
-
-        setTimeout(function () {
-            $(".advice.modal")
-                .modal('setting', 'transition', 'horizontal flip')
-                .modal("show");
-
-        }, 300);
-    };
-</script>

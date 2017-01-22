@@ -21,90 +21,9 @@
     decimal grandTotal = totalBeforeDisount - Model.View.Discount;
     decimal discountRate = Math.Round(Model.View.Discount * 100 / totalBeforeDisount, 1);
 }
-<style>
-    html, body, table {
-        font-family: Consolas, "Courier New", monospace;
-        font-size: 12px;
-        text-align: center;
-        text-transform: uppercase;
-    }
-
-    table {
-        border-collapse: collapse;
-        text-align: left;
-        width: 100%;
-    }
-
-        table th, table td {
-            border-bottom: 1px solid #ddd;
-            padding: 0.2em;
-        }
-
-
-    .right {
-        text-align: right;
-    }
-
-    .logo img {
-        height: 40px;
-    }
-
-    .coupon.header {
-        font-size: 1.4em;
-        padding: 1em;
-    }
-
-    .transaction.items {
-        padding-bottom: 1em;
-    }
-
-        .transaction.items .info, .coupon .info {
-            display: flex;
-        }
-
-            .transaction.items .info .name {
-                font-weight: bold;
-                text-align: left;
-                width: 120px;
-            }
-
-                .transaction.items .info .name:after {
-                    content: ":";
-                }
-
-    .coupons .coupon {
-        display: flex;
-        margin: 0 auto;
-        padding: 1em;
-    }
-
-        .coupons .coupon .qrcode {
-            width: 80px;
-        }
-
-        .coupons .coupon .description {
-            padding-left: 1em;
-            text-align: left;
-        }
-
-            .coupons .coupon .description .title:not(.sub) {
-                font-size: 1.2em;
-                font-weight: bold;
-            }
-
-            .coupons .coupon .description .sub.title {
-                font-size: 1.1em;
-                font-weight: bold;
-            }
-
-            .coupons .coupon .description .info .name {
-                font-size: 0.87em;
-                font-weight: bold;
-                padding-right: 1em;
-            }
-</style>
-<script src="/Scripts/jquery-2.2.4.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/Areas/MixERP.Sales/styles/ticket/index.css" />
+<script src="/scripts/jquery-2.2.4.min.js"></script>
+<script src="/scripts/jquery-qrcode/jquery.qrcode.min.js"></script>
 <div class="ticket">
     <div class="header">
         <div class="logo">
@@ -114,11 +33,11 @@
         <div class="address">
             @if (!string.IsNullOrWhiteSpace(appUser.AddressLine1))
             {
-                @appUser.AddressLine1
+            @appUser.AddressLine1
             }
             @if (!string.IsNullOrWhiteSpace(appUser.AddressLine2))
             {
-                @appUser.AddressLine2
+            @appUser.AddressLine2
             }
 
             @appUser.Street, @appUser.City @appUser.State
@@ -150,35 +69,35 @@
             </div>
             @if (Model.View.PaymentTermId > 0)
             {
-                <div class="info">
-                    <div class="name">Payment Term</div>
-                    <div class="value">@Model.View.PaymentTermName</div>
-                </div>
+            <div class="info">
+                <div class="name">Payment Term</div>
+                <div class="value">@Model.View.PaymentTermName</div>
+            </div>
             }
             @if (Model.View.CheckAmount > 0)
             {
-                <div class="info">
-                    <div class="name">Check</div>
-                    <div class="value">Check #@Model.View.CheckNumber dated @Model.View.CheckDate.ToString("D") (@Model.View.CheckBankName) </div>
-                </div>
-                <div class="info">
-                    <div class="name">Check Amount</div>
-                    <div class="value">Check #@Model.View.CheckAmount </div>
-                </div>
+            <div class="info">
+                <div class="name">Check</div>
+                <div class="value">Check #@Model.View.CheckNumber dated @Model.View.CheckDate.ToString("D") (@Model.View.CheckBankName) </div>
+            </div>
+            <div class="info">
+                <div class="name">Check Amount</div>
+                <div class="value">Check #@Model.View.CheckAmount </div>
+            </div>
             }
             @if (Model.View.GiftCardId > 0)
             {
-                <div class="info">
-                    <div class="name">Gift Card #</div>
-                    <div class="value">@Model.View.GiftCardNumber</div>
-                </div>
+            <div class="info">
+                <div class="name">Gift Card #</div>
+                <div class="value">@Model.View.GiftCardNumber</div>
+            </div>
             }
             @if (Model.View.RewardPoints > 0)
             {
-                <div class="info">
-                    <div class="name">Reward Points</div>
-                    <div class="value">@Model.View.RewardPoints.ToString("N2")</div>
-                </div>
+            <div class="info">
+                <div class="name">Reward Points</div>
+                <div class="value">@Model.View.RewardPoints.ToString("N2")</div>
+            </div>
             }
         </div>
 
@@ -192,67 +111,67 @@
             <tbody>
                 @foreach (var item in Model.Details)
                 {
-                    <tr>
-                        <td>
-                            <div class="item info">
-                                @item.ItemName
+                <tr>
+                    <td>
+                        <div class="item info">
+                            @item.ItemName
 
-                                @item.Quantity.ToString("N")@item.UnitCode x @item.Price.ToString("N2") = @currenySymbol@((item.Quantity * item.Price).ToString("N2"))
-                            </div>
-                            @if (item.Discount > 0)
+                            @item.Quantity.ToString("N")@item.UnitCode x @item.Price.ToString("N2") = @currenySymbol@((item.Quantity * item.Price).ToString("N2"))
+                        </div>
+                        @if (item.Discount > 0)
                 {
-                                <div class="discount info">
-                                    Less @currenySymbol@item.Discount.ToString("N2") (@((item.Discount * 100 / (item.Amount + item.Discount)).ToString("N2"))%)
-                                </div>
+                            <div class="discount info">
+                                Less @currenySymbol@item.Discount.ToString("N2") (@((item.Discount * 100 / (item.Amount + item.Discount)).ToString("N2"))%)
+                            </div>
                             }
-                        </td>
-                        <td class="right">
-                            @currenySymbol@(item.Amount.ToString("N2"))
-                        </td>
-                    </tr>
+                    </td>
+                    <td class="right">
+                        @currenySymbol@(item.Amount.ToString("N2"))
+                    </td>
+                </tr>
                 }
             </tbody>
             <tfoot>
                 @if (taxableTotal > 0)
                 {
-                    <tr>
-                        <th class="right">Sub Total</th>
-                        <th class="right">@currenySymbol@taxableTotal.ToString("N2")</th>
-                    </tr>
+                <tr>
+                    <th class="right">Sub Total</th>
+                    <th class="right">@currenySymbol@taxableTotal.ToString("N2")</th>
+                </tr>
                 }
                 @if (taxTotal > 0)
                 {
-                    <tr>
-                        <th class="right">Tax (@taxRate.ToString("N2")%)</th>
-                        <th class="right">@currenySymbol@taxTotal.ToString("N2")</th>
-                    </tr>
-                    <tr>
-                        <th class="right">Total</th>
-                        <th class="right">@currenySymbol@((taxableTotal + taxTotal).ToString("N2"))</th>
-                    </tr>
+                <tr>
+                    <th class="right">Tax (@taxRate.ToString("N2")%)</th>
+                    <th class="right">@currenySymbol@taxTotal.ToString("N2")</th>
+                </tr>
+                <tr>
+                    <th class="right">Total</th>
+                    <th class="right">@currenySymbol@((taxableTotal + taxTotal).ToString("N2"))</th>
+                </tr>
                 }
 
                 @if (nonTaxableTotal > 0 && nonTaxableTotal != grandTotal)
                 {
-                    <tr>
-                        <th class="right">Non Taxable Sales</th>
-                        <th class="right">@currenySymbol@nonTaxableTotal.ToString("N2")</th>
-                    </tr>
+                <tr>
+                    <th class="right">Non Taxable Sales</th>
+                    <th class="right">@currenySymbol@nonTaxableTotal.ToString("N2")</th>
+                </tr>
                 }
 
-            @if (Model.View.Discount > 0)
+                @if (Model.View.Discount > 0)
                 {
-                    <tr>
-                        <th class="right">Total</th>
-                        <th class="right">@currenySymbol@(totalBeforeDisount.ToString("N2"))</th>
-                    </tr>
-                    <tr>
-                        <th class="right">
-                            Discount
-                            (@(discountRate.ToString("N2"))%)
-                        </th>
-                        <th class="right">@currenySymbol@Model.View.Discount.ToString("N2")</th>
-                    </tr>
+                <tr>
+                    <th class="right">Total</th>
+                    <th class="right">@currenySymbol@(totalBeforeDisount.ToString("N2"))</th>
+                </tr>
+                <tr>
+                    <th class="right">
+                        Discount
+                        (@(discountRate.ToString("N2"))%)
+                    </th>
+                    <th class="right">@currenySymbol@Model.View.Discount.ToString("N2")</th>
+                </tr>
                 }
 
 
@@ -262,68 +181,68 @@
                 </tr>
                 @if (Model.View.Tender > 0)
                 {
-                    <tr>
-                        <th class="right">Tender</th>
-                        <th class="right">@currenySymbol@Model.View.Tender.ToString("N2")</th>
-                    </tr>
-                    <tr>
-                        <th class="right">Change</th>
-                        <th class="right">@currenySymbol@Model.View.Change.ToString("N2")</th>
-                    </tr>
+                <tr>
+                    <th class="right">Tender</th>
+                    <th class="right">@currenySymbol@Model.View.Tender.ToString("N2")</th>
+                </tr>
+                <tr>
+                    <th class="right">Change</th>
+                    <th class="right">@currenySymbol@Model.View.Change.ToString("N2")</th>
+                </tr>
                 }
             </tfoot>
         </table>
 
         @if (Model.DiscountCoupons.Any())
         {
-            <div class="discount coupons">
-                @foreach (var coupon in Model.DiscountCoupons)
+        <div class="discount coupons">
+            @foreach (var coupon in Model.DiscountCoupons)
                 {
-                    <div class="coupon">
-                        <div class="qrcode" data-coupon="@coupon.CouponCode"></div>
-                        <div class="description">
-                            <div class="title">@coupon.CouponName</div>
-                            <div class="sub title">@coupon.DiscountRate@(coupon.IsPercentage ? "%" : "") off</div>
+                <div class="coupon">
+                    <div class="qrcode" data-coupon="@coupon.CouponCode"></div>
+                    <div class="description">
+                        <div class="title">@coupon.CouponName</div>
+                        <div class="sub title">@coupon.DiscountRate@(coupon.IsPercentage ? "%" : "") off</div>
 
-                            @if (coupon.MinimumPurchaseAmount > 0)
+                        @if (coupon.MinimumPurchaseAmount > 0)
                     {
-                                <div class="info">
-                                    <div class="name">Minimum purchase amount</div>
-                                    <div class="value">@coupon.MinimumPurchaseAmount</div>
-                                </div>
+                            <div class="info">
+                                <div class="name">Minimum purchase amount</div>
+                                <div class="value">@coupon.MinimumPurchaseAmount</div>
+                            </div>
                             }
-                            @if (coupon.MaximumPurchaseAmount > 0)
+                        @if (coupon.MaximumPurchaseAmount > 0)
                     {
-                                <div class="info">
-                                    <div class="name">Maximum purchase amount</div>
-                                    <div class="value">@coupon.MaximumPurchaseAmount</div>
-                                </div>
+                            <div class="info">
+                                <div class="name">Maximum purchase amount</div>
+                                <div class="value">@coupon.MaximumPurchaseAmount</div>
+                            </div>
                             }
-                            @if (coupon.BeginsFrom != null)
+                        @if (coupon.BeginsFrom != null)
                     {
-                                <div class="info">
-                                    <div class="name">Effective From</div>
-                                    <div class="value">@coupon.BeginsFrom.Value.ToString("d")</div>
-                                </div>
+                            <div class="info">
+                                <div class="name">Effective From</div>
+                                <div class="value">@coupon.BeginsFrom.Value.ToString("d")</div>
+                            </div>
                             }
-                            @if (coupon.ExpiresOn != null)
+                        @if (coupon.ExpiresOn != null)
                     {
-                                <div class="info">
-                                    <div class="name">Effective From</div>
-                                    <div class="value">@coupon.ExpiresOn.Value.ToString("d")</div>
-                                </div>
+                            <div class="info">
+                                <div class="name">Effective From</div>
+                                <div class="value">@coupon.ExpiresOn.Value.ToString("d")</div>
+                            </div>
                             }
-                            @if (coupon.MaximumUsage != null)
+                        @if (coupon.MaximumUsage != null)
                     {
-                                <div class="info">
-                                    <div class="name">Total Usage</div>
-                                    <div class="value">@coupon.MaximumUsage.Value</div>
-                                </div>
+                            <div class="info">
+                                <div class="name">Total Usage</div>
+                                <div class="value">@coupon.MaximumUsage.Value</div>
+                            </div>
                             }
-                        </div>
                     </div>
+                </div>
                 }
-            </div>
+        </div>
         }
     </div>
 </div>

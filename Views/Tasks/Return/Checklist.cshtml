@@ -9,12 +9,7 @@
 
 <script>
     window.overridePath = "/dashboard/sales/tasks/entry";
-
-    window.prepareChecklist({
-    	TranId: "@Model",
-        Title: "Sales Return Checklist #@Model",
-        ViewText: "View Sales Returns",
-        ViewUrl: "/dashboard/sales/tasks/return",
-        ReportPath: "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Return.xml?transaction_master_id=@Model"
-    });
+    window.tranId = "@Model";
 </script>
+
+<script src="/Areas/MixERP.Sales/scripts/tasks/return/checklist.js"></script>

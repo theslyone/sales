@@ -7,16 +7,9 @@
 }
 @Html.FinancePartialView("Shared/Checklist.cshtml", TenantConvention.GetTenant())
 
+
 <script>
     window.overridePath = "/dashboard/sales/tasks/entry";
-
-    window.prepareChecklist({
-        TranId: "@Model",
-        Title: "Sales Checklist #@Model",
-        ViewText: "View Sales",
-        ViewUrl: "/dashboard/sales/tasks/entry",
-        AddNewText: "Add New Sales Entry",
-        AddNewUrl: "/dashboard/sales/tasks/entry/new",
-        ReportPath: "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Invoice.xml?transaction_master_id=@Model"
-    });
+    window.tranId = "@Model";
 </script>
+<script src="/Areas/MixERP.Sales/scripts/tasks/entry/checklist.js"></script>

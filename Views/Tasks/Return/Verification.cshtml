@@ -7,28 +7,4 @@
 }
 @Html.FinancePartialView("Shared/Verification.cshtml", TenantConvention.GetTenant())
 
-<script>
-    window.prepareVerification({
-        Title: "Sales Return Verification",
-        Book: "Sales Return",
-        ChecklistUrl : "/dashboard/sales/tasks/return/checklist/{tranId}",
-        AdviceButtons: [
-            {
-                Title: "View Sales Return",
-                Href: "javascript:void(0);",
-                OnClick: "showReturn({tranId});"
-            }
-        ]
-    });
-
-    function showReturn(tranId) {
-        $(".advice.modal iframe").attr("src", "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Return.xml?transaction_master_id=" + tranId);
-
-        setTimeout(function () {
-            $(".advice.modal")
-                .modal('setting', 'transition', 'horizontal flip')
-                .modal("show");
-
-        }, 300);
-    };
-</script>
+<script src="/Areas/MixERP.Sales/scripts/tasks/return/verification.js"></script>

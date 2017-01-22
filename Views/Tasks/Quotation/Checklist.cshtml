@@ -10,16 +10,7 @@
 
 <script>
     window.overridePath = "/dashboard/sales/tasks/entry";
-
-    window.prepareChecklist({
-        TranId: "@Model",
-        Title: "Sales Quotation Checklist #@Model",
-        ViewText: "View Sales Quotations",
-        ViewUrl: "/dashboard/sales/tasks/quotation",
-        AddNewText: "Add New Sales Quotation",
-        AddNewUrl: "/dashboard/sales/tasks/quotation/new",
-        ReportPath: "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Quotation.xml?quotation_id=@Model"
-    });
-
-    $(".withdraw.button").remove();
+    window.tranId = "@Model";
 </script>
+
+<script src="/Areas/MixERP.Sales/scripts/tasks/quotation/checklist.js"></script>
