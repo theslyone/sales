@@ -1,7 +1,7 @@
 ﻿@model long
 
 @{
-    ViewBag.Title = "Checklist";
+    ViewBag.Title = @I18N.Checklist;
     Layout = ViewBag.SalesLayoutPath;
 }
 <style>
@@ -14,16 +14,16 @@
     }
 </style>
 <div class="ui attached page segment" style="min-height: 100%; padding: 3em;">
-    <div class="ui huge header">Gift Card Fund Sales</div>
+    <div class="ui huge header">@I18N.GiftCardFundSales</div>
     <div class="ui divider"></div>
 
-    <div class="ui positive message">The transaction was posted successfully.</div>
+    <div class="ui positive message">@I18N.TransactionPostedSuccessfully </div>
 
     <a href="/dashboard/loyalty/tasks/gift-cards/add-fund" class="ui green button">
-        View Sales
+        @I18N.ViewSales
     </a>
     <a href="/dashboard/loyalty/tasks/gift-cards/add-fund/entry" class="ui red button">
-        Add a New Sales Entry
+        @I18N.AddNewSalesEntry
     </a>
     <iframe src="/dashboard/reports/source/Areas/MixERP.Sales/Reports/GiftCardTransaction.xml?transaction_master_id=@Model"></iframe>
 </div>

@@ -2,7 +2,7 @@
 @model dynamic
 
 @{
-    ViewBag.Title = "Sales Return Verification";
+    ViewBag.Title = I18N.SalesReturnVerification;
     Layout = ViewBag.SalesLayoutPath;
 }
 @Html.FinancePartialView("Shared/Verification.cshtml", TenantConvention.GetTenant())

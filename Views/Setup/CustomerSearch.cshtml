@@ -1,14 +1,14 @@
 ﻿@model dynamic
 
 @{
-    ViewBag.Title = "Customers";
+    ViewBag.Title = I18N.Customers;
     Layout = ViewBag.SalesLayoutPath;
 }
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Customers</title>
+    <title>@I18N.Customers</title>
     <meta charset="utf-8" />
     <script src="/i18n/resources.js?cultureCode=@CultureManager.GetCurrentUiCulture().Name"></script>
     <script src="/assets/js/backend.js"></script>

@@ -3,7 +3,7 @@
 @model MixERP.Sales.ViewModels.TicketViewModel
 
 @{
-    ViewBag.Title = "Sales Receipt";
+    ViewBag.Title = @I18N.SalesReceipt;
     string logo = AppUsers.GetCurrent().Logo.Or("/Static/images/logo.png");
     var appUser = AppUsers.GetCurrent();
     string currenySymbol = appUser.CurrencySymbol;
@@ -44,58 +44,58 @@
             <br />
         </div>
 
-        <div class="coupon header">Sales Receipt</div>
+        <div class="coupon header">@I18N.SalesReceipt</div>
 
         <div class="transaction items">
             <div class="info">
-                <div class="name">Invoice Number</div>
+                <div class="name">@I18N.InvoiceNumber</div>
                 <div class="value">#@Model.View.InvoiceNumber</div>
             </div>
             <div class="info">
-                <div class="name">Tran Code</div>
+                <div class="name">@I18N.TranCode</div>
                 <div class="value">#@Model.View.TransactionMasterId/@Model.View.TransactionCode</div>
             </div>
             <div class="info">
-                <div class="name">Tran Date</div>
+                <div class="name">@I18N.TranDate</div>
                 <div class="value">@Model.View.ValueDate.ToString("d") (@Model.View.TransactionTs)</div>
             </div>
             <div class="info">
-                <div class="name">Customer</div>
+                <div class="name">@I18N.Customer</div>
                 <div class="value">#@Model.View.CustomerId, @Model.View.CustomerName</div>
             </div>
             <div class="info">
-                <div class="name">Posted By</div>
+                <div class="name">@I18N.PostedBy</div>
                 <div class="value">@Model.View.PostedBy (@Model.View.CounterName/@Model.View.StoreName)</div>
             </div>
             @if (Model.View.PaymentTermId > 0)
             {
             <div class="info">
-                <div class="name">Payment Term</div>
+                <div class="name">@I18N.PaymentTerm</div>
                 <div class="value">@Model.View.PaymentTermName</div>
             </div>
             }
             @if (Model.View.CheckAmount > 0)
             {
             <div class="info">
-                <div class="name">Check</div>
+                <div class="name">@I18N.Check</div>
                 <div class="value">Check #@Model.View.CheckNumber dated @Model.View.CheckDate.ToString("D") (@Model.View.CheckBankName) </div>
             </div>
             <div class="info">
-                <div class="name">Check Amount</div>
+                <div class="name">@I18N.CheckAmount</div>
                 <div class="value">Check #@Model.View.CheckAmount </div>
             </div>
             }
             @if (Model.View.GiftCardId > 0)
             {
             <div class="info">
-                <div class="name">Gift Card #</div>
+                <div class="name">@I18N.GiftCardNumber</div>
                 <div class="value">@Model.View.GiftCardNumber</div>
             </div>
             }
             @if (Model.View.RewardPoints > 0)
             {
             <div class="info">
-                <div class="name">Reward Points</div>
+                <div class="name">@I18N.RewardPoints</div>
                 <div class="value">@Model.View.RewardPoints.ToString("N2")</div>
             </div>
             }
@@ -104,8 +104,8 @@
         <table>
             <thead>
                 <tr>
-                    <th>Description</th>
-                    <th class="right">Amount</th>
+                    <th>@I18N.Description</th>
+                    <th class="right">@I18N.Amount</th>
                 </tr>
             </thead>
             <tbody>
@@ -135,7 +135,7 @@
                 @if (taxableTotal > 0)
                 {
                 <tr>
-                    <th class="right">Sub Total</th>
+                    <th class="right">@I18N.SubTotal</th>
                     <th class="right">@currenySymbol@taxableTotal.ToString("N2")</th>
                 </tr>
                 }
@@ -146,7 +146,7 @@
                     <th class="right">@currenySymbol@taxTotal.ToString("N2")</th>
                 </tr>
                 <tr>
-                    <th class="right">Total</th>
+                    <th class="right">@I18N.Total</th>
                     <th class="right">@currenySymbol@((taxableTotal + taxTotal).ToString("N2"))</th>
                 </tr>
                 }
@@ -154,7 +154,7 @@
                 @if (nonTaxableTotal > 0 && nonTaxableTotal != grandTotal)
                 {
                 <tr>
-                    <th class="right">Non Taxable Sales</th>
+                    <th class="right">@I18N.NonTaxableSales</th>
                     <th class="right">@currenySymbol@nonTaxableTotal.ToString("N2")</th>
                 </tr>
                 }
@@ -162,7 +162,7 @@
                 @if (Model.View.Discount > 0)
                 {
                 <tr>
-                    <th class="right">Total</th>
+                    <th class="right">@I18N.Total</th>
                     <th class="right">@currenySymbol@(totalBeforeDisount.ToString("N2"))</th>
                 </tr>
                 <tr>
@@ -176,17 +176,17 @@
 
 
                 <tr>
-                    <th class="right">Grand Total</th>
+                    <th class="right">@I18N.GrandTotal</th>
                     <th class="right">@currenySymbol@(grandTotal.ToString("N2"))</th>
                 </tr>
                 @if (Model.View.Tender > 0)
                 {
                 <tr>
-                    <th class="right">Tender</th>
+                    <th class="right">@I18N.Tender</th>
                     <th class="right">@currenySymbol@Model.View.Tender.ToString("N2")</th>
                 </tr>
                 <tr>
-                    <th class="right">Change</th>
+                    <th class="right">@I18N.Change</th>
                     <th class="right">@currenySymbol@Model.View.Change.ToString("N2")</th>
                 </tr>
                 }
@@ -207,35 +207,35 @@
                         @if (coupon.MinimumPurchaseAmount > 0)
                     {
                             <div class="info">
-                                <div class="name">Minimum purchase amount</div>
+                                <div class="name">@I18N.MinimumPurchaseAmount</div>
                                 <div class="value">@coupon.MinimumPurchaseAmount</div>
                             </div>
                             }
                         @if (coupon.MaximumPurchaseAmount > 0)
                     {
                             <div class="info">
-                                <div class="name">Maximum purchase amount</div>
+                                <div class="name">@I18N.MaximumPurchaseAmount</div>
                                 <div class="value">@coupon.MaximumPurchaseAmount</div>
                             </div>
                             }
                         @if (coupon.BeginsFrom != null)
                     {
                             <div class="info">
-                                <div class="name">Effective From</div>
+                                <div class="name">@I18N.EffectiveFrom</div>
                                 <div class="value">@coupon.BeginsFrom.Value.ToString("d")</div>
                             </div>
                             }
                         @if (coupon.ExpiresOn != null)
                     {
                             <div class="info">
-                                <div class="name">Effective From</div>
+                                <div class="name">@I18N.EffectiveFrom</div>
                                 <div class="value">@coupon.ExpiresOn.Value.ToString("d")</div>
                             </div>
                             }
                         @if (coupon.MaximumUsage != null)
                     {
                             <div class="info">
-                                <div class="name">Total Usage</div>
+                                <div class="name">@I18N.TotalUsage</div>
                                 <div class="value">@coupon.MaximumUsage.Value</div>
                             </div>
                             }

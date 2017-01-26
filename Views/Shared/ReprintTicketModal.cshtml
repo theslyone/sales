@@ -3,16 +3,16 @@
 <div class="ui reprint ticket small modal">
     <i class="close icon"></i>
     <div class="header">
-        Reprint Ticket
+        @I18N.ReprintTicket
     </div>
     <div class="content">
         <div class="ui big form">
             <div class="field">
-                <label>Enter Transaction Id</label>
+                <label>@I18N.EnterTransactionId</label>
                 <input id="TicketTranIdInputText" class="integer" placeholder="Enter Transaction Id" type="text">
             </div>
-            <button reprint-ticket-button class="ui blue button">Reprint</button>
-            <button onclick="$(this).parent().parent().parent().modal('hide');" class="ui red button">Close</button>
+            <button reprint-ticket-button class="ui blue button">@I18N.Reprint</button>
+            <button onclick="$(this).parent().parent().parent().modal('hide');" class="ui red button">@I18N.Close</button>
         </div>
     </div>
 </div>

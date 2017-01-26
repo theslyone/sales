@@ -2,7 +2,7 @@
 @model dynamic
 
 @{
-    ViewBag.Title = "Add Fund to Gift Cards";
+    ViewBag.Title = I18N.AddFundGiftCards;
     Layout = ViewBag.SalesLayoutPath;
 }
 
@@ -17,11 +17,11 @@
 </style>
 <div class="ui attached gift card fund segment" style="padding: 3em">
     <div class="ui container">
-        <div class="ui large header">Add Funds To Gift Card</div>
+        <div class="ui large header">@I18N.AddFundsGiftCard</div>
         <div class="ui divider"></div>
         <div class="ui form" style="width: 500px;">
             <div class="field">
-                <label>Enter Gift Card Number</label>
+                <label>@I18N.EnterGiftCardNumber</label>
                 <div class="ui action input">
                     <input id="GiftCardNumberInputText" required="" type="text">
                     <button class="ui icon blue button" onclick='$(".ui.gift.card.modal").modal("show");'>
@@ -30,36 +30,36 @@
                 </div>
             </div>
             <div class="field">
-                <label>Enter Amount</label>
+                <label>@I18N.EnterAmount</label>
                 <input id="AmountInputText" type="text" class="decimal" required="" />
             </div>
             <div class="field">
-                <label>Select Debit Account</label>
+                <label>@I18N.SelectDebitAccount</label>
                 <select id="AccountIdSelect" class="ui search dropdown" required=""></select>
             </div>
             <div class="field">
-                <label>Value Date</label>
+                <label>@I18N.ValueDate</label>
                 <input type="text" class="date" required="" id="ValueDateInputText" />
             </div>
             <div class="field">
-                <label>Book Date</label>
+                <label>@I18N.BookDate</label>
                 <input type="text" class="date" required="" id="BookDateInputText" />
             </div>
             <div class="field">
-                <label>Select Cost Center</label>
+                <label>@I18N.SelectCostCenter</label>
                 <select id="CostCenterIdSelect" class="ui search dropdown" required=""></select>
             </div>
             <div class="field">
-                <label>Reference Number</label>
+                <label>@I18N.ReferenceNumber</label>
                 <input type="text" id="ReferenceNumberInputText" />
             </div>
             <div class="field">
-                <label>Memo</label>
+                <label>@I18N.Memo</label>
                 <input type="text" id="StatementReferenceInputText" />
             </div>
 
-            <button id="SaveButton" class="ui positive circular button">Save</button>
-            <a href="/dashboard/loyalty/tasks/gift-cards/add-fund/" class="ui negative circular button">Back</a>
+            <button id="SaveButton" class="ui positive circular button">@I18N.Save</button>
+            <a href="/dashboard/loyalty/tasks/gift-cards/add-fund/" class="ui negative circular button">@I18N.Back</a>
         </div>
     </div>
 </div>

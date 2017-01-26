@@ -2,7 +2,7 @@
 @model MixERP.Sales.ViewModels.OpeningCash
 
 @{
-    ViewBag.Title = "title";
+    ViewBag.Title = I18N.Title;
     Layout = ViewBag.Layout;
 }
 
@@ -15,34 +15,34 @@
 <div class="ui attached very relaxed segment">
     <div class="ui container">
         <div class="ui huge header">
-            BOD Cash
+            @I18N.BODCash
             <div class="ui teal label">@DateTime.Now.ToLongDateString()</div>
         </div>
         <div class="ui divider"></div>
         <div class="ui positive message">
-            @AppUsers.GetCurrent().Name, you may also edit the beginning cash later <a href="eod">this evening</a>.
+            @AppUsers.GetCurrent().Name, you may also edit the beginning cash later <a href="eod">@I18N.ThisEvening</a>.
         </div>
         <div class="ui form">
             <div class="four fields">
                 <div class="field">
-                    <label>Today's Beginning Cash</label>
+                    <label>@I18N.TodayBeginningCash</label>
                     <input type="text" id="AmountInputText" class="decimal" required="" value="@Model.Amount" 
                            disabled="disabled" data-allow-edit="@(!Model.Closed)" />
                 </div>
                 <div class="field">
-                    <label>Provided By</label>
+                    <label>@I18N.ProvidedBy</label>
                     <input type="text" id="ProvidedByInputText" required="" value="@Model.ProvidedBy" 
                            disabled="disabled" data-allow-edit="@(!Model.Closed)" />
                 </div>
             </div>
             <div class="two fields">
                 <div class="field">
-                    <label>Memo</label>
+                    <label>@I18N.Memo</label>
                     <textarea id="MemoTextArea" disabled="disabled" data-allow-edit="@(!Model.Closed)">@Model.Memo</textarea>
                 </div>
             </div>
 
-            <button id="SaveButton" class="ui green button" disabled="disabled" data-allow-edit="@(!Model.Closed)">Save</button>
+            <button id="SaveButton" class="ui green button" disabled="disabled" data-allow-edit="@(!Model.Closed)">@I18N.Save</button>
         </div>
     </div>
 </div>

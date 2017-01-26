@@ -3,13 +3,13 @@
 <div class="header items">
     <div class="two summary items">
         <div class="amount item">
-            <div class="description">Amount</div>
+            <div class="description">@I18N.Amount</div>
             <div class="money">
                 <span></span>
             </div>
         </div>
         <div class="count item">
-            <div class="description">Count</div>
+            <div class="description">@I18N.Count</div>
             <div class="money">
 
             </div>
@@ -21,13 +21,13 @@
     <div class="payment type container">
         <div data-payment-type="cash" class="two summary items">
             <div class="tender item">
-                <div class="description">Cash Tender</div>
+                <div class="description">@I18N.CashTender</div>
                 <div class="control">
                     <input type="text" class="decimal" id="TenderInputText" />
                 </div>
             </div>
             <div class="change item">
-                <div class="description">Cash Change</div>
+                <div class="description">@I18N.CashChange</div>
                 <div class="control">
                     <input class="decimal" type="text" readonly="readonly" id="ChangeInputText" />
                 </div>
@@ -35,7 +35,7 @@
         </div>
         <div data-payment-type="credit" style="display: none;" class="one summary items">
             <div class="gift-card number item">
-                <div class="description">Payment Term</div>
+                <div class="description">@I18N.PaymentTerm</div>
                 <div class="control">
                     <select class="ui inverted fluid dropdown" id="PaymentTermSelect"></select>
                 </div>
@@ -44,13 +44,13 @@
         <div data-payment-type="check" style="display: none;">
             <div class="two summary items">
                 <div class="check amount item">
-                    <div class="description">Check Amount</div>
+                    <div class="description">@I18N.CheckAmount</div>
                     <div class="control">
                         <input class="decimal" type="text" id="CheckAmountInputText" />
                     </div>
                 </div>
                 <div class="check bank name item">
-                    <div class="description">Bank Name</div>
+                    <div class="description">@I18N.BankName</div>
                     <div class="control">
                         <input type="text" id="BankNameInputText" />
                     </div>
@@ -58,13 +58,13 @@
             </div>
             <div class="two summary items">
                 <div class="check number item">
-                    <div class="description">Check Number</div>
+                    <div class="description">@I18N.CheckNumber</div>
                     <div class="control">
                         <input type="text" id="CheckNumberInputText" />
                     </div>
                 </div>
                 <div class="check date item">
-                    <div class="description">Check Date</div>
+                    <div class="description">@I18N.CheckDate</div>
                     <div class="control">
                         <input type="text" class="date" id="CheckDateInputText" />
                     </div>
@@ -73,7 +73,7 @@
         </div>
         <div data-payment-type="gift-card" style="display: none;" class="two summary items">
             <div class="gift-card number item">
-                <div class="description">Gift Card Number</div>
+                <div class="description">@I18N.GiftCardNumber</div>
                 <div class="control">
                     <div class="ui action fluid input">
                         <input id="GiftCardNumberInputText" required="" type="text">
@@ -84,7 +84,7 @@
                 </div>
             </div>
             <div class="gift-card balance item">
-                <div class="description">Gift Card Balance</div>
+                <div class="description">@I18N.GiftCardBalance</div>
                 <div class="control">
                     <input class="decimal" type="text" readonly="readonly" id="GiftCardNumberBalanceInputText" />
                 </div>
@@ -93,7 +93,7 @@
     </div>
     <div class="one summary items">
         <div class="customer item">
-            <div class="description">Customer</div>
+            <div class="description">@I18N.Customer</div>
             <div class="control">
                 @*<select id="CustomerSelect" class="ui search fluid inverted dropdown"></select>*@
                 <div class="ui fluid customer search">
@@ -107,22 +107,22 @@
     </div>
     <div class="three summary items">
         <div class="coupon code item">
-            <div class="description">Coupon Code</div>
+            <div class="description">@I18N.CouponCode</div>
             <div class="control">
                 <input type="text" class="" id="CouponCodeInputText" />
             </div>
         </div>
         <div class="discount type item">
-            <div class="description">Discount Type</div>
+            <div class="description">@I18N.DiscountType</div>
             <div class="control">
                 <select class="ui inverted fluid dropdown" id="DiscountTypeSelect">
-                    <option value="1">Rate</option>
-                    <option value="2">Amount</option>
+                    <option value="1">@I18N.Rate</option>
+                    <option value="2">@I18N.Amount</option>
                 </select>
             </div>
         </div>
         <div class="discount item">
-            <div class="description">Discount</div>
+            <div class="description">@I18N.Discount</div>
             <div class="control">
                 <input type="text" class="decimal" id="DiscountInputText" />
             </div>
@@ -130,23 +130,23 @@
     </div>
     <div class="two summary items">
         <div class="value date item">
-            <div class="description">Value Date</div>
+            <div class="description">@I18N.ValueDate</div>
             <div class="control">
                 <input type="text" class="date" id="ValueDateInputText" />
             </div>
         </div>
         <div class="book date item">
-            <div class="description">Book Date</div>
+            <div class="description">@I18N.BookDate</div>
             <div class="control">
                 <input type="text" class="date" id="BookDateInputText" />
             </div>
         </div>
     </div>
-    <a class="show more anchor">Show More</a>
+    <a class="show more anchor">@I18N.ShowMore</a>
     <div class="more" style="display: none;">
         <div class="one summary items">
             <div class="cost center item">
-                <div class="description">Cost Center</div>
+                <div class="description">@I18N.CostCenter</div>
                 <div class="control">
                     <select class="ui inverted fluid dropdown" id="CostCenterSelect"></select>
                 </div>
@@ -154,7 +154,7 @@
         </div>
         <div class="one summary items">
             <div class="shipping company item">
-                <div class="description">Shipper</div>
+                <div class="description">@I18N.Shipper</div>
                 <div class="control">
                     <select class="ui inverted fluid dropdown" id="ShipperSelect"></select>
                 </div>
@@ -162,27 +162,27 @@
         </div>
         <div class="two summary items">
             <div class="reference number item">
-                <div class="description">Ref#</div>
+                <div class="description">@I18N.ReferenceNumberAbbreviated</div>
                 <div class="control">
                     <input type="text" id="ReferenceNumberInputText" />
                 </div>
             </div>
             <div class="memo item">
-                <div class="description">Memo</div>
+                <div class="description">@I18N.Memo</div>
                 <div class="control">
                     <input type="text" id="StatementReferenceInputText" />
                 </div>
             </div>
         </div>
-        <a class="show less anchor">Show Less</a>
+        <a class="show less anchor">@I18N.ShowLess</a>
     </div>
     <div class="ui one column padded grid">
         <div class="column">
-            <button class="ui big green button" id="CheckoutButton">Checkout</button>
+            <button class="ui big green button" id="CheckoutButton">@I18N.Checkout</button>
 
             <div class="ticket panel">
                 <iframe id="TicketIframe"></iframe>
-                <button class="ui blue circular button" onclick="$('#TicketIframe').get(0).contentWindow.print();" id="PrintButton">Print</button>
+                <button class="ui blue circular button" onclick="$('#TicketIframe').get(0).contentWindow.print();" id="PrintButton">@I18N.Print</button>
                 <button class="ui red  circular button" onclick="$('.ticket.panel').hide();">Hide</button>
             </div>
         </div>
