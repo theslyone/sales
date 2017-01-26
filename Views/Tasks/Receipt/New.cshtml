@@ -1,0 +1,495 @@
+﻿@using MixERP.Sales.Extensions
+@model dynamic
+
+@{
+    ViewBag.Title = "Receipt from Customer";
+    Layout = ViewBag.SalesLayoutPath;
+}
+
+<style>
+    .receipt.type.buttons .active.button {
+        background: #16AB39;
+        color: #fff;
+    }
+</style>
+@Html.PartialView("Shared/CustomerSearchModal.cshtml", TenantConvention.GetTenant())
+
+<div id="receipt" class="ui very relaxed padded segment" style="padding: 3em;">
+    <div class="ui container">
+        <div class="ui huge header">Receipt from Customer</div>
+        <div class="ui form">
+            <div class="fields">
+                <div class="six wide field">
+                    <label for="CustomerIdSelect" data-localize="SelectCustomer"></label>
+                    <select id="CustomerIdSelect" class="ui search dropdown"></select>
+                </div>
+                <div class="field">
+                    <label>&nbsp;</label>
+                    <button id="GoButton" type="button" class="ui small grey button" data-localize="Go"></button>
+                </div>
+            </div>
+        </div>
+        <div class="ui divider"></div>
+        <div class="ui two column relaxed grid receipt form">
+            <div class="column">
+                <div class="field">
+                    <label for="DueAmountInputText" data-localize="TotalDueAmountInBaseCurrency">
+                    </label>
+                    <input type="text" id="DueAmountInputText" readonly="readonly" class="currency" />
+                </div>
+                <div class="field">
+                    <label for="CurrencyInputText" data-localize="BaseCurrency">
+                    </label>
+                    <input type="text" id="CurrencyInputText" readonly="readonly" class="text-right" />
+                </div>
+
+                <div class="field">
+                    <label for="CurrencyCodeSelect" data-localize="ReceivedCurrency"></label>
+                    <select id="CurrencyCodeSelect" class="ui search dropdown text-right"></select>
+                </div>
+                <div class="field">
+                    <label for="AmountInputText" data-localize="ReceivedAmountInaboveCurrency">
+                    </label>
+                    <input type="text" id="AmountInputText" class="currency" />
+                </div>
+                <div class="field">
+                    <label for="DebitExchangeRateInputText" data-localize="DebitExchangeRate">
+                    </label>
+                    <input type="text" id="DebitExchangeRateInputText" class="decimal4 text-right" />
+                </div>
+                <div class="field">
+                    <label for="AmountInHomeCurrencyInputText" data-localize="ConvertedToHomeCurrency">
+                    </label>
+                    <input type="text" id="AmountInHomeCurrencyInputText" class="currency" readonly="readonly" />
+                </div>
+
+                <div class="field">
+                    <label for="CreditExchangeRateInputText" data-localize="CreditExchangeRate">
+                    </label>
+                    <input type="text" id="CreditExchangeRateInputText" class="decimal4 text-right" />
+                </div>
+                <div class="field">
+                    <label for="BaseAmountInputText" data-localize="ConvertedToBaseCurrency">
+                    </label>
+                    <input type="text" id="BaseAmountInputText" readonly="readonly" class="currency text-right" />
+                </div>
+
+                <div class="field">
+                    <label for="FinalDueAmountInputText" data-localize="FinalDueAmountInBaseCurrency">
+                    </label>
+                    <input type="text" id="FinalDueAmountInputText" readonly="readonly" class="currency text-right" />
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label data-localize="ReceiptType">
+                    </label>
+                    <div class="vpad8" id="ReceiptType">
+
+                        <div class="ui receipt type buttons">
+                            <input type="button" class="ui active button" id="CashButton" value="Cash" />
+                            <div class="or"></div>
+                            <input type="button" class="ui button" id="BankButton" value="Bank" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="CostCenterIdSelect" data-localize="CostCenter"></label>
+                    <select id="CostCenterIdSelect" class="ui dropdown"></select>
+                </div>
+
+                <div id="CashFormGroup" style="padding-bottom: 12px;">
+                    <div class="field">
+                        <label for="CashAccountIdSelect" data-localize="CashAccountId"></label>
+                        <select id="CashAccountIdSelect" class="ui dropdown"></select>
+                    </div>
+                    <div class="field">
+                        <label for="CashRepositoryIdSelect" data-localize="CashRepository"></label>
+                        <select id="CashRepositoryIdSelect" class="ui dropdown"></select>
+                    </div>
+                </div>
+
+                <div id="BankFormGroup" style="display: none; padding-bottom: 12px;">
+                    <div class="field">
+                        <label for="BankAccountIdSelect" data-localize="WhichBank">
+                        </label>
+                        <select id="BankAccountIdSelect" class="ui dropdown"></select>
+                    </div>
+
+                    <div class="field">
+                        <label for="PaymentCardIdSelect" data-localize="PaymentCard">
+                        </label>
+                        <select id="PaymentCardIdSelect" class="ui dropdown"></select>
+                    </div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label for="MerchantFeeInputText" data-localize="MerchantFee">
+                            </label>
+                            <input type="text" id="MerchantFeeInputText" readonly="readonly" />
+                        </div>
+                        <div class="field">
+                            <label data-localize="CustomerPaysFees">
+                            </label>
+                            <div class="ui checkbox">
+                                <input type="radio" disabled="disabled" id="CustomerPaysFeeRadio" />
+                                <label data-localize="Yes">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="PostedDateTextBox" data-localize="PostedDate">
+                        </label>
+
+
+                        <input type="text" id="PostedDateTextBox" class="date" required="" />
+                    </div>
+                    <div class="field">
+                        <label for="BankInstrumentCodeInputText" data-localize="InstrumentCode">
+                        </label>
+                        <input type="text" id="BankInstrumentCodeInputText" />
+                    </div>
+
+                    <div class="field">
+                        <label for="BankTransactionCodeInputText" data-localize="BankTransactionCode">
+                        </label>
+                        <input type="text" id="BankTransactionCodeInputText" />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="ReferenceNumberInputText" data-localize="ReferenceNumber">
+                    </label>
+                    <input type="text" id="ReferenceNumberInputText" />
+                </div>
+
+                <div class="field">
+                    <label for="StatementReferenceTextArea" data-localize="StatementReference">
+                    </label>
+                    <textarea id="StatementReferenceTextArea" rows="3"></textarea>
+                </div>
+                <button type="button" id="SaveButton" class="ui small submit button green" data-localize="Save"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.localize();
+    $(".ui.dropdown").dropdown();
+</script>
+
+<script>
+    var exchangeRateLocalized = "Exchange Rate ({0} - {1})";
+
+    var receiptTypeDiv = $("#ReceiptType");
+
+    //Variables
+    var homeCurrency = "";
+
+    receiptTypeDiv.find(".button").click(function () {
+        toggleTransactionType($(this));
+    });
+
+
+    $("#GoButton").off("click").on("click", function () {
+        function getCustomerInfo(customerId) {
+            function request() {
+                var url = "/dashboard/sales/tasks/receipt/customer/transaction-summary/{customerId}";
+                url = url.replace("{customerId}", customerId);
+
+                return window.getAjaxRequest(url);
+            };
+
+            const ajax = request();
+
+
+            ajax.success(function (response) {
+                const due = response.OfficeDueAmount;
+                const customerCurrency = response.CurrencyCode;
+
+                if (!customerCurrency) {
+                    window.displayMessage("This customer does not have a default currency.");
+                };
+
+                $("#DueAmountInputText").val(due);
+                $("#CurrencyInputText").val(customerCurrency);
+            });
+
+        };
+
+        function getCurrencyInfo() {
+            function request() {
+                const url = "/dashboard/sales/tasks/receipt/home-currency";
+                return window.getAjaxRequest(url);
+            };
+
+            const ajax = request();
+
+            ajax.done(function (response) {
+                homeCurrency = response;
+                getExchangeRates();
+                $("#AmountInputText").focus();
+            });
+
+            ajax.fail(function (xhr) {
+                window.logAjaxErrorMessage(xhr);
+            });
+        };
+
+
+        const customerId = $("#CustomerIdSelect").val();
+        if (!customerId) {
+            window.displayMessage("Please select a customer.");
+            return;
+        };
+
+
+        getCurrencyInfo();
+        getCustomerInfo(customerId);
+    });
+
+    $(document).ready(function () {
+        $("#receipt").appendTo("#home");
+        loadCurrencies();
+        loadCustomers();
+        loadCashRepositories();
+        loadBankAccounts();
+        loadCostCenters();
+        loadCashAccounts();
+    });
+
+    //Control Events
+
+    $("#SaveButton").off("click").on("click", function () {
+        function request(model) {
+            const url = "/dashboard/sales/tasks/receipt/new";
+
+            const data = JSON.stringify(model);
+
+            return window.getAjaxRequest(url, "POST", data);
+        };
+
+        function getModel() {
+            const model = window.serializeForm($(".receipt.form"));
+            model.CustomerId = $("#CustomerIdSelect").val();
+
+            return model;
+        };
+
+        const model = getModel();
+
+        const ajax = request(model);
+
+        ajax.success(function (id) {
+            window.location = `/dashboard/sales/tasks/receipt/checklist/${id}`;
+        });
+
+        ajax.fail(function (xhr) {
+            window.logAjaxErrorMessage(xhr);
+        });
+    });
+
+    $("#CurrencyCodeSelect").off("change").on("change", function () {
+        getExchangeRates();
+    });
+
+    function getExchangeRates() {
+        if (exchangeRateLocalized) {
+            $("label[for='DebitExchangeRateInputText']").html(window.stringFormat(exchangeRateLocalized,
+                $("#CurrencyCodeSelect").val(), homeCurrency));
+            $("label[for='CreditExchangeRateInputText']").html(window.stringFormat(exchangeRateLocalized, homeCurrency,
+                $("#CurrencyInputText").val()));
+        };
+
+        updateExchangeRate($("#DebitExchangeRateInputText"), $("#CurrencyCodeSelect").val(), homeCurrency);
+        updateExchangeRate($("#CreditExchangeRateInputText"), homeCurrency, $("#CurrencyInputText").val());
+    }
+
+    function updateExchangeRate(associatedControl, sourceCurrencyCode, destinationCurrencyCode) {
+        function request() {
+            var url = "/dashboard/sales/tasks/receipt/exchange-rate/{sourceCurrencyCode}/{destinationCurrencyCode}";
+            url = url.replace("{sourceCurrencyCode}", sourceCurrencyCode);
+            url = url.replace("{destinationCurrencyCode}", destinationCurrencyCode);
+
+            return window.getAjaxRequest(url);
+        };
+
+        if (!sourceCurrencyCode || !destinationCurrencyCode) {
+            return;
+        };
+
+        const ajax = request();
+
+        ajax.success(function (response) {
+            associatedControl.val(response).trigger("change");
+        });
+    };
+
+    $("#AmountInputText").keyup(function () {
+        updateTotal();
+    });
+
+    $("#DebitExchangeRateInputText").keyup(function () {
+        updateTotal();
+    });
+
+    $("#CreditExchangeRateInputText").keyup(function () {
+        updateTotal();
+    });
+
+
+    $("#BankAccountIdSelect").change(function () {
+        loadPaymentCards();
+    });
+
+    $("#PaymentCardIdSelect").change(function () {
+        const merchantAccountId = parseInt($("#BankAccountIdSelect").val() || 0);
+        const paymentCardId = parseInt($("#PaymentCardIdSelect").val() || 0);
+
+        $("#CustomerPaysFeeRadio").removeProp("checked");
+        $("#MerchantFeeInputText").val("");
+
+        if (!(merchantAccountId && paymentCardId)) {
+            return;
+        };
+
+
+        const ajaxMerchantFeeSetup = getMerchantFeeSetup(merchantAccountId, paymentCardId);
+
+        ajaxMerchantFeeSetup.success(function (msg) {
+
+            const rate = msg.d.Rate;
+            const customerPaysFee = msg.d.CustomerPaysFee;
+            $("#MerchantFeeInputText").val(rate);
+
+            if (customerPaysFee) {
+                $("#CustomerPaysFeeRadio").prop("checked", "checked");
+            };
+        });
+
+        ajaxMerchantFeeSetup.fail(function (xhr) {
+            logAjaxErrorMessage(xhr);
+        });
+
+    });
+
+    function updateTotal() {
+        if ($("#CurrencyCodeSelect").val() === homeCurrency) {
+            $("#DebitExchangeRateInputText").val("1");
+        };
+
+        if ($("#CurrencyInputText").val() === homeCurrency) {
+            $("#CreditExchangeRateInputText").val("1");
+        };
+
+        const due = parseFloat($("#DueAmountInputText").val() || 0);
+        const amount = parseFloat($("#AmountInputText").val() || 0);
+        const er = parseFloat($("#DebitExchangeRateInputText").val() || 0);
+        const er2 = parseFloat($("#CreditExchangeRateInputText").val()) || 0;
+
+        const toHomeCurrency = amount * er;
+
+        $("#AmountInHomeCurrencyInputText").val(toHomeCurrency);
+
+        const toBase = toHomeCurrency * er2;
+
+        const remainingDue = due - toBase;
+
+        $("#BaseAmountInputText").val(toBase);
+
+        $("#FinalDueAmountInputText").val(remainingDue);
+
+        $("#FinalDueAmountInputText").removeClass("alert-danger");
+
+        if (remainingDue < 0) {
+            $("#FinalDueAmountInputText").addClass("alert-danger");
+        };
+    };
+
+    var toggleTransactionType = function (e) {
+        if (e.attr("id") === "BankButton") {
+            if (!$("#BankFormGroup").is(":visible")) {
+                $("#BankFormGroup").show(500);
+                $("#CashFormGroup").hide();
+                $("#CashButton").removeClass("active");
+                $("#BankButton").addClass("active");
+                loadCashRepositories();
+                return;
+            };
+        };
+
+        if (e.attr("id") === "CashButton") {
+            if (!$("#CashFormGroup").is(":visible")) {
+                $("#CashFormGroup").show(500);
+                $("#BankFormGroup").hide();
+                loadBankAccounts();
+                loadCostCenters();
+                $("#PostedDateTextBox").val("");
+                $("#BankInstrumentCodeInputText").val("");
+                $("#BankTransactionCodeInputText").val("");
+                $("#CashButton").addClass("active");
+                $("#BankButton").removeClass("active");
+                return;
+            };
+        };
+    };
+
+    function loadCostCenters() {
+        const url = "/api/forms/finance/cost-centers/display-fields";
+        const target = $("#CostCenterIdSelect");
+        window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+    };
+
+    function loadCurrencies() {
+        const url = "/api/forms/core/currencies/lookup-fields";
+        const target = $("#CurrencyCodeSelect");
+        window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+    };
+
+    function loadCustomers() {
+        const url = "/api/forms/inventory/customers/display-fields";
+        const target = $("#CustomerIdSelect");
+        window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+    };
+
+    function loadCashRepositories() {
+        const url = "/api/forms/finance/cash-repositories/display-fields";
+        const target = $("#CashRepositoryIdSelect");
+        window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+    };
+
+    function loadCashAccounts() {
+        const url = "/api/views/finance/cash-account-selector-view/display-fields";
+        const target = $("#CashAccountIdSelect");
+        window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+    };
+
+    function loadBankAccounts() {
+        const url = "/api/forms/finance/bank-accounts/display-fields";
+        const target = $("#BankAccountIdSelect");
+        window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+    };
+
+
+    function loadPaymentCards() {
+        if (!$("#PaymentCardIdSelect option").length) {
+            const url = "/api/forms/finance/payment-cards/display-fields";
+            window.displayFieldBinder($("#PaymentCardIdSelect"), url);
+        };
+    };
+
+    //Ajax Requests
+
+
+    function getMerchantFeeSetup(merchantAccountId, paymentCardId) {
+        var url = "/dashboard/sales/tasks/receipt/merchant-fee-setup/{merchantAccountId}/{paymentCardId}";
+        url = url.replace("{merchantAccountId}", merchantAccountId);
+        url = url.replace("{paymentCardId}", paymentCardId);
+
+        return window.getAjaxRequest(url);
+    };
+
+
+</script>

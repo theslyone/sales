@@ -1,0 +1,12 @@
+﻿@using MixERP.Sales.Extensions
+@model dynamic
+
+@{
+    ViewBag.Title = "Sales Verification";
+    Layout = ViewBag.SalesLayoutPath;
+}
+
+
+@Html.FinancePartialView("Shared/Verification.cshtml", TenantConvention.GetTenant())
+
+<script src="/Areas/MixERP.Sales/scripts/tasks/receipt/verification.js"></script>

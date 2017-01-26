@@ -151,6 +151,7 @@
     <Compile Include="Controllers\Backend\Tasks\OrderController.cs" />
     <Compile Include="Controllers\Backend\Tasks\QuotationController.cs" />
     <Compile Include="Controllers\Backend\Summary\SalesSummaryController.cs" />
+    <Compile Include="Controllers\Backend\Tasks\ReceiptController.cs" />
     <Compile Include="Controllers\Backend\Tasks\SalesTicketController.cs" />
     <Compile Include="Controllers\SalesDashboardController.cs" />
     <Compile Include="Controllers\Backend\Setups\CashierController.cs" />
@@ -168,12 +169,16 @@
     <Compile Include="DAL\Backend\Tasks\GiftCardFunds.cs" />
     <Compile Include="DAL\Backend\Tasks\Orders.cs" />
     <Compile Include="DAL\Backend\Tasks\Quotations.cs" />
+    <Compile Include="DAL\Backend\Tasks\ReceiptEntry\IReceiptEntry.cs" />
+    <Compile Include="DAL\Backend\Tasks\ReceiptEntry\PostgreSQL.cs" />
+    <Compile Include="DAL\Backend\Tasks\ReceiptEntry\SqlServer.cs" />
+    <Compile Include="DAL\Backend\Tasks\Receipts.cs" />
+    <Compile Include="DAL\Backend\Tasks\ReturnEntry\IReturnEntry.cs" />
     <Compile Include="DAL\Backend\Tasks\ReturnEntry\PostgreSQL.cs" />
     <Compile Include="DAL\Backend\Tasks\ReturnEntry\SqlServer.cs" />
     <Compile Include="DAL\Backend\Summary\Sales.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntries.cs" />
     <Compile Include="DAL\Backend\Service\Items.cs" />
-    <Compile Include="DAL\Backend\Tasks\ReturnEntry\ISalesEntry.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntry\ISalesEntry.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntry\PostgreSQL.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntry\SqlServer.cs" />
@@ -182,8 +187,10 @@
     <Compile Include="DTO\CheckoutDetailView.cs" />
     <Compile Include="DTO\ClosingCash.cs" />
     <Compile Include="DTO\CouponView.cs" />
+    <Compile Include="DTO\CustomerTransactionSummary.cs" />
     <Compile Include="DTO\GiftCards.cs" />
     <Compile Include="DTO\ItemView.cs" />
+    <Compile Include="DTO\MerchantFeeSetup.cs" />
     <Compile Include="DTO\Order.cs" />
     <Compile Include="DTO\OrderDetail.cs" />
     <Compile Include="DTO\OrderInfo.cs" />
@@ -209,6 +216,7 @@
     <Compile Include="ViewModels\Sales.cs" />
     <Compile Include="ViewModels\SalesDetailType.cs" />
     <Compile Include="ViewModels\CustomerSearchResult.cs" />
+    <Compile Include="ViewModels\SalesReceipt.cs" />
     <Compile Include="ViewModels\SalesReturn.cs" />
     <Compile Include="ViewModels\TicketViewModel.cs" />
   </ItemGroup>
@@ -225,6 +233,10 @@
     <Content Include="scripts\loyalty\gift-cards\add-fund\verification.js" />
     <Content Include="scripts\loyalty\gift-cards\index.js" />
     <Content Include="scripts\loyalty\coupons\index.js" />
+    <Content Include="scripts\tasks\receipt\checklist.js" />
+    <Content Include="scripts\tasks\receipt\index.js" />
+    <Content Include="scripts\tasks\receipt\new.js" />
+    <Content Include="scripts\tasks\receipt\verification.js" />
     <Content Include="scripts\tasks\entry\verification.js" />
     <Content Include="scripts\tasks\entry\new.js" />
     <Content Include="scripts\tasks\entry\index.js" />
@@ -305,6 +317,10 @@
     <Content Include="Views\Tasks\Quotation\Checklist.cshtml" />
     <Content Include="Views\Tasks\Quotation\Index.cshtml" />
     <Content Include="Views\Tasks\Quotation\New.cshtml" />
+    <Content Include="Views\Tasks\Receipt\Checklist.cshtml" />
+    <Content Include="Views\Tasks\Receipt\Index.cshtml" />
+    <Content Include="Views\Tasks\Receipt\New.cshtml" />
+    <Content Include="Views\Tasks\Receipt\Verification.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

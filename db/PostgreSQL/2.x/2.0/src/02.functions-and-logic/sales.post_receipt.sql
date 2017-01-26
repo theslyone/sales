@@ -57,8 +57,8 @@ CREATE FUNCTION sales.post_receipt
 
     _tender                                     public.money_strict2,
     _change                                     public.money_strict2,
-    _check_amount                               public.money_strict2,
 
+    _check_amount                               public.money_strict2,
     _check_bank_name                            national character varying(1000),
     _check_number                               national character varying(100),
     _check_date                                 date,
