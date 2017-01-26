@@ -13,14 +13,14 @@
             <i class="ui huge loading spinner icon"></i>
         </div>
         <div>
-            Loading Items
+            @I18N.LoadingItems
         </div>
     </div>
     <div class="layout" style="display: none;">
         <div class="pos tabs">
             <div class="new item">+</div>
             <div id="tab-item-1" class="selected item">
-                1
+                @I18N.One
             </div>
             <div class="actions">
                 <div class="remove">
@@ -32,16 +32,16 @@
             <div class="all items">
                 <div class="status head">
                     <div class="left">
-                        <span class="office info" title="Current Branch Office">
+                        <span class="office info" title="@I18N.CurrentBranchOffice">
                             @meta.OfficeName
                         </span>
-                        <span class="user info" title="You">
+                        <span class="user info" title="@I18N.You">
                             @meta.Name
                         </span>
-                        <span class="area info" title="Current Area">
+                        <span class="area info" title="@I18N.CurrentArea">
                             @meta.OfficeCode
                         </span>
-                        <span class="office info" title="Office Name">
+                        <span class="office info" title="@I18N.OfficeName">
                             @meta.OfficeName
                         </span>
                     </div>
@@ -67,25 +67,25 @@
             <div class="checkout items">
                 <div class="ui action panel">
                     <div class="toolbar">
-                        <div class="toggle view item" title="Toggle View">
+                        <div class="toggle view item" title="@I18N.ToggleView">
                             <i class="toggle off icon"></i>
                         </div>
-                        <div class="item" data-payment-type="credit" title="Credit">
+                        <div class="item" data-payment-type="credit" title="@I18N.Credit">
                             <i class="tags icon"></i>
                         </div>
-                        <div class="item" data-payment-type="cash" title="Cash">
+                        <div class="item" data-payment-type="cash" title="@I18N.Cash">
                             <i class="money icon"></i>
                         </div>
-                        <div class="item" data-payment-type="check" title="Pay by Check">
+                        <div class="item" data-payment-type="check" title="@I18N.PayByCheck">
                             <i class="newspaper icon"></i>
                         </div>
-                        <div class="item" data-payment-type="gift-card" title="Pay by Gift Card">
+                        <div class="item" data-payment-type="gift-card" title="@I18N.PayByGiftCard">
                             <i class="gift icon"></i>
                         </div>
-                        <div class="item" id="SearchCustomerAction" title="Search Customer">
+                        <div class="item" id="SearchCustomerAction" title="@I18N.SearchCustomer">
                             <i class="search icon"></i>
                         </div>
-                        <div class="reprint ticket item" onclick="$('.reprint.ticket.modal').modal('show');" title="Reprint Ticket">
+                        <div class="reprint ticket item" onclick="$('.reprint.ticket.modal').modal('show');" title="@I18N.ReprintTicket">
                             <i class="print icon"></i>
                         </div>
                     </div>
@@ -96,9 +96,9 @@
                         </div>
                         <div class="footer items" style="display: none;">
                             <div class="ui clear negative circular button" id="ClearScreenButton">
-                                Clear Screen
+                                @I18N.ClearScreen
                             </div>
-                            <div class="ui next positive circular button">Next</div>
+                            <div class="ui next positive circular button">@I18N.Next</div>
                         </div>
                     </div>
                 </div>

@@ -24,9 +24,24 @@ namespace MixERP.Sales
 		}
 
 		/// <summary>
-		///Account Id
+		///Actions
 		/// </summary>
-		public static string AccountId => I18NResource.GetString(ResourceDirectory, "AccountId");
+		public static string Actions => I18NResource.GetString(ResourceDirectory, "Actions");
+
+		/// <summary>
+		///Add Fund to Gift Cards
+		/// </summary>
+		public static string AddFundGiftCards => I18NResource.GetString(ResourceDirectory, "AddFundGiftCards");
+
+		/// <summary>
+		///Add Funds to Gift Card
+		/// </summary>
+		public static string AddFundsGiftCard => I18NResource.GetString(ResourceDirectory, "AddFundsGiftCard");
+
+		/// <summary>
+		///Add New
+		/// </summary>
+		public static string AddNew => I18NResource.GetString(ResourceDirectory, "AddNew");
 
 		/// <summary>
 		///Add a New Sales Entry
@@ -34,19 +49,24 @@ namespace MixERP.Sales
 		public static string AddNewSalesEntry => I18NResource.GetString(ResourceDirectory, "AddNewSalesEntry");
 
 		/// <summary>
+		///Add a New Sales Order
+		/// </summary>
+		public static string AddNewSalesOrder => I18NResource.GetString(ResourceDirectory, "AddNewSalesOrder");
+
+		/// <summary>
+		///Add a New Sales Quotation
+		/// </summary>
+		public static string AddNewSalesQuotation => I18NResource.GetString(ResourceDirectory, "AddNewSalesQuotation");
+
+		/// <summary>
+		///Add Tax
+		/// </summary>
+		public static string AddTax => I18NResource.GetString(ResourceDirectory, "AddTax");
+
+		/// <summary>
 		///Address
 		/// </summary>
 		public static string Address => I18NResource.GetString(ResourceDirectory, "Address");
-
-		/// <summary>
-		///Address Line 1
-		/// </summary>
-		public static string AddressLine1 => I18NResource.GetString(ResourceDirectory, "AddressLine1");
-
-		/// <summary>
-		///Address Line 2
-		/// </summary>
-		public static string AddressLine2 => I18NResource.GetString(ResourceDirectory, "AddressLine2");
 
 		/// <summary>
 		///Amount
@@ -54,64 +74,34 @@ namespace MixERP.Sales
 		public static string Amount => I18NResource.GetString(ResourceDirectory, "Amount");
 
 		/// <summary>
-		///Approval Memo
+		///Approve
 		/// </summary>
-		public static string ApprovalMemo => I18NResource.GetString(ResourceDirectory, "ApprovalMemo");
+		public static string Approve => I18NResource.GetString(ResourceDirectory, "Approve");
 
 		/// <summary>
-		///Approved By
+		///Are you sure?
 		/// </summary>
-		public static string ApprovedBy => I18NResource.GetString(ResourceDirectory, "ApprovedBy");
+		public static string AreYouSure => I18NResource.GetString(ResourceDirectory, "AreYouSure");
 
 		/// <summary>
-		///Associated Price Type Code
+		///Are you sure you want to delete this tab?
 		/// </summary>
-		public static string AssociatedPriceTypeCode => I18NResource.GetString(ResourceDirectory, "AssociatedPriceTypeCode");
+		public static string AreYouSureYouWantDeleteTab => I18NResource.GetString(ResourceDirectory, "AreYouSureYouWantDeleteTab");
 
 		/// <summary>
-		///Associated Price Type Id
+		///BOD Cash
 		/// </summary>
-		public static string AssociatedPriceTypeId => I18NResource.GetString(ResourceDirectory, "AssociatedPriceTypeId");
+		public static string BODCash => I18NResource.GetString(ResourceDirectory, "BODCash");
 
 		/// <summary>
-		///Associated Price Type Name
+		///Back
 		/// </summary>
-		public static string AssociatedPriceTypeName => I18NResource.GetString(ResourceDirectory, "AssociatedPriceTypeName");
+		public static string Back => I18NResource.GetString(ResourceDirectory, "Back");
 
 		/// <summary>
-		///Associated User
+		///BankName
 		/// </summary>
-		public static string AssociatedUser => I18NResource.GetString(ResourceDirectory, "AssociatedUser");
-
-		/// <summary>
-		///Associated User Id
-		/// </summary>
-		public static string AssociatedUserId => I18NResource.GetString(ResourceDirectory, "AssociatedUserId");
-
-		/// <summary>
-		///Attempted By
-		/// </summary>
-		public static string AttemptedBy => I18NResource.GetString(ResourceDirectory, "AttemptedBy");
-
-		/// <summary>
-		///Audit Ts
-		/// </summary>
-		public static string AuditTs => I18NResource.GetString(ResourceDirectory, "AuditTs");
-
-		/// <summary>
-		///Audit User Id
-		/// </summary>
-		public static string AuditUserId => I18NResource.GetString(ResourceDirectory, "AuditUserId");
-
-		/// <summary>
-		///Barcode
-		/// </summary>
-		public static string Barcode => I18NResource.GetString(ResourceDirectory, "Barcode");
-
-		/// <summary>
-		///Begins From
-		/// </summary>
-		public static string BeginsFrom => I18NResource.GetString(ResourceDirectory, "BeginsFrom");
+		public static string BankName => I18NResource.GetString(ResourceDirectory, "BankName");
 
 		/// <summary>
 		///Book Date
@@ -119,59 +109,34 @@ namespace MixERP.Sales
 		public static string BookDate => I18NResource.GetString(ResourceDirectory, "BookDate");
 
 		/// <summary>
-		///Brand Id
+		///Cancel
 		/// </summary>
-		public static string BrandId => I18NResource.GetString(ResourceDirectory, "BrandId");
+		public static string Cancel => I18NResource.GetString(ResourceDirectory, "Cancel");
 
 		/// <summary>
-		///Brand Name
+		///Cannot add item because the price is zero.
 		/// </summary>
-		public static string BrandName => I18NResource.GetString(ResourceDirectory, "BrandName");
+		public static string CannotAddItemBecausePriceIsZero => I18NResource.GetString(ResourceDirectory, "CannotAddItemBecausePriceIsZero");
 
 		/// <summary>
-		///Browser
+		///Cash
 		/// </summary>
-		public static string Browser => I18NResource.GetString(ResourceDirectory, "Browser");
+		public static string Cash => I18NResource.GetString(ResourceDirectory, "Cash");
 
 		/// <summary>
-		///Cancellation Reason
+		///Cash Change
 		/// </summary>
-		public static string CancellationReason => I18NResource.GetString(ResourceDirectory, "CancellationReason");
+		public static string CashChange => I18NResource.GetString(ResourceDirectory, "CashChange");
 
 		/// <summary>
-		///Cancelled
+		///Cash Tender
 		/// </summary>
-		public static string Cancelled => I18NResource.GetString(ResourceDirectory, "Cancelled");
+		public static string CashTender => I18NResource.GetString(ResourceDirectory, "CashTender");
 
 		/// <summary>
-		///Cashier Code
+		///Cashiers
 		/// </summary>
-		public static string CashierCode => I18NResource.GetString(ResourceDirectory, "CashierCode");
-
-		/// <summary>
-		///Cashier Id
-		/// </summary>
-		public static string CashierId => I18NResource.GetString(ResourceDirectory, "CashierId");
-
-		/// <summary>
-		///Cashier Login Info Id
-		/// </summary>
-		public static string CashierLoginInfoId => I18NResource.GetString(ResourceDirectory, "CashierLoginInfoId");
-
-		/// <summary>
-		///Cash Repository Code
-		/// </summary>
-		public static string CashRepositoryCode => I18NResource.GetString(ResourceDirectory, "CashRepositoryCode");
-
-		/// <summary>
-		///Cash Repository Id
-		/// </summary>
-		public static string CashRepositoryId => I18NResource.GetString(ResourceDirectory, "CashRepositoryId");
-
-		/// <summary>
-		///Cash Repository Name
-		/// </summary>
-		public static string CashRepositoryName => I18NResource.GetString(ResourceDirectory, "CashRepositoryName");
+		public static string Cashiers => I18NResource.GetString(ResourceDirectory, "Cashiers");
 
 		/// <summary>
 		///Change
@@ -179,39 +144,24 @@ namespace MixERP.Sales
 		public static string Change => I18NResource.GetString(ResourceDirectory, "Change");
 
 		/// <summary>
+		///Check
+		/// </summary>
+		public static string Check => I18NResource.GetString(ResourceDirectory, "Check");
+
+		/// <summary>
 		///Check Amount
 		/// </summary>
 		public static string CheckAmount => I18NResource.GetString(ResourceDirectory, "CheckAmount");
 
 		/// <summary>
-		///Check Bank Name
-		/// </summary>
-		public static string CheckBankName => I18NResource.GetString(ResourceDirectory, "CheckBankName");
-
-		/// <summary>
-		///Check Clear Date
-		/// </summary>
-		public static string CheckClearDate => I18NResource.GetString(ResourceDirectory, "CheckClearDate");
-
-		/// <summary>
-		///Check Cleared
-		/// </summary>
-		public static string CheckCleared => I18NResource.GetString(ResourceDirectory, "CheckCleared");
-
-		/// <summary>
-		///Check Clearing Memo
-		/// </summary>
-		public static string CheckClearingMemo => I18NResource.GetString(ResourceDirectory, "CheckClearingMemo");
-
-		/// <summary>
-		///Check Clearing Transaction Master Id
-		/// </summary>
-		public static string CheckClearingTransactionMasterId => I18NResource.GetString(ResourceDirectory, "CheckClearingTransactionMasterId");
-
-		/// <summary>
 		///Check Date
 		/// </summary>
 		public static string CheckDate => I18NResource.GetString(ResourceDirectory, "CheckDate");
+
+		/// <summary>
+		///Check Number
+		/// </summary>
+		public static string CheckNumber => I18NResource.GetString(ResourceDirectory, "CheckNumber");
 
 		/// <summary>
 		///Checklist
@@ -224,14 +174,9 @@ namespace MixERP.Sales
 		public static string ChecklistWindow => I18NResource.GetString(ResourceDirectory, "ChecklistWindow");
 
 		/// <summary>
-		///Check Number
+		///Checkout
 		/// </summary>
-		public static string CheckNumber => I18NResource.GetString(ResourceDirectory, "CheckNumber");
-
-		/// <summary>
-		///Checkout Id
-		/// </summary>
-		public static string CheckoutId => I18NResource.GetString(ResourceDirectory, "CheckoutId");
+		public static string Checkout => I18NResource.GetString(ResourceDirectory, "Checkout");
 
 		/// <summary>
 		///City
@@ -239,14 +184,29 @@ namespace MixERP.Sales
 		public static string City => I18NResource.GetString(ResourceDirectory, "City");
 
 		/// <summary>
-		///Closed
+		///Clear
 		/// </summary>
-		public static string Closed => I18NResource.GetString(ResourceDirectory, "Closed");
+		public static string Clear => I18NResource.GetString(ResourceDirectory, "Clear");
 
 		/// <summary>
-		///Closing Cash Id
+		///Clear Screen
 		/// </summary>
-		public static string ClosingCashId => I18NResource.GetString(ResourceDirectory, "ClosingCashId");
+		public static string ClearScreen => I18NResource.GetString(ResourceDirectory, "ClearScreen");
+
+		/// <summary>
+		///Close
+		/// </summary>
+		public static string Close => I18NResource.GetString(ResourceDirectory, "Close");
+
+		/// <summary>
+		///Closing Summary
+		/// </summary>
+		public static string ClosingSummary => I18NResource.GetString(ResourceDirectory, "ClosingSummary");
+
+		/// <summary>
+		///CLS
+		/// </summary>
+		public static string Cls => I18NResource.GetString(ResourceDirectory, "Cls");
 
 		/// <summary>
 		///Coins
@@ -254,29 +214,29 @@ namespace MixERP.Sales
 		public static string Coins => I18NResource.GetString(ResourceDirectory, "Coins");
 
 		/// <summary>
-		///Cost Center Name
+		///Convert to Order
 		/// </summary>
-		public static string CostCenterName => I18NResource.GetString(ResourceDirectory, "CostCenterName");
+		public static string ConvertOrder => I18NResource.GetString(ResourceDirectory, "ConvertOrder");
+
+		/// <summary>
+		///Convert to Sales
+		/// </summary>
+		public static string ConvertSales => I18NResource.GetString(ResourceDirectory, "ConvertSales");
+
+		/// <summary>
+		///Cost Center
+		/// </summary>
+		public static string CostCenter => I18NResource.GetString(ResourceDirectory, "CostCenter");
+
+		/// <summary>
+		///Count
+		/// </summary>
+		public static string Count => I18NResource.GetString(ResourceDirectory, "Count");
 
 		/// <summary>
 		///Counter
 		/// </summary>
 		public static string Counter => I18NResource.GetString(ResourceDirectory, "Counter");
-
-		/// <summary>
-		///Counter Code
-		/// </summary>
-		public static string CounterCode => I18NResource.GetString(ResourceDirectory, "CounterCode");
-
-		/// <summary>
-		///Counter Id
-		/// </summary>
-		public static string CounterId => I18NResource.GetString(ResourceDirectory, "CounterId");
-
-		/// <summary>
-		///Counter Name
-		/// </summary>
-		public static string CounterName => I18NResource.GetString(ResourceDirectory, "CounterName");
 
 		/// <summary>
 		///Country
@@ -289,29 +249,29 @@ namespace MixERP.Sales
 		public static string CouponCode => I18NResource.GetString(ResourceDirectory, "CouponCode");
 
 		/// <summary>
-		///Coupon Id
+		///Credit
 		/// </summary>
-		public static string CouponId => I18NResource.GetString(ResourceDirectory, "CouponId");
+		public static string Credit => I18NResource.GetString(ResourceDirectory, "Credit");
 
 		/// <summary>
-		///Coupon Name
+		///CTRL + RETURN
 		/// </summary>
-		public static string CouponName => I18NResource.GetString(ResourceDirectory, "CouponName");
+		public static string CtrlReturn => I18NResource.GetString(ResourceDirectory, "CtrlReturn");
 
 		/// <summary>
-		///Credit Settled
+		///Current Area
 		/// </summary>
-		public static string CreditSettled => I18NResource.GetString(ResourceDirectory, "CreditSettled");
+		public static string CurrentArea => I18NResource.GetString(ResourceDirectory, "CurrentArea");
 
 		/// <summary>
-		///Currency Code
+		///Current Branch Office
 		/// </summary>
-		public static string CurrencyCode => I18NResource.GetString(ResourceDirectory, "CurrencyCode");
+		public static string CurrentBranchOffice => I18NResource.GetString(ResourceDirectory, "CurrentBranchOffice");
 
 		/// <summary>
-		///Customer Id
+		///Customer
 		/// </summary>
-		public static string CustomerId => I18NResource.GetString(ResourceDirectory, "CustomerId");
+		public static string Customer => I18NResource.GetString(ResourceDirectory, "Customer");
 
 		/// <summary>
 		///Customer Name
@@ -319,79 +279,29 @@ namespace MixERP.Sales
 		public static string CustomerName => I18NResource.GetString(ResourceDirectory, "CustomerName");
 
 		/// <summary>
-		///Customer Type
+		///Customer Types
 		/// </summary>
-		public static string CustomerType => I18NResource.GetString(ResourceDirectory, "CustomerType");
+		public static string CustomerTypes => I18NResource.GetString(ResourceDirectory, "CustomerTypes");
 
 		/// <summary>
-		///Customer Type Id
+		///Customers
 		/// </summary>
-		public static string CustomerTypeId => I18NResource.GetString(ResourceDirectory, "CustomerTypeId");
+		public static string Customers => I18NResource.GetString(ResourceDirectory, "Customers");
 
 		/// <summary>
-		///Deleted
+		///Delete
 		/// </summary>
-		public static string Deleted => I18NResource.GetString(ResourceDirectory, "Deleted");
+		public static string Delete => I18NResource.GetString(ResourceDirectory, "Delete");
 
 		/// <summary>
-		///Deno 1
+		///Denominations
 		/// </summary>
-		public static string Deno1 => I18NResource.GetString(ResourceDirectory, "Deno1");
+		public static string Denominations => I18NResource.GetString(ResourceDirectory, "Denominations");
 
 		/// <summary>
-		///Deno 10
+		///Description
 		/// </summary>
-		public static string Deno10 => I18NResource.GetString(ResourceDirectory, "Deno10");
-
-		/// <summary>
-		///Deno 100
-		/// </summary>
-		public static string Deno100 => I18NResource.GetString(ResourceDirectory, "Deno100");
-
-		/// <summary>
-		///Deno 1000
-		/// </summary>
-		public static string Deno1000 => I18NResource.GetString(ResourceDirectory, "Deno1000");
-
-		/// <summary>
-		///Deno 2
-		/// </summary>
-		public static string Deno2 => I18NResource.GetString(ResourceDirectory, "Deno2");
-
-		/// <summary>
-		///Deno 20
-		/// </summary>
-		public static string Deno20 => I18NResource.GetString(ResourceDirectory, "Deno20");
-
-		/// <summary>
-		///Deno 200
-		/// </summary>
-		public static string Deno200 => I18NResource.GetString(ResourceDirectory, "Deno200");
-
-		/// <summary>
-		///Deno 25
-		/// </summary>
-		public static string Deno25 => I18NResource.GetString(ResourceDirectory, "Deno25");
-
-		/// <summary>
-		///Deno 250
-		/// </summary>
-		public static string Deno250 => I18NResource.GetString(ResourceDirectory, "Deno250");
-
-		/// <summary>
-		///Deno 5
-		/// </summary>
-		public static string Deno5 => I18NResource.GetString(ResourceDirectory, "Deno5");
-
-		/// <summary>
-		///Deno 50
-		/// </summary>
-		public static string Deno50 => I18NResource.GetString(ResourceDirectory, "Deno50");
-
-		/// <summary>
-		///Deno 500
-		/// </summary>
-		public static string Deno500 => I18NResource.GetString(ResourceDirectory, "Deno500");
+		public static string Description => I18NResource.GetString(ResourceDirectory, "Description");
 
 		/// <summary>
 		///Discount
@@ -404,104 +314,104 @@ namespace MixERP.Sales
 		public static string DiscountCoupons => I18NResource.GetString(ResourceDirectory, "DiscountCoupons");
 
 		/// <summary>
-		///Discount Rate
+		///Discount Type
 		/// </summary>
-		public static string DiscountRate => I18NResource.GetString(ResourceDirectory, "DiscountRate");
+		public static string DiscountType => I18NResource.GetString(ResourceDirectory, "DiscountType");
 
 		/// <summary>
-		///Due Days
+		///EOD Cash
 		/// </summary>
-		public static string DueDays => I18NResource.GetString(ResourceDirectory, "DueDays");
+		public static string EODCash => I18NResource.GetString(ResourceDirectory, "EODCash");
 
 		/// <summary>
-		///Due Fequency
+		///Effective From
 		/// </summary>
-		public static string DueFequency => I18NResource.GetString(ResourceDirectory, "DueFequency");
+		public static string EffectiveFrom => I18NResource.GetString(ResourceDirectory, "EffectiveFrom");
 
 		/// <summary>
-		///Due Frequency Id
+		///Enter Amount
 		/// </summary>
-		public static string DueFrequencyId => I18NResource.GetString(ResourceDirectory, "DueFrequencyId");
+		public static string EnterAmount => I18NResource.GetString(ResourceDirectory, "EnterAmount");
 
 		/// <summary>
-		///Due On Date
+		///Enter a Gift Card Number
 		/// </summary>
-		public static string DueOnDate => I18NResource.GetString(ResourceDirectory, "DueOnDate");
+		public static string EnterGiftCardNumber => I18NResource.GetString(ResourceDirectory, "EnterGiftCardNumber");
 
 		/// <summary>
-		///Enable Ticket Printing
+		///Enter Transaction Id
 		/// </summary>
-		public static string EnableTicketPrinting => I18NResource.GetString(ResourceDirectory, "EnableTicketPrinting");
+		public static string EnterTransactionId => I18NResource.GetString(ResourceDirectory, "EnterTransactionId");
 
 		/// <summary>
-		///Entered By
+		///Expected Date
 		/// </summary>
-		public static string EnteredBy => I18NResource.GetString(ResourceDirectory, "EnteredBy");
+		public static string ExpectedDate => I18NResource.GetString(ResourceDirectory, "ExpectedDate");
 
 		/// <summary>
-		///Er Credit
+		///Expected From
 		/// </summary>
-		public static string ErCredit => I18NResource.GetString(ResourceDirectory, "ErCredit");
+		public static string ExpectedFrom => I18NResource.GetString(ResourceDirectory, "ExpectedFrom");
 
 		/// <summary>
-		///Er Debit
+		///Expected To
 		/// </summary>
-		public static string ErDebit => I18NResource.GetString(ResourceDirectory, "ErDebit");
+		public static string ExpectedTo => I18NResource.GetString(ResourceDirectory, "ExpectedTo");
 
 		/// <summary>
-		///Expected Delivery Date
+		///Export
 		/// </summary>
-		public static string ExpectedDeliveryDate => I18NResource.GetString(ResourceDirectory, "ExpectedDeliveryDate");
+		public static string Export => I18NResource.GetString(ResourceDirectory, "Export");
 
 		/// <summary>
-		///Expires On
+		///Export This Document
 		/// </summary>
-		public static string ExpiresOn => I18NResource.GetString(ResourceDirectory, "ExpiresOn");
+		public static string ExportThisDocument => I18NResource.GetString(ResourceDirectory, "ExportThisDocument");
 
 		/// <summary>
-		///Fax
+		///Export to Doc
 		/// </summary>
-		public static string Fax => I18NResource.GetString(ResourceDirectory, "Fax");
+		public static string ExportToDoc => I18NResource.GetString(ResourceDirectory, "ExportToDoc");
 
 		/// <summary>
-		///First Name
+		///Export to Excel
 		/// </summary>
-		public static string FirstName => I18NResource.GetString(ResourceDirectory, "FirstName");
+		public static string ExportToExcel => I18NResource.GetString(ResourceDirectory, "ExportToExcel");
 
 		/// <summary>
-		///Fiscal Year Code
+		///Export to PDF
 		/// </summary>
-		public static string FiscalYearCode => I18NResource.GetString(ResourceDirectory, "FiscalYearCode");
+		public static string ExportToPDF => I18NResource.GetString(ResourceDirectory, "ExportToPDF");
 
 		/// <summary>
-		///For Ticket Having Maximum Amount
+		///50
 		/// </summary>
-		public static string ForTicketHavingMaximumAmount => I18NResource.GetString(ResourceDirectory, "ForTicketHavingMaximumAmount");
+		public static string Fifty => I18NResource.GetString(ResourceDirectory, "Fifty");
 
 		/// <summary>
-		///For Ticket Having Minimum Amount
+		///5
 		/// </summary>
-		public static string ForTicketHavingMinimumAmount => I18NResource.GetString(ResourceDirectory, "ForTicketHavingMinimumAmount");
+		public static string Five => I18NResource.GetString(ResourceDirectory, "Five");
 
 		/// <summary>
-		///For Ticket Of Price Type Code
+		///500
 		/// </summary>
-		public static string ForTicketOfPriceTypeCode => I18NResource.GetString(ResourceDirectory, "ForTicketOfPriceTypeCode");
+		public static string FiveHundred => I18NResource.GetString(ResourceDirectory, "FiveHundred");
 
 		/// <summary>
-		///For Ticket Of Price Type Id
+		///From
 		/// </summary>
-		public static string ForTicketOfPriceTypeId => I18NResource.GetString(ResourceDirectory, "ForTicketOfPriceTypeId");
+		public static string From => I18NResource.GetString(ResourceDirectory, "From");
 
 		/// <summary>
-		///For Ticket Of Price Type Name
+		///Gift Card #
 		/// </summary>
-		public static string ForTicketOfPriceTypeName => I18NResource.GetString(ResourceDirectory, "ForTicketOfPriceTypeName");
+		public static string GiftCard => I18NResource.GetString(ResourceDirectory, "GiftCard");
 
 		/// <summary>
-		///For Ticket Of Unknown Customers Only
+		///Gift Card Balance
 		/// </summary>
-		public static string ForTicketOfUnknownCustomersOnly => I18NResource.GetString(ResourceDirectory, "ForTicketOfUnknownCustomersOnly");
+		public static string GiftCardBalance => I18NResource.GetString(ResourceDirectory, "GiftCardBalance");
 
 		/// <summary>
 		///Gift Card Fund Sales
@@ -509,34 +419,49 @@ namespace MixERP.Sales
 		public static string GiftCardFundSales => I18NResource.GetString(ResourceDirectory, "GiftCardFundSales");
 
 		/// <summary>
-		///Gift Card Id
+		///Gift Card Fund Verification
 		/// </summary>
-		public static string GiftCardId => I18NResource.GetString(ResourceDirectory, "GiftCardId");
+		public static string GiftCardFundVerification => I18NResource.GetString(ResourceDirectory, "GiftCardFundVerification");
 
 		/// <summary>
-		///Gift Card Number
+		///Gift card Funds
+		/// </summary>
+		public static string GiftCardFunds => I18NResource.GetString(ResourceDirectory, "GiftCardFunds");
+
+		/// <summary>
+		///Gift Card Funds Verification
+		/// </summary>
+		public static string GiftCardFundsVerification => I18NResource.GetString(ResourceDirectory, "GiftCardFundsVerification");
+
+		/// <summary>
+		///Gift Card #
 		/// </summary>
 		public static string GiftCardNumber => I18NResource.GetString(ResourceDirectory, "GiftCardNumber");
 
 		/// <summary>
-		///Gift Card Owner
+		///Gift Cards
 		/// </summary>
-		public static string GiftCardOwner => I18NResource.GetString(ResourceDirectory, "GiftCardOwner");
+		public static string GiftCards => I18NResource.GetString(ResourceDirectory, "GiftCards");
 
 		/// <summary>
-		///Grace Period
+		///Grand Total
 		/// </summary>
-		public static string GracePeriod => I18NResource.GetString(ResourceDirectory, "GracePeriod");
+		public static string GrandTotal => I18NResource.GetString(ResourceDirectory, "GrandTotal");
 
 		/// <summary>
-		///Hot Item
+		///Hide
 		/// </summary>
-		public static string HotItem => I18NResource.GetString(ResourceDirectory, "HotItem");
+		public static string Hide => I18NResource.GetString(ResourceDirectory, "Hide");
 
 		/// <summary>
-		///Includes Tax
+		///100
 		/// </summary>
-		public static string IncludesTax => I18NResource.GetString(ResourceDirectory, "IncludesTax");
+		public static string Hundred => I18NResource.GetString(ResourceDirectory, "Hundred");
+
+		/// <summary>
+		///Id
+		/// </summary>
+		public static string Id => I18NResource.GetString(ResourceDirectory, "Id");
 
 		/// <summary>
 		///Internal Memo
@@ -549,89 +474,9 @@ namespace MixERP.Sales
 		public static string InvoiceNumber => I18NResource.GetString(ResourceDirectory, "InvoiceNumber");
 
 		/// <summary>
-		///Ip Address
+		///Inv#
 		/// </summary>
-		public static string IpAddress => I18NResource.GetString(ResourceDirectory, "IpAddress");
-
-		/// <summary>
-		///Is Credit
-		/// </summary>
-		public static string IsCredit => I18NResource.GetString(ResourceDirectory, "IsCredit");
-
-		/// <summary>
-		///Is Flat Amount
-		/// </summary>
-		public static string IsFlatAmount => I18NResource.GetString(ResourceDirectory, "IsFlatAmount");
-
-		/// <summary>
-		///Is Flat Discount
-		/// </summary>
-		public static string IsFlatDiscount => I18NResource.GetString(ResourceDirectory, "IsFlatDiscount");
-
-		/// <summary>
-		///Is Percentage
-		/// </summary>
-		public static string IsPercentage => I18NResource.GetString(ResourceDirectory, "IsPercentage");
-
-		/// <summary>
-		///Is Taxable Item
-		/// </summary>
-		public static string IsTaxableItem => I18NResource.GetString(ResourceDirectory, "IsTaxableItem");
-
-		/// <summary>
-		///Item
-		/// </summary>
-		public static string Item => I18NResource.GetString(ResourceDirectory, "Item");
-
-		/// <summary>
-		///Item Code
-		/// </summary>
-		public static string ItemCode => I18NResource.GetString(ResourceDirectory, "ItemCode");
-
-		/// <summary>
-		///Item Group Id
-		/// </summary>
-		public static string ItemGroupId => I18NResource.GetString(ResourceDirectory, "ItemGroupId");
-
-		/// <summary>
-		///Item Group Name
-		/// </summary>
-		public static string ItemGroupName => I18NResource.GetString(ResourceDirectory, "ItemGroupName");
-
-		/// <summary>
-		///Item Id
-		/// </summary>
-		public static string ItemId => I18NResource.GetString(ResourceDirectory, "ItemId");
-
-		/// <summary>
-		///Item Name
-		/// </summary>
-		public static string ItemName => I18NResource.GetString(ResourceDirectory, "ItemName");
-
-		/// <summary>
-		///Item Selling Price Id
-		/// </summary>
-		public static string ItemSellingPriceId => I18NResource.GetString(ResourceDirectory, "ItemSellingPriceId");
-
-		/// <summary>
-		///Item Type Id
-		/// </summary>
-		public static string ItemTypeId => I18NResource.GetString(ResourceDirectory, "ItemTypeId");
-
-		/// <summary>
-		///Item Type Name
-		/// </summary>
-		public static string ItemTypeName => I18NResource.GetString(ResourceDirectory, "ItemTypeName");
-
-		/// <summary>
-		///Last Name
-		/// </summary>
-		public static string LastName => I18NResource.GetString(ResourceDirectory, "LastName");
-
-		/// <summary>
-		///Last Verified On
-		/// </summary>
-		public static string LastVerifiedOn => I18NResource.GetString(ResourceDirectory, "LastVerifiedOn");
+		public static string InvoiceNumberAbbreviated => I18NResource.GetString(ResourceDirectory, "InvoiceNumberAbbreviated");
 
 		/// <summary>
 		///Late Fee
@@ -639,54 +484,19 @@ namespace MixERP.Sales
 		public static string LateFee => I18NResource.GetString(ResourceDirectory, "LateFee");
 
 		/// <summary>
-		///Late Fee Code
+		///Loading items...
 		/// </summary>
-		public static string LateFeeCode => I18NResource.GetString(ResourceDirectory, "LateFeeCode");
+		public static string LoadingItems => I18NResource.GetString(ResourceDirectory, "LoadingItems");
 
 		/// <summary>
-		///Late Fee Frequency
+		///Loyalty Point Manager
 		/// </summary>
-		public static string LateFeeFrequency => I18NResource.GetString(ResourceDirectory, "LateFeeFrequency");
+		public static string LoyaltyPointManager => I18NResource.GetString(ResourceDirectory, "LoyaltyPointManager");
 
 		/// <summary>
-		///Late Fee Id
-		/// </summary>
-		public static string LateFeeId => I18NResource.GetString(ResourceDirectory, "LateFeeId");
-
-		/// <summary>
-		///Late Fee Name
-		/// </summary>
-		public static string LateFeeName => I18NResource.GetString(ResourceDirectory, "LateFeeName");
-
-		/// <summary>
-		///Late Fee Posting Frequency Id
-		/// </summary>
-		public static string LateFeePostingFrequencyId => I18NResource.GetString(ResourceDirectory, "LateFeePostingFrequencyId");
-
-		/// <summary>
-		///Late Fee Tran Id
-		/// </summary>
-		public static string LateFeeTranId => I18NResource.GetString(ResourceDirectory, "LateFeeTranId");
-
-		/// <summary>
-		///Login Date
-		/// </summary>
-		public static string LoginDate => I18NResource.GetString(ResourceDirectory, "LoginDate");
-
-		/// <summary>
-		///Maximum Discount Amount
-		/// </summary>
-		public static string MaximumDiscountAmount => I18NResource.GetString(ResourceDirectory, "MaximumDiscountAmount");
-
-		/// <summary>
-		///Maximum Purchase Amount
+		///Maximum purchase amount
 		/// </summary>
 		public static string MaximumPurchaseAmount => I18NResource.GetString(ResourceDirectory, "MaximumPurchaseAmount");
-
-		/// <summary>
-		///Maximum Usage
-		/// </summary>
-		public static string MaximumUsage => I18NResource.GetString(ResourceDirectory, "MaximumUsage");
 
 		/// <summary>
 		///Memo
@@ -694,12 +504,7 @@ namespace MixERP.Sales
 		public static string Memo => I18NResource.GetString(ResourceDirectory, "Memo");
 
 		/// <summary>
-		///Middle Name
-		/// </summary>
-		public static string MiddleName => I18NResource.GetString(ResourceDirectory, "MiddleName");
-
-		/// <summary>
-		///Minimum Purchase Amount
+		///Minimum purchase amount
 		/// </summary>
 		public static string MinimumPurchaseAmount => I18NResource.GetString(ResourceDirectory, "MinimumPurchaseAmount");
 
@@ -707,6 +512,21 @@ namespace MixERP.Sales
 		///Name
 		/// </summary>
 		public static string Name => I18NResource.GetString(ResourceDirectory, "Name");
+
+		/// <summary>
+		///Next
+		/// </summary>
+		public static string Next => I18NResource.GetString(ResourceDirectory, "Next");
+
+		/// <summary>
+		///Non Taxable Sales
+		/// </summary>
+		public static string NonTaxableSales => I18NResource.GetString(ResourceDirectory, "NonTaxableSales");
+
+		/// <summary>
+		///Office
+		/// </summary>
+		public static string Office => I18NResource.GetString(ResourceDirectory, "Office");
 
 		/// <summary>
 		///Office Id
@@ -719,94 +539,99 @@ namespace MixERP.Sales
 		public static string OfficeName => I18NResource.GetString(ResourceDirectory, "OfficeName");
 
 		/// <summary>
+		///1
+		/// </summary>
+		public static string One => I18NResource.GetString(ResourceDirectory, "One");
+
+		/// <summary>
 		///Opening Cash
 		/// </summary>
 		public static string OpeningCash => I18NResource.GetString(ResourceDirectory, "OpeningCash");
 
 		/// <summary>
-		///Opening Cash Id
+		///PO Box
 		/// </summary>
-		public static string OpeningCashId => I18NResource.GetString(ResourceDirectory, "OpeningCashId");
+		public static string POBox => I18NResource.GetString(ResourceDirectory, "POBox");
 
 		/// <summary>
-		///Order Detail Id
+		///Pay by Check
 		/// </summary>
-		public static string OrderDetailId => I18NResource.GetString(ResourceDirectory, "OrderDetailId");
+		public static string PayByCheck => I18NResource.GetString(ResourceDirectory, "PayByCheck");
 
 		/// <summary>
-		///Order Id
+		///Pay by Gift Card
 		/// </summary>
-		public static string OrderId => I18NResource.GetString(ResourceDirectory, "OrderId");
+		public static string PayByGiftCard => I18NResource.GetString(ResourceDirectory, "PayByGiftCard");
 
 		/// <summary>
-		///Payable Account Id
+		///Pay by Check
 		/// </summary>
-		public static string PayableAccountId => I18NResource.GetString(ResourceDirectory, "PayableAccountId");
+		public static string PayCheck => I18NResource.GetString(ResourceDirectory, "PayCheck");
 
 		/// <summary>
-		///Payment Term Code
+		///Pay by Gift Card
 		/// </summary>
-		public static string PaymentTermCode => I18NResource.GetString(ResourceDirectory, "PaymentTermCode");
+		public static string PayGiftCard => I18NResource.GetString(ResourceDirectory, "PayGiftCard");
 
 		/// <summary>
-		///Payment Term Id
+		///Payment Term
 		/// </summary>
-		public static string PaymentTermId => I18NResource.GetString(ResourceDirectory, "PaymentTermId");
+		public static string PaymentTerm => I18NResource.GetString(ResourceDirectory, "PaymentTerm");
 
 		/// <summary>
-		///Payment Term Name
+		///Payment Terms
 		/// </summary>
-		public static string PaymentTermName => I18NResource.GetString(ResourceDirectory, "PaymentTermName");
+		public static string PaymentTerms => I18NResource.GetString(ResourceDirectory, "PaymentTerms");
 
 		/// <summary>
-		///Phone Numbers
+		///Phone
 		/// </summary>
-		public static string PhoneNumbers => I18NResource.GetString(ResourceDirectory, "PhoneNumbers");
+		public static string Phone => I18NResource.GetString(ResourceDirectory, "Phone");
 
 		/// <summary>
-		///Photo
+		///Please enter the bank name.
 		/// </summary>
-		public static string Photo => I18NResource.GetString(ResourceDirectory, "Photo");
+		public static string PleaseEnterBankName => I18NResource.GetString(ResourceDirectory, "PleaseEnterBankName");
 
 		/// <summary>
-		///Pin Code
+		///Please enter the check date.
 		/// </summary>
-		public static string PinCode => I18NResource.GetString(ResourceDirectory, "PinCode");
+		public static string PleaseEnterCheckDate => I18NResource.GetString(ResourceDirectory, "PleaseEnterCheckDate");
+
+		/// <summary>
+		///Please enter the check number
+		/// </summary>
+		public static string PleaseEnterCheckNumber => I18NResource.GetString(ResourceDirectory, "PleaseEnterCheckNumber");
+
+		/// <summary>
+		///Please enter the gift card number.
+		/// </summary>
+		public static string PleaseEnterGiftCardNumber => I18NResource.GetString(ResourceDirectory, "PleaseEnterGiftCardNumber");
+
+		/// <summary>
+		///Please select an item.
+		/// </summary>
+		public static string PleaseSelectItem => I18NResource.GetString(ResourceDirectory, "PleaseSelectItem");
 
 		/// <summary>
 		///Please select an item from the grid.
 		/// </summary>
-		public static string PleaseSelectItemFromGrid => I18NResource.GetString(ResourceDirectory, "PleaseSelectItemFromGrid");
+		public static string PleaseSelectItemGrid => I18NResource.GetString(ResourceDirectory, "PleaseSelectItemGrid");
 
 		/// <summary>
-		///Po Box
+		///Please select a payment term.
 		/// </summary>
-		public static string PoBox => I18NResource.GetString(ResourceDirectory, "PoBox");
+		public static string PleaseSelectPaymentTerm => I18NResource.GetString(ResourceDirectory, "PleaseSelectPaymentTerm");
 
 		/// <summary>
-		///Posted By
+		///PostedBy
 		/// </summary>
 		public static string PostedBy => I18NResource.GetString(ResourceDirectory, "PostedBy");
 
 		/// <summary>
-		///Posted By Name
+		///Posted On
 		/// </summary>
-		public static string PostedByName => I18NResource.GetString(ResourceDirectory, "PostedByName");
-
-		/// <summary>
-		///Posted Date
-		/// </summary>
-		public static string PostedDate => I18NResource.GetString(ResourceDirectory, "PostedDate");
-
-		/// <summary>
-		///Preferred Supplier Id
-		/// </summary>
-		public static string PreferredSupplierId => I18NResource.GetString(ResourceDirectory, "PreferredSupplierId");
-
-		/// <summary>
-		///Price
-		/// </summary>
-		public static string Price => I18NResource.GetString(ResourceDirectory, "Price");
+		public static string PostedOn => I18NResource.GetString(ResourceDirectory, "PostedOn");
 
 		/// <summary>
 		///Price Type
@@ -814,19 +639,14 @@ namespace MixERP.Sales
 		public static string PriceType => I18NResource.GetString(ResourceDirectory, "PriceType");
 
 		/// <summary>
-		///Price Type Code
+		///Price Types
 		/// </summary>
-		public static string PriceTypeCode => I18NResource.GetString(ResourceDirectory, "PriceTypeCode");
+		public static string PriceTypes => I18NResource.GetString(ResourceDirectory, "PriceTypes");
 
 		/// <summary>
-		///Price Type Id
+		///Print
 		/// </summary>
-		public static string PriceTypeId => I18NResource.GetString(ResourceDirectory, "PriceTypeId");
-
-		/// <summary>
-		///Price Type Name
-		/// </summary>
-		public static string PriceTypeName => I18NResource.GetString(ResourceDirectory, "PriceTypeName");
+		public static string Print => I18NResource.GetString(ResourceDirectory, "Print");
 
 		/// <summary>
 		///Provided By
@@ -834,34 +654,14 @@ namespace MixERP.Sales
 		public static string ProvidedBy => I18NResource.GetString(ResourceDirectory, "ProvidedBy");
 
 		/// <summary>
-		///Quantity
-		/// </summary>
-		public static string Quantity => I18NResource.GetString(ResourceDirectory, "Quantity");
-
-		/// <summary>
-		///Quotation Detail Id
-		/// </summary>
-		public static string QuotationDetailId => I18NResource.GetString(ResourceDirectory, "QuotationDetailId");
-
-		/// <summary>
-		///Quotation Id
-		/// </summary>
-		public static string QuotationId => I18NResource.GetString(ResourceDirectory, "QuotationId");
-
-		/// <summary>
 		///Rate
 		/// </summary>
 		public static string Rate => I18NResource.GetString(ResourceDirectory, "Rate");
 
 		/// <summary>
-		///Receipt Id
+		///Reason
 		/// </summary>
-		public static string ReceiptId => I18NResource.GetString(ResourceDirectory, "ReceiptId");
-
-		/// <summary>
-		///Receipt Transaction Master Id
-		/// </summary>
-		public static string ReceiptTransactionMasterId => I18NResource.GetString(ResourceDirectory, "ReceiptTransactionMasterId");
+		public static string Reason => I18NResource.GetString(ResourceDirectory, "Reason");
 
 		/// <summary>
 		///Reference Number
@@ -869,14 +669,24 @@ namespace MixERP.Sales
 		public static string ReferenceNumber => I18NResource.GetString(ResourceDirectory, "ReferenceNumber");
 
 		/// <summary>
-		///Return Id
+		///Ref#
 		/// </summary>
-		public static string ReturnId => I18NResource.GetString(ResourceDirectory, "ReturnId");
+		public static string ReferenceNumberAbbreviated => I18NResource.GetString(ResourceDirectory, "ReferenceNumberAbbreviated");
 
 		/// <summary>
-		///Return Transaction Master Id
+		///Reject
 		/// </summary>
-		public static string ReturnTransactionMasterId => I18NResource.GetString(ResourceDirectory, "ReturnTransactionMasterId");
+		public static string Reject => I18NResource.GetString(ResourceDirectory, "Reject");
+
+		/// <summary>
+		///Reprint
+		/// </summary>
+		public static string Reprint => I18NResource.GetString(ResourceDirectory, "Reprint");
+
+		/// <summary>
+		///Reprint Ticket
+		/// </summary>
+		public static string ReprintTicket => I18NResource.GetString(ResourceDirectory, "ReprintTicket");
 
 		/// <summary>
 		///Reward Points
@@ -884,49 +694,129 @@ namespace MixERP.Sales
 		public static string RewardPoints => I18NResource.GetString(ResourceDirectory, "RewardPoints");
 
 		/// <summary>
-		///Sales Id
+		///Sales
 		/// </summary>
-		public static string SalesId => I18NResource.GetString(ResourceDirectory, "SalesId");
+		public static string Sales => I18NResource.GetString(ResourceDirectory, "Sales");
 
 		/// <summary>
-		///Sales Order Id
+		///Sales Entries
 		/// </summary>
-		public static string SalesOrderId => I18NResource.GetString(ResourceDirectory, "SalesOrderId");
+		public static string SalesEntries => I18NResource.GetString(ResourceDirectory, "SalesEntries");
 
 		/// <summary>
-		///Salesperson Id
+		///Sales Order
 		/// </summary>
-		public static string SalespersonId => I18NResource.GetString(ResourceDirectory, "SalespersonId");
+		public static string SalesOrder => I18NResource.GetString(ResourceDirectory, "SalesOrder");
 
 		/// <summary>
-		///Salesperson Name
+		///Sales Order Checklist
 		/// </summary>
-		public static string SalespersonName => I18NResource.GetString(ResourceDirectory, "SalespersonName");
+		public static string SalesOrderChecklist => I18NResource.GetString(ResourceDirectory, "SalesOrderChecklist");
 
 		/// <summary>
-		///Sales Quotation Id
+		///Sales Orders
 		/// </summary>
-		public static string SalesQuotationId => I18NResource.GetString(ResourceDirectory, "SalesQuotationId");
+		public static string SalesOrders => I18NResource.GetString(ResourceDirectory, "SalesOrders");
 
 		/// <summary>
-		///Selling Price
+		///Sales Quotation
 		/// </summary>
-		public static string SellingPrice => I18NResource.GetString(ResourceDirectory, "SellingPrice");
+		public static string SalesQuotation => I18NResource.GetString(ResourceDirectory, "SalesQuotation");
 
 		/// <summary>
-		///Selling Price Includes Tax
+		///Sales Quotation Checklist
 		/// </summary>
-		public static string SellingPriceIncludesTax => I18NResource.GetString(ResourceDirectory, "SellingPriceIncludesTax");
+		public static string SalesQuotationChecklist => I18NResource.GetString(ResourceDirectory, "SalesQuotationChecklist");
 
 		/// <summary>
-		///Shipper Id
+		///Sales Quotations
 		/// </summary>
-		public static string ShipperId => I18NResource.GetString(ResourceDirectory, "ShipperId");
+		public static string SalesQuotations => I18NResource.GetString(ResourceDirectory, "SalesQuotations");
 
 		/// <summary>
-		///Shipping Charge
+		///Sales Receipt
 		/// </summary>
-		public static string ShippingCharge => I18NResource.GetString(ResourceDirectory, "ShippingCharge");
+		public static string SalesReceipt => I18NResource.GetString(ResourceDirectory, "SalesReceipt");
+
+		/// <summary>
+		///Sales Return Verification
+		/// </summary>
+		public static string SalesReturnVerification => I18NResource.GetString(ResourceDirectory, "SalesReturnVerification");
+
+		/// <summary>
+		///Sales Returns
+		/// </summary>
+		public static string SalesReturns => I18NResource.GetString(ResourceDirectory, "SalesReturns");
+
+		/// <summary>
+		///Sales Verification
+		/// </summary>
+		public static string SalesVerification => I18NResource.GetString(ResourceDirectory, "SalesVerification");
+
+		/// <summary>
+		///Save
+		/// </summary>
+		public static string Save => I18NResource.GetString(ResourceDirectory, "Save");
+
+		/// <summary>
+		///Search ...
+		/// </summary>
+		public static string Search => I18NResource.GetString(ResourceDirectory, "Search");
+
+		/// <summary>
+		///Search Customer
+		/// </summary>
+		public static string SearchCustomer => I18NResource.GetString(ResourceDirectory, "SearchCustomer");
+
+		/// <summary>
+		///Search Gift Card
+		/// </summary>
+		public static string SearchGiftCard => I18NResource.GetString(ResourceDirectory, "SearchGiftCard");
+
+		/// <summary>
+		///Select
+		/// </summary>
+		public static string Select => I18NResource.GetString(ResourceDirectory, "Select");
+
+		/// <summary>
+		///Select & Close
+		/// </summary>
+		public static string SelectAndClose => I18NResource.GetString(ResourceDirectory, "SelectAndClose");
+
+		/// <summary>
+		///Select Cost Center
+		/// </summary>
+		public static string SelectCostCenter => I18NResource.GetString(ResourceDirectory, "SelectCostCenter");
+
+		/// <summary>
+		///Select Debit Account
+		/// </summary>
+		public static string SelectDebitAccount => I18NResource.GetString(ResourceDirectory, "SelectDebitAccount");
+
+		/// <summary>
+		///Selling Prices
+		/// </summary>
+		public static string SellingPrices => I18NResource.GetString(ResourceDirectory, "SellingPrices");
+
+		/// <summary>
+		///Shipper
+		/// </summary>
+		public static string Shipper => I18NResource.GetString(ResourceDirectory, "Shipper");
+
+		/// <summary>
+		///Show
+		/// </summary>
+		public static string Show => I18NResource.GetString(ResourceDirectory, "Show");
+
+		/// <summary>
+		///Show Less
+		/// </summary>
+		public static string ShowLess => I18NResource.GetString(ResourceDirectory, "ShowLess");
+
+		/// <summary>
+		///Show More
+		/// </summary>
+		public static string ShowMore => I18NResource.GetString(ResourceDirectory, "ShowMore");
 
 		/// <summary>
 		///State
@@ -944,24 +834,24 @@ namespace MixERP.Sales
 		public static string Status => I18NResource.GetString(ResourceDirectory, "Status");
 
 		/// <summary>
-		///Store Code
+		///Store
 		/// </summary>
-		public static string StoreCode => I18NResource.GetString(ResourceDirectory, "StoreCode");
+		public static string Store => I18NResource.GetString(ResourceDirectory, "Store");
 
 		/// <summary>
-		///Store Id
+		///Sub Total
 		/// </summary>
-		public static string StoreId => I18NResource.GetString(ResourceDirectory, "StoreId");
+		public static string SubTotal => I18NResource.GetString(ResourceDirectory, "SubTotal");
 
 		/// <summary>
-		///Store Name
+		///Submitted Amount
 		/// </summary>
-		public static string StoreName => I18NResource.GetString(ResourceDirectory, "StoreName");
+		public static string SubmittedAmount => I18NResource.GetString(ResourceDirectory, "SubmittedAmount");
 
 		/// <summary>
-		///Street
+		///The submitted amount must be equal to total amount.
 		/// </summary>
-		public static string Street => I18NResource.GetString(ResourceDirectory, "Street");
+		public static string SubmittedAmountMustEqualTotalAmount => I18NResource.GetString(ResourceDirectory, "SubmittedAmountMustEqualTotalAmount");
 
 		/// <summary>
 		///Submitted Cash
@@ -974,14 +864,14 @@ namespace MixERP.Sales
 		public static string SubmittedTo => I18NResource.GetString(ResourceDirectory, "SubmittedTo");
 
 		/// <summary>
-		///Success
-		/// </summary>
-		public static string Success => I18NResource.GetString(ResourceDirectory, "Success");
-
-		/// <summary>
 		///Tax
 		/// </summary>
 		public static string Tax => I18NResource.GetString(ResourceDirectory, "Tax");
+
+		/// <summary>
+		///100
+		/// </summary>
+		public static string Ten => I18NResource.GetString(ResourceDirectory, "Ten");
 
 		/// <summary>
 		///Tender
@@ -994,114 +884,114 @@ namespace MixERP.Sales
 		public static string Terms => I18NResource.GetString(ResourceDirectory, "Terms");
 
 		/// <summary>
-		///The ticket {0} could not be found.
+		///Terms & Conditions
 		/// </summary>
-		public static string TicketTranIdCouldNotBeFound => I18NResource.GetString(ResourceDirectory, "TicketTranIdCouldNotBeFound");
+		public static string TermsConditions => I18NResource.GetString(ResourceDirectory, "TermsConditions");
 
 		/// <summary>
-		///Total Amount
+		///this evening
 		/// </summary>
-		public static string TotalAmount => I18NResource.GetString(ResourceDirectory, "TotalAmount");
+		public static string ThisEvening => I18NResource.GetString(ResourceDirectory, "ThisEvening");
 
 		/// <summary>
-		///Total Cash Sales
+		///1000
 		/// </summary>
-		public static string TotalCashSales => I18NResource.GetString(ResourceDirectory, "TotalCashSales");
+		public static string Thousand => I18NResource.GetString(ResourceDirectory, "Thousand");
 
 		/// <summary>
-		///Total Discount Amount
+		///title
 		/// </summary>
-		public static string TotalDiscountAmount => I18NResource.GetString(ResourceDirectory, "TotalDiscountAmount");
+		public static string Title => I18NResource.GetString(ResourceDirectory, "Title");
 
 		/// <summary>
-		///Transaction Code
+		///To
 		/// </summary>
-		public static string TransactionCode => I18NResource.GetString(ResourceDirectory, "TransactionCode");
+		public static string To => I18NResource.GetString(ResourceDirectory, "To");
 
 		/// <summary>
-		///Transaction Counter
+		///Today's Beginning Cash
 		/// </summary>
-		public static string TransactionCounter => I18NResource.GetString(ResourceDirectory, "TransactionCounter");
+		public static string TodayBeginningCash => I18NResource.GetString(ResourceDirectory, "TodayBeginningCash");
 
 		/// <summary>
-		///Transaction Date
+		///Toggle View
 		/// </summary>
-		public static string TransactionDate => I18NResource.GetString(ResourceDirectory, "TransactionDate");
+		public static string ToggleView => I18NResource.GetString(ResourceDirectory, "ToggleView");
 
 		/// <summary>
-		///Transaction Id
+		///Total
 		/// </summary>
-		public static string TransactionId => I18NResource.GetString(ResourceDirectory, "TransactionId");
+		public static string Total => I18NResource.GetString(ResourceDirectory, "Total");
 
 		/// <summary>
-		///Transaction Master Id
+		///Total Sales
 		/// </summary>
-		public static string TransactionMasterId => I18NResource.GetString(ResourceDirectory, "TransactionMasterId");
+		public static string TotalSales => I18NResource.GetString(ResourceDirectory, "TotalSales");
 
 		/// <summary>
-		///The transaction was posted successfully.
+		///:Total Usage
+		/// </summary>
+		public static string TotalUsage => I18NResource.GetString(ResourceDirectory, "TotalUsage");
+
+		/// <summary>
+		///Tran Code
+		/// </summary>
+		public static string TranCode => I18NResource.GetString(ResourceDirectory, "TranCode");
+
+		/// <summary>
+		///Tran Date
+		/// </summary>
+		public static string TranDate => I18NResource.GetString(ResourceDirectory, "TranDate");
+
+		/// <summary>
+		///Tran Id
+		/// </summary>
+		public static string TranId => I18NResource.GetString(ResourceDirectory, "TranId");
+
+		/// <summary>
+		///Transaction was posted successfully.
 		/// </summary>
 		public static string TransactionPostedSuccessfully => I18NResource.GetString(ResourceDirectory, "TransactionPostedSuccessfully");
 
 		/// <summary>
-		///Transaction Timestamp
+		///20
 		/// </summary>
-		public static string TransactionTimestamp => I18NResource.GetString(ResourceDirectory, "TransactionTimestamp");
+		public static string Twenty => I18NResource.GetString(ResourceDirectory, "Twenty");
 
 		/// <summary>
-		///Transaction Ts
+		///25
 		/// </summary>
-		public static string TransactionTs => I18NResource.GetString(ResourceDirectory, "TransactionTs");
+		public static string TwentyFive => I18NResource.GetString(ResourceDirectory, "TwentyFive");
 
 		/// <summary>
-		///Transaction Type
+		///2
 		/// </summary>
-		public static string TransactionType => I18NResource.GetString(ResourceDirectory, "TransactionType");
+		public static string Two => I18NResource.GetString(ResourceDirectory, "Two");
 
 		/// <summary>
-		///Unit
+		///200
 		/// </summary>
-		public static string Unit => I18NResource.GetString(ResourceDirectory, "Unit");
+		public static string Twohundred => I18NResource.GetString(ResourceDirectory, "Twohundred");
 
 		/// <summary>
-		///Unit Code
+		///250
 		/// </summary>
-		public static string UnitCode => I18NResource.GetString(ResourceDirectory, "UnitCode");
+		public static string TwohundredFifty => I18NResource.GetString(ResourceDirectory, "TwohundredFifty");
 
 		/// <summary>
-		///Unit Id
+		///Unverified
 		/// </summary>
-		public static string UnitId => I18NResource.GetString(ResourceDirectory, "UnitId");
+		public static string Unverified => I18NResource.GetString(ResourceDirectory, "Unverified");
 
 		/// <summary>
-		///Unit Name
+		///Use
 		/// </summary>
-		public static string UnitName => I18NResource.GetString(ResourceDirectory, "UnitName");
-
-		/// <summary>
-		///User Agent
-		/// </summary>
-		public static string UserAgent => I18NResource.GetString(ResourceDirectory, "UserAgent");
+		public static string Use => I18NResource.GetString(ResourceDirectory, "Use");
 
 		/// <summary>
 		///User Id
 		/// </summary>
 		public static string UserId => I18NResource.GetString(ResourceDirectory, "UserId");
-
-		/// <summary>
-		///Valid From
-		/// </summary>
-		public static string ValidFrom => I18NResource.GetString(ResourceDirectory, "ValidFrom");
-
-		/// <summary>
-		///Valid Till
-		/// </summary>
-		public static string ValidTill => I18NResource.GetString(ResourceDirectory, "ValidTill");
-
-		/// <summary>
-		///Valid Units
-		/// </summary>
-		public static string ValidUnits => I18NResource.GetString(ResourceDirectory, "ValidUnits");
 
 		/// <summary>
 		///Value Date
@@ -1114,29 +1004,29 @@ namespace MixERP.Sales
 		public static string VerificationReason => I18NResource.GetString(ResourceDirectory, "VerificationReason");
 
 		/// <summary>
-		///Verification Status Id
-		/// </summary>
-		public static string VerificationStatusId => I18NResource.GetString(ResourceDirectory, "VerificationStatusId");
-
-		/// <summary>
-		///Verification Status Name
-		/// </summary>
-		public static string VerificationStatusName => I18NResource.GetString(ResourceDirectory, "VerificationStatusName");
-
-		/// <summary>
 		///Verified By
 		/// </summary>
 		public static string VerifiedBy => I18NResource.GetString(ResourceDirectory, "VerifiedBy");
 
 		/// <summary>
-		///Verified By User Id
+		///Verified On
 		/// </summary>
-		public static string VerifiedByUserId => I18NResource.GetString(ResourceDirectory, "VerifiedByUserId");
+		public static string VerifiedOn => I18NResource.GetString(ResourceDirectory, "VerifiedOn");
 
 		/// <summary>
-		///View Journal Advice
+		///Verify
 		/// </summary>
-		public static string ViewJournalAdvice => I18NResource.GetString(ResourceDirectory, "ViewJournalAdvice");
+		public static string Verify => I18NResource.GetString(ResourceDirectory, "Verify");
+
+		/// <summary>
+		///View Order
+		/// </summary>
+		public static string ViewOrder => I18NResource.GetString(ResourceDirectory, "ViewOrder");
+
+		/// <summary>
+		///View Quotation
+		/// </summary>
+		public static string ViewQuotation => I18NResource.GetString(ResourceDirectory, "ViewQuotation");
 
 		/// <summary>
 		///View Sales
@@ -1144,14 +1034,39 @@ namespace MixERP.Sales
 		public static string ViewSales => I18NResource.GetString(ResourceDirectory, "ViewSales");
 
 		/// <summary>
-		///View Sales Invoice
+		///View Sales Orders
 		/// </summary>
-		public static string ViewSalesInvoice => I18NResource.GetString(ResourceDirectory, "ViewSalesInvoice");
+		public static string ViewSalesOrders => I18NResource.GetString(ResourceDirectory, "ViewSalesOrders");
 
 		/// <summary>
-		///Zipcode
+		///View Sales Quotation
 		/// </summary>
-		public static string Zipcode => I18NResource.GetString(ResourceDirectory, "Zipcode");
+		public static string ViewSalesQuotation => I18NResource.GetString(ResourceDirectory, "ViewSalesQuotation");
+
+		/// <summary>
+		///You
+		/// </summary>
+		public static string You => I18NResource.GetString(ResourceDirectory, "You");
+
+		/// <summary>
+		///you may also edit the beginning cash later
+		/// </summary>
+		public static string YouMayEditBeginningCashLater => I18NResource.GetString(ResourceDirectory, "YouMayEditBeginningCashLater");
+
+		/// <summary>
+		///Your Cash Sales
+		/// </summary>
+		public static string YourCashSales => I18NResource.GetString(ResourceDirectory, "YourCashSales");
+
+		/// <summary>
+		///Your Sales for
+		/// </summary>
+		public static string YourSalesFor => I18NResource.GetString(ResourceDirectory, "YourSalesFor");
+
+		/// <summary>
+		///ZIP Code
+		/// </summary>
+		public static string ZIPCode => I18NResource.GetString(ResourceDirectory, "ZIPCode");
 
 	}
 }
