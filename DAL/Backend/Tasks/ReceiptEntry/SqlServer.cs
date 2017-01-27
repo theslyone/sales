@@ -20,7 +20,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.ReceiptEntry
                                     @ReferenceNumber, @StatementReference, 
                                     @CostCenterId, @CashRepositoryId, 
                                     @PostedDate, @BankAccountId, @PaymentCardId, @BankInstrumentCode, @BankTranCode,
-                                    @TransactionMasterId
+                                    @TransactionMasterId OUTPUT
                                 ;";
 
 

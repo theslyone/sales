@@ -62,7 +62,7 @@
       </tr>
       <tr>
         <td>
-          {i18n.customerCode}
+          {i18n.CustomerCode}
         </td>
         <td>
           {DataSource[0].customer_code}
@@ -70,7 +70,7 @@
       </tr>
       <tr>
         <td>
-          {i18n.customerName}
+          {i18n.CustomerName}
         </td>
         <td>
           {DataSource[0].customer_name}

@@ -14,12 +14,12 @@ namespace MixERP.Sales.DAL.Backend.Tasks.ReceiptEntry
             string connectionString = FrapidDbServer.GetConnectionString(tenant);
             const string sql = @"SELECT * FROM sales.post_customer_receipt
                             (
-                                @UserId, @OfficeId, @LoginId, @CustomerId, 
-                                @CurrencyCode, @CashAccountId, @Amount, 
-                                @ExchangeRateDebit, @ExchangeRateCredit, 
-                                @ReferenceNumber, @StatementReference, 
-                                @CostCenterId, @CashRepositoryId, 
-                                @PostedDate::date, @BankAccountId, @PaymentCardId, @BankInstrumentCode, @BankTranCode
+                                @UserId::integer, @OfficeId::integer, @LoginId::bigint, @CustomerId::integer, 
+                                @CurrencyCode::national character varying(12), @CashAccountId::integer, @Amount::public.money_strict, 
+                                @ExchangeRateDebit::public.decimal_strict, @ExchangeRateCredit::public.decimal_strict, 
+                                @ReferenceNumber::national character varying(24), @StatementReference::national character varying(128), 
+                                @CostCenterId::integer, @CashRepositoryId::integer, 
+                                @PostedDate::date, @BankAccountId::integer, @PaymentCardId::integer, @BankInstrumentCode::national character varying(128), @BankTranCode::national character varying(128)
                             );";
 
 
