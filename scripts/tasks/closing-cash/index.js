@@ -42,7 +42,7 @@ $("#SaveButton").off("click").on("click", function () {
         return window.getAjaxRequest(url, "POST", data);
     };
 
-    const confirmed = confirm("Are you sure?");
+    const confirmed = confirm(window.translate("AreYouSure"));
 
     if (!confirmed) {
         return;
@@ -52,7 +52,7 @@ $("#SaveButton").off("click").on("click", function () {
     const total = parseFloat($("#TotalInputText").val()) || 0;
 
     if (model.SubmittedCash !== total) {
-        window.displayMessage("The submitted amount must be equal to total amount.");
+        window.displayMessage(window.translate("SubmittedAmountMustEqualTotalAmount"));
         return;
     };
 

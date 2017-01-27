@@ -12,14 +12,14 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
         {
             if (tranId <= 0)
             {
-                return this.HttpNotFound($"The ticket {tranId} could not be found.");
+                return this.HttpNotFound(string.Format(I18N.TheTicketCouldNotBeFound, tranId));
             }
 
             var model = await Tickets.GetTicketViewModelAsync(this.Tenant, tranId).ConfigureAwait(true);
 
             if (model.View == null)
             {
-                return this.HttpNotFound($"The ticket {tranId} could not be found.");
+                return this.HttpNotFound(string.Format(I18N.TheTicketCouldNotBeFound, tranId));
             }
 
             return this.View(this.GetRazorView<AreaRegistration>("Ticket/Index.cshtml", this.Tenant), model);

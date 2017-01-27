@@ -1,10 +1,10 @@
 ﻿window.prepareView({
-    Title: "Sales Returns",
+    Title: window.translate("SalesReturns"),
     Book: "Sales Return",
     ChecklistUrl: "/dashboard/sales/tasks/return/checklist/{tranId}",
     AdviceButtons: [
         {
-            Title: "View Sales Return",
+            Title: window.translate("ViewSalesReturn"),
             Href: "javascript:void(0);",
             OnClick: "showReturn({tranId});"
         }

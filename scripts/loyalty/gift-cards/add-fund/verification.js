@@ -19,14 +19,14 @@
     function getActionCell(tranId) {
         const cell = $("<td />");
 
-        const checklistAnchor = $("<a title='Checklist Window'><i class='list icon'></i></a>");
+        const checklistAnchor = $(`<a title='${window.translate("ChecklistWindow")}'><i class='list icon'></i></a>`);
         checklistAnchor.attr("href", "/dashboard/sales/tasks/entry/checklist/" + tranId);
 
-        const journalAdviceAnchor = $("<a title='View Journal Advice'><i class='print icon'></i></a>");
+        const journalAdviceAnchor = $(`<a title='${window.translate("ViewJournalAdvice")}'><i class='print icon'></i></a>`);
         journalAdviceAnchor.attr("href", "javascript:void(0);");
         journalAdviceAnchor.attr("onclick", "showJournalAdvice(" + tranId + ");");
 
-        const salesAdvice = $("<a title='View Sales Invoice'><i class='zoom icon'></i></a>");
+        const salesAdvice = $(`<a title='${window.translate("ViewSalesInvoice")}'><i class='zoom icon'></i></a>`);
         salesAdvice.attr("href", "javascript:void(0);");
 
 
@@ -159,12 +159,12 @@ function showModal() {
     const header = modal.find(".ui.massive.header");
     const subheader = modal.find(".ui.dividing.header");
 
-    header.html("Reject Transaction");
+    header.html(window.translate("RejectTransaction"));
     subheader.html(window.stringFormat("TranId: #{0}", tranId));
     header.removeClass("green").addClass("red");
 
     if (approve) {
-        header.html("Approve Transaction");
+        header.html(window.translate("ApproveTransaction"));
         header.removeClass("red").addClass("green");
     };
 

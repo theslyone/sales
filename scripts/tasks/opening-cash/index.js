@@ -23,7 +23,7 @@ $("#SaveButton").off("click").on("click", function () {
         return window.getAjaxRequest(url, "POST", data);
     };
 
-    const confirmed = confirm("Are you sure?");
+    const confirmed = confirm(window.translate("AreYouSure"));
 
     if (!confirmed) {
         return;

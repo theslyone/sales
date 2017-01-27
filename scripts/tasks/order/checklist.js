@@ -1,9 +1,9 @@
 ﻿window.prepareChecklist({
     TranId: window.tranId,
-    Title: "Sales Order Checklist #" + window.tranId,
-    ViewText: "View Sales Orders",
+    Title: window.translate("SalesOrderChecklist") + " #" + window.tranId,
+    ViewText: window.translate("ViewSalesOrders"),
     ViewUrl: "/dashboard/sales/tasks/order",
-    AddNewText: "Add New Sales Order",
+    AddNewText: window.translate("AddNewSalesOrder"),
     AddNewUrl: "/dashboard/sales/tasks/order/new",
     ReportPath: "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Order.xml?order_id=" + window.tranId
 });

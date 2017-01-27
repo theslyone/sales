@@ -1,9 +1,9 @@
 ﻿window.prepareChecklist({
     TranId: window.tranId,
-    Title: "Sales Quotation Checklist #" + window.tranId,
-    ViewText: "View Sales Quotations",
+    Title: window.translate("SalesQuotationChecklist") + window.tranId,
+    ViewText: window.translate("ViewSalesQuotations"),
     ViewUrl: "/dashboard/sales/tasks/quotation",
-    AddNewText: "Add New Sales Quotation",
+    AddNewText: window.translate("AddNewSalesQuotation"),
     AddNewUrl: "/dashboard/sales/tasks/quotation/new",
     ReportPath: "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Quotation.xml?quotation_id=" + window.tranId
 });

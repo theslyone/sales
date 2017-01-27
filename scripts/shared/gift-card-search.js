@@ -12,7 +12,7 @@ $("#SearchButton").off("click").on("click", function () {
         };
 
         function getActionCell(id) {
-            var html = "<a onclick='showSearchResult(\"{id}\");'>Select</a>";
+            var html = `<a onclick='showSearchResult(\"{id}\");'>${window.translate("Select")}</a>`;
             html = html.replace("{id}", id);
 
             const cell = $("<td />");

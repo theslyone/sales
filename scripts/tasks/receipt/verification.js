@@ -1,12 +1,12 @@
 ﻿window.prepareVerification({
-    Title: "Receipt Verification",
-    AddNewText: "Add New",
+    Title: window.translate("ReceiptVerification"),
+    AddNewText: window.translate("AddNew"),
     AddNewUrl: "/dashboard/sales/tasks/receipt/new",
     Book: "Sales Receipt",
     ChecklistUrl: "/dashboard/sales/tasks/receipt/checklist/{tranId}",
     AdviceButtons: [
         {
-            Title: "View Receipt",
+            Title: window.translate("ViewReceipt"),
             Href: "javascript:void(0);",
             OnClick: "showReceipt({tranId});"
         }
