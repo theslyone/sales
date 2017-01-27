@@ -23,7 +23,7 @@ var itemTemplate =
 			<span class="amount"></span>
 		</div>
 		<div class ="discount info" style="display:none;">
-			<span>Less&nbsp; </span>
+			<span>${window.translate("Less")}&nbsp; </span>
 			<span class ="discount rate"></span>
 			<span>&nbsp; =&nbsp; </span>
 			<span class ="discounted amount"></span>
@@ -42,10 +42,10 @@ var itemTemplate =
 		</div>
 	</div>
 	<div class="number block">
-		<input type="text" class="price" title="Edit Price" value="{SellingPrice}">
-		<input type="text" class="quantity" title="Enter Quantity" value="1">
-		<input type="text" class="discount" title="Enter Discount" value="">
-		<button class="ui red fluid button" onclick="removeItem(this);" style="display:none;">Delete</button>
+		<input type="text" class="price" title="${window.translate("EditPrice")}" value="{SellingPrice}">
+		<input type="text" class="quantity" title="${window.translate("EnterQuantity")}" value="1">
+		<input type="text" class="discount" title="${window.translate("EnterDiscount")}" value="">
+		<button class="ui red fluid button" onclick="removeItem(this);" style="display:none;">${window.translate("Delete")}</button>
 	</div>
 </div>`
 
@@ -113,7 +113,7 @@ setTimeout(function () {
 }, 120000);
 
 function removeItem(el) {
-    const confirmed = confirm("Are you sure?");
+    const confirmed = confirm(window.translate("AreYouSure"));
 
     if (!confirmed) {
         return;
@@ -208,7 +208,7 @@ function initializeClickAndAction() {
             $.each(units, function () {
                 const unit = this;
 
-                const option = $("<option/ >");
+                const option = $("<option/>");
                 option.attr("value", unit.UnitId);
                 option.html(unit.UnitName);
 

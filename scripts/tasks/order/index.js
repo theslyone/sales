@@ -19,17 +19,17 @@
     function getActionCell(id) {
         const cell = $("<td />");
 
-        const checklistAnchor = $("<a title='Checklist Window'><i class='list icon'></i></a>");
+        const checklistAnchor = $(`<a title='${window.translate("ChecklistWindow")}'><i class='list icon'></i></a>`);
         const checklistUrl = "/dashboard/sales/tasks/order/checklist/{id}";
         checklistAnchor.attr("href", checklistUrl.replace("{id}", id));
 
 
-        const covertToSalesAnchor = $("<a title='Convert to Sales'><i class='chevron circle right icon'></i></a>");
+        const covertToSalesAnchor = $(`<a title='${window.translate("ConvertSales")}'><i class='chevron circle right icon'></i></a>`);
         const convertToSalesUrl = "/dashboard/sales/tasks/entry/new?OrderId={id}";
         covertToSalesAnchor.attr("href", convertToSalesUrl.replace("{id}", id));
 
 
-        const journalAdviceAnchor = $("<a title='View Order'><i class='print icon'></i></a>");
+        const journalAdviceAnchor = $(`<a title='${window.translate("ViewOrder")}'><i class='print icon'></i></a>`);
         journalAdviceAnchor.attr("href", "javascript:void(0);");
         journalAdviceAnchor.attr("onclick", "showOrder(" + id + ");");
 

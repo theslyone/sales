@@ -51,7 +51,7 @@ function mergeQuotation(quotationId) {
 function initializeUI() {
     const template = `<div class="one summary items">
                             <div class="terms item">
-                                <div class="description">Terms & Conditions</div>
+                                <div class="description">${window.translate("TermsAndConditions")}</div>
                                 <div class="control">
                                     <textarea id="TermsTextArea" type="text"></textarea>
                                 </div>
@@ -59,14 +59,14 @@ function initializeUI() {
                         </div>
                         <div class="one summary items">
                             <div class="terms item">
-                                <div class="description">Internal Memo</div>
+                                <div class ="description">${window.translate("InternalMemo")}</div>
                                 <div class="control">
                                     <textarea id="InternalMemoTextArea" type="text"></textarea>
                                 </div>
                             </div>
                         </div>`;
 
-    $(".page.title").html("Sales Order");
+    $(".page.title").html(window.translate("SalesOrder"));
 
     const expectedDeliveryDate =
         $("<input type='text' class='date' value='7d' id='ExpectedDeliveryDateInputText' />");
@@ -158,7 +158,7 @@ $("#CheckoutButton").off("click").on("click", function () {
         return;
     };
 
-    const confirmed = confirm("Are you sure");
+    const confirmed = confirm(window.translate("AreYouSure"));
 
     if (!confirmed) {
         return;

@@ -64,7 +64,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
         {
             if (string.IsNullOrWhiteSpace(sourceCurrencyCode) || string.IsNullOrWhiteSpace(destinationCurrencyCode))
             {
-                return this.Failed("Bad request.", HttpStatusCode.BadRequest);
+                return this.Failed(I18N.BadRequest, HttpStatusCode.BadRequest);
             }
 
             if (sourceCurrencyCode == destinationCurrencyCode)
@@ -83,7 +83,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
         {
             if (customerId <= 0)
             {
-                return this.Failed("Bad request.", HttpStatusCode.BadRequest);
+                return this.Failed(I18N.BadRequest, HttpStatusCode.BadRequest);
             }
 
             var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);
@@ -103,12 +103,12 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
             if (model.CashRepositoryId == 0 && model.BankAccountId == 0)
             {
-                throw new InvalidOperationException("Invalid receipt mode.");
+                throw new InvalidOperationException(I18N.InvalidReceiptMode);
             }
 
             if (model.CashRepositoryId > 0 && (model.BankAccountId > 0 || !string.IsNullOrWhiteSpace(model.BankInstrumentCode) || !string.IsNullOrWhiteSpace(model.BankInstrumentCode)))
             {
-                throw new InvalidOperationException("A cash transaction cannot contain bank transaction details.");
+                throw new InvalidOperationException(I18N.CashTransactionCannotContainBankTransactionDetails);
             }
 
             var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);

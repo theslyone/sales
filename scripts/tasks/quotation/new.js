@@ -1,7 +1,7 @@
 ﻿function initializeUI() {
     const template = `<div class="one summary items">
                             <div class="terms item">
-                                <div class="description">Terms & Conditions</div>
+                                <div class ="description">${window.translate("TermsAndConditions")}</div>
                                 <div class="control">
                                     <textarea id="TermsTextArea" type="text"></textarea>
                                 </div>
@@ -9,7 +9,7 @@
                         </div>
                         <div class="one summary items">
                             <div class="terms item">
-                                <div class="description">Internal Memo</div>
+                                <div class ="description">${window.translate("InternalMemo")}</div>
                                 <div class="control">
                                     <textarea id="InternalMemoTextArea" type="text"></textarea>
                                 </div>
@@ -21,7 +21,7 @@
     const expectedDeliveryDate =
         $("<input type='text' class='date' value='7d' id='ExpectedDeliveryDateInputText' />");
     $("#BookDateInputDate").after(expectedDeliveryDate).remove();
-    expectedDeliveryDate.parent().parent().find(".description").html("Expected Delivery Date");
+    expectedDeliveryDate.parent().parent().find(".description").html(window.translate("ExpectedDeliveryDate"));
 
     $("#StatementReferenceInputText").closest(".two.summary.items").attr("class", "one summary items")
         .after(template);
@@ -97,11 +97,11 @@ $("#CheckoutButton").off("click").on("click", function () {
     const model = getModel();
 
     if (!model.Details.length) {
-        alert("Please select an item.");
+        alert(window.translate("PleaseSelectItem"));
         return;
     };
 
-    const confirmed = confirm("Are you sure");
+    const confirmed = confirm(window.translate("AreYouSure"));
 
     if (!confirmed) {
         return;

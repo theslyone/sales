@@ -13,13 +13,13 @@
 			<span class="amount"></span>
 		</div>
 		<div class="discount info" style="display:none;">
-			<span>Less&nbsp; </span>
+			<span>${window.translate("Less")}&nbsp; </span>
 			<span class="discount rate"></span>
 			<span>&nbsp; =&nbsp; </span>
 			<span class="discounted amount"></span>
 		</div>
 		<div class ="tax info" style="display:none;">
-			<span>Add Tax </span>
+			<span>${window.translate("AddTax")} </span>
 			<span class ="tax-amount"></span>
 			<span> (</span>
 			<span class ="tax-rate"></span>
@@ -32,10 +32,10 @@
 		</div>
 	</div>
 	<div class="number block">
-		<input type="text" class ="decimal price" title="Edit Price" value="{SellingPrice}">
-		<input type="text" class="decimal quantity" title="Enter Quantity" value="1">
-		<input type="text" class="decimal discount" title="Enter Rate of Discount" value="">
-		<button class="ui red fluid button" onclick="removeItem(this);" style="display:none;">Delete</button>
+		<input type="text" class ="decimal price" title="${window.translate("EditPrice")}" value="{SellingPrice}">
+		<input type="text" class="decimal quantity" title="${window.translate("EnterQuantity")}" value="1">
+		<input type="text" class ="decimal discount" title="${window.translate("EnterRateDiscount")}" value="">
+		<button class ="ui red fluid button" onclick="removeItem(this);" style="display:none;">${window.translate("Delete")}</button>
 	</div>
 </div>`;
 
@@ -66,7 +66,7 @@ function defaulPOSItemClick(el, callback) {
     var price = sellingPrice;
 
     if (!price) {
-        window.displayMessage("Cannot add item because the price is zero.");
+        window.displayMessage(window.translate("CannotAddItemBecausePriceIsZero"));
         return;
     };
 
@@ -121,7 +121,7 @@ function defaulPOSItemClick(el, callback) {
         $.each(units, function () {
             const unit = this;
 
-            const option = $("<option/ >");
+            const option = $("<option/>");
             option.attr("value", unit.UnitId);
             option.html(unit.UnitName);
 

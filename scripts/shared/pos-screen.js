@@ -56,7 +56,7 @@ setTimeout(function () {
 }, 120000);
 
 function removeItem(el) {
-    const confirmed = confirm("Are you sure?");
+    const confirmed = confirm(window.translate("AreYouSure"));
 
     if (!confirmed) {
         return;
@@ -281,7 +281,7 @@ $(".tabs .actions .delete.icon").off("click").on("click", function () {
     const id = parseInt(activeEl.text());
 
     if (activeEl.length && id > 1) {
-        const confirmed = window.confirm("Are you sure you want to delete this tab?");
+        const confirmed = window.confirm(window.translate("AreYouSureYouWantDeleteTab"));
 
         if (!confirmed) {
             return;

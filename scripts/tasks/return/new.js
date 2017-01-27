@@ -1,5 +1,5 @@
 ﻿const transactionMasterId = window.getQueryStringByName("TransactionMasterId");
-const header = $("<div class='ui centered sales return header'>Sales Return #<span></span></a>");
+const header = $(`<div class='ui centered sales return header'>${window.translate("SalesReturn")}<span></span></a>`);
 header.find("span").html(transactionMasterId);
 $(".status.head").before(header);
 
@@ -27,11 +27,11 @@ $(document).on("posready", function() {
 
 
         if (!model.Details.length) {
-            window.displayMessage("Please select an item.");
+            window.displayMessage(window.translate("PleaseSelectItem"));
             return;
         };
 
-        const confirmed = confirm("Are you sure");
+        const confirmed = confirm(window.translate("AreYouSure"));
 
         if (!confirmed) {
             return;

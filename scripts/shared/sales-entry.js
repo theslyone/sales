@@ -143,7 +143,7 @@ function saveState() {
     const id = getSelectedTabId();
 
     if (!id) {
-        window.displayMessage("Please select a tab");
+        window.displayMessage(window.translate("PleaseSelectTab"));
         return;
     };
 
@@ -286,17 +286,17 @@ $("#CheckoutButton").off("click").on("click", function () {
         if (checkAmount >= transactionTotal) {
             //Paid via Check/Cheque
             if (!bankName) {
-                window.displayMessage("Please enter the bank name.");
+                window.displayMessage(window.translate("PleaseEnterBankName"));
                 return false;
             };
 
             if (!checkNumber) {
-                window.displayMessage("Please enter the check number.");
+                window.displayMessage(window.translate("PleaseEnterCheckNumber"));
                 return false;
             };
 
             if (!checkDate) {
-                window.displayMessage("Please enter the check date.");
+                window.displayMessage(window.translate("PleaseEnterCheckDate"));
                 return false;
             };
 
@@ -314,7 +314,7 @@ $("#CheckoutButton").off("click").on("click", function () {
             //Paid via Gift Card
 
             if (!giftCardNumber) {
-                window.displayMessage("Please enter the gift card number.");
+                window.displayMessage(window.translate("PleaseEnterGiftCardNumber"));
                 return false;
             };
 
@@ -340,7 +340,7 @@ $("#CheckoutButton").off("click").on("click", function () {
         $("#GiftCardNumberBalanceInputText").val("");
 
         if (!paymentTerm) {
-            window.displayMessage("Please select a payment term.");
+            window.displayMessage(window.translate("PleaseSelectPaymentTerm"));
             return false;
         };
 
@@ -356,11 +356,11 @@ $("#CheckoutButton").off("click").on("click", function () {
     const model = window.getModel();
 
     if (!model.Details.length) {
-        window.displayMessage("Please select an item.");
+        window.displayMessage(window.translate("PleaseSelectItem"));
         return;
     };
 
-    const confirmed = confirm("Are you sure");
+    const confirmed = confirm(window.translate("AreYouSure"));
 
     if (!confirmed) {
         return;

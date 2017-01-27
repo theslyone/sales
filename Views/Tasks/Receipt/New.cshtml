@@ -2,7 +2,7 @@
 @model dynamic
 
 @{
-    ViewBag.Title = "Receipt from Customer";
+    ViewBag.Title = I18N.ReceiptFromCustomer;
     Layout = ViewBag.SalesLayoutPath;
 }
 
@@ -16,16 +16,16 @@
 
 <div id="receipt" class="ui very relaxed padded segment" style="padding: 3em;">
     <div class="ui container">
-        <div class="ui huge header">Receipt from Customer</div>
+        <div class="ui huge header">@I18N.ReceiptFromCustomer</div>
         <div class="ui form">
             <div class="fields">
                 <div class="six wide field">
-                    <label for="CustomerIdSelect" data-localize="SelectCustomer"></label>
+                    <label for="CustomerIdSelect">@I18N.SelectCustomer</label>
                     <select id="CustomerIdSelect" class="ui search dropdown"></select>
                 </div>
                 <div class="field">
                     <label>&nbsp;</label>
-                    <button id="GoButton" type="button" class="ui small grey button" data-localize="Go"></button>
+                    <button id="GoButton" type="button" class="ui small grey button">@I18N.Go</button>
                 </div>
             </div>
         </div>
@@ -33,143 +33,145 @@
         <div class="ui two column relaxed grid receipt form">
             <div class="column">
                 <div class="field">
-                    <label for="DueAmountInputText" data-localize="TotalDueAmountInBaseCurrency">
+                    <label for="DueAmountInputText">@I18N.TotalDueAmountInBaseCurrency"
                     </label>
                     <input type="text" id="DueAmountInputText" readonly="readonly" class="currency" />
                 </div>
                 <div class="field">
-                    <label for="CurrencyInputText" data-localize="BaseCurrency">
+                    <label for="CurrencyInputText">@I18N.BaseCurrency
                     </label>
                     <input type="text" id="CurrencyInputText" readonly="readonly" class="text-right" />
                 </div>
 
                 <div class="field">
-                    <label for="CurrencyCodeSelect" data-localize="ReceivedCurrency"></label>
+                    <label for="CurrencyCodeSelect">@I18N.ReceivedCurrency</label>
                     <select id="CurrencyCodeSelect" class="ui search dropdown text-right"></select>
                 </div>
                 <div class="field">
-                    <label for="AmountInputText" data-localize="ReceivedAmountInaboveCurrency">
+                    <label for="AmountInputText">@I18N.ReceivedAmountInaboveCurrency
                     </label>
                     <input type="text" id="AmountInputText" class="currency" />
                 </div>
                 <div class="field">
-                    <label for="DebitExchangeRateInputText" data-localize="DebitExchangeRate">
+                    <label for="DebitExchangeRateInputText">@I18N.DebitExchangeRate
                     </label>
                     <input type="text" id="DebitExchangeRateInputText" class="decimal4 text-right" />
                 </div>
                 <div class="field">
-                    <label for="AmountInHomeCurrencyInputText" data-localize="ConvertedToHomeCurrency">
+                    <label for="AmountInHomeCurrencyInputText"> @I18N.ConvertedToHomeCurrency
                     </label>
                     <input type="text" id="AmountInHomeCurrencyInputText" class="currency" readonly="readonly" />
                 </div>
 
                 <div class="field">
-                    <label for="CreditExchangeRateInputText" data-localize="CreditExchangeRate">
+                    <label for="CreditExchangeRateInputText">@I18N.CreditExchangeRate
                     </label>
                     <input type="text" id="CreditExchangeRateInputText" class="decimal4 text-right" />
                 </div>
                 <div class="field">
-                    <label for="BaseAmountInputText" data-localize="ConvertedToBaseCurrency">
+                    <label for="BaseAmountInputText">@I18N.ConvertedToBaseCurrency
                     </label>
                     <input type="text" id="BaseAmountInputText" readonly="readonly" class="currency text-right" />
                 </div>
 
                 <div class="field">
-                    <label for="FinalDueAmountInputText" data-localize="FinalDueAmountInBaseCurrency">
+                    <label for="FinalDueAmountInputText">
+                    @I18N.FinalDueAmountInBaseCurrency
                     </label>
                     <input type="text" id="FinalDueAmountInputText" readonly="readonly" class="currency text-right" />
                 </div>
             </div>
             <div class="column">
                 <div class="field">
-                    <label data-localize="ReceiptType">
+                    <label>@I18N.ReceiptType
                     </label>
                     <div class="vpad8" id="ReceiptType">
 
                         <div class="ui receipt type buttons">
-                            <input type="button" class="ui active button" id="CashButton" value="Cash" />
+                            <input type="button" class="ui active button" id="CashButton" value="@I18N.Cash" />
                             <div class="or"></div>
-                            <input type="button" class="ui button" id="BankButton" value="Bank" />
+                            <input type="button" class="ui button" id="BankButton" value="@I18N.Bank" />
                         </div>
                     </div>
                 </div>
 
                 <div class="field">
-                    <label for="CostCenterIdSelect" data-localize="CostCenter"></label>
+                    <label for="CostCenterIdSelect">@I18N.CostCenter</label>
                     <select id="CostCenterIdSelect" class="ui dropdown"></select>
                 </div>
 
                 <div id="CashFormGroup" style="padding-bottom: 12px;">
                     <div class="field">
-                        <label for="CashAccountIdSelect" data-localize="CashAccountId"></label>
+                        <label for="CashAccountIdSelect">@I18N.CashAccountId</label>
                         <select id="CashAccountIdSelect" class="ui dropdown"></select>
                     </div>
                     <div class="field">
-                        <label for="CashRepositoryIdSelect" data-localize="CashRepository"></label>
+                        <label for="CashRepositoryIdSelect">@I18N.CashRepository</label>
                         <select id="CashRepositoryIdSelect" class="ui dropdown"></select>
                     </div>
                 </div>
 
                 <div id="BankFormGroup" style="display: none; padding-bottom: 12px;">
                     <div class="field">
-                        <label for="BankAccountIdSelect" data-localize="WhichBank">
+                        <label for="BankAccountIdSelect">@I18N.WhichBank
                         </label>
                         <select id="BankAccountIdSelect" class="ui dropdown"></select>
                     </div>
 
                     <div class="field">
-                        <label for="PaymentCardIdSelect" data-localize="PaymentCard">
+                        <label for="PaymentCardIdSelect">@I18N.PaymentCard
                         </label>
                         <select id="PaymentCardIdSelect" class="ui dropdown"></select>
                     </div>
                     <div class="two fields">
                         <div class="field">
-                            <label for="MerchantFeeInputText" data-localize="MerchantFee">
+                            <label for="MerchantFeeInputText">@I18N.MerchantFee
                             </label>
                             <input type="text" id="MerchantFeeInputText" readonly="readonly" />
                         </div>
                         <div class="field">
-                            <label data-localize="CustomerPaysFees">
+                            <label>@I18N.CustomerPaysFees
                             </label>
                             <div class="ui checkbox">
                                 <input type="radio" disabled="disabled" id="CustomerPaysFeeRadio" />
-                                <label data-localize="Yes">
+                                <label>@I18N.Yes
                                 </label>
                             </div>
                         </div>
                     </div>
                     <div class="field">
-                        <label for="PostedDateTextBox" data-localize="PostedDate">
+                        <label for="PostedDateTextBox">@I18N.PostedDate
                         </label>
 
 
                         <input type="text" id="PostedDateTextBox" class="date" required="" />
                     </div>
                     <div class="field">
-                        <label for="BankInstrumentCodeInputText" data-localize="InstrumentCode">
+                        <label for="BankInstrumentCodeInputText">@I18N.InstrumentCode
                         </label>
                         <input type="text" id="BankInstrumentCodeInputText" />
                     </div>
 
                     <div class="field">
-                        <label for="BankTransactionCodeInputText" data-localize="BankTransactionCode">
+                        <label for="BankTransactionCodeInputText">@I18N.BankTransactionCode
                         </label>
                         <input type="text" id="BankTransactionCodeInputText" />
                     </div>
                 </div>
 
                 <div class="field">
-                    <label for="ReferenceNumberInputText" data-localize="ReferenceNumber">
+                    <label for="ReferenceNumberInputText">@I18N.ReferenceNumber
                     </label>
                     <input type="text" id="ReferenceNumberInputText" />
                 </div>
 
                 <div class="field">
-                    <label for="StatementReferenceTextArea" data-localize="StatementReference">
+                    <label for="StatementReferenceTextArea">@I18N.StatementReference
                     </label>
                     <textarea id="StatementReferenceTextArea" rows="3"></textarea>
                 </div>
-                <button type="button" id="SaveButton" class="ui small submit button green" data-localize="Save"></button>
+                <button type="button" id="SaveButton" class="ui small submit button green">
+                @I18N.Save</button>
             </div>
         </div>
     </div>
@@ -181,7 +183,7 @@
 </script>
 
 <script>
-    var exchangeRateLocalized = "Exchange Rate ({0} - {1})";
+    var exchangeRateLocalized = window.translate("ExchangeRateWithValue");
 
     var receiptTypeDiv = $("#ReceiptType");
 
@@ -210,7 +212,7 @@
                 const customerCurrency = response.CurrencyCode;
 
                 if (!customerCurrency) {
-                    window.displayMessage("This customer does not have a default currency.");
+                    window.displayMessage(window.translate("ThisCustomerDoesNotHaveDefaultCurrency"));
                 };
 
                 $("#DueAmountInputText").val(due);
@@ -241,7 +243,7 @@
 
         const customerId = $("#CustomerIdSelect").val();
         if (!customerId) {
-            window.displayMessage("Please select a customer.");
+            window.displayMessage(window.translate("PleaseSelectCustomer"));
             return;
         };
 

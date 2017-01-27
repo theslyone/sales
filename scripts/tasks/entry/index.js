@@ -1,6 +1,6 @@
 ﻿window.prepareView({
-    Title: "Sales",
-    AddNewText: "Add New",
+    Title: window.translate("Sales"),
+    AddNewText: window.translate("AddNew"),
     AddNewUrl: "/dashboard/sales/tasks/entry/new",
     ReturnText: "Return",
     ReturnUrl: "javascript:void(0);",
@@ -8,7 +8,7 @@
     ChecklistUrl: "/dashboard/sales/tasks/entry/checklist/{tranId}",
     AdviceButtons: [
         {
-            Title: "View Sales Invoice",
+            Title: window.translate("ViewSalesInvoice"),
             Href: "javascript:void(0);",
             OnClick: "showInvoice({tranId});"
         }
@@ -35,7 +35,7 @@ $("#ReturnButton").click(function () {
         return;
     };
 
-    window.displayMessage("Please select an item from the grid.");
+    window.displayMessage(window.translate("PleaseSelectItemFromGrid"));
 });
 
 function showInvoice(tranId) {

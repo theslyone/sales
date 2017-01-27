@@ -83,7 +83,7 @@ namespace MixERP.Sales.Controllers.Backend.Loyalty
         {
             var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);
 
-            decimal result = await DAL.Backend.Tasks.GiftCardFunds.GetBalanceAsync(this.Tenant, giftCardNumber, meta.OfficeId).ConfigureAwait(true);
+            decimal result = await GiftCardFunds.GetBalanceAsync(this.Tenant, giftCardNumber, meta.OfficeId).ConfigureAwait(true);
             return this.Ok(result);
         }
     }
