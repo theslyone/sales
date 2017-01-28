@@ -1,5 +1,4 @@
-﻿$(".dropdown").dropdown({ placeholder: false });
-
+﻿window.loadDatepicker();
 var exchangeRateLocalized = window.translate("ExchangeRateWithValue");
 
 var receiptTypeDiv = $("#ReceiptType");
@@ -179,8 +178,8 @@ $("#PaymentCardIdSelect").change(function () {
 
     ajaxMerchantFeeSetup.success(function (msg) {
 
-        const rate = msg.d.Rate;
-        const customerPaysFee = msg.d.CustomerPaysFee;
+        const rate = msg.Rate;
+        const customerPaysFee = msg.CustomerPaysFee;
         $("#MerchantFeeInputText").val(rate);
 
         if (customerPaysFee) {
@@ -189,7 +188,7 @@ $("#PaymentCardIdSelect").change(function () {
     });
 
     ajaxMerchantFeeSetup.fail(function (xhr) {
-        logAjaxErrorMessage(xhr);
+        window.logAjaxErrorMessage(xhr);
     });
 
 });
@@ -295,7 +294,8 @@ function loadBankAccounts() {
 function loadPaymentCards() {
     if (!$("#PaymentCardIdSelect option").length) {
         const url = "/api/forms/finance/payment-cards/display-fields";
-        window.displayFieldBinder($("#PaymentCardIdSelect"), url);
+        const target = $("#PaymentCardIdSelect");
+        window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
     };
 };
 

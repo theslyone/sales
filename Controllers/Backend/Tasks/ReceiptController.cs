@@ -103,12 +103,12 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
             if (model.CashRepositoryId == 0 && model.BankAccountId == 0)
             {
-                throw new InvalidOperationException(I18N.InvalidReceiptMode);
+                this.Failed(I18N.InvalidReceiptMode, HttpStatusCode.InternalServerError);
             }
 
             if (model.CashRepositoryId > 0 && (model.BankAccountId > 0 || !string.IsNullOrWhiteSpace(model.BankInstrumentCode) || !string.IsNullOrWhiteSpace(model.BankInstrumentCode)))
             {
-                throw new InvalidOperationException(I18N.CashTransactionCannotContainBankTransactionDetails);
+                this.Failed(I18N.CashTransactionCannotContainBankTransactionDetails, HttpStatusCode.InternalServerError);
             }
 
             var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);

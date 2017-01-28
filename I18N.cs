@@ -1486,7 +1486,7 @@ namespace MixERP.Sales
 		/// <summary>
 		///Received Amount in Above Currency
 		/// </summary>
-		public static string ReceivedAmountInaboveCurrency => I18NResource.GetString(ResourceDirectory, "ReceivedAmountInaboveCurrency");
+		public static string ReceivedAmountInAboveCurrency => I18NResource.GetString(ResourceDirectory, "ReceivedAmountInAboveCurrency");
 
 		/// <summary>
 		///Received Currency
@@ -2277,6 +2277,11 @@ namespace MixERP.Sales
 		///ZIP Code
 		/// </summary>
 		public static string ZipCode => I18NResource.GetString(ResourceDirectory, "ZipCode");
+
+		/// <summary>
+		///Check
+		/// </summary>
+		public static string Cheque => I18NResource.GetString(ResourceDirectory, "Cheque");
 
 	}
 }
