@@ -10,7 +10,8 @@
     decimal taxableTotal = Model.Details.Where(x => x.IsTaxableItem).Sum(x => x.Amount);
     decimal taxTotal = Model.Details.Where(x => x.IsTaxableItem).Sum(x => x.Tax);
     decimal taxRate = 0;
-
+}
+@{ 
     if (taxableTotal > 0)
     {
         taxRate = Math.Round(taxTotal / taxableTotal * 100, 1);
@@ -20,7 +21,9 @@
     decimal totalBeforeDisount = nonTaxableTotal + taxableTotal + taxTotal;
     decimal grandTotal = totalBeforeDisount - Model.View.Discount;
     decimal discountRate = Math.Round(Model.View.Discount * 100 / totalBeforeDisount, 1);
+
 }
+
 <link rel="stylesheet" type="text/css" href="/Areas/MixERP.Sales/styles/ticket/index.css" />
 <script src="/scripts/jquery-2.2.4.min.js"></script>
 <script src="/scripts/jquery-qrcode/jquery.qrcode.min.js"></script>
