@@ -337,7 +337,6 @@ setTimeout(function () {
     $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
 }, 100);
 
-//$("select:not(.ui)").addClass("inverted fluid").dropdown();
 
 window.overridePath = "/dashboard/sales/tasks/entry";
 
