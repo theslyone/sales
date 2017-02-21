@@ -462,21 +462,15 @@ input.customer.address {
     background-color: #555 !important;
     color: #eee !important;
     border: 1px solid #666 !important;
-    padding: .87em;
     border-radius: 0.4em;
     width: 100%;
     -moz-appearance: none; /* Firefox */
-}
-
-.summary.items .dropdown {
-    padding: 1em !important;
 }
 
 select.inverted {
     background-color: #333;
     border: 1px solid #555;
     width: 100%;
-    padding: 0.55em 1em;
     border-radius: 0.5em;
     -moz-appearance: none; /* Firefox */
 }
@@ -659,8 +653,15 @@ select.inverted {
     background-color: #555 !important;
     color: #eee !important;
     border: 1px solid #666 !important;
-    padding: .87em;
     border-radius: 0.4em;
     width: 100%;
     -moz-appearance: none; /* Firefox */
+}
+.summary.items input,
+.summary.items textarea{
+    padding: .87em;
+}
+
+.summary.items select {
+    height:3em!important;
 }

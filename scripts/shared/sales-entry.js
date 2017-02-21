@@ -171,12 +171,7 @@ function loadModelData(model) {
     $("#TenderInputText").val(model.Tender);
     $("#ChangeInputText").val(model.Change);
 
-    //Todo: Remove Semantic UI Dropdown dependency 
-    //$("#PaymentTermSelect").dropdown("set selected", model.PaymentTermId);
-    //$("#CounterSelect").dropdown("set selected", model.CounterId);
-
     $("#PaymentTermSelect").val(model.PaymentTermId);
-    $("#CounterSelect").val(model.CounterId);
 
     $("#CheckAmountInputText").val(model.CheckAmount);
     $("#BankNameInputText").val(model.CheckBankName);
@@ -190,8 +185,6 @@ function loadModelData(model) {
     $("#GiftCardNumberInputText").val(model.GiftCardNumber).trigger("change");
     $("#CouponCodeInputText").val(model.CouponCode);
 
-    //Todo: Remove Semantic UI Dropdown dependency 
-    // $("#DiscountTypeSelect").dropdown("set selected", model.DiscountType);
     $("#DiscountTypeSelect").val(model.DiscountType);
 
     $("#DiscountInputText").val(model.Discount);
@@ -204,8 +197,6 @@ function loadModelData(model) {
         $("#BookDateInputText").datepicker("setDate", new Date(model.BookDate));
     };
 
-    //Todo: Remove Semantic UI Dropdown dependency 
-    // $("#CostCenterSelect").dropdown("set selected", model.CostCenterId);
     $("#CostCenterSelect").val(model.CostCenterId);
     $("#ReferenceNumberInputText").val(model.ReferenceNumber);
     $("#StatementReferenceInputText").val(model.StatementReference);
@@ -213,21 +204,15 @@ function loadModelData(model) {
     $("#CustomerInputText").attr("data-customer-id", model.CustomerId).val(model.CustomerCode);
 
     if (model.PriceTypeId) {
-        //Todo: Remove Semantic UI Dropdown dependency 
-        // $("#PriceTypeSelect").dropdown("set selected", model.PriceTypeId);
         $("#PriceTypeSelect").val(model.PriceTypeId);
     };
 
     if (model.ShipperId) {
-        //Todo: Remove Semantic UI Dropdown dependency 
-        //$("#ShipperSelect").dropdown("set selected", model.ShipperId);
         $("#ShipperSelect").val(model.ShipperId);
     };
 
     if (model.StoreId) {
-        //Todo: Remove Semantic UI Dropdown dependency 
-        // $("#StoreSelect").dropdown("set selected", model.StoreId);
-        $("#StoreSelect").val(model.StoreId);
+        $("#StoreSelect").val(model.StoreId).attr("data-counter-id", model.CounterId).trigger("change");
     };
 
 

@@ -210,7 +210,7 @@ $('.ui.customer.search').search({
     minCharacters: 1
 });
 
-$("#StoreSelect").change(function () {
+$("#StoreSelect").off("change").on("change", function () {
     var el = $(this);
 
     function loadCounters() {
@@ -223,7 +223,17 @@ $("#StoreSelect").change(function () {
         const filters = [];
         filters.push(window.getAjaxColumnFilter("WHERE", "StoreId", "int", window.FilterConditions.IsEqualTo, storeId));
 
-        window.displayFieldBinder($("#CounterSelect"), "/api/forms/inventory/counters/display-fields/get-where", true, filters);
+        window.displayFieldBinder($("#CounterSelect"), "/api/forms/inventory/counters/display-fields/get-where", true, filters, function () {
+            const counterId = el.attr("data-counter-id");
+
+            el.removeAttr("data-counter-id");
+
+            if (!counterId) {
+                return;
+            };
+
+            $("#CounterSelect").val(counterId);
+        });
     };
 
     loadCounters();
