@@ -91,7 +91,7 @@ function processQuery() {
         });
 
         ajax.fail(function (xhr) {
-            alert(JSON.stringify(xhr));
+            window.logAjaxErrorMessage(xhr);
         });
     };
 

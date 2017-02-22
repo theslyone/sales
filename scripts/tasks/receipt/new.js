@@ -98,13 +98,16 @@ $("#SaveButton").off("click").on("click", function () {
 
     const model = getModel();
 
+    $("#SaveButton").addClass("loading");
     const ajax = request(model);
 
     ajax.success(function (id) {
+        $("#SaveButton").removeClass("loading");
         window.location = `/dashboard/sales/tasks/receipt/checklist/${id}`;
     });
 
     ajax.fail(function (xhr) {
+        $("#SaveButton").removeClass("loading");
         window.logAjaxErrorMessage(xhr);
     });
 });
@@ -257,37 +260,37 @@ var toggleTransactionType = function (e) {
 function loadCostCenters() {
     const url = "/api/forms/finance/cost-centers/display-fields";
     const target = $("#CostCenterIdSelect");
-    window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+    window.ajaxDataBind(url, target, null, "Key", "Value");
 };
 
 function loadCurrencies() {
     const url = "/api/forms/core/currencies/lookup-fields";
     const target = $("#CurrencyCodeSelect");
-    window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+    window.ajaxDataBind(url, target, null, "Key", "Value");
 };
 
 function loadCustomers() {
     const url = "/api/forms/inventory/customers/display-fields";
     const target = $("#CustomerIdSelect");
-    window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+    window.ajaxDataBind(url, target, null, "Key", "Value");
 };
 
 function loadCashRepositories() {
     const url = "/api/forms/finance/cash-repositories/display-fields";
     const target = $("#CashRepositoryIdSelect");
-    window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+    window.ajaxDataBind(url, target, null, "Key", "Value");
 };
 
 function loadCashAccounts() {
     const url = "/api/views/finance/cash-account-selector-view/display-fields";
     const target = $("#CashAccountIdSelect");
-    window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+    window.ajaxDataBind(url, target, null, "Key", "Value");
 };
 
 function loadBankAccounts() {
     const url = "/api/forms/finance/bank-accounts/display-fields";
     const target = $("#BankAccountIdSelect");
-    window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+    window.ajaxDataBind(url, target, null, "Key", "Value");
 };
 
 
@@ -295,7 +298,7 @@ function loadPaymentCards() {
     if (!$("#PaymentCardIdSelect option").length) {
         const url = "/api/forms/finance/payment-cards/display-fields";
         const target = $("#PaymentCardIdSelect");
-        window.ajaxDataBind(url, target, null, null, null, null, "Key", "Value");
+        window.ajaxDataBind(url, target, null, "Key", "Value");
     };
 };
 

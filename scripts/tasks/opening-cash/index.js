@@ -30,13 +30,16 @@ $("#SaveButton").off("click").on("click", function () {
     };
 
     const model = window.serializeForm($(".ui.form"));
+    $("#SaveButton").addClass("loading");
     const ajax = request(model);
 
     ajax.success(function () {
+        $("#SaveButton").removeClass("loading");
         window.displaySuccess();
     });
 
     ajax.fail(function (xhr) {
-        alert(JSON.stringify(xhr));
+        $("#SaveButton").removeClass("loading");
+        window.logAjaxErrorMessage(xhr);
     });
 });

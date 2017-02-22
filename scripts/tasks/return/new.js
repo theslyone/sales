@@ -43,7 +43,7 @@ $(document).on("posready", function() {
         const ajax = request(model);
 
         ajax.success(function(response) {
-            const id = response;
+            //const id = response;
             document.location = "/dashboard/sales/tasks/return";
         });
 

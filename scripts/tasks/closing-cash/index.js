@@ -51,20 +51,23 @@ $("#SaveButton").off("click").on("click", function () {
     const model = window.serializeForm($(".eod.cash"));
     const total = parseFloat($("#TotalInputText").val()) || 0;
 
-    if (model.SubmittedCash !== total) {
+    if (parseFloat(model.SubmittedCash) !== total) {
         window.displayMessage(window.translate("SubmittedAmountMustEqualTotalAmount"));
         return;
     };
 
+    $("#SaveButton").addClass("loading");
     const ajax = request(model);
 
     ajax.success(function () {
+        $("#SaveButton").removeClass("loading");
         window.displaySuccess();
         document.location = document.location;
     });
 
     ajax.fail(function (xhr) {
-        alert(JSON.stringify(xhr));
+        $("#SaveButton").removeClass("loading");
+        window.logAjaxErrorMessage(xhr);
     });
 });
 

@@ -19,6 +19,7 @@ namespace MixERP.Sales.DTO
         public int UserId { get; set; }
         public int OfficeId { get; set; }
         public string ReferenceNumber { get; set; }
+        public string Terms { get; set; }
         public string InternalMemo { get; set; }
         public int AuditUserId { get; set; }
         public DateTimeOffset AuditTs { get; set; }
