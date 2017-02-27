@@ -4,7 +4,7 @@
   <Title>Top Selling Products</Title>
   <TopSection>
     <Charts>
-      <Chart ID="Chart1" GridViewIndex="0" HideGridView="false" Type="Doughnut" BorderColor="transparent" Width="500" Height="300"
+      <Chart ID="Chart1" GridViewIndex="0" HideGridView="false" Type="Pie" BorderColor="transparent" Width="400" Height="300"
                 TitleColumnIndex="3" ValueColumnIndex="4">
       </Chart>
     </Charts>
