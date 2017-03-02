@@ -779,7 +779,7 @@ namespace MixERP.Sales
 		public static string From => I18NResource.GetString(ResourceDirectory, "From");
 
 		/// <summary>
-		///Gift Card 
+		///Gift Card
 		/// </summary>
 		public static string GiftCard => I18NResource.GetString(ResourceDirectory, "GiftCard");
 
@@ -799,7 +799,7 @@ namespace MixERP.Sales
 		public static string GiftCardFundVerification => I18NResource.GetString(ResourceDirectory, "GiftCardFundVerification");
 
 		/// <summary>
-		///Gift card Funds
+		///Gift Card Funds
 		/// </summary>
 		public static string GiftCardFunds => I18NResource.GetString(ResourceDirectory, "GiftCardFunds");
 
@@ -2282,6 +2282,16 @@ namespace MixERP.Sales
 		///Check
 		/// </summary>
 		public static string Cheque => I18NResource.GetString(ResourceDirectory, "Cheque");
+
+		/// <summary>
+		///Gift Card Name
+		/// </summary>
+		public static string GiftCardName => I18NResource.GetString(ResourceDirectory, "GiftCardName");
+
+		/// <summary>
+		///Customer Code
+		/// </summary>
+		public static string CustomerCode => I18NResource.GetString(ResourceDirectory, "CustomerCode");
 
 	}
 }
