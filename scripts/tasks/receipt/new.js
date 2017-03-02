@@ -1,4 +1,5 @@
-﻿window.loadDatepicker();
+﻿window.overridePath = "/dashboard/sales/tasks/receipt";
+window.loadDatepicker();
 var exchangeRateLocalized = window.translate("ExchangeRateWithValue");
 
 var receiptTypeDiv = $("#ReceiptType");
@@ -312,5 +313,3 @@ function getMerchantFeeSetup(merchantAccountId, paymentCardId) {
 
     return window.getAjaxRequest(url);
 };
-
-window.overridePath = "/dashboard/sales/tasks/receipt";

@@ -11,6 +11,7 @@ scrudFactory.formTableName = "inventory.customers";
 scrudFactory.uploadHanlder = "/dashboard/inventory/services/attachments";
 
 scrudFactory.excludedColumns = ["AuditUserId", "AuditTs", "Deleted"];
+scrudFactory.hiddenColumns = ["AccountId"];
 
 
 scrudFactory.allowDelete = true;
@@ -36,13 +37,6 @@ scrudFactory.keys = [
     {
         property: "CustomerTypeId",
         url: '/api/forms/inventory/customer-types/display-fields',
-        data: null,
-        valueField: "Key",
-        textField: "Value"
-    },
-    {
-        property: "AccountId",
-        url: '/api/views/finance/receivable-account-selector-view/display-fields',
         data: null,
         valueField: "Key",
         textField: "Value"
