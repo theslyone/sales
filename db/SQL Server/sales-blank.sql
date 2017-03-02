@@ -717,6 +717,68 @@ END;
 
 GO
 
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_customer_account_detail.sql --<--<--
+IF OBJECT_ID('sales.get_customer_account_detail') IS NOT NULL
+DROP FUNCTION sales.get_customer_account_detail;
+GO
+
+CREATE FUNCTION sales.get_customer_account_detail
+(
+    @customer_id			integer,
+    @from					date,
+    @to						date
+)
+RETURNS @result TABLE
+(
+  id						integer IDENTITY, 
+  value_date				date, 
+  invoice_number			bigint, 
+  statement_reference		text, 
+  debit						numeric, 
+  credit					numeric, 
+  balance					numeric
+) 
+AS
+BEGIN
+    INSERT INTO @result
+	(
+		value_date, 
+		invoice_number, 
+		statement_reference, 
+		debit, 
+		credit
+	)
+    SELECT 
+		ctv.value_date,
+        ctv.invoice_number,
+        ctv.statement_reference,
+        ctv.debit,
+        ctv.credit
+    FROM sales.customer_transaction_view ctv
+    LEFT JOIN inventory.customers cus
+    ON ctv.customer_id = cus.customer_id
+    WHERE ctv.customer_id = @customer_id
+    AND ctv.value_date BETWEEN @from AND @to;
+
+    UPDATE @result 
+    SET balance = c.balance
+	FROM @result as result
+    INNER JOIN
+    (
+        SELECT p.id,
+            SUM(COALESCE(c.debit, 0) - COALESCE(c.credit, 0)) As balance
+        FROM @result p
+        LEFT JOIN @result c
+        ON c.id <= p.id
+        GROUP BY p.id
+    ) AS c
+    ON result.id = c.id;
+
+    RETURN 
+END
+
+GO
+
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_balance.sql --<--<--
 IF OBJECT_ID('sales.get_gift_card_balance') IS NOT NULL
 DROP FUNCTION sales.get_gift_card_balance;
@@ -753,6 +815,102 @@ END
 
 
 GO
+
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_detail.sql --<--<--
+IF OBJECT_ID('sales.get_gift_card_detail') IS NOT NULL
+DROP FUNCTION sales.get_gift_card_detail;
+GO
+
+CREATE FUNCTION sales.get_gift_card_detail
+(
+    @card_number nvarchar(50),
+    @from date,
+    @to date
+)
+RETURNS @result TABLE
+(
+	id					integer IDENTITY, 
+	gift_card_id		integer, 
+	transaction_ts		datetime, 
+	statement_reference text, 
+	debit				numeric, 
+	credit				numeric, 
+	balance				numeric
+)
+AS
+BEGIN
+	INSERT INTO @result
+	(
+		gift_card_id, 
+		transaction_ts, 
+		statement_reference, 
+		debit,
+		credit
+	)
+	SELECT 
+		gift_card_id, 
+		transaction_ts, 
+		statement_reference, 
+		debit, 
+		credit
+	FROM
+	(
+		SELECT
+			gift_card_transactions.gift_card_id,
+			transaction_master.transaction_ts,
+			transaction_master.statement_reference,
+			CASE WHEN gift_card_transactions.transaction_type = 'Dr' THEN gift_card_transactions.amount END AS debit,
+			CASE WHEN gift_card_transactions.transaction_type = 'Cr' THEN gift_card_transactions.amount END AS credit
+		FROM sales.gift_card_transactions
+		JOIN finance.transaction_master
+			ON transaction_master.transaction_master_id = gift_card_transactions.transaction_master_id
+		JOIN sales.gift_cards
+			ON gift_cards.gift_card_id = gift_card_transactions.gift_card_id
+		WHERE 
+			gift_cards.gift_card_number = @card_number
+		AND 
+			transaction_master.transaction_ts BETWEEN @from AND @to
+		UNION ALL
+
+		SELECT 
+			sales.gift_card_id,
+			transaction_master.transaction_ts,
+			transaction_master.statement_reference,
+			sales.total_amount,
+			0
+		FROM sales.sales
+		LEFT JOIN finance.transaction_master
+			ON transaction_master.transaction_master_id = sales.transaction_master_id
+		JOIN sales.gift_cards
+			ON gift_cards.gift_card_id = sales.gift_card_id
+		WHERE sales.gift_card_id IS NOT NULL
+		AND gift_cards.gift_card_number = @card_number
+		AND transaction_master.transaction_ts BETWEEN @from AND @to
+	) t
+	ORDER BY t.transaction_ts ASC;
+
+	UPDATE result
+	SET balance = c.balance
+	FROM @result result
+	INNER JOIN	
+	(
+		SELECT
+			p.id, 
+			SUM(COALESCE(c.credit, 0) - COALESCE(c.debit, 0)) As balance
+		FROM @result p
+		LEFT JOIN @result AS c 
+			ON (c.transaction_ts <= p.transaction_ts)
+		GROUP BY p.id
+	) AS c
+	ON result.id = c.id;
+        
+	RETURN
+END
+GO
+
+
+
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_id_by_gift_card_number.sql --<--<--
@@ -4024,6 +4182,61 @@ WHERE finance.transaction_master.deleted = 0;
 
 --SELECT * FROM sales.sales_view
 
+GO
+
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/05.views/sales.zcustomer_transaction_view.sql --<--<--
+IF OBJECT_ID('sales.customer_transaction_view') IS NOT NULL
+DROP VIEW sales.customer_transaction_view;
+GO
+
+CREATE VIEW sales.customer_transaction_view AS 
+SELECT 
+	sales_view.value_date,
+	sales_view.invoice_number,
+	sales_view.customer_id,
+	'Invoice' AS statement_reference,
+	sales_view.total_amount + COALESCE(sales_view.check_amount, 0) - sales_view.total_discount_amount AS debit,
+	NULL AS credit
+FROM sales.sales_view
+WHERE sales_view.verification_status_id > 0
+UNION ALL
+
+SELECT 
+	sales_view.value_date,
+	sales_view.invoice_number,
+	sales_view.customer_id,
+	'Payment' AS statement_reference,
+	NULL AS debit,
+	sales_view.total_amount + COALESCE(sales_view.check_amount, 0) - sales_view.total_discount_amount AS credit
+FROM sales.sales_view
+WHERE sales_view.verification_status_id > 0 AND sales_view.is_credit = 0
+UNION ALL
+
+SELECT 
+	sales_view.value_date,
+	sales_view.invoice_number,
+	returns.customer_id,
+	'Return' AS statement_reference,
+	NULL AS debit,
+	sum(checkout_detail_view.total) AS credit
+FROM sales.returns
+JOIN sales.sales_view ON returns.sales_id = sales_view.sales_id
+JOIN inventory.checkout_detail_view ON returns.checkout_id = checkout_detail_view.checkout_id
+WHERE sales_view.verification_status_id > 0
+GROUP BY sales_view.value_date, sales_view.invoice_number, returns.customer_id
+UNION ALL
+
+SELECT 
+	customer_receipts.posted_date AS value_date,
+	NULL AS invoice_number,
+	customer_receipts.customer_id,
+	'Payment' AS statement_reference,
+	NULL AS debit,
+	customer_receipts.amount AS credit
+FROM sales.customer_receipts
+JOIN finance.transaction_master ON customer_receipts.transaction_master_id = transaction_master.transaction_master_id
+WHERE transaction_master.verification_status_id > 0;
 GO
 
 
