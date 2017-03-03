@@ -682,6 +682,80 @@ LANGUAGE plpgsql;
 
 --SELECT * FROM sales.get_avaiable_coupons_to_print(2);
 
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_customer_account_detail.sql --<--<--
+DROP FUNCTION IF EXISTS sales.get_customer_account_detail(integer, date, date);
+CREATE OR REPLACE FUNCTION sales.get_customer_account_detail
+(
+    _customer_id        integer,
+    _from               date,
+    _to                 date
+)
+RETURNS TABLE
+(
+    id                  integer, 
+    value_date          date, 
+    invoice_number      bigint, 
+    statement_reference text, 
+    debit               numeric(30, 6), 
+    credit              numeric(30, 6), 
+    balance             numeric(30, 6)
+)
+AS
+$BODY$
+BEGIN
+    CREATE TEMPORARY TABLE _customer_account_detail
+    (
+        id                      SERIAL NOT NULL,
+        value_date              date,
+        invoice_number          bigint,
+        statement_reference     text,
+        debit                   numeric(30, 6),
+        credit                  numeric(30, 6),
+        balance                 numeric(30, 6)
+    ) ON COMMIT DROP;
+
+    INSERT INTO _customer_account_detail
+    (
+        value_date, 
+        invoice_number, 
+        statement_reference, 
+        debit, 
+        credit
+    )
+    SELECT 
+        ctv.value_date,
+        ctv.invoice_number,
+        ctv.statement_reference,
+        ctv.debit,
+        ctv.credit
+    FROM sales.customer_transaction_view ctv
+    LEFT JOIN inventory.customers cus
+    ON ctv.customer_id = cus.customer_id
+    WHERE ctv.customer_id = _customer_id
+    AND ctv.value_date BETWEEN _from AND _to;
+
+    UPDATE _customer_account_detail 
+    SET balance = c.balance
+    FROM
+    (
+        SELECT p.id,
+            SUM(COALESCE(c.debit, 0) - COALESCE(c.credit, 0)) As balance
+        FROM _customer_account_detail p
+        LEFT JOIN _customer_account_detail c
+        ON c.id <= p.id
+        GROUP BY p.id
+        ORDER BY p.id
+    ) AS c
+    WHERE _customer_account_detail.id = c.id;
+
+    RETURN QUERY
+    SELECT * FROM _customer_account_detail;
+END
+$BODY$
+ LANGUAGE plpgsql;
+
+
+
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_balance.sql --<--<--
 DROP FUNCTION IF EXISTS sales.get_gift_card_balance(_gift_card_id integer, _value_date date);
 
@@ -715,6 +789,111 @@ BEGIN
 END
 $$
 LANGUAGE plpgsql;
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_detail.sql --<--<--
+DROP FUNCTION IF EXISTS sales.get_gift_card_detail(national character varying(50), date, date);
+CREATE FUNCTION sales.get_gift_card_detail
+(
+    _card_number        national character varying(50),
+    _from               date,
+    _to                 date
+)
+RETURNS TABLE
+(
+    id                  integer, 
+    gift_card_id        integer, 
+    transaction_ts      timestamp without time zone, 
+    statement_reference text, 
+    debit               numeric(30,6), 
+    credit              numeric(30,6), 
+    balance             numeric(30,6)
+)
+AS
+$BODY$
+BEGIN
+    CREATE TEMPORARY TABLE  _gift_card_detail
+    (
+        id                      SERIAL NOT NULL,    
+        gift_card_id            integer,
+        transaction_ts          timestamp without time zone, 
+        statement_reference     text,
+        debit                   numeric(30, 6),
+        credit                  numeric(30, 6),
+        balance                 numeric(30, 6)
+    ) ON COMMIT DROP;
+
+    INSERT INTO _gift_card_detail
+    (
+        gift_card_id, 
+        transaction_ts, 
+        statement_reference, 
+        debit, 
+        credit
+    )
+    SELECT 
+        t.gift_card_id, 
+        t.transaction_ts, 
+        t.statement_reference, 
+        t.debit, 
+        t.credit
+    FROM
+    (
+        SELECT  gift_card_transactions.gift_card_id,
+                transaction_master.transaction_ts,
+                transaction_master.statement_reference,
+                CASE WHEN gift_card_transactions.transaction_type = 'Dr' THEN gift_card_transactions.amount END AS debit,
+                CASE WHEN gift_card_transactions.transaction_type = 'Cr' THEN gift_card_transactions.amount END AS credit
+        FROM sales.gift_card_transactions
+        JOIN finance.transaction_master
+            ON transaction_master.transaction_master_id = gift_card_transactions.transaction_master_id
+        JOIN sales.gift_cards
+            ON gift_cards.gift_card_id = gift_card_transactions.gift_card_id
+        WHERE gift_cards.gift_card_number = _card_number
+        AND transaction_master.transaction_ts::date BETWEEN _from AND _to
+        UNION ALL
+        
+        SELECT 
+            sales.gift_card_id,
+            transaction_master.transaction_ts,
+            transaction_master.statement_reference,
+            sales.total_amount,
+            0
+            FROM sales.sales
+            LEFT JOIN finance.transaction_master
+            ON transaction_master.transaction_master_id = sales.transaction_master_id
+            JOIN sales.gift_cards
+            ON gift_cards.gift_card_id = sales.gift_card_id
+            WHERE sales.gift_card_id IS NOT NULL
+            AND gift_cards.gift_card_number = _card_number
+            AND transaction_master.transaction_ts::date BETWEEN _from AND _to
+        ) t
+        ORDER BY t.transaction_ts ASC;
+
+    UPDATE _gift_card_detail
+    SET balance = c.balance
+    FROM
+    (
+        SELECT
+            p.id, 
+            SUM(COALESCE(c.credit, 0) - COALESCE(c.debit, 0)) As balance
+        FROM _gift_card_detail p
+        LEFT JOIN _gift_card_detail AS c 
+            ON (c.transaction_ts <= p.transaction_ts)
+        GROUP BY p.id
+        ORDER BY p.id    
+     ) AS c
+    WHERE _gift_card_detail.id = c.id;
+    
+    RETURN QUERY
+    (
+        SELECT * FROM _gift_card_detail
+        ORDER BY transaction_ts ASC
+    );
+END
+$BODY$
+  LANGUAGE plpgsql;
+
+
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_id_by_gift_card_number.sql --<--<--
 DROP FUNCTION IF EXISTS sales.get_gift_card_id_by_gift_card_number(_gift_card_number national character varying(100));
@@ -3705,6 +3884,58 @@ WHERE NOT finance.transaction_master.deleted;
 
 
 --SELECT * FROM sales.sales_view
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.views/sales.zcustomer_transaction_view.sql --<--<--
+DROP VIEW IF EXISTS sales.customer_transaction_view;
+CREATE VIEW sales.customer_transaction_view 
+AS
+SELECT 
+    sales_view.value_date,
+    sales_view.invoice_number,
+    sales_view.customer_id,
+    'Invoice'::text AS statement_reference,
+    sales_view.total_amount::numeric + COALESCE(sales_view.check_amount::numeric, 0::numeric) - sales_view.total_discount_amount::numeric AS debit,
+    NULL::numeric AS credit
+FROM sales.sales_view
+WHERE sales_view.verification_status_id > 0
+UNION ALL
+
+SELECT 
+    sales_view.value_date,
+    sales_view.invoice_number,
+    sales_view.customer_id,
+    'Payment'::text AS statement_reference,
+    NULL::numeric AS debit,
+    sales_view.total_amount::numeric + COALESCE(sales_view.check_amount::numeric, 0::numeric) - sales_view.total_discount_amount::numeric AS credit
+FROM sales.sales_view
+WHERE sales_view.verification_status_id > 0 AND NOT sales_view.is_credit
+UNION ALL
+
+SELECT 
+    sales_view.value_date,
+    sales_view.invoice_number,
+    returns.customer_id,
+    'Return'::text AS statement_reference,
+    NULL::numeric AS debit,
+    sum(checkout_detail_view.total) AS credit
+FROM sales.returns
+JOIN sales.sales_view ON returns.sales_id = sales_view.sales_id
+JOIN inventory.checkout_detail_view ON returns.checkout_id = checkout_detail_view.checkout_id
+WHERE sales_view.verification_status_id > 0
+GROUP BY sales_view.value_date, sales_view.invoice_number, returns.customer_id
+UNION ALL
+
+SELECT 
+    customer_receipts.posted_date AS value_date,
+    NULL::bigint AS invoice_number,
+    customer_receipts.customer_id,
+    'Payment'::text AS statement_reference,
+    NULL::numeric AS debit,
+    customer_receipts.amount AS credit
+FROM sales.customer_receipts
+JOIN finance.transaction_master ON customer_receipts.transaction_master_id = transaction_master.transaction_master_id
+WHERE transaction_master.verification_status_id > 0;
+
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/99.ownership.sql --<--<--
 DO

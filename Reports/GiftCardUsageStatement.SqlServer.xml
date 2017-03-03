@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<FrapidReport>
+  <Header />
+  <Title>Gift Card Usage Statement</Title>
+  <TopSection>
+    <table>
+      <tr>
+        <td>{i18n.GiftCard}#</td>
+        <td>{datasource[0].gift_card_number}</td>
+      </tr>
+      <tr>
+        <td>{i18n.GiftCardName}</td>
+        <td>{datasource[0].card_holder_name}</td>
+      </tr>
+      <tr>
+        <td>{i18n.CustomerName}</td>
+        <td>{datasource[0].customer_name}</td>
+      </tr>
+    </table>
+    <br/>
+  </TopSection>
+  <Body>
+    <Content>
+    </Content>
+    <GridViews>
+      <GridView>
+        <GridViewDataSource Index="1">
+        </GridViewDataSource>
+      </GridView>
+    </GridViews>
+  </Body>
+  <BottomSection>
+  </BottomSection>
+  <DataSources>
+    <DataSource>
+      <Query>
+        SELECT
+        COALESCE(gc.first_name, '') +
+        CASE WHEN (COALESCE(gc.middle_name, '') = '') THEN ' '
+        WHEN (COALESCE(gc.middle_name, '') != '') THEN gc.middle_name END
+        + COALESCE(gc.last_name, '') card_holder_name,
+        gc.gift_card_number,
+        customer_name
+        FROM sales.gift_cards gc
+        LEFT JOIN inventory.customers ON gc.customer_id = customers.customer_id
+        WHERE gc.gift_card_number = @CardNo
+      </Query>
+      <Parameters>
+        <Parameter Name="@CardNo" FieldLabel="Card No" Type="System.String" />
+      </Parameters>
+    </DataSource>
+    <DataSource>
+      <Query>
+        SELECT
+          transaction_ts AS transaction_datetime,
+          statement_reference,
+          debit,
+          credit,
+          balance
+        FROM sales.get_gift_card_detail(@CardNo, @From, @To)
+      </Query>
+      <Parameters>
+        <Parameter Name="@CardNo" FieldLabel="Card No" Type="System.String" />
+        <Parameter Name="@From" FieldLabel="From Date" Type="System.DateTime" />
+        <Parameter Name="@To" FieldLabel="To Date" Type="System.DateTime" />
+      </Parameters>
+      <RunningTotalTextColumnIndex>1</RunningTotalTextColumnIndex>
+      <RunningTotalFieldIndices>2, 3</RunningTotalFieldIndices>
+    </DataSource>
+  </DataSources>
+</FrapidReport>
