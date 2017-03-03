@@ -18,7 +18,7 @@ CREATE TABLE sales.gift_cards
     state                                   national character varying(100),
     country                                 national character varying(100),
     po_box                                  national character varying(100),
-    zipcode                                 national character varying(100),
+    zip_code                                national character varying(100),
     phone_numbers                           national character varying(100),
     fax                                     national character varying(100),    
     audit_user_id                           integer REFERENCES account.users,

@@ -13,7 +13,6 @@ scrudFactory.uploadHanlder = "/dashboard/inventory/services/attachments";
 scrudFactory.excludedColumns = ["AuditUserId", "AuditTs", "Deleted"];
 scrudFactory.hiddenColumns = ["AccountId"];
 
-
 scrudFactory.allowDelete = true;
 scrudFactory.allowEdit = true;
 

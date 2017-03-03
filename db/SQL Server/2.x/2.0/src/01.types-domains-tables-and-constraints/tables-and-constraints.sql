@@ -7,7 +7,7 @@ CREATE TABLE sales.gift_cards
 (
     gift_card_id                            integer IDENTITY PRIMARY KEY,
     gift_card_number                        national character varying(100) NOT NULL,
-    payable_account_id                        integer NOT NULL REFERENCES finance.accounts,
+    payable_account_id                      integer NOT NULL REFERENCES finance.accounts,
     customer_id                             integer REFERENCES inventory.customers,
     first_name                              national character varying(100),
     middle_name                             national character varying(100),
@@ -19,12 +19,12 @@ CREATE TABLE sales.gift_cards
     state                                   national character varying(100),
     country                                 national character varying(100),
     po_box                                  national character varying(100),
-    zipcode                                 national character varying(100),
+    zip_code                                national character varying(100),
     phone_numbers                           national character varying(100),
     fax                                     national character varying(100),    
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
-    deleted                                    bit DEFAULT(0)    
+    deleted                                 bit DEFAULT(0)    
 );
 
 CREATE UNIQUE INDEX gift_cards_gift_card_number_uix

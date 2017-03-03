@@ -11,7 +11,7 @@ SELECT
     sales.gift_cards.state,
     sales.gift_cards.country,
     sales.gift_cards.po_box,
-    sales.gift_cards.zipcode,
+    sales.gift_cards.zip_code,
     sales.gift_cards.phone_numbers,
     sales.gift_cards.fax    
 FROM sales.gift_cards
