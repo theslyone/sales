@@ -1477,8 +1477,8 @@ BEGIN
         SELECT @transaction_master_id, @office_id, @value_date, @book_date, 'Cr', @customer_account_id, @statement_reference, NULL, @base_currency_code, @credit, @local_currency_code, @exchange_rate_credit, @lc_credit, @user_id;
         
         
-        INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, cash_repository_id, posted_date, tender, change)
-        SELECT @transaction_master_id, @customer_id, @currency_code, @exchange_rate_debit, @exchange_rate_credit, @cash_repository_id, @value_date, @tender, @change;
+        INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, cash_repository_id, posted_date, tender, change, amount)
+        SELECT @transaction_master_id, @customer_id, @currency_code, @exchange_rate_debit, @exchange_rate_credit, @cash_repository_id, @value_date, @tender, @change, @receivable;
 
         IF(@tran_count = 0)
         BEGIN
@@ -1613,8 +1613,8 @@ BEGIN
         SELECT @transaction_master_id, @office_id, @value_date, @book_date, 'Cr', @customer_account_id, @statement_reference, NULL, @base_currency_code, @credit, @local_currency_code, @exchange_rate_credit, @lc_credit, @user_id;
         
         
-        INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, posted_date, check_amount, check_bank_name, check_number, check_date)
-        SELECT @transaction_master_id, @customer_id, @currency_code, @exchange_rate_debit, @exchange_rate_credit, @value_date, @check_amount, @check_bank_name, @check_number, @check_date;
+        INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, posted_date, check_amount, check_bank_name, check_number, check_date, amount)
+        SELECT @transaction_master_id, @customer_id, @currency_code, @exchange_rate_debit, @exchange_rate_credit, @value_date, @check_amount, @check_bank_name, @check_number, @check_date, @check_amount;
 
         IF(@tran_count = 0)
         BEGIN
@@ -2446,8 +2446,8 @@ BEGIN
         SELECT @transaction_master_id, @office_id, @value_date, @book_date, 'Cr', @customer_account_id, @statement_reference, NULL, @base_currency_code, @credit, @local_currency_code, @exchange_rate_credit, @lc_credit, @user_id;
         
         
-        INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, posted_date, gift_card_number)
-        SELECT @transaction_master_id, @customer_id, @currency_code, @exchange_rate_debit, @exchange_rate_credit, @value_date, @gift_card_number;
+        INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, posted_date, gift_card_number, amount)
+        SELECT @transaction_master_id, @customer_id, @currency_code, @exchange_rate_debit, @exchange_rate_credit, @value_date, @gift_card_number, @amount;
 
         IF(@tran_count = 0)
         BEGIN
@@ -3677,7 +3677,7 @@ DELETE FROM core.menus
 WHERE app_name = 'MixERP.Sales';
 
 
-EXECUTE core.create_app 'MixERP.Sales', 'Sales', 'Sales', '1.0', 'MixERP Inc.', 'December 1, 2015', 'shipping blue', '/dashboard/sales/tasks/entry', NULL;
+EXECUTE core.create_app 'MixERP.Sales', 'Sales', 'Sales', '1.0', 'MixERP Inc.', 'December 1, 2015', 'shipping blue', '/dashboard/sales/tasks/console', NULL;
 
 EXECUTE core.create_menu 'MixERP.Sales', 'Tasks', 'Tasks', '', 'lightning', '';
 EXECUTE core.create_menu 'MixERP.Sales', 'OpeningCash', 'Opening Cash', '/dashboard/sales/tasks/opening-cash', 'money', 'Tasks';
@@ -4238,6 +4238,106 @@ FROM sales.customer_receipts
 JOIN finance.transaction_master ON customer_receipts.transaction_master_id = transaction_master.transaction_master_id
 WHERE transaction_master.verification_status_id > 0;
 GO
+
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/06.widgets/inventory.top_customers_by_office_view.sql --<--<--
+IF OBJECT_ID('inventory.top_customers_by_office_view') IS NOT NULL
+DROP VIEW inventory.top_customers_by_office_view;
+
+GO
+
+CREATE VIEW inventory.top_customers_by_office_view
+AS
+SELECT TOP 5
+    inventory.verified_checkout_view.office_id,
+    inventory.customers.customer_id,
+    CASE WHEN COALESCE(inventory.customers.customer_name, '') = ''
+    THEN inventory.customers.company_name
+    ELSE inventory.customers.customer_name
+    END as customer,
+    inventory.customers.company_country AS country,
+    SUM(
+        (inventory.verified_checkout_view.price * inventory.verified_checkout_view.quantity) 
+        - inventory.verified_checkout_view.discount 
+        + inventory.verified_checkout_view.tax) AS amount
+FROM inventory.verified_checkout_view
+INNER JOIN sales.sales
+ON inventory.verified_checkout_view.checkout_id = sales.sales.checkout_id
+INNER JOIN inventory.customers
+ON sales.sales.customer_id = inventory.customers.customer_id
+GROUP BY
+inventory.verified_checkout_view.office_id,
+inventory.customers.customer_id,
+inventory.customers.customer_name,
+inventory.customers.company_name,
+inventory.customers.company_country
+ORDER BY 2 DESC;
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/06.widgets/sales.get_account_receivable_widget_details.sql --<--<--
+IF OBJECT_ID('sales.get_account_receivable_widget_details') IS NOT NULL
+DROP FUNCTION sales.get_account_receivable_widget_details;
+GO
+
+CREATE FUNCTION sales.get_account_receivable_widget_details(@office_id integer)
+RETURNS @result TABLE
+(
+    all_time_sales                              decimal(30, 6),
+    all_time_receipt                            decimal(30, 6),
+    receivable_of_all_time                      decimal(30, 6),
+    this_months_sales                           decimal(30, 6),
+    this_months_receipt                         decimal(30, 6),
+    receivable_of_this_month                    decimal(30, 6)
+)
+AS
+BEGIN
+    DECLARE @all_time_sales                     decimal(30, 6);
+    DECLARE @all_time_receipt                   decimal(30, 6);
+    DECLARE @this_months_sales                  decimal(30, 6);
+    DECLARE @this_months_receipt                decimal(30, 6);
+    DECLARE @start_date                         date = finance.get_month_start_date(@office_id);
+    DECLARE @end_date                           date = finance.get_month_end_date(@office_id);
+
+    SELECT @all_time_sales = COALESCE(SUM(sales.sales.total_amount), 0) 
+    FROM sales.sales
+    INNER JOIN finance.transaction_master
+    ON finance.transaction_master.transaction_master_id = sales.sales.transaction_master_id
+    WHERE finance.transaction_master.office_id IN (SELECT * FROM core.get_office_ids(@office_id))
+    AND finance.transaction_master.verification_status_id > 0;
+    
+    SELECT @all_time_receipt = COALESCE(SUM(sales.customer_receipts.amount), 0)
+    FROM sales.customer_receipts
+    INNER JOIN finance.transaction_master
+    ON finance.transaction_master.transaction_master_id = sales.customer_receipts.transaction_master_id
+    WHERE finance.transaction_master.office_id IN (SELECT * FROM core.get_office_ids(@office_id))
+    AND finance.transaction_master.verification_status_id > 0;
+
+    SELECT @this_months_sales = COALESCE(SUM(sales.sales.total_amount), 0)
+    FROM sales.sales
+    INNER JOIN finance.transaction_master
+    ON finance.transaction_master.transaction_master_id = sales.sales.transaction_master_id
+    WHERE finance.transaction_master.office_id IN (SELECT * FROM core.get_office_ids(@office_id))
+    AND finance.transaction_master.verification_status_id > 0
+    AND finance.transaction_master.value_date BETWEEN @start_date AND @end_date;
+    
+    SELECT @this_months_receipt = COALESCE(SUM(sales.customer_receipts.amount), 0) 
+    FROM sales.customer_receipts
+    INNER JOIN finance.transaction_master
+    ON finance.transaction_master.transaction_master_id = sales.customer_receipts.transaction_master_id
+    WHERE finance.transaction_master.office_id IN (SELECT * FROM core.get_office_ids(@office_id))
+    AND finance.transaction_master.verification_status_id > 0
+    AND finance.transaction_master.value_date BETWEEN @start_date AND @end_date;
+
+	INSERT INTO @result
+    SELECT @all_time_sales, @all_time_receipt, @all_time_sales - @all_time_receipt, 
+    @this_months_sales, @this_months_receipt, @this_months_sales - @this_months_receipt;
+
+	RETURN;
+END
+
+GO
+
+--SELECT * FROM sales.get_account_receivable_widget_details(1);
+
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/99.ownership.sql --<--<--

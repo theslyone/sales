@@ -29,7 +29,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>..\..\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -151,12 +151,16 @@
     <Compile Include="Controllers\Backend\Tasks\ClosingCashController.cs" />
     <Compile Include="Controllers\Backend\Tasks\CustomerSearchController.cs" />
     <Compile Include="Controllers\Backend\Loyalty\GiftCardController.cs" />
+    <Compile Include="Controllers\Backend\Tasks\ConsoleController.cs" />
     <Compile Include="Controllers\Backend\Tasks\OpeningCashController.cs" />
     <Compile Include="Controllers\Backend\Tasks\OrderController.cs" />
     <Compile Include="Controllers\Backend\Tasks\QuotationController.cs" />
     <Compile Include="Controllers\Backend\Summary\SalesSummaryController.cs" />
     <Compile Include="Controllers\Backend\Tasks\ReceiptController.cs" />
     <Compile Include="Controllers\Backend\Tasks\SalesTicketController.cs" />
+    <Compile Include="Controllers\Backend\Widgets\AccountReceivableController.cs" />
+    <Compile Include="Controllers\Backend\Widgets\TopCustomersController.cs" />
+    <Compile Include="Controllers\Backend\Widgets\TopSellingItemsController.cs" />
     <Compile Include="Controllers\SalesDashboardController.cs" />
     <Compile Include="Controllers\Backend\Setups\CashierController.cs" />
     <Compile Include="Controllers\Backend\Setups\LateFeeController.cs" />
@@ -188,6 +192,9 @@
     <Compile Include="DAL\Backend\Tasks\SalesEntry\SqlServer.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesReturnEntries.cs" />
     <Compile Include="DAL\Backend\Tasks\Ticket.cs" />
+    <Compile Include="DAL\Backend\Widgets\AccountReceivables.cs" />
+    <Compile Include="DAL\Backend\Widgets\TopCustomers.cs" />
+    <Compile Include="DAL\Backend\Widgets\TopSellingItems.cs" />
     <Compile Include="DTO\CheckoutDetailView.cs" />
     <Compile Include="DTO\ClosingCash.cs" />
     <Compile Include="DTO\CouponView.cs" />
@@ -227,6 +234,11 @@
   <ItemGroup>
     <Content Include="DevTrends.MvcDonutCaching.README.txt" />
     <Content Include="packages.config" />
+    <Content Include="widgets\receipts.html" />
+    <Content Include="widgets\top-customers.html" />
+    <Content Include="widgets\top-items.html" />
+    <Content Include="widgets\account-receivables.html" />
+    <Content Include="widgets\total-sales.html" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Reports\Invoice.xml" />
@@ -326,6 +338,7 @@
     <Content Include="Views\Tasks\Receipt\Index.cshtml" />
     <Content Include="Views\Tasks\Receipt\New.cshtml" />
     <Content Include="Views\Tasks\Receipt\Verification.cshtml" />
+    <Content Include="Views\Tasks\Console\Index.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -359,7 +372,8 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>start xcopy /y /r "$(ProjectDir)\bin\*.dll" "$(ProjectDir)..\..\bin"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

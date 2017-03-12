@@ -1,5 +1,5 @@
-﻿using Frapid.Dashboard.Extensions;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
+using Frapid.Dashboard.Extensions;
 
 namespace MixERP.Sales.Extensions
 {
@@ -8,6 +8,11 @@ namespace MixERP.Sales.Extensions
         public static MvcHtmlString PartialView(this HtmlHelper helper, string path, string tenant)
         {
             return helper.PartialView<AreaRegistration>(path, tenant);
+        }
+
+        public static MvcHtmlString DashboardPartialView(this HtmlHelper helper, string path, string tenant)
+        {
+            return helper.PartialView<Frapid.Dashboard.AreaRegistration>(path, tenant);
         }
 
         public static MvcHtmlString FinancePartialView(this HtmlHelper helper, string path, string tenant)

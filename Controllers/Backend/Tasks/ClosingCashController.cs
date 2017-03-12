@@ -31,7 +31,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
             var model = new ClosingCashViewModel
             {
-                OpeningCashInfo = openingCash ?? new OpeningCash {TransactionDate = dates.Today},
+                OpeningCashInfo = openingCash ?? new OpeningCash { TransactionDate = dates.Today },
                 SalesView = salesView ?? new List<SalesView>(),
                 ClosingCashInfo = closingCash ?? new ClosingCash { TransactionDate = dates.Today }
             };

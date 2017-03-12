@@ -16,7 +16,7 @@ DELETE FROM core.menus
 WHERE app_name = 'MixERP.Sales';
 
 
-EXECUTE core.create_app 'MixERP.Sales', 'Sales', 'Sales', '1.0', 'MixERP Inc.', 'December 1, 2015', 'shipping blue', '/dashboard/sales/tasks/entry', NULL;
+EXECUTE core.create_app 'MixERP.Sales', 'Sales', 'Sales', '1.0', 'MixERP Inc.', 'December 1, 2015', 'shipping blue', '/dashboard/sales/tasks/console', NULL;
 
 EXECUTE core.create_menu 'MixERP.Sales', 'Tasks', 'Tasks', '', 'lightning', '';
 EXECUTE core.create_menu 'MixERP.Sales', 'OpeningCash', 'Opening Cash', '/dashboard/sales/tasks/opening-cash', 'money', 'Tasks';

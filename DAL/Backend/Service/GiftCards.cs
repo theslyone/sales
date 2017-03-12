@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Frapid.DataAccess;
 using Frapid.Framework.Extensions;
 using Frapid.Mapper;
-using Frapid.Mapper.Decorators;
 using MixERP.Sales.DTO;
 using MixERP.Sales.QueryModels;
 
