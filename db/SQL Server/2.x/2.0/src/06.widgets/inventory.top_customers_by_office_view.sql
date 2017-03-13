@@ -29,3 +29,4 @@ inventory.customers.customer_name,
 inventory.customers.company_name,
 inventory.customers.company_country
 ORDER BY 2 DESC;
+GO

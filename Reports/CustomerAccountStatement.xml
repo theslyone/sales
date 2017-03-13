@@ -52,7 +52,7 @@
         FROM sales.get_customer_account_detail(@CustomerId::int, @from::Date , @To::Date)
       </Query>
       <Parameters>
-        <Parameter Name="@CustomerId" FieldLabel="Customer" Type="integer" PopulateFrom="/api/tables/inventory/customers/display-fields" KeyField="Key" ValueField="Value"/>
+        <Parameter Name="@CustomerId" FieldLabel="Customer" Type="integer" PopulateFrom="/api/views/inventory/customers/display-fields" KeyField="Key" ValueField="Value"/>
         <Parameter Name="@From" FieldLabel="From Date" Type="System.DateTime" />
         <Parameter Name="@To" FieldLabel="To Date" Type="System.DateTime" />
       </Parameters>

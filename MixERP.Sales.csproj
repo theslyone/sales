@@ -234,6 +234,37 @@
   <ItemGroup>
     <Content Include="DevTrends.MvcDonutCaching.README.txt" />
     <Content Include="packages.config" />
+    <Content Include="Reports\AccountReceivables.SqlServer.xml" />
+    <Content Include="Reports\AccountReceivables.xml" />
+    <Content Include="Reports\AllGiftCards.SqlServer.xml" />
+    <Content Include="Reports\AllGiftCards.xml" />
+    <Content Include="Reports\CustomerAccountStatement.SqlServer.xml" />
+    <Content Include="Reports\CustomerAccountStatement.xml" />
+    <Content Include="Reports\CustomerReceipts.SqlServer.xml" />
+    <Content Include="Reports\CustomerReceipts.xml" />
+    <Content Include="Reports\DetailedPaymentReport.SqlServer.xml" />
+    <Content Include="Reports\DetailedPaymentReport.xml" />
+    <Content Include="Reports\GiftCardSummary.SqlServer.xml" />
+    <Content Include="Reports\GiftCardSummary.xml" />
+    <Content Include="Reports\GiftCardTransaction.SqlServer.xml" />
+    <Content Include="Reports\GiftCardTransaction.xml" />
+    <Content Include="Reports\GiftCardUsageStatement.SqlServer.xml" />
+    <Content Include="Reports\GiftCardUsageStatement.xml" />
+    <Content Include="Reports\Invoice.SqlServer.xml" />
+    <Content Include="Reports\Invoice.xml" />
+    <Content Include="Reports\Order.xml" />
+    <Content Include="Reports\OrderStatus.SqlServer.xml" />
+    <Content Include="Reports\OrderStatus.xml" />
+    <Content Include="Reports\Quotation.xml" />
+    <Content Include="Reports\QuotationStatus.SqlServer.xml" />
+    <Content Include="Reports\QuotationStatus.xml" />
+    <Content Include="Reports\Receipt.xml" />
+    <Content Include="Reports\Return.xml" />
+    <Content Include="Reports\SalesByOffice.SqlServer.xml" />
+    <Content Include="Reports\SalesByOffice.xml" />
+    <Content Include="Reports\SalesDiscountStatus.xml" />
+    <Content Include="Reports\SalesDiscountStatus.SqlServer.xml" />
+    <Content Include="Reports\TopSellingItems.xml" />
     <Content Include="widgets\receipts.html" />
     <Content Include="widgets\top-customers.html" />
     <Content Include="widgets\top-items.html" />
@@ -241,8 +272,6 @@
     <Content Include="widgets\total-sales.html" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Reports\Invoice.xml" />
-    <Content Include="Reports\Return.xml" />
     <Content Include="scripts\loyalty\points\index.js" />
     <Content Include="scripts\loyalty\gift-cards\add-fund\checklist.js" />
     <Content Include="scripts\loyalty\gift-cards\add-fund\entry.js" />
