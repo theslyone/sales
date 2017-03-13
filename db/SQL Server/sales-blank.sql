@@ -4273,7 +4273,9 @@ inventory.customers.customer_name,
 inventory.customers.company_name,
 inventory.customers.company_country
 ORDER BY 2 DESC;
+
 GO
+
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/06.widgets/sales.get_account_receivable_widget_details.sql --<--<--
 IF OBJECT_ID('sales.get_account_receivable_widget_details') IS NOT NULL
