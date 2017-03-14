@@ -13,7 +13,7 @@ namespace MixERP.Sales.DAL.Backend.Widgets
             using (var db = DbProvider.Get(FrapidDbServer.GetConnectionString(tenant), tenant).GetDatabase())
             {
                 db.CacheResults = true;
-                db.CacheMilliseconds = 60000 * 60; //1 hour
+                db.CacheMilliseconds = 5000; //5 seconds
 
                 var sql = new Sql("SELECT * FROM sales.get_top_selling_products_of_all_time(@0);", officeId);
                 return await db.SelectAsync<dynamic>(sql).ConfigureAwait(false);
