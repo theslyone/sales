@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using Frapid.ApplicationState.Cache;
 using Frapid.Dashboard;
 using Frapid.Areas.CSRF;
+using Frapid.DataAccess.Models;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
@@ -13,6 +14,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
     {
         [Route("dashboard/sales/tasks/entry/checklist/{tranId}")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/entry")]
+        [AccessPolicy("sales", "sales", AccessTypeEnum.Read)]
         public ActionResult CheckList(long tranId)
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Entry/CheckList.cshtml", this.Tenant), tranId);
@@ -20,6 +22,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/entry")]
         [MenuPolicy]
+        [AccessPolicy("sales", "sales", AccessTypeEnum.Read)]
         public ActionResult Index()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Entry/Index.cshtml", this.Tenant));
@@ -27,6 +30,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/entry/verification")]
         [MenuPolicy]
+        [AccessPolicy("sales", "sales", AccessTypeEnum.Verify)]
         public ActionResult Verification()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Entry/Verification.cshtml", this.Tenant));
@@ -34,6 +38,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/entry/new")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/entry")]
+        [AccessPolicy("sales", "sales", AccessTypeEnum.Read)]
         public ActionResult New()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Entry/New.cshtml", this.Tenant));
@@ -42,6 +47,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [HttpPost]
         [Route("dashboard/sales/tasks/entry/new")]
+        [AccessPolicy("sales", "sales", AccessTypeEnum.Create)]
         public async Task<ActionResult> PostAsync(ViewModels.Sales model)
         {
             if (!this.ModelState.IsValid)

@@ -8,6 +8,7 @@ using MixERP.Finance.Cache;
 using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.ViewModels;
 using Frapid.Areas.CSRF;
+using Frapid.DataAccess.Models;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
@@ -16,6 +17,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
     {
         [Route("dashboard/sales/tasks/opening-cash")]
         [MenuPolicy]
+        [AccessPolicy("sales", "opening_cash", AccessTypeEnum.Read)]
         public async Task<ActionResult> IndexAsync()
         {
             var meta = await AppUsers.GetCurrentAsync(this.Tenant).ConfigureAwait(true);
@@ -29,6 +31,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/opening-cash")]
         [HttpPost]
+        [AccessPolicy("sales", "opening_cash", AccessTypeEnum.Create)]
         public async Task<ActionResult> PostAsync(OpeningCash model)
         {
             if (!this.ModelState.IsValid)
