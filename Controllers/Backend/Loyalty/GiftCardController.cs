@@ -9,6 +9,7 @@ using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.QueryModels;
 using MixERP.Sales.ViewModels;
 using Frapid.Areas.CSRF;
+using Frapid.DataAccess.Models;
 
 namespace MixERP.Sales.Controllers.Backend.Loyalty
 {
@@ -17,12 +18,14 @@ namespace MixERP.Sales.Controllers.Backend.Loyalty
     {
         [Route("dashboard/sales/loyalty/gift-cards")]
         [MenuPolicy]
+        [AccessPolicy("sales", "gift_cards", AccessTypeEnum.Read)]
         public ActionResult Index()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Loyalty/GiftCards/Index.cshtml", this.Tenant));
         }
 
         [Route("dashboard/loyalty/tasks/gift-cards/add-fund")]
+        [AccessPolicy("sales", "gift_cards", AccessTypeEnum.Read)]
         public ActionResult AddFundIndex()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Loyalty/GiftCards/AddFund/Index.cshtml", this.Tenant));
@@ -30,6 +33,7 @@ namespace MixERP.Sales.Controllers.Backend.Loyalty
 
         [Route("dashboard/loyalty/tasks/gift-cards/add-fund/checklist/{tranId}")]
         [MenuPolicy(OverridePath = "/dashboard/loyalty/tasks/gift-cards/add-fund")]
+        [AccessPolicy("sales", "gift_cards", AccessTypeEnum.Read)]
         public ActionResult CheckList(long tranId)
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Loyalty/GiftCards/AddFund/CheckList.cshtml", this.Tenant), tranId);
@@ -37,6 +41,7 @@ namespace MixERP.Sales.Controllers.Backend.Loyalty
 
         [Route("dashboard/loyalty/tasks/gift-cards/add-fund/entry")]
         [MenuPolicy(OverridePath = "/dashboard/loyalty/tasks/gift-cards/add-fund")]
+        [AccessPolicy("sales", "gift_cards", AccessTypeEnum.Read)]
         public ActionResult AddFundEntry()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Loyalty/GiftCards/AddFund/Entry.cshtml", this.Tenant));
@@ -45,6 +50,7 @@ namespace MixERP.Sales.Controllers.Backend.Loyalty
         [Route("dashboard/loyalty/tasks/gift-cards/add-fund/entry")]
         [MenuPolicy(OverridePath = "/dashboard/loyalty/tasks/gift-cards/add-fund")]
         [HttpPost]
+        [AccessPolicy("sales", "gift_card_transactions", AccessTypeEnum.Create)]
         public async Task<ActionResult> AddFundEntryAsync(GiftCardFund model)
         {
             if (!this.ModelState.IsValid)
@@ -71,6 +77,7 @@ namespace MixERP.Sales.Controllers.Backend.Loyalty
 
         [Route("dashboard/loyalty/tasks/gift-cards/search")]
         [HttpPost]
+        [AccessPolicy("sales", "gift_card_search_view", AccessTypeEnum.Create)]
         public async Task<ActionResult> SearchGiftCardsAsync(GiftCardSearch model)
         {
             var result = await GiftCards.SearchAsync(this.Tenant, model).ConfigureAwait(false);
@@ -79,6 +86,7 @@ namespace MixERP.Sales.Controllers.Backend.Loyalty
 
         [Route("dashboard/loyalty/tasks/gift-cards/get-balance/{giftCardNumber}")]
         [HttpPost]
+        [AccessPolicy("sales", "gift_card_transactions", AccessTypeEnum.Read)]
         public async Task<ActionResult> GetBalanceAsync(string giftCardNumber)
         {
             var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);
