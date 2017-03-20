@@ -1,5 +1,6 @@
 using System.Web.Mvc;
 using Frapid.Dashboard;
+using Frapid.DataAccess.Models;
 
 namespace MixERP.Sales.Controllers.Backend.Loyalty
 {

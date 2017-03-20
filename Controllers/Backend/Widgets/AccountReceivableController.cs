@@ -7,6 +7,8 @@ using Frapid.ApplicationState.Cache;
 using Frapid.Areas.Caching;
 using Frapid.Dashboard.Controllers;
 using MixERP.Sales.DAL.Backend.Widgets;
+using Frapid.DataAccess.Models;
+using Frapid.Dashboard;
 
 namespace MixERP.Sales.Controllers.Backend.Widgets
 {
@@ -14,6 +16,7 @@ namespace MixERP.Sales.Controllers.Backend.Widgets
     {
         [Route("dashboard/sales/widgets/account-receivables")]
         [FrapidOutputCache(Duration = 2, Location = OutputCacheLocation.Client)]
+        [AccessPolicy("finance", "transaction_master", AccessTypeEnum.Read)]
         public async Task<ActionResult> GetAsync()
         {
             var meta = await AppUsers.GetCurrentAsync();

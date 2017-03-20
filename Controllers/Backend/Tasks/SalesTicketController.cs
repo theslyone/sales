@@ -2,12 +2,15 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using Frapid.Dashboard.Controllers;
 using MixERP.Sales.Models;
+using Frapid.DataAccess.Models;
+using Frapid.Dashboard;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
     public class SalesTicketController : BackendController
     {
         [Route("dashboard/sales/ticket/{tranId}")]
+        [AccessPolicy("sales", "sales_view", AccessTypeEnum.Read)]
         public async Task<ActionResult> IndexAsync(long tranId)
         {
             if (tranId <= 0)
