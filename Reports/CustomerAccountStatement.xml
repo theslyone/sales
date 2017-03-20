@@ -3,6 +3,7 @@
   <Header />
   <Title>Customer Account Statement Report</Title>
   <TopSection>
+    <br></br>
     <table>
       <tr>
         <td>{i18n.CustomerCode}#</td>
@@ -49,10 +50,11 @@
         debit,
         credit,
         balance
-        FROM sales.get_customer_account_detail(@CustomerId::int, @from::Date , @To::Date)
+        FROM sales.get_customer_account_detail(@CustomerId::int, @from::Date, @To::Date, @OfficeId::int)
       </Query>
       <Parameters>
-        <Parameter Name="@CustomerId" FieldLabel="Customer" Type="integer" PopulateFrom="/api/views/inventory/customers/display-fields" KeyField="Key" ValueField="Value"/>
+        <Parameter Name="@OfficeId" FieldLabel="Office Id" Type="int"  DefaultValue="{Meta.OfficeId}" />
+        <Parameter Name="@CustomerId" FieldLabel="Customer" Type="int" PopulateFrom="/api/views/inventory/customers/display-fields" KeyField="Key" ValueField="Value" Optional="true"/>
         <Parameter Name="@From" FieldLabel="From Date" Type="System.DateTime" />
         <Parameter Name="@To" FieldLabel="To Date" Type="System.DateTime" />
       </Parameters>
