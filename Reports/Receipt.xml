@@ -81,7 +81,7 @@
           {i18n.Address}
         </td>
         <td>
-          {DataSource[0].company_zipcode}
+          {DataSource[0].company_zip_code}
           {DataSource[0].company_po_box}
 		  <br />
           {DataSource[0].company_address_line_1}
@@ -185,7 +185,7 @@
 			sales.customer_receipts.customer_id,
 			inventory.customers.customer_code,
 			inventory.customers.customer_name,
-			inventory.customers.company_zipcode, 
+			inventory.customers.company_zip_code, 
 			inventory.customers.company_po_box, 
 			inventory.customers.company_address_line_1, 
 			inventory.customers.company_address_line_2, 

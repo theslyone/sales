@@ -2,7 +2,7 @@
 @model MixERP.Sales.ViewModels.ClosingCashViewModel
 
 @{
-    ViewBag.Title = I18N.Title;
+    ViewBag.Title = I18N.EODCash;
     Layout = ViewBag.Layout;
     decimal tenderTotal = Model.SalesView.Sum(x => x.Tender);
     decimal changeTotal = Model.SalesView.Sum(x => x.Change);

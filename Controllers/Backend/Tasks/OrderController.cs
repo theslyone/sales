@@ -8,6 +8,7 @@ using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.DTO;
 using MixERP.Sales.QueryModels;
 using Frapid.Areas.CSRF;
+using Frapid.DataAccess.Models;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
@@ -16,12 +17,14 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
     {
         [Route("dashboard/sales/tasks/order/checklist/{tranId}")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/order")]
+        [AccessPolicy("sales", "orders", AccessTypeEnum.Read)]
         public ActionResult CheckList(long tranId)
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Order/CheckList.cshtml", this.Tenant), tranId);
         }
 
         [Route("dashboard/sales/tasks/order/merge-model/{orderId}")]
+        [AccessPolicy("sales", "order_details", AccessTypeEnum.Read)]
         public async Task<ActionResult> GetMergeModelAsync(long orderId)
         {
             var model = await Orders.GetMergeModelAsync(this.Tenant, orderId).ConfigureAwait(true);
@@ -30,6 +33,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/order/view")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/order")]
+        [AccessPolicy("sales", "orders", AccessTypeEnum.Read)]
         public async Task<ActionResult> ViewAsync(OrderQueryModel query)
         {
             try
@@ -51,6 +55,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/order")]
         [MenuPolicy]
+        [AccessPolicy("sales", "orders", AccessTypeEnum.Read)]
         public ActionResult Index()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Order/Index.cshtml", this.Tenant));
@@ -58,6 +63,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/order/verification")]
         [MenuPolicy]
+        [AccessPolicy("sales", "orders", AccessTypeEnum.Verify)]
         public ActionResult Verification()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Order/Verification.cshtml", this.Tenant));
@@ -65,6 +71,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/order/new")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/order")]
+        [AccessPolicy("sales", "orders", AccessTypeEnum.Read)]
         public ActionResult New()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Order/New.cshtml", this.Tenant));
@@ -72,6 +79,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/order/new")]
         [HttpPost]
+        [AccessPolicy("sales", "orders", AccessTypeEnum.Create)]
         public async Task<ActionResult> PostAsync(Order model)
         {
             if (!this.ModelState.IsValid)

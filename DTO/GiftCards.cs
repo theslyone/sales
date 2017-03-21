@@ -13,7 +13,7 @@ namespace MixERP.Sales.DTO
         public string State { get; set; }
         public string Country { get; set; }
         public string PoBox { get; set; }
-        public string Zipcode { get; set; }
+        public string ZipCode { get; set; }
         public string PhoneNumbers { get; set; }
         public string Fax { get; set; }
     }

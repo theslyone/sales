@@ -19,7 +19,7 @@ CREATE TABLE sales.gift_cards
     state                                   national character varying(100),
     country                                 national character varying(100),
     po_box                                  national character varying(100),
-    zipcode                                 national character varying(100),
+    zip_code                                national character varying(100),
     phone_numbers                           national character varying(100),
     fax                                     national character varying(100),    
     audit_user_id                           integer REFERENCES account.users,
@@ -682,6 +682,80 @@ LANGUAGE plpgsql;
 
 --SELECT * FROM sales.get_avaiable_coupons_to_print(2);
 
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_customer_account_detail.sql --<--<--
+DROP FUNCTION IF EXISTS sales.get_customer_account_detail(integer, date, date);
+CREATE OR REPLACE FUNCTION sales.get_customer_account_detail
+(
+    _customer_id        integer,
+    _from               date,
+    _to                 date
+)
+RETURNS TABLE
+(
+    id                  integer, 
+    value_date          date, 
+    invoice_number      bigint, 
+    statement_reference text, 
+    debit               numeric(30, 6), 
+    credit              numeric(30, 6), 
+    balance             numeric(30, 6)
+)
+AS
+$BODY$
+BEGIN
+    CREATE TEMPORARY TABLE _customer_account_detail
+    (
+        id                      SERIAL NOT NULL,
+        value_date              date,
+        invoice_number          bigint,
+        statement_reference     text,
+        debit                   numeric(30, 6),
+        credit                  numeric(30, 6),
+        balance                 numeric(30, 6)
+    ) ON COMMIT DROP;
+
+    INSERT INTO _customer_account_detail
+    (
+        value_date, 
+        invoice_number, 
+        statement_reference, 
+        debit, 
+        credit
+    )
+    SELECT 
+        ctv.value_date,
+        ctv.invoice_number,
+        ctv.statement_reference,
+        ctv.debit,
+        ctv.credit
+    FROM sales.customer_transaction_view ctv
+    LEFT JOIN inventory.customers cus
+    ON ctv.customer_id = cus.customer_id
+    WHERE ctv.customer_id = _customer_id
+    AND ctv.value_date BETWEEN _from AND _to;
+
+    UPDATE _customer_account_detail 
+    SET balance = c.balance
+    FROM
+    (
+        SELECT p.id,
+            SUM(COALESCE(c.debit, 0) - COALESCE(c.credit, 0)) As balance
+        FROM _customer_account_detail p
+        LEFT JOIN _customer_account_detail c
+        ON c.id <= p.id
+        GROUP BY p.id
+        ORDER BY p.id
+    ) AS c
+    WHERE _customer_account_detail.id = c.id;
+
+    RETURN QUERY
+    SELECT * FROM _customer_account_detail;
+END
+$BODY$
+ LANGUAGE plpgsql;
+
+
+
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_balance.sql --<--<--
 DROP FUNCTION IF EXISTS sales.get_gift_card_balance(_gift_card_id integer, _value_date date);
 
@@ -715,6 +789,111 @@ BEGIN
 END
 $$
 LANGUAGE plpgsql;
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_detail.sql --<--<--
+DROP FUNCTION IF EXISTS sales.get_gift_card_detail(national character varying(50), date, date);
+CREATE FUNCTION sales.get_gift_card_detail
+(
+    _card_number        national character varying(50),
+    _from               date,
+    _to                 date
+)
+RETURNS TABLE
+(
+    id                  integer, 
+    gift_card_id        integer, 
+    transaction_ts      timestamp without time zone, 
+    statement_reference text, 
+    debit               numeric(30,6), 
+    credit              numeric(30,6), 
+    balance             numeric(30,6)
+)
+AS
+$BODY$
+BEGIN
+    CREATE TEMPORARY TABLE  _gift_card_detail
+    (
+        id                      SERIAL NOT NULL,    
+        gift_card_id            integer,
+        transaction_ts          timestamp without time zone, 
+        statement_reference     text,
+        debit                   numeric(30, 6),
+        credit                  numeric(30, 6),
+        balance                 numeric(30, 6)
+    ) ON COMMIT DROP;
+
+    INSERT INTO _gift_card_detail
+    (
+        gift_card_id, 
+        transaction_ts, 
+        statement_reference, 
+        debit, 
+        credit
+    )
+    SELECT 
+        t.gift_card_id, 
+        t.transaction_ts, 
+        t.statement_reference, 
+        t.debit, 
+        t.credit
+    FROM
+    (
+        SELECT  gift_card_transactions.gift_card_id,
+                transaction_master.transaction_ts,
+                transaction_master.statement_reference,
+                CASE WHEN gift_card_transactions.transaction_type = 'Dr' THEN gift_card_transactions.amount END AS debit,
+                CASE WHEN gift_card_transactions.transaction_type = 'Cr' THEN gift_card_transactions.amount END AS credit
+        FROM sales.gift_card_transactions
+        JOIN finance.transaction_master
+            ON transaction_master.transaction_master_id = gift_card_transactions.transaction_master_id
+        JOIN sales.gift_cards
+            ON gift_cards.gift_card_id = gift_card_transactions.gift_card_id
+        WHERE gift_cards.gift_card_number = _card_number
+        AND transaction_master.transaction_ts::date BETWEEN _from AND _to
+        UNION ALL
+        
+        SELECT 
+            sales.gift_card_id,
+            transaction_master.transaction_ts,
+            transaction_master.statement_reference,
+            sales.total_amount,
+            0
+            FROM sales.sales
+            LEFT JOIN finance.transaction_master
+            ON transaction_master.transaction_master_id = sales.transaction_master_id
+            JOIN sales.gift_cards
+            ON gift_cards.gift_card_id = sales.gift_card_id
+            WHERE sales.gift_card_id IS NOT NULL
+            AND gift_cards.gift_card_number = _card_number
+            AND transaction_master.transaction_ts::date BETWEEN _from AND _to
+        ) t
+        ORDER BY t.transaction_ts ASC;
+
+    UPDATE _gift_card_detail
+    SET balance = c.balance
+    FROM
+    (
+        SELECT
+            p.id, 
+            SUM(COALESCE(c.credit, 0) - COALESCE(c.debit, 0)) As balance
+        FROM _gift_card_detail p
+        LEFT JOIN _gift_card_detail AS c 
+            ON (c.transaction_ts <= p.transaction_ts)
+        GROUP BY p.id
+        ORDER BY p.id    
+     ) AS c
+    WHERE _gift_card_detail.id = c.id;
+    
+    RETURN QUERY
+    (
+        SELECT * FROM _gift_card_detail
+        ORDER BY transaction_ts ASC
+    );
+END
+$BODY$
+  LANGUAGE plpgsql;
+
+
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_id_by_gift_card_number.sql --<--<--
 DROP FUNCTION IF EXISTS sales.get_gift_card_id_by_gift_card_number(_gift_card_number national character varying(100));
@@ -1269,8 +1448,8 @@ BEGIN
     SELECT _transaction_master_id, _office_id, _value_date, _book_date, 'Cr', _customer_account_id, _statement_reference, NULL, _base_currency_code, _credit, _local_currency_code, _exchange_rate_credit, _lc_credit, _user_id;
     
     
-    INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, cash_repository_id, posted_date, tender, change)
-    SELECT _transaction_master_id, _customer_id, _currency_code, _exchange_rate_debit, _exchange_rate_credit, _cash_repository_id, _value_date, _tender, _change;
+    INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, cash_repository_id, posted_date, tender, change, amount)
+    SELECT _transaction_master_id, _customer_id, _currency_code, _exchange_rate_debit, _exchange_rate_credit, _cash_repository_id, _value_date, _tender, _change, _receivable;
 
     RETURN _transaction_master_id;
 END
@@ -1394,8 +1573,8 @@ BEGIN
     SELECT _transaction_master_id, _office_id, _value_date, _book_date, 'Cr', _customer_account_id, _statement_reference, NULL, _base_currency_code, _credit, _local_currency_code, _exchange_rate_credit, _lc_credit, _user_id;
     
     
-    INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, posted_date, check_amount, check_bank_name, check_number, check_date)
-    SELECT _transaction_master_id, _customer_id, _currency_code, _exchange_rate_debit, _exchange_rate_credit, _value_date, _check_amount, _check_bank_name, _check_number, _check_date;
+    INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, posted_date, check_amount, check_bank_name, check_number, check_date, amount)
+    SELECT _transaction_master_id, _customer_id, _currency_code, _exchange_rate_debit, _exchange_rate_credit, _value_date, _check_amount, _check_bank_name, _check_number, _check_date, _check_amount;
 
     RETURN _transaction_master_id;
 END
@@ -2117,8 +2296,8 @@ BEGIN
     SELECT _transaction_master_id, _office_id, _value_date, _book_date, 'Cr', _customer_account_id, _statement_reference, NULL, _base_currency_code, _credit, _local_currency_code, _exchange_rate_credit, _lc_credit, _user_id;
     
     
-    INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, posted_date, gift_card_number)
-    SELECT _transaction_master_id, _customer_id, _currency_code, _exchange_rate_debit, _exchange_rate_credit, _value_date, _gift_card_number;
+    INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, er_debit, er_credit, posted_date, gift_card_number, amount)
+    SELECT _transaction_master_id, _customer_id, _currency_code, _exchange_rate_debit, _exchange_rate_credit, _value_date, _gift_card_number, _amount;
 
     RETURN _transaction_master_id;
 END
@@ -3238,70 +3417,70 @@ DELETE FROM auth.menu_access_policy
 WHERE menu_id IN
 (
     SELECT menu_id FROM core.menus
-    WHERE app_name = 'Sales'
+    WHERE app_name = 'MixERP.Sales'
 );
 
 DELETE FROM auth.group_menu_access_policy
 WHERE menu_id IN
 (
     SELECT menu_id FROM core.menus
-    WHERE app_name = 'Sales'
+    WHERE app_name = 'MixERP.Sales'
 );
 
 DELETE FROM core.menus
-WHERE app_name = 'Sales';
+WHERE app_name = 'MixERP.Sales';
 
 
-SELECT * FROM core.create_app('Sales', 'Sales', 'Sales', '1.0', 'MixERP Inc.', 'December 1, 2015', 'shipping blue', '/dashboard/sales/tasks/entry', NULL::text[]);
+SELECT * FROM core.create_app('MixERP.Sales', 'Sales', 'Sales', '1.0', 'MixERP Inc.', 'December 1, 2015', 'shipping blue', '/dashboard/sales/tasks/console', NULL::text[]);
 
-SELECT * FROM core.create_menu('Sales', 'Tasks', 'Tasks', '', 'lightning', '');
-SELECT * FROM core.create_menu('Sales', 'OpeningCash', 'Opening Cash', '/dashboard/sales/tasks/opening-cash', 'money', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'SalesEntry', 'Sales Entry', '/dashboard/sales/tasks/entry', 'write', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'Receipt', 'Receipt', '/dashboard/sales/tasks/receipt', 'checkmark box', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'SalesReturns', 'Sales Returns', '/dashboard/sales/tasks/return', 'minus square', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'SalesQuotations', 'Sales Quotations', '/dashboard/sales/tasks/quotation', 'quote left', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'SalesOrders', 'Sales Orders', '/dashboard/sales/tasks/order', 'file text outline', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'SalesEntryVerification', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'ReceiptVerification', 'Receipt Verification', '/dashboard/sales/tasks/receipt/verification', 'checkmark', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'SalesReturnVerification', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'CheckClearing', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');
-SELECT * FROM core.create_menu('Sales', 'EOD', 'EOD', '/dashboard/sales/tasks/eod', 'money', 'Tasks');
+SELECT * FROM core.create_menu('MixERP.Sales', 'Tasks', 'Tasks', '', 'lightning', '');
+SELECT * FROM core.create_menu('MixERP.Sales', 'OpeningCash', 'Opening Cash', '/dashboard/sales/tasks/opening-cash', 'money', 'Tasks');
+SELECT * FROM core.create_menu('MixERP.Sales', 'SalesEntry', 'Sales Entry', '/dashboard/sales/tasks/entry', 'write', 'Tasks');
+SELECT * FROM core.create_menu('MixERP.Sales', 'Receipt', 'Receipt', '/dashboard/sales/tasks/receipt', 'checkmark box', 'Tasks');
+SELECT * FROM core.create_menu('MixERP.Sales', 'SalesReturns', 'Sales Returns', '/dashboard/sales/tasks/return', 'minus square', 'Tasks');
+SELECT * FROM core.create_menu('MixERP.Sales', 'SalesQuotations', 'Sales Quotations', '/dashboard/sales/tasks/quotation', 'quote left', 'Tasks');
+SELECT * FROM core.create_menu('MixERP.Sales', 'SalesOrders', 'Sales Orders', '/dashboard/sales/tasks/order', 'file text outline', 'Tasks');
+SELECT * FROM core.create_menu('MixERP.Sales', 'SalesEntryVerification', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks');
+SELECT * FROM core.create_menu('MixERP.Sales', 'ReceiptVerification', 'Receipt Verification', '/dashboard/sales/tasks/receipt/verification', 'checkmark', 'Tasks');
+SELECT * FROM core.create_menu('MixERP.Sales', 'SalesReturnVerification', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks');
+SELECT * FROM core.create_menu('MixERP.Sales', 'CheckClearing', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');
+SELECT * FROM core.create_menu('MixERP.Sales', 'EOD', 'EOD', '/dashboard/sales/tasks/eod', 'money', 'Tasks');
 
-SELECT * FROM core.create_menu('Sales', 'CustomerLoyalty', 'Customer Loyalty', 'square outline', 'user', '');
-SELECT * FROM core.create_menu('Sales', 'GiftCards', 'Gift Cards', '/dashboard/sales/loyalty/gift-cards', 'gift', 'Customer Loyalty');
-SELECT * FROM core.create_menu('Sales', 'AddGiftCardFund', 'Add Gift Card Fund', '/dashboard/loyalty/tasks/gift-cards/add-fund', 'pound', 'Customer Loyalty');
-SELECT * FROM core.create_menu('Sales', 'VerifyGiftCardFund', 'Verify Gift Card Fund', '/dashboard/loyalty/tasks/gift-cards/add-fund/verification', 'checkmark', 'Customer Loyalty');
-SELECT * FROM core.create_menu('Sales', 'SalesCoupons', 'Sales Coupons', '/dashboard/sales/loyalty/coupons', 'browser', 'Customer Loyalty');
---SELECT * FROM core.create_menu('Sales', 'LoyaltyPointConfiguration', 'Loyalty Point Configuration', '/dashboard/sales/loyalty/points', 'selected radio', 'Customer Loyalty');
+SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerLoyalty', 'Customer Loyalty', 'square outline', 'user', '');
+SELECT * FROM core.create_menu('MixERP.Sales', 'GiftCards', 'Gift Cards', '/dashboard/sales/loyalty/gift-cards', 'gift', 'Customer Loyalty');
+SELECT * FROM core.create_menu('MixERP.Sales', 'AddGiftCardFund', 'Add Gift Card Fund', '/dashboard/loyalty/tasks/gift-cards/add-fund', 'pound', 'Customer Loyalty');
+SELECT * FROM core.create_menu('MixERP.Sales', 'VerifyGiftCardFund', 'Verify Gift Card Fund', '/dashboard/loyalty/tasks/gift-cards/add-fund/verification', 'checkmark', 'Customer Loyalty');
+SELECT * FROM core.create_menu('MixERP.Sales', 'SalesCoupons', 'Sales Coupons', '/dashboard/sales/loyalty/coupons', 'browser', 'Customer Loyalty');
+--SELECT * FROM core.create_menu('MixERP.Sales', 'LoyaltyPointConfiguration', 'Loyalty Point Configuration', '/dashboard/sales/loyalty/points', 'selected radio', 'Customer Loyalty');
 
-SELECT * FROM core.create_menu('Sales', 'Setup', 'Setup', 'square outline', 'configure', '');
-SELECT * FROM core.create_menu('Sales', 'CustomerTypes', 'Customer Types', '/dashboard/sales/setup/customer-types', 'child', 'Setup');
-SELECT * FROM core.create_menu('Sales', 'Customers', 'Customers', '/dashboard/sales/setup/customers', 'street view', 'Setup');
-SELECT * FROM core.create_menu('Sales', 'PriceTypes', 'Price Types', '/dashboard/sales/setup/price-types', 'ruble', 'Setup');
-SELECT * FROM core.create_menu('Sales', 'SellingPrices', 'Selling Prices', '/dashboard/sales/setup/selling-prices', 'in cart', 'Setup');
-SELECT * FROM core.create_menu('Sales', 'LateFee', 'Late Fee', '/dashboard/sales/setup/late-fee', 'alarm mute', 'Setup');
-SELECT * FROM core.create_menu('Sales', 'PaymentTerms', 'Payment Terms', '/dashboard/sales/setup/payment-terms', 'checked calendar', 'Setup');
-SELECT * FROM core.create_menu('Sales', 'Cashiers', 'Cashiers', '/dashboard/sales/setup/cashiers', 'male', 'Setup');
+SELECT * FROM core.create_menu('MixERP.Sales', 'Setup', 'Setup', 'square outline', 'configure', '');
+SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerTypes', 'Customer Types', '/dashboard/sales/setup/customer-types', 'child', 'Setup');
+SELECT * FROM core.create_menu('MixERP.Sales', 'Customers', 'Customers', '/dashboard/sales/setup/customers', 'street view', 'Setup');
+SELECT * FROM core.create_menu('MixERP.Sales', 'PriceTypes', 'Price Types', '/dashboard/sales/setup/price-types', 'ruble', 'Setup');
+SELECT * FROM core.create_menu('MixERP.Sales', 'SellingPrices', 'Selling Prices', '/dashboard/sales/setup/selling-prices', 'in cart', 'Setup');
+SELECT * FROM core.create_menu('MixERP.Sales', 'LateFee', 'Late Fee', '/dashboard/sales/setup/late-fee', 'alarm mute', 'Setup');
+SELECT * FROM core.create_menu('MixERP.Sales', 'PaymentTerms', 'Payment Terms', '/dashboard/sales/setup/payment-terms', 'checked calendar', 'Setup');
+SELECT * FROM core.create_menu('MixERP.Sales', 'Cashiers', 'Cashiers', '/dashboard/sales/setup/cashiers', 'male', 'Setup');
 
-SELECT * FROM core.create_menu('Sales', 'Reports', 'Reports', '', 'block layout', '');
-SELECT * FROM core.create_menu('Sales', 'AccountReceivables', 'Account Receivables', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountReceivables.xml', 'certificate', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'AllGiftCards', 'All Gift Cards', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AllGiftCards.xml', 'certificate', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'GiftCardUsageStatement', 'Gift Card Usage Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/GiftCardUsageStatement.xml', 'columns', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'CustomerAccountStatement', 'Customer Account Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerAccountStatement.xml', 'content', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'TopSellingItems', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'SalesByOffice', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'CustomerReceipts', 'Customer Receipts', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerReceipts.xml', 'building', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'DetailedPaymentReport', 'Detailed Payment Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/DetailedPaymentReport.xml', 'bar chart', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'GiftCardSummary', 'Gift Card Summary', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/GiftCardSummary.xml', 'list', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'QuotationStatus', 'Quotation Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/QuotationStatus.xml', 'list', 'Reports');
-SELECT * FROM core.create_menu('Sales', 'OrderStatus', 'Order Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/OrderStatus.xml', 'bar chart', 'Reports');
-
+SELECT * FROM core.create_menu('MixERP.Sales', 'Reports', 'Reports', '', 'block layout', '');
+SELECT * FROM core.create_menu('MixERP.Sales', 'AccountReceivables', 'Account Receivables', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountReceivables.xml', 'certificate', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'AllGiftCards', 'All Gift Cards', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AllGiftCards.xml', 'certificate', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'GiftCardUsageStatement', 'Gift Card Usage Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/GiftCardUsageStatement.xml', 'columns', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerAccountStatement', 'Customer Account Statement', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerAccountStatement.xml', 'content', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'TopSellingItems', 'Top Selling Items', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/TopSellingItems.xml', 'map signs', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'SalesByOffice', 'Sales by Office', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesByOffice.xml', 'building', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerReceipts', 'Customer Receipts', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomerReceipts.xml', 'building', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'DetailedPaymentReport', 'Detailed Payment Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/DetailedPaymentReport.xml', 'bar chart', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'GiftCardSummary', 'Gift Card Summary', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/GiftCardSummary.xml', 'list', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'QuotationStatus', 'Quotation Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/QuotationStatus.xml', 'list', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'OrderStatus', 'Order Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/OrderStatus.xml', 'bar chart', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'SalesDiscountStatus', 'Sales Discount Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesDiscountStatus.xml', 'shopping basket icon', 'Reports');
 
 SELECT * FROM auth.create_app_menu_policy
 (
     'Admin', 
     core.get_office_id_by_office_name('Default'), 
-    'Sales',
+    'MixERP.Sales',
     '{*}'::text[]
 );
 
@@ -3527,7 +3706,7 @@ SELECT
     sales.gift_cards.state,
     sales.gift_cards.country,
     sales.gift_cards.po_box,
-    sales.gift_cards.zipcode,
+    sales.gift_cards.zip_code,
     sales.gift_cards.phone_numbers,
     sales.gift_cards.fax    
 FROM sales.gift_cards
@@ -3705,6 +3884,153 @@ WHERE NOT finance.transaction_master.deleted;
 
 
 --SELECT * FROM sales.sales_view
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.views/sales.zcustomer_transaction_view.sql --<--<--
+DROP VIEW IF EXISTS sales.customer_transaction_view;
+CREATE VIEW sales.customer_transaction_view 
+AS
+SELECT 
+    sales_view.value_date,
+    sales_view.invoice_number,
+    sales_view.customer_id,
+    'Invoice'::text AS statement_reference,
+    sales_view.total_amount::numeric + COALESCE(sales_view.check_amount::numeric, 0::numeric) - sales_view.total_discount_amount::numeric AS debit,
+    NULL::numeric AS credit
+FROM sales.sales_view
+WHERE sales_view.verification_status_id > 0
+UNION ALL
+
+SELECT 
+    sales_view.value_date,
+    sales_view.invoice_number,
+    sales_view.customer_id,
+    'Payment'::text AS statement_reference,
+    NULL::numeric AS debit,
+    sales_view.total_amount::numeric + COALESCE(sales_view.check_amount::numeric, 0::numeric) - sales_view.total_discount_amount::numeric AS credit
+FROM sales.sales_view
+WHERE sales_view.verification_status_id > 0 AND NOT sales_view.is_credit
+UNION ALL
+
+SELECT 
+    sales_view.value_date,
+    sales_view.invoice_number,
+    returns.customer_id,
+    'Return'::text AS statement_reference,
+    NULL::numeric AS debit,
+    sum(checkout_detail_view.total) AS credit
+FROM sales.returns
+JOIN sales.sales_view ON returns.sales_id = sales_view.sales_id
+JOIN inventory.checkout_detail_view ON returns.checkout_id = checkout_detail_view.checkout_id
+WHERE sales_view.verification_status_id > 0
+GROUP BY sales_view.value_date, sales_view.invoice_number, returns.customer_id
+UNION ALL
+
+SELECT 
+    customer_receipts.posted_date AS value_date,
+    NULL::bigint AS invoice_number,
+    customer_receipts.customer_id,
+    'Payment'::text AS statement_reference,
+    NULL::numeric AS debit,
+    customer_receipts.amount AS credit
+FROM sales.customer_receipts
+JOIN finance.transaction_master ON customer_receipts.transaction_master_id = transaction_master.transaction_master_id
+WHERE transaction_master.verification_status_id > 0;
+
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/06.widgets/inventory.top_customers_by_office_view.sql --<--<--
+DROP VIEW IF EXISTS inventory.top_customers_by_office_view;
+
+CREATE VIEW inventory.top_customers_by_office_view
+AS
+SELECT
+    inventory.verified_checkout_view.office_id,
+    inventory.customers.customer_id,
+    CASE WHEN COALESCE(inventory.customers.customer_name, '') = ''
+    THEN inventory.customers.company_name
+    ELSE inventory.customers.customer_name
+    END as customer,
+    inventory.customers.company_country AS country,
+    SUM(
+        (inventory.verified_checkout_view.price * inventory.verified_checkout_view.quantity) 
+        - inventory.verified_checkout_view.discount 
+        + inventory.verified_checkout_view.tax) AS amount
+FROM inventory.verified_checkout_view
+INNER JOIN sales.sales
+ON inventory.verified_checkout_view.checkout_id = sales.sales.checkout_id
+INNER JOIN inventory.customers
+ON sales.sales.customer_id = inventory.customers.customer_id
+GROUP BY
+inventory.verified_checkout_view.office_id,
+inventory.customers.customer_id,
+inventory.customers.customer_name,
+inventory.customers.company_name,
+inventory.customers.company_country
+ORDER BY 2 DESC
+LIMIT 5;
+
+
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/06.widgets/sales.get_account_receivable_widget_details.sql --<--<--
+DROP FUNCTION IF EXISTS sales.get_account_receivable_widget_details(_office_id integer);
+
+CREATE FUNCTION sales.get_account_receivable_widget_details(_office_id integer)
+RETURNS TABLE
+(
+    all_time_sales                              decimal(30, 6),
+    all_time_receipt                            decimal(30, 6),
+    receivable_of_all_time                      decimal(30, 6),
+    this_months_sales                           decimal(30, 6),
+    this_months_receipt                         decimal(30, 6),
+    receivable_of_this_month                    decimal(30, 6)
+)
+AS
+$$
+    DECLARE _all_time_sales                     decimal(30, 6);
+    DECLARE _all_time_receipt                   decimal(30, 6);
+    DECLARE _this_months_sales                  decimal(30, 6);
+    DECLARE _this_months_receipt                decimal(30, 6);
+    DECLARE _start_date                         date = finance.get_month_start_date(_office_id);
+    DECLARE _end_date                           date = finance.get_month_end_date(_office_id);
+BEGIN    
+    SELECT COALESCE(SUM(sales.sales.total_amount), 0) INTO _all_time_sales 
+    FROM sales.sales
+    INNER JOIN finance.transaction_master
+    ON finance.transaction_master.transaction_master_id = sales.sales.transaction_master_id
+    WHERE finance.transaction_master.office_id IN (SELECT * FROM core.get_office_ids(_office_id))
+    AND finance.transaction_master.verification_status_id > 0;
+    
+    SELECT COALESCE(SUM(sales.customer_receipts.amount), 0) INTO _all_time_receipt 
+    FROM sales.customer_receipts
+    INNER JOIN finance.transaction_master
+    ON finance.transaction_master.transaction_master_id = sales.customer_receipts.transaction_master_id
+    WHERE finance.transaction_master.office_id IN (SELECT * FROM core.get_office_ids(_office_id))
+    AND finance.transaction_master.verification_status_id > 0;
+
+    SELECT COALESCE(SUM(sales.sales.total_amount), 0) INTO _this_months_sales 
+    FROM sales.sales
+    INNER JOIN finance.transaction_master
+    ON finance.transaction_master.transaction_master_id = sales.sales.transaction_master_id
+    WHERE finance.transaction_master.office_id IN (SELECT * FROM core.get_office_ids(_office_id))
+    AND finance.transaction_master.verification_status_id > 0
+    AND finance.transaction_master.value_date BETWEEN _start_date AND _end_date;
+    
+    SELECT COALESCE(SUM(sales.customer_receipts.amount), 0) INTO _this_months_receipt 
+    FROM sales.customer_receipts
+    INNER JOIN finance.transaction_master
+    ON finance.transaction_master.transaction_master_id = sales.customer_receipts.transaction_master_id
+    WHERE finance.transaction_master.office_id IN (SELECT * FROM core.get_office_ids(_office_id))
+    AND finance.transaction_master.verification_status_id > 0
+    AND finance.transaction_master.value_date BETWEEN _start_date AND _end_date;
+
+
+    RETURN QUERY
+    SELECT _all_time_sales, _all_time_receipt, _all_time_sales - _all_time_receipt, 
+    _this_months_sales, _this_months_receipt, _this_months_sales - _this_months_receipt;    
+END
+$$
+LANGUAGE plpgsql;
+
+--SELECT * FROM sales.get_account_receivable_widget_details(1);
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/99.ownership.sql --<--<--
 DO

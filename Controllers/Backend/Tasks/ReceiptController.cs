@@ -7,6 +7,7 @@ using Frapid.Areas.CSRF;
 using Frapid.Dashboard;
 using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.ViewModels;
+using Frapid.DataAccess.Models;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
@@ -15,6 +16,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
     {
         [Route("dashboard/sales/tasks/receipt/checklist/{tranId}")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/receipt")]
+        [AccessPolicy("sales", "customer_receipts", AccessTypeEnum.Read)]
         public ActionResult CheckList(long tranId)
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Receipt/CheckList.cshtml", this.Tenant), tranId);
@@ -22,6 +24,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/receipt")]
         [MenuPolicy]
+        [AccessPolicy("sales", "customer_receipts", AccessTypeEnum.Read)]
         public ActionResult Index()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Receipt/Index.cshtml", this.Tenant));
@@ -29,6 +32,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/receipt/verification")]
         [MenuPolicy]
+        [AccessPolicy("sales", "customer_receipts", AccessTypeEnum.Verify)]
         public ActionResult Verification()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Receipt/Verification.cshtml", this.Tenant));
@@ -36,6 +40,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/receipt/new")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/receipt")]
+        [AccessPolicy("sales", "customer_receipts", AccessTypeEnum.Read)]
         public ActionResult New()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Receipt/New.cshtml", this.Tenant));
@@ -43,6 +48,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/receipt/merchant-fee-setup/{merchantAccountId}/{paymentCardId}")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/receipt")]
+        [AccessPolicy("finance", "merchant_fee_setup", AccessTypeEnum.Read)]
         public async Task<ActionResult> GetMerchantFeeSetupAsync(int merchantAccountId, int paymentCardId)
         {
             var model = await Receipts.GetMerchantFeeSetupAsync(this.Tenant, merchantAccountId, paymentCardId).ConfigureAwait(true);
@@ -51,6 +57,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/receipt/home-currency")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/receipt")]
+        [AccessPolicy("core", "offices", AccessTypeEnum.Read)]
         public async Task<ActionResult> GetHomeCurrencyAsync()
         {
             var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);
@@ -60,6 +67,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/receipt/exchange-rate/{sourceCurrencyCode}/{destinationCurrencyCode}")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/receipt")]
+        [AccessPolicy("finance", "exchange_rates", AccessTypeEnum.Read)]
         public async Task<ActionResult> GetHomeCurrencyAsync(string sourceCurrencyCode, string destinationCurrencyCode)
         {
             if (string.IsNullOrWhiteSpace(sourceCurrencyCode) || string.IsNullOrWhiteSpace(destinationCurrencyCode))
@@ -79,6 +87,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/receipt/customer/transaction-summary/{customerId}")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/receipt")]
+        [AccessPolicy("core", "currencies", AccessTypeEnum.Read)]
         public async Task<ActionResult> GetCustomerTransactionSummaryAsync(int customerId)
         {
             if (customerId <= 0)
@@ -94,6 +103,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [HttpPost]
         [Route("dashboard/sales/tasks/receipt/new")]
+        [AccessPolicy("sales", "customer_receipts", AccessTypeEnum.Create)]
         public async Task<ActionResult> PostAsync(SalesReceipt model)
         {
             if (!this.ModelState.IsValid)
@@ -117,7 +127,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
             model.LoginId = meta.LoginId;
 
             try
-            {                
+            {
                 long tranId = await Receipts.PostAsync(this.Tenant, model).ConfigureAwait(true);
                 return this.Ok(tranId);
             }

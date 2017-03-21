@@ -8,6 +8,7 @@ using Frapid.Dashboard;
 using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.DTO;
 using MixERP.Sales.QueryModels;
+using Frapid.DataAccess.Models;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
@@ -16,12 +17,14 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
     {
         [Route("dashboard/sales/tasks/quotation/checklist/{tranId}")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/quotation")]
+        [AccessPolicy("sales", "quotations", AccessTypeEnum.Read)]
         public ActionResult CheckList(long tranId)
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Quotation/CheckList.cshtml", this.Tenant), tranId);
         }
 
         [Route("dashboard/sales/tasks/quotation/merge-model/{quotationId}")]
+        [AccessPolicy("sales", "quotation_details", AccessTypeEnum.Read)]
         public async Task<ActionResult> GetMergeModelAsync(long quotationId)
         {
             var model = await Quotations.GetMergeModelAsync(this.Tenant, quotationId).ConfigureAwait(true);
@@ -30,6 +33,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/quotation/view")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/quotation")]
+        [AccessPolicy("sales", "quotations", AccessTypeEnum.Read)]
         public async Task<ActionResult> ViewAsync(QuotationQueryModel query)
         {
             try
@@ -50,6 +54,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/quotation")]
         [MenuPolicy]
+        [AccessPolicy("sales", "quotations", AccessTypeEnum.Read)]
         public ActionResult Index()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Quotation/Index.cshtml", this.Tenant));
@@ -57,6 +62,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/quotation/verification")]
         [MenuPolicy]
+        [AccessPolicy("sales", "quotations", AccessTypeEnum.Verify)]
         public ActionResult Verification()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Quotation/Verification.cshtml", this.Tenant));
@@ -64,6 +70,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/quotation/new")]
         [MenuPolicy(OverridePath = "/dashboard/sales/tasks/quotation")]
+        [AccessPolicy("sales", "quotations", AccessTypeEnum.Read)]
         public ActionResult New()
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Quotation/New.cshtml", this.Tenant));
@@ -71,6 +78,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
         [Route("dashboard/sales/tasks/quotation/new")]
         [HttpPost]
+        [AccessPolicy("sales", "quotations", AccessTypeEnum.Create)]
         public async Task<ActionResult> PostAsync(Quotation model)
         {
             if (!this.ModelState.IsValid)

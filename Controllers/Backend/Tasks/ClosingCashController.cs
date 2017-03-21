@@ -9,6 +9,7 @@ using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.DTO;
 using MixERP.Sales.ViewModels;
 using Frapid.Areas.CSRF;
+using Frapid.DataAccess.Models;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
@@ -17,6 +18,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
     {
         [Route("dashboard/sales/tasks/eod")]
         [MenuPolicy]
+        [AccessPolicy("sales", "sales_view", AccessTypeEnum.Read)]
         public async Task<ActionResult> IndexAsync()
         {
             var meta = await AppUsers.GetCurrentAsync(this.Tenant).ConfigureAwait(true);
@@ -31,7 +33,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
             var model = new ClosingCashViewModel
             {
-                OpeningCashInfo = openingCash ?? new OpeningCash {TransactionDate = dates.Today},
+                OpeningCashInfo = openingCash ?? new OpeningCash { TransactionDate = dates.Today },
                 SalesView = salesView ?? new List<SalesView>(),
                 ClosingCashInfo = closingCash ?? new ClosingCash { TransactionDate = dates.Today }
             };
@@ -42,6 +44,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
         [Route("dashboard/sales/tasks/eod")]
         [HttpPost]
         [MenuPolicy]
+        [AccessPolicy("sales", "closing_cash", AccessTypeEnum.Create)]
         public async Task<ActionResult> PostAsync(ClosingCash model)
         {
             var meta = await AppUsers.GetCurrentAsync(this.Tenant).ConfigureAwait(true);
