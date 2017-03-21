@@ -683,12 +683,13 @@ LANGUAGE plpgsql;
 --SELECT * FROM sales.get_avaiable_coupons_to_print(2);
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_customer_account_detail.sql --<--<--
-DROP FUNCTION IF EXISTS sales.get_customer_account_detail(integer, date, date);
+DROP FUNCTION IF EXISTS sales.get_customer_account_detail(integer, date, date, integer);
 CREATE OR REPLACE FUNCTION sales.get_customer_account_detail
 (
     _customer_id        integer,
     _from               date,
-    _to                 date
+    _to                 date,
+    _office_id          integer
 )
 RETURNS TABLE
 (
@@ -723,16 +724,20 @@ BEGIN
         credit
     )
     SELECT 
-        ctv.value_date,
-        ctv.invoice_number,
-        ctv.statement_reference,
-        ctv.debit,
-        ctv.credit
-    FROM sales.customer_transaction_view ctv
-    LEFT JOIN inventory.customers cus
-    ON ctv.customer_id = cus.customer_id
-    WHERE ctv.customer_id = _customer_id
-    AND ctv.value_date BETWEEN _from AND _to;
+        customer_transaction_view.value_date,
+        customer_transaction_view.invoice_number,
+        customer_transaction_view.statement_reference,
+        customer_transaction_view.debit,
+        customer_transaction_view.credit
+    FROM sales.customer_transaction_view
+    LEFT JOIN inventory.customers
+    ON customer_transaction_view.customer_id = customers.customer_id
+    LEFT JOIN sales.sales_view
+    ON sales_view.invoice_number = customer_transaction_view.invoice_number
+    WHERE customer_transaction_view.customer_id = _customer_id
+    AND NOT customers.deleted
+	AND sales_view.office_id = _office_id
+    AND customer_transaction_view.value_date BETWEEN _from AND _to;
 
     UPDATE _customer_account_detail 
     SET balance = c.balance
@@ -791,12 +796,13 @@ $$
 LANGUAGE plpgsql;
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_detail.sql --<--<--
-DROP FUNCTION IF EXISTS sales.get_gift_card_detail(national character varying(50), date, date);
+DROP FUNCTION IF EXISTS sales.get_gift_card_detail(national character varying(50), date, date, integer);
 CREATE FUNCTION sales.get_gift_card_detail
 (
     _card_number        national character varying(50),
     _from               date,
-    _to                 date
+    _to                 date,
+    _office_id          integer
 )
 RETURNS TABLE
 (
@@ -849,6 +855,9 @@ BEGIN
         JOIN sales.gift_cards
             ON gift_cards.gift_card_id = gift_card_transactions.gift_card_id
         WHERE gift_cards.gift_card_number = _card_number
+        AND transaction_master.verification_status_id > 0
+        AND NOT transaction_master.deleted
+		AND transaction_master.office_id IN (SELECT get_office_ids FROM core.get_office_ids(_office_id))
         AND transaction_master.transaction_ts::date BETWEEN _from AND _to
         UNION ALL
         
@@ -865,6 +874,9 @@ BEGIN
             ON gift_cards.gift_card_id = sales.gift_card_id
             WHERE sales.gift_card_id IS NOT NULL
             AND gift_cards.gift_card_number = _card_number
+            AND transaction_master.verification_status_id > 0
+            AND NOT transaction_master.deleted
+            AND transaction_master.office_id IN (SELECT get_office_ids FROM core.get_office_ids(_office_id))
             AND transaction_master.transaction_ts::date BETWEEN _from AND _to
         ) t
         ORDER BY t.transaction_ts ASC;
@@ -3475,6 +3487,10 @@ SELECT * FROM core.create_menu('MixERP.Sales', 'GiftCardSummary', 'Gift Card Sum
 SELECT * FROM core.create_menu('MixERP.Sales', 'QuotationStatus', 'Quotation Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/QuotationStatus.xml', 'list', 'Reports');
 SELECT * FROM core.create_menu('MixERP.Sales', 'OrderStatus', 'Order Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/OrderStatus.xml', 'bar chart', 'Reports');
 SELECT * FROM core.create_menu('MixERP.Sales', 'SalesDiscountStatus', 'Sales Discount Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesDiscountStatus.xml', 'shopping basket icon', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'AccountReceivableByCustomer', 'Account Receivable By Customer Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountReceivableByCustomer.xml', 'list layout icon', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'ReceiptJournalSummary', 'Receipt Journal Summary Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ReceiptJournalSummary.xml', 'angle double left icon', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'AccountantSummary', 'Accountant Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountantSummary.xml', 'address book outline icon', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'ClosedOut', 'Closed Out Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ClosedOut.xml', 'book icon', 'Reports');
 
 SELECT * FROM auth.create_app_menu_policy
 (
