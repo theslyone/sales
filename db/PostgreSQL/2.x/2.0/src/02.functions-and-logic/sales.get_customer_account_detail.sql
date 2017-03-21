@@ -1,9 +1,10 @@
-﻿DROP FUNCTION IF EXISTS sales.get_customer_account_detail(integer, date, date);
+﻿DROP FUNCTION IF EXISTS sales.get_customer_account_detail(integer, date, date, integer);
 CREATE OR REPLACE FUNCTION sales.get_customer_account_detail
 (
     _customer_id        integer,
     _from               date,
-    _to                 date
+    _to                 date,
+    _office_id          integer
 )
 RETURNS TABLE
 (
@@ -38,16 +39,20 @@ BEGIN
         credit
     )
     SELECT 
-        ctv.value_date,
-        ctv.invoice_number,
-        ctv.statement_reference,
-        ctv.debit,
-        ctv.credit
-    FROM sales.customer_transaction_view ctv
-    LEFT JOIN inventory.customers cus
-    ON ctv.customer_id = cus.customer_id
-    WHERE ctv.customer_id = _customer_id
-    AND ctv.value_date BETWEEN _from AND _to;
+        customer_transaction_view.value_date,
+        customer_transaction_view.invoice_number,
+        customer_transaction_view.statement_reference,
+        customer_transaction_view.debit,
+        customer_transaction_view.credit
+    FROM sales.customer_transaction_view
+    LEFT JOIN inventory.customers
+    ON customer_transaction_view.customer_id = customers.customer_id
+    LEFT JOIN sales.sales_view
+    ON sales_view.invoice_number = customer_transaction_view.invoice_number
+    WHERE customer_transaction_view.customer_id = _customer_id
+    AND NOT customers.deleted
+	AND sales_view.office_id = _office_id
+    AND customer_transaction_view.value_date BETWEEN _from AND _to;
 
     UPDATE _customer_account_detail 
     SET balance = c.balance

@@ -1,9 +1,10 @@
-﻿DROP FUNCTION IF EXISTS sales.get_gift_card_detail(national character varying(50), date, date);
+﻿DROP FUNCTION IF EXISTS sales.get_gift_card_detail(national character varying(50), date, date, integer);
 CREATE FUNCTION sales.get_gift_card_detail
 (
     _card_number        national character varying(50),
     _from               date,
-    _to                 date
+    _to                 date,
+    _office_id          integer
 )
 RETURNS TABLE
 (
@@ -56,6 +57,9 @@ BEGIN
         JOIN sales.gift_cards
             ON gift_cards.gift_card_id = gift_card_transactions.gift_card_id
         WHERE gift_cards.gift_card_number = _card_number
+        AND transaction_master.verification_status_id > 0
+        AND NOT transaction_master.deleted
+		AND transaction_master.office_id IN (SELECT get_office_ids FROM core.get_office_ids(_office_id))
         AND transaction_master.transaction_ts::date BETWEEN _from AND _to
         UNION ALL
         
@@ -72,6 +76,9 @@ BEGIN
             ON gift_cards.gift_card_id = sales.gift_card_id
             WHERE sales.gift_card_id IS NOT NULL
             AND gift_cards.gift_card_number = _card_number
+            AND transaction_master.verification_status_id > 0
+            AND NOT transaction_master.deleted
+            AND transaction_master.office_id IN (SELECT get_office_ids FROM core.get_office_ids(_office_id))
             AND transaction_master.transaction_ts::date BETWEEN _from AND _to
         ) t
         ORDER BY t.transaction_ts ASC;
