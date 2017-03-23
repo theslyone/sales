@@ -453,3 +453,70 @@ BEGIN
 END;
 
 GO
+
+
+--DECLARE @office_id								integer 							= (SELECT TOP 1 office_id FROM core.offices);
+--DECLARE @user_id                                integer 							= (SELECT TOP 1 user_id FROM account.users);
+--DECLARE @login_id                               bigint  							= (SELECT TOP 1 login_id FROM account.logins WHERE user_id = @user_id);
+--DECLARE @counter_id                             integer								= (SELECT TOP 1 counter_id FROM inventory.counters);
+--DECLARE @value_date                             date								= finance.get_value_date(@office_id);
+--DECLARE @book_date                              date								= finance.get_value_date(@office_id);
+--DECLARE @cost_center_id                         integer								= (SELECT TOP 1 cost_center_id FROM finance.cost_centers);
+--DECLARE @reference_number                       national character varying(24)		= 'N/A';
+--DECLARE @statement_reference                    national character varying(2000)	= 'Test';
+--DECLARE @tender                                 decimal(30, 6)						= 2000;
+--DECLARE @change                                 decimal(30, 6)						= 10;
+--DECLARE @payment_term_id                        integer								= NULL;
+--DECLARE @check_amount                           decimal(30, 6)						= NULL;
+--DECLARE @check_bank_name                        national character varying(1000)	= NULL;
+--DECLARE @check_number                           national character varying(100)		= NULL;
+--DECLARE @check_date                             date								= NULL;
+--DECLARE @gift_card_number                       national character varying(100)		= NULL;
+--DECLARE @customer_id                            integer								= (SELECT TOP 1 customer_id FROM inventory.customers);
+--DECLARE @price_type_id                          integer								= (SELECT TOP 1 price_type_id FROM sales.price_types);
+--DECLARE @shipper_id                             integer								= (SELECT TOP 1 shipper_id FROM inventory.shippers);
+--DECLARE @store_id                               integer								= (SELECT TOP 1 store_id FROM inventory.stores WHERE store_code='CRR');
+--DECLARE @coupon_code                            national character varying(100)		= NULL;
+--DECLARE @is_flat_discount                       bit									= 0;
+--DECLARE @discount                               decimal(30, 6)						= 0;
+--DECLARE @details                                sales.sales_detail_type;
+--DECLARE @sales_quotation_id                     bigint								= NULL;
+--DECLARE @sales_order_id                         bigint								= NULL;
+--DECLARE @transaction_master_id                  bigint								= NULL;
+
+--INSERT INTO @details
+--SELECT @store_id, 'Cr', item_id, 1, unit_id, selling_price, 0, selling_price * 0.13, 0
+--FROM inventory.items
+--WHERE inventory.items.item_code IN('FNG0001', 'FNG0002');
+
+
+--EXECUTE sales.post_sales
+--    @office_id,
+--    @user_id,
+--    @login_id,
+--    @counter_id,
+--    @value_date,
+--    @book_date,
+--    @cost_center_id,
+--    @reference_number,
+--    @statement_reference,
+--    @tender,
+--    @change, 
+--    @payment_term_id,
+--	@check_amount,
+--    @check_bank_name,
+--    @check_number,
+--    @check_date,
+--	@gift_card_number,
+--    @customer_id,    
+--    @price_type_id,
+--    @shipper_id,
+--    @store_id,
+--    @coupon_code,
+--    @is_flat_discount,
+--    @discount,
+--    @details,
+--    @sales_quotation_id,
+--    @sales_order_id,  
+--    @transaction_master_id OUTPUT;
+

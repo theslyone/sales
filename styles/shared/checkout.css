@@ -115,6 +115,7 @@ input.invoice.number.for.reprint {
 	padding:0.3em 1em;
 	margin:2px;
 	border-radius: 1.5em;
+	display: inline-flex;
 }
 
 .inline.blocks > .item {
@@ -294,6 +295,12 @@ input.invoice.number.for.reprint {
         overflow: hidden;
     }
 
+@media (max-width: 1200px) {
+  .sales.items .item .block{
+    height: 152px; 
+  }  
+}
+	
         .sales.items .item .block img {
             height: 112px;
         }
