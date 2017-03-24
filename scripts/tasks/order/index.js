@@ -1,14 +1,21 @@
 ﻿function displayTable(target, data) {
     target.find("tbody").html("");
 
-    function getCell(text, isDate) {
+    function getCell(text, isDate, hasTime) {
         const cell = $("<td />");
 
         cell.text(text);
 
         if (isDate) {
-            if ((text || "").trim()) {
-                cell.text(window.moment(new Date(text)).fromNow() || "");
+            const date = new Date(text);
+
+            if (hasTime) {
+                if ((text || "").trim()) {
+                    cell.text(window.moment(date).fromNow() || "");
+                    cell.attr("title", date.toLocaleString());
+                };
+            } else {
+                cell.text(date.toLocaleDateString());
                 cell.attr("title", text);
             };
         };
@@ -40,8 +47,14 @@
         return cell;
     };
 
+    const sorted = window.Enumerable.From(data)
+        .OrderByDescending(function (x) {
+            return new Date(x.ValueDate);
+        }).ThenByDescending(function (x) {
+            return new Date(x.TransactionTs);
+        }).ToArray();
 
-    $.each(data, function () {
+    $.each(sorted, function () {
         const item = this;
 
         const row = $("<tr />");
@@ -49,14 +62,14 @@
         row.append(getActionCell(item.Id));
         row.append(getCell(item.Id));
         row.append(getCell(item.Customer));
-        row.append(getCell(item.ValueDate, true));
-        row.append(getCell(item.ExpectedDate, true));
+        row.append(getCell(item.ValueDate, true, false));
+        row.append(getCell(item.ExpectedDate, true, false));
         row.append(getCell(item.ReferenceNumber));
         row.append(getCell(item.Terms));
         row.append(getCell(item.InternalMemo));
         row.append(getCell(item.PostedBy));
         row.append(getCell(item.Office));
-        row.append(getCell(item.TransactionTs, true));
+        row.append(getCell(item.TransactionTs, true, true));
 
         target.find("tbody").append(row);
     });
