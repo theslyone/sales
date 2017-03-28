@@ -291,13 +291,13 @@ input.invoice.number.for.reprint {
 
     .sales.items .item .block {
         display: inline-block;
-        height: 112px;
+        min-height: 112px;
         overflow: hidden;
     }
 
 @media (max-width: 1200px) {
   .sales.items .item .block{
-    height: 152px; 
+    min-height: 152px; 
   }  
 }
 	

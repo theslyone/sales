@@ -112,7 +112,7 @@ $("#CheckoutButton").off("click").on("click", function () {
                 const unitId = parseInt(el.find("select.unit").val());
                 const price = parseFloat(el.find("input.price").val()) || 0;
                 const discount = parseFloat(el.find("input.discount").val()) || 0;
-                const tax = parseFloat(el.find(".tax-amount").html()) || 0;
+                const tax = parseFloat2(el.find(".tax-amount").html()) || 0;
 
                 model.push({
                     ValueDate: $("#ValueDateInputDate").datepicker("getDate"),

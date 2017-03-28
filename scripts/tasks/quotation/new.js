@@ -36,6 +36,57 @@
 
 initializeUI();
 
+function getModel() {
+    function getDetails() {
+        const items = $("#SalesItems .item");
+        var model = [];
+
+        $.each(items, function () {
+            const el = $(this);
+            const itemId = parseInt(el.attr("data-item-id"));
+            const quantity = parseFloat(el.find("input.quantity").val());
+            const unitId = parseInt(el.find("select.unit").val());
+            const price = parseFloat(el.find("input.price").val()) || 0;
+            const discount = parseFloat(el.find("input.discount").val()) || 0;
+            const tax = parseFloat2(el.find(".tax-amount").html()) || 0;
+
+            model.push({
+                ValueDate: $("#ValueDateInputDate").datepicker("getDate"),
+                ItemId: itemId,
+                Quantity: quantity,
+                UnitId: unitId,
+                Price: price,
+                Tax: tax,
+                DiscountRate: discount
+            });
+        });
+
+        return model;
+    };
+
+    const valueDate = $("#ValueDateInputDate").datepicker("getDate");
+    const expectedDeliveryDate = $("#ExpectedDeliveryDateInputText").datepicker("getDate");
+    const referenceNumber = $("#ReferenceNumberInputText").val();
+    const terms = $("#TermsTextArea").val();
+    const internalMemo = $("#InternalMemoTextArea").val();
+    const customerId = $("#CustomerSelect").val();
+    const priceTypeId = $("#PriceTypeSelect").val();
+    const shipperId = $("#ShipperSelect").val();
+    const details = getDetails();
+
+    return {
+        ValueDate: valueDate,
+        ExpectedDeliveryDate: expectedDeliveryDate,
+        ReferenceNumber: referenceNumber,
+        Terms: terms,
+        InternalMemo: internalMemo,
+        CustomerId: customerId,
+        PriceTypeId: priceTypeId,
+        ShipperId: shipperId,
+        Details: details
+    };
+};
+
 $("#CheckoutButton").off("click").on("click", function () {
     function request(model) {
         const url = "/dashboard/sales/tasks/quotation/new";
@@ -43,56 +94,6 @@ $("#CheckoutButton").off("click").on("click", function () {
         return window.getAjaxRequest(url, "POST", data);
     };
 
-    function getModel() {
-        function getDetails() {
-            const items = $("#SalesItems .item");
-            var model = [];
-
-            $.each(items, function () {
-                const el = $(this);
-                const itemId = parseInt(el.attr("data-item-id"));
-                const quantity = parseFloat(el.find("input.quantity").val());
-                const unitId = parseInt(el.find("select.unit").val());
-                const price = parseFloat(el.find("input.price").val()) || 0;
-                const discount = parseFloat(el.find("input.discount").val()) || 0;
-                const tax = parseFloat(el.find(".tax-amount").html()) || 0;
-
-                model.push({
-                    ValueDate: $("#ValueDateInputDate").datepicker("getDate"),
-                    ItemId: itemId,
-                    Quantity: quantity,
-                    UnitId: unitId,
-                    Price: price,
-                    Tax: tax,
-                    DiscountRate: discount
-                });
-            });
-
-            return model;
-        };
-
-        const valueDate = $("#ValueDateInputDate").datepicker("getDate");
-        const expectedDeliveryDate = $("#ExpectedDeliveryDateInputText").datepicker("getDate");
-        const referenceNumber = $("#ReferenceNumberInputText").val();
-        const terms = $("#TermsTextArea").val();
-        const internalMemo = $("#InternalMemoTextArea").val();
-        const customerId = $("#CustomerSelect").val();
-        const priceTypeId = $("#PriceTypeSelect").val();
-        const shipperId = $("#ShipperSelect").val();
-        const details = getDetails();
-
-        return {
-            ValueDate: valueDate,
-            ExpectedDeliveryDate: expectedDeliveryDate,
-            ReferenceNumber: referenceNumber,
-            Terms: terms,
-            InternalMemo: internalMemo,
-            CustomerId: customerId,
-            PriceTypeId: priceTypeId,
-            ShipperId: shipperId,
-            Details: details
-        };
-    };
 
     const model = getModel();
 

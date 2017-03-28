@@ -80,32 +80,41 @@
     </DataSource>
     <DataSource>
       <Query>
-    		SELECT
-    			sales.quotation_details.item_id,
-    			inventory.items.item_code,
-    			inventory.items.item_name,
-    			sales.quotation_details.price,
-    			sales.quotation_details.quantity,
-    			inventory.get_unit_name_by_unit_id(sales.quotation_details.unit_id) AS unit,
-    			sales.quotation_details.price * sales.quotation_details.quantity AS amount,
-    			sales.quotation_details.discount_rate,
-    			sales.quotation_details.tax,
-    			ROUND(
-    			(
-    			(sales.quotation_details.price + sales.quotation_details.tax)
-    			* ((100 - sales.quotation_details.discount_rate)/100)			
-    			* 
-    			sales.quotation_details.quantity) , 4) AS total
-    		FROM sales.quotation_details
-    		INNER JOIN inventory.items
-    		ON inventory.items.item_id = sales.quotation_details.item_id
-        WHERE sales.quotation_details.quotation_id = @quotation_id;
+		SELECT
+			sales.quotation_details.item_id,
+			inventory.items.item_code,
+			inventory.items.item_name,
+			sales.quotation_details.price,
+			sales.quotation_details.quantity,
+			inventory.get_unit_name_by_unit_id(sales.quotation_details.unit_id) AS unit,
+			sales.quotation_details.price * sales.quotation_details.quantity AS amount,
+			sales.quotation_details.discount_rate,
+			ROUND(
+			(
+				(sales.quotation_details.price)
+				* ((sales.quotation_details.discount_rate)/100)			
+				* 
+				sales.quotation_details.quantity) 
+			, 4)
+			AS discount,
+			sales.quotation_details.tax,
+			ROUND(
+			(
+			(sales.quotation_details.price * sales.quotation_details.quantity)
+			* ((100 - sales.quotation_details.discount_rate)/100)) , 4) 
+			+ sales.quotation_details.tax
+			AS total
+		FROM sales.quotation_details
+		INNER JOIN inventory.items
+		ON inventory.items.item_id = sales.quotation_details.item_id
+		WHERE sales.quotation_details.quotation_id = @quotation_id
+		ORDER BY sales.quotation_details.quotation_detail_id;
       </Query>
       <Parameters>
         <Parameter Name="@quotation_id" Type="long" />
       </Parameters>
       <RunningTotalTextColumnIndex>3</RunningTotalTextColumnIndex>
-      <RunningTotalFieldIndices>4,6,8,9</RunningTotalFieldIndices>
+      <RunningTotalFieldIndices>4,6,8,9,10</RunningTotalFieldIndices>
     </DataSource>
   </DataSources>
 </FrapidReport>

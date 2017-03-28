@@ -89,13 +89,21 @@
 			inventory.get_unit_name_by_unit_id(sales.order_details.unit_id) AS unit,
 			sales.order_details.price * sales.order_details.quantity AS amount,
 			sales.order_details.discount_rate,
+			ROUND(
+			(
+				(sales.order_details.price)
+				* ((sales.order_details.discount_rate)/100)			
+				* 
+				sales.order_details.quantity) 
+			, 4)
+			AS discount,
 			sales.order_details.tax,
 			ROUND(
 			(
-			(sales.order_details.price + sales.order_details.tax)
-			* ((100 - sales.order_details.discount_rate)/100)			
-			* 
-			sales.order_details.quantity) , 4) AS total
+			(sales.order_details.price * sales.order_details.quantity)
+			* ((100 - sales.order_details.discount_rate)/100)) , 4) 
+			+ sales.order_details.tax
+			AS total
 		FROM sales.order_details
 		INNER JOIN inventory.items
 		ON inventory.items.item_id = sales.order_details.item_id
@@ -106,7 +114,7 @@
         <Parameter Name="@order_id" Type="long" />
       </Parameters>
       <RunningTotalTextColumnIndex>3</RunningTotalTextColumnIndex>
-      <RunningTotalFieldIndices>4,6,8,9</RunningTotalFieldIndices>
+      <RunningTotalFieldIndices>4,6,8,9,10</RunningTotalFieldIndices>
     </DataSource>
   </DataSources>
 </FrapidReport>
