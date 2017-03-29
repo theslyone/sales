@@ -221,7 +221,7 @@ function updateTotal() {
 
     $("#BaseAmountInputText").val(toBase);
 
-    $("#FinalDueAmountInputText").val(remainingDue);
+    $("#FinalDueAmountInputText").val(window.round(remainingDue, 2));
 
     $("#FinalDueAmountInputText").removeClass("alert-danger");
 

@@ -14,7 +14,7 @@
     _cost_center_id                             integer,
     _cash_repository_id                         integer,
     _posted_date                                date,
-    _bank_account_id                            integer,
+    _bank_id                                    integer,
     _payment_card_id                            integer,
     _bank_instrument_code                       national character varying(128),
     _bank_tran_code                             national character varying(128)
@@ -36,7 +36,7 @@ CREATE FUNCTION sales.post_customer_receipt
     _cost_center_id                             integer,
     _cash_repository_id                         integer,
     _posted_date                                date,
-    _bank_account_id                            integer,
+    _bank_id                                    integer,
     _payment_card_id                            integer,
     _bank_instrument_code                       national character varying(128),
     _bank_tran_code                             national character varying(128)
@@ -63,16 +63,18 @@ $$
     DECLARE _merchant_fee_statement_reference   text;
     DECLARE _merchant_fee                       public.money_strict2;
     DECLARE _merchant_fee_lc                    public.money_strict2;
+	DECLARE _bank_account_id					integer;
 BEGIN
     _value_date                             := finance.get_value_date(_office_id);
     _book_date                              := _value_date;
+	_bank_account_id					    := finance.get_account_id_by_bank_account_id(_bank_id);    
 
     IF(finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) = false) THEN
         RETURN 0;
     END IF;
 
     IF(_cash_repository_id > 0) THEN
-        IF(_posted_date IS NOT NULL OR _bank_account_id IS NOT NULL OR COALESCE(_bank_instrument_code, '') != '' OR COALESCE(_bank_tran_code, '') != '') THEN
+        IF(_posted_date IS NOT NULL OR _bank_id IS NOT NULL OR COALESCE(_bank_instrument_code, '') != '' OR COALESCE(_bank_tran_code, '') != '') THEN
             RAISE EXCEPTION 'Invalid bank transaction information provided.'
             USING ERRCODE='P5111';
         END IF;
@@ -90,7 +92,7 @@ BEGIN
     (
         SELECT true FROM finance.bank_accounts
         WHERE is_merchant_account
-        AND account_id = _bank_account_id
+        AND bank_account_id = _bank_id
     ) THEN
         _is_merchant = true;
     END IF;
@@ -106,7 +108,7 @@ BEGIN
         _merchant_fee_accont_id,
         _merchant_fee_statement_reference
     FROM finance.merchant_fee_setup
-    WHERE merchant_account_id = _bank_account_id
+    WHERE merchant_account_id = _bank_id
     AND payment_card_id = _payment_card_id;
 
     _merchant_rate      := COALESCE(_merchant_rate, 0);
