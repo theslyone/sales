@@ -49,7 +49,7 @@ $("#SaveButton").off("click").on("click", function () {
     };
 
     const model = window.serializeForm($(".eod.cash"));
-    const total = parseFloat($("#TotalInputText").val()) || 0;
+    const total = parseFloat2($("#TotalInputText").val()) || 0;//because the field is readonyl
 
     if (parseFloat(model.SubmittedCash) !== total) {
         window.displayMessage(window.translate("SubmittedAmountMustEqualTotalAmount"));
