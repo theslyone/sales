@@ -11,7 +11,7 @@
 
 $(document).ready(function () {
     window.validator.initialize($(".ui.form"));
-    $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
+    window.setRegionalFormat();
 });
 
 

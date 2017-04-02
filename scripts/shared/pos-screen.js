@@ -94,8 +94,8 @@ $("#DiscountTypeSelect").change(function () {
 });
 
 $("#DiscountInputText").keyup(function () {
-    const rate = parseFloat($("#DiscountInputText").val()) || 0;
-    const type = window.parseInt($("#DiscountTypeSelect").val()) || 0;
+    const rate = window.parseFloat2($("#DiscountInputText").val()) || 0;
+    const type = window.parseInt2($("#DiscountTypeSelect").val()) || 0;
 
     if (type === 1 && rate > 100) {
         $("#DiscountInputText").val("0");
@@ -109,8 +109,8 @@ function updateTotal() {
     const candidates = $("#SalesItems div.item");
     const amountEl = $("div.amount .money");
     const countEl = $("div.count .money");
-    const couponDiscountType = parseInt($("#DiscountTypeSelect").val());
-    const couponDiscountRate = parseFloat($("#DiscountInputText").val()) || 0;
+    const couponDiscountType = window.parseInt2($("#DiscountTypeSelect").val());
+    const couponDiscountRate = window.parseFloat2($("#DiscountInputText").val()) || 0;
     var discount;
 
 
@@ -120,7 +120,7 @@ function updateTotal() {
     $.each(candidates, function () {
         const el = $(this);
         const quantityEl = el.find("input.quantity");
-        const quantity = parseFloat(quantityEl.val()) || 0;
+        const quantity = window.parseFloat2(quantityEl.val()) || 0;
 
         const discountedAmount = window.parseFloat2(el.find(".discounted.amount").html());
         const amountPlusTax = window.parseFloat2(el.find(".amount-plus-tax").html());
@@ -130,7 +130,7 @@ function updateTotal() {
         totalQuantity += quantity;
     });
 
-    totalPrice = parseFloat(window.round(totalPrice, 2)) || 0;
+    totalPrice = window.parseFloat2(window.round(totalPrice, 2)) || 0;
 
     if (couponDiscountType === 1 && couponDiscountRate > 0 && couponDiscountRate <= 100) {
         discount = totalPrice * (couponDiscountRate / 100);
@@ -266,7 +266,7 @@ $(".tabs .new.item").off("click").on("click", function () {
 
     $.each(candidates, function () {
         const el = $(this);
-        const id = parseInt(el.text());
+        const id = window.parseInt2(el.text());
         items.push(id);
     });
 
@@ -288,7 +288,7 @@ $(".tabs .new.item").off("click").on("click", function () {
 
 $(".tabs .actions .delete.icon").off("click").on("click", function () {
     const activeEl = $(".tabs .selected.item");
-    const id = parseInt(activeEl.text());
+    const id = window.parseInt2(activeEl.text());
 
     if (activeEl.length && id > 1) {
         const confirmed = window.confirm(window.translate("AreYouSureYouWantDeleteTab"));
@@ -344,7 +344,7 @@ $(document).ajaxStop(function () {
 
 
 setTimeout(function () {
-    $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
+    window.setRegionalFormat();
 }, 100);
 
 
@@ -385,7 +385,7 @@ function getTaxRate() {
     const ajax = request();
 
     ajax.success(function (response) {
-        const salesTaxRate = parseFloat(response[0].SalesTaxRate) || 0;
+        const salesTaxRate = window.parseFloat2(response[0].SalesTaxRate) || 0;
         $("#SalesTaxRateHidden").val(salesTaxRate);
     });
 };

@@ -49,7 +49,7 @@ function defaulPOSItemClick(el, callback) {
     $(".footer.items").show();
     targetEl.show();
 
-    var sellingPrice = parseFloat(el.attr("data-selling-price")) || 0;
+    var sellingPrice = window.parseFloat2(el.attr("data-selling-price")) || 0;
     var photo = el.attr("data-photo") || "";
 
     var barCode = el.attr("data-barcode");
@@ -61,7 +61,7 @@ function defaulPOSItemClick(el, callback) {
     var itemCode = el.attr("data-item-code");
     var itemId = el.attr("data-item-id");
     var isTaxableItem = el.attr("data-is-taxable-item") === "true";
-    var taxRate = parseFloat($("#SalesTaxRateHidden").val()) || 0;
+    var taxRate = window.parseFloat2($("#SalesTaxRateHidden").val()) || 0;
 
     var price = sellingPrice;
 
@@ -137,14 +137,14 @@ function defaulPOSItemClick(el, callback) {
     loadUnits(unitSelect, unitId, validUnits.split(','));
 
     function updateItemInfo(el) {
-        window.setNumberFormat();
+        window.setRegionalFormat();
         const quantityEl = el.find("input.quantity");
         const discountEl = el.find("input.discount");
 
-        const quantity = parseFloat(quantityEl.val()) || 0;
-        const discountRate = parseFloat(discountEl.val()) || 0;
+        const quantity = window.parseFloat2(quantityEl.val()) || 0;
+        const discountRate = window.parseFloat2(discountEl.val()) || 0;
 
-        const price = parseFloat(el.find("input.price").val()) || 0;
+        const price = window.parseFloat2(el.find("input.price").val()) || 0;
 
         const amount = window.round(price * quantity, 2);
         const discountedAmount = window.round((price * quantity) * ((100 - discountRate) / 100), 2);
@@ -185,7 +185,7 @@ function defaulPOSItemClick(el, callback) {
     discountInput.on("keyup", function () {
         const el = $(this);
 
-        const rate = parseFloat(el.val()) || 0;
+        const rate = window.parseFloat2(el.val()) || 0;
         if (rate > 100) {
             el.val("100");
             return;
@@ -230,8 +230,8 @@ function defaulPOSItemClick(el, callback) {
         };
 
         const itemId = el.attr("data-item-id");
-        const customerId = parseInt($("#CustomerInputText").attr("data-customer-id")) || 0;
-        const priceTypeId = parseInt($("#PriceTypeSelect").val()) || 0;
+        const customerId = window.parseInt2($("#CustomerInputText").attr("data-customer-id")) || 0;
+        const priceTypeId = window.parseInt2($("#PriceTypeSelect").val()) || 0;
         const unitId = el.val();
 
         $(".action.panel.segment").addClass("loading");
@@ -265,7 +265,7 @@ function defaulPOSItemClick(el, callback) {
 
     item.appendTo(targetEl);
     quantityInput.trigger("keyup");
-    window.setNumberFormat();
+    window.setRegionalFormat();
     window.updateTotal();
 
     var tabId = window.getSelectedTabId();

@@ -163,7 +163,7 @@ function getSelectedItem() {
     if (selected.length) {
         const row = selected.parent().parent().parent();
         const id = row.find("td:nth-child(3)").html();
-        return parseInt(id);
+        return window.parseInt2(id);
     };
 
     return 0;
@@ -240,11 +240,11 @@ verifyButton.click(function () {
     const ajax = request(model, type);
 
     ajax.success(function (response) {
-        var cascadingTranId = parseFloat(response);
+        var cascadingTranId = window.parseFloat2(response);
 
         if (cascadingTranId) {
             journalView.find("tr td:nth-child(3)").each(function (i) {
-                const tranId = parseFloat($(this).text()) || 0;
+                const tranId = window.parseFloat2($(this).text()) || 0;
 
                 if (cascadingTranId === tranId) {
                     removeRow(i);
