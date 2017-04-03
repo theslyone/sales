@@ -2219,6 +2219,11 @@ namespace MixERP.Sales
 		public static string Office => I18NResource.GetString(ResourceDirectory, "Office");
 
 		/// <summary>
+		///One
+		/// </summary>
+		public static string One => I18NResource.GetString(ResourceDirectory, "One");
+
+		/// <summary>
 		///Order Action Code
 		/// </summary>
 		public static string OrderActionCode => I18NResource.GetString(ResourceDirectory, "OrderActionCode");
@@ -3147,11 +3152,6 @@ namespace MixERP.Sales
 		///Zipcode
 		/// </summary>
 		public static string Zipcode => I18NResource.GetString(ResourceDirectory, "Zipcode");
-
-		/// <summary>
-		///One
-		/// </summary>
-		public static string One => I18NResource.GetString(ResourceDirectory, "One");
 
 	}
 }

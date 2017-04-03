@@ -14,8 +14,8 @@ namespace MixERP.Sales.DAL.Backend.Tasks
     {
         public static async Task<MerchantFeeSetup> GetMerchantFeeSetupAsync(string tenant, int merchantAccountId, int paymentCardId)
         {
-            const string sql = "SELECT * FROM finance.merchant_fee_setup WHERE merchant_account_id=@0 AND payment_card_id=@1;";
-            return (await Factory.GetAsync<MerchantFeeSetup>(tenant, sql, merchantAccountId, paymentCardId).ConfigureAwait(false)).FirstOrDefault();
+            const string sql = "SELECT * FROM finance.merchant_fee_setup WHERE merchant_account_id=@0 AND payment_card_id=@1 AND deleted=@2;";
+            return (await Factory.GetAsync<MerchantFeeSetup>(tenant, sql, merchantAccountId, paymentCardId, false).ConfigureAwait(false)).FirstOrDefault();
         }
 
         public static async Task<string> GetHomeCurrencyAsync(string tenant, int officeId)
