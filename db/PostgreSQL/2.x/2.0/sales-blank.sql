@@ -1612,7 +1612,7 @@ DROP FUNCTION IF EXISTS sales.post_customer_receipt
     _cost_center_id                             integer,
     _cash_repository_id                         integer,
     _posted_date                                date,
-    _bank_account_id                            integer,
+    _bank_id                                    integer,
     _payment_card_id                            integer,
     _bank_instrument_code                       national character varying(128),
     _bank_tran_code                             national character varying(128)
@@ -1634,7 +1634,7 @@ CREATE FUNCTION sales.post_customer_receipt
     _cost_center_id                             integer,
     _cash_repository_id                         integer,
     _posted_date                                date,
-    _bank_account_id                            integer,
+    _bank_id                                    integer,
     _payment_card_id                            integer,
     _bank_instrument_code                       national character varying(128),
     _bank_tran_code                             national character varying(128)
@@ -1661,16 +1661,18 @@ $$
     DECLARE _merchant_fee_statement_reference   text;
     DECLARE _merchant_fee                       public.money_strict2;
     DECLARE _merchant_fee_lc                    public.money_strict2;
+	DECLARE _bank_account_id					integer;
 BEGIN
     _value_date                             := finance.get_value_date(_office_id);
     _book_date                              := _value_date;
+	_bank_account_id					    := finance.get_account_id_by_bank_account_id(_bank_id);    
 
     IF(finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) = false) THEN
         RETURN 0;
     END IF;
 
     IF(_cash_repository_id > 0) THEN
-        IF(_posted_date IS NOT NULL OR _bank_account_id IS NOT NULL OR COALESCE(_bank_instrument_code, '') != '' OR COALESCE(_bank_tran_code, '') != '') THEN
+        IF(_posted_date IS NOT NULL OR _bank_id IS NOT NULL OR COALESCE(_bank_instrument_code, '') != '' OR COALESCE(_bank_tran_code, '') != '') THEN
             RAISE EXCEPTION 'Invalid bank transaction information provided.'
             USING ERRCODE='P5111';
         END IF;
@@ -1688,7 +1690,7 @@ BEGIN
     (
         SELECT true FROM finance.bank_accounts
         WHERE is_merchant_account
-        AND account_id = _bank_account_id
+        AND bank_account_id = _bank_id
     ) THEN
         _is_merchant = true;
     END IF;
@@ -1704,7 +1706,7 @@ BEGIN
         _merchant_fee_accont_id,
         _merchant_fee_statement_reference
     FROM finance.merchant_fee_setup
-    WHERE merchant_account_id = _bank_account_id
+    WHERE merchant_account_id = _bank_id
     AND payment_card_id = _payment_card_id;
 
     _merchant_rate      := COALESCE(_merchant_rate, 0);
@@ -3491,8 +3493,11 @@ SELECT * FROM core.create_menu('MixERP.Sales', 'AccountReceivableByCustomer', 'A
 SELECT * FROM core.create_menu('MixERP.Sales', 'ReceiptJournalSummary', 'Receipt Journal Summary Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ReceiptJournalSummary.xml', 'angle double left icon', 'Reports');
 SELECT * FROM core.create_menu('MixERP.Sales', 'AccountantSummary', 'Accountant Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountantSummary.xml', 'address book outline icon', 'Reports');
 SELECT * FROM core.create_menu('MixERP.Sales', 'ClosedOut', 'Closed Out Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ClosedOut.xml', 'book icon', 'Reports');
+<<<<<<< HEAD
 SELECT * FROM core.create_menu('MixERP.Sales', 'CustomersSummary', 'Customers Summary Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomersSummary.xml', 'users icon', 'Reports');
 SELECT * FROM core.create_menu('MixERP.Sales', 'FlashReport', 'Flash Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/FlashReport.xml', 'tasks icon', 'Reports');
+=======
+>>>>>>> 196726fef3b76cbf09f6291b6ea18d6cc1d83b65
 
 SELECT * FROM auth.create_app_menu_policy
 (
@@ -3539,7 +3544,7 @@ BEGIN
         total_amount                numeric(30, 6)
     ) ON COMMIT DROP;
 
-    INSERT INTO _results(office_id, office_name, account_id)
+    INSERT INTO _results(account_id, office_name, office_id)
     SELECT DISTINCT inventory.customers.account_id, core.get_office_name_by_office_id(_office_id), _office_id FROM inventory.customers;
 
     UPDATE _results
@@ -3595,6 +3600,11 @@ BEGIN
     UPDATE _results
     SET total_amount = COALESCE(_results.previous_period, 0) + COALESCE(_results.current_period, 0);
     
+    DELETE FROM _results
+    WHERE COALESCE(previous_period, 0) = 0
+    AND COALESCE(current_period, 0) = 0
+    AND COALESCE(total_amount, 0) = 0;
+
     RETURN QUERY
     SELECT * FROM _results;
 END

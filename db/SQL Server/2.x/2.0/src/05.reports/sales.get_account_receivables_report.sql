@@ -17,7 +17,7 @@ RETURNS @results TABLE
 )
 AS
 BEGIN
-    INSERT INTO @results(office_id, office_name, account_id)
+    INSERT INTO @results(account_id, office_name, office_id)
     SELECT DISTINCT inventory.customers.account_id, core.get_office_name_by_office_id(@office_id), @office_id FROM inventory.customers;
 
     UPDATE @results
@@ -25,7 +25,7 @@ BEGIN
         account_number  = finance.accounts.account_number,
         account_name    = finance.accounts.account_name
     FROM @results AS results
-	INNER JOIN finance.accounts
+    INNER JOIN finance.accounts
     ON finance.accounts.account_id = results.account_id;
 
 
@@ -49,7 +49,7 @@ BEGIN
             SELECT * FROM finance.get_account_ids(results.account_id)
         )
     )
-	FROM @results  results;
+    FROM @results  results;
 
     UPDATE @results
     SET current_period = 
@@ -74,8 +74,13 @@ BEGIN
 
     UPDATE @results
     SET total_amount = COALESCE(results.previous_period, 0) + COALESCE(results.current_period, 0)
-	FROM @results AS results;
+    FROM @results AS results;
     
+    DELETE FROM @results
+    WHERE COALESCE(previous_period, 0) = 0
+    AND COALESCE(current_period, 0) = 0
+    AND COALESCE(total_amount, 0) = 0;
+
     RETURN;
 END
 

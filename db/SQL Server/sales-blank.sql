@@ -1673,7 +1673,7 @@ CREATE PROCEDURE sales.post_customer_receipt
     @cost_center_id                             integer,
     @cash_repository_id                         integer,
     @posted_date                                date,
-    @bank_account_id                            integer,
+    @bank_id									integer,
     @payment_card_id                            integer,
     @bank_instrument_code                       national character varying(128),
     @bank_tran_code                             national character varying(128),
@@ -1684,6 +1684,7 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
+	DECLARE @bank_account_id					integer = finance.get_account_id_by_bank_account_id(@bank_id);
     DECLARE @value_date                         date = finance.get_value_date(@office_id);
     DECLARE @book_date                          date = @value_date;
     DECLARE @book                               national character varying(50);
@@ -1726,7 +1727,7 @@ BEGIN
 
 		IF(@cash_repository_id > 0)
 		BEGIN
-			IF(@posted_date IS NOT NULL OR @bank_account_id IS NOT NULL OR COALESCE(@bank_instrument_code, '') != '' OR COALESCE(@bank_tran_code, '') != '')
+			IF(@posted_date IS NOT NULL OR @bank_id IS NOT NULL OR COALESCE(@bank_instrument_code, '') != '' OR COALESCE(@bank_tran_code, '') != '')
 			BEGIN
 				RAISERROR('Invalid bank transaction information provided.', 16, 1);
 			END;
@@ -1745,7 +1746,7 @@ BEGIN
 		(
 			SELECT 1 FROM finance.bank_accounts
 			WHERE is_merchant_account = 1
-			AND account_id = @bank_account_id
+			AND bank_account_id = @bank_id
 		)
 		BEGIN
 			SET @is_merchant = 1;
@@ -1757,7 +1758,7 @@ BEGIN
 			@merchant_fee_accont_id				=	account_id,
 			@merchant_fee_statement_reference	= statement_reference
 		FROM finance.merchant_fee_setup
-		WHERE merchant_account_id = @bank_account_id
+		WHERE merchant_account_id = @bank_id
 		AND payment_card_id = @payment_card_id;
 
 		SET @merchant_rate		= COALESCE(@merchant_rate, 0);
@@ -3193,6 +3194,73 @@ END;
 GO
 
 
+--DECLARE @office_id								integer 							= (SELECT TOP 1 office_id FROM core.offices);
+--DECLARE @user_id                                integer 							= (SELECT TOP 1 user_id FROM account.users);
+--DECLARE @login_id                               bigint  							= (SELECT TOP 1 login_id FROM account.logins WHERE user_id = @user_id);
+--DECLARE @counter_id                             integer								= (SELECT TOP 1 counter_id FROM inventory.counters);
+--DECLARE @value_date                             date								= finance.get_value_date(@office_id);
+--DECLARE @book_date                              date								= finance.get_value_date(@office_id);
+--DECLARE @cost_center_id                         integer								= (SELECT TOP 1 cost_center_id FROM finance.cost_centers);
+--DECLARE @reference_number                       national character varying(24)		= 'N/A';
+--DECLARE @statement_reference                    national character varying(2000)	= 'Test';
+--DECLARE @tender                                 decimal(30, 6)						= 2000;
+--DECLARE @change                                 decimal(30, 6)						= 10;
+--DECLARE @payment_term_id                        integer								= NULL;
+--DECLARE @check_amount                           decimal(30, 6)						= NULL;
+--DECLARE @check_bank_name                        national character varying(1000)	= NULL;
+--DECLARE @check_number                           national character varying(100)		= NULL;
+--DECLARE @check_date                             date								= NULL;
+--DECLARE @gift_card_number                       national character varying(100)		= NULL;
+--DECLARE @customer_id                            integer								= (SELECT TOP 1 customer_id FROM inventory.customers);
+--DECLARE @price_type_id                          integer								= (SELECT TOP 1 price_type_id FROM sales.price_types);
+--DECLARE @shipper_id                             integer								= (SELECT TOP 1 shipper_id FROM inventory.shippers);
+--DECLARE @store_id                               integer								= (SELECT TOP 1 store_id FROM inventory.stores WHERE store_code='CRR');
+--DECLARE @coupon_code                            national character varying(100)		= NULL;
+--DECLARE @is_flat_discount                       bit									= 0;
+--DECLARE @discount                               decimal(30, 6)						= 0;
+--DECLARE @details                                sales.sales_detail_type;
+--DECLARE @sales_quotation_id                     bigint								= NULL;
+--DECLARE @sales_order_id                         bigint								= NULL;
+--DECLARE @transaction_master_id                  bigint								= NULL;
+
+--INSERT INTO @details
+--SELECT @store_id, 'Cr', item_id, 1, unit_id, selling_price, 0, selling_price * 0.13, 0
+--FROM inventory.items
+--WHERE inventory.items.item_code IN('FNG0001', 'FNG0002');
+
+
+--EXECUTE sales.post_sales
+--    @office_id,
+--    @user_id,
+--    @login_id,
+--    @counter_id,
+--    @value_date,
+--    @book_date,
+--    @cost_center_id,
+--    @reference_number,
+--    @statement_reference,
+--    @tender,
+--    @change, 
+--    @payment_term_id,
+--	@check_amount,
+--    @check_bank_name,
+--    @check_number,
+--    @check_date,
+--	@gift_card_number,
+--    @customer_id,    
+--    @price_type_id,
+--    @shipper_id,
+--    @store_id,
+--    @coupon_code,
+--    @is_flat_discount,
+--    @discount,
+--    @details,
+--    @sales_quotation_id,
+--    @sales_order_id,  
+--    @transaction_master_id OUTPUT;
+
+
+
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.settle_customer_due.sql --<--<--
 IF OBJECT_ID('sales.settle_customer_due') IS NOT NULL
 DROP PROCEDURE sales.settle_customer_due;
@@ -3736,8 +3804,11 @@ EXECUTE core.create_menu 'MixERP.Sales', 'AccountReceivableByCustomer', 'Account
 EXECUTE core.create_menu 'MixERP.Sales', 'ReceiptJournalSummary', 'Receipt Journal Summary Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ReceiptJournalSummary.xml', 'angle double left icon', 'Reports';
 EXECUTE core.create_menu 'MixERP.Sales', 'AccountantSummary', 'Accountant Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountantSummary.xml', 'address book outline icon', 'Reports';
 EXECUTE core.create_menu 'MixERP.Sales', 'ClosedOut', 'Closed Out Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ClosedOut.xml', 'book icon', 'Reports';
+<<<<<<< HEAD
 EXECUTE core.create_menu 'MixERP.Sales', 'CustomersSummary', 'Customers Summary Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomersSummary.xml', 'users icon', 'Reports';
 EXECUTE core.create_menu 'MixERP.Sales', 'FlashReport', 'Flash Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/FlashReport.xml', 'tasks icon', 'Reports';
+=======
+>>>>>>> 196726fef3b76cbf09f6291b6ea18d6cc1d83b65
 
 DECLARE @office_id integer = core.get_office_id_by_office_name('Default');
 EXECUTE auth.create_app_menu_policy
@@ -3773,7 +3844,7 @@ RETURNS @results TABLE
 )
 AS
 BEGIN
-    INSERT INTO @results(office_id, office_name, account_id)
+    INSERT INTO @results(account_id, office_name, office_id)
     SELECT DISTINCT inventory.customers.account_id, core.get_office_name_by_office_id(@office_id), @office_id FROM inventory.customers;
 
     UPDATE @results
@@ -3781,7 +3852,7 @@ BEGIN
         account_number  = finance.accounts.account_number,
         account_name    = finance.accounts.account_name
     FROM @results AS results
-	INNER JOIN finance.accounts
+    INNER JOIN finance.accounts
     ON finance.accounts.account_id = results.account_id;
 
 
@@ -3805,7 +3876,7 @@ BEGIN
             SELECT * FROM finance.get_account_ids(results.account_id)
         )
     )
-	FROM @results  results;
+    FROM @results  results;
 
     UPDATE @results
     SET current_period = 
@@ -3830,8 +3901,13 @@ BEGIN
 
     UPDATE @results
     SET total_amount = COALESCE(results.previous_period, 0) + COALESCE(results.current_period, 0)
-	FROM @results AS results;
+    FROM @results AS results;
     
+    DELETE FROM @results
+    WHERE COALESCE(previous_period, 0) = 0
+    AND COALESCE(current_period, 0) = 0
+    AND COALESCE(total_amount, 0) = 0;
+
     RETURN;
 END
 

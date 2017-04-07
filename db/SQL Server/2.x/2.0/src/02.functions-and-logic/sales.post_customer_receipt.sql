@@ -19,7 +19,7 @@ CREATE PROCEDURE sales.post_customer_receipt
     @cost_center_id                             integer,
     @cash_repository_id                         integer,
     @posted_date                                date,
-    @bank_account_id                            integer,
+    @bank_id									integer,
     @payment_card_id                            integer,
     @bank_instrument_code                       national character varying(128),
     @bank_tran_code                             national character varying(128),
@@ -30,6 +30,7 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
+	DECLARE @bank_account_id					integer = finance.get_account_id_by_bank_account_id(@bank_id);
     DECLARE @value_date                         date = finance.get_value_date(@office_id);
     DECLARE @book_date                          date = @value_date;
     DECLARE @book                               national character varying(50);
@@ -72,7 +73,7 @@ BEGIN
 
 		IF(@cash_repository_id > 0)
 		BEGIN
-			IF(@posted_date IS NOT NULL OR @bank_account_id IS NOT NULL OR COALESCE(@bank_instrument_code, '') != '' OR COALESCE(@bank_tran_code, '') != '')
+			IF(@posted_date IS NOT NULL OR @bank_id IS NOT NULL OR COALESCE(@bank_instrument_code, '') != '' OR COALESCE(@bank_tran_code, '') != '')
 			BEGIN
 				RAISERROR('Invalid bank transaction information provided.', 16, 1);
 			END;
@@ -91,7 +92,7 @@ BEGIN
 		(
 			SELECT 1 FROM finance.bank_accounts
 			WHERE is_merchant_account = 1
-			AND account_id = @bank_account_id
+			AND bank_account_id = @bank_id
 		)
 		BEGIN
 			SET @is_merchant = 1;
@@ -103,7 +104,7 @@ BEGIN
 			@merchant_fee_accont_id				=	account_id,
 			@merchant_fee_statement_reference	= statement_reference
 		FROM finance.merchant_fee_setup
-		WHERE merchant_account_id = @bank_account_id
+		WHERE merchant_account_id = @bank_id
 		AND payment_card_id = @payment_card_id;
 
 		SET @merchant_rate		= COALESCE(@merchant_rate, 0);
