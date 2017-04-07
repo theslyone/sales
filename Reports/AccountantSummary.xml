@@ -73,7 +73,7 @@
         ON  transaction_master.transaction_master_id = checkout_detail_view.transaction_master_id
         WHERE users.user_id = @UserId::int
         AND transaction_master.verification_status_id &gt; 0
-        AND transaction_master.office_id = @OfficeId::int
+        AND transaction_master.office_id IN (SELECT get_office_ids FROM core.get_office_ids(@OfficeId))
         AND NOT users.deleted
         AND NOT items.deleted
         AND sales_view.value_date BETWEEN @From::date AND @To::date;
@@ -106,7 +106,7 @@
         AND NOT users.deleted
         AND NOT items.deleted
         AND transaction_master.verification_status_id &gt; 0
-        AND transaction_master.office_id = @OfficeId::int
+        AND transaction_master.office_id IN (SELECT get_office_ids FROM core.get_office_ids(@OfficeId))
         AND sales_view.value_date BETWEEN @From::date AND @To::date
         GROUP BY items.item_name
         ORDER BY total_sales desc
@@ -140,7 +140,7 @@
         AND NOT users.deleted
         AND NOT items.deleted
         AND transaction_master.verification_status_id &gt; 0
-        AND transaction_master.office_id = @OfficeId::int
+        AND transaction_master.office_id IN (SELECT get_office_ids FROM core.get_office_ids(@OfficeId))
         AND sales_view.value_date BETWEEN @From::date AND @To::date
         GROUP BY items.item_name;
       </Query>

@@ -726,17 +726,19 @@ CREATE FUNCTION sales.get_customer_account_detail
 (
     @customer_id			integer,
     @from					date,
-    @to						date
+    @to						date,
+	@office_id				integer
 )
 RETURNS @result TABLE
 (
+  
   id						integer IDENTITY, 
   value_date				date, 
   invoice_number			bigint, 
   statement_reference		text, 
-  debit						numeric, 
-  credit					numeric, 
-  balance					numeric
+  debit						numeric(30, 6), 
+  credit					numeric(30, 6), 
+  balance					numeric(30, 6)
 ) 
 AS
 BEGIN
@@ -749,16 +751,20 @@ BEGIN
 		credit
 	)
     SELECT 
-		ctv.value_date,
-        ctv.invoice_number,
-        ctv.statement_reference,
-        ctv.debit,
-        ctv.credit
-    FROM sales.customer_transaction_view ctv
-    LEFT JOIN inventory.customers cus
-    ON ctv.customer_id = cus.customer_id
-    WHERE ctv.customer_id = @customer_id
-    AND ctv.value_date BETWEEN @from AND @to;
+		customer_transaction_view.value_date,
+        customer_transaction_view.invoice_number,
+        customer_transaction_view.statement_reference,
+        customer_transaction_view.debit,
+        customer_transaction_view.credit
+    FROM sales.customer_transaction_view
+    LEFT JOIN inventory.customers 
+		ON customer_transaction_view.customer_id = customers.customer_id
+	LEFT JOIN sales.sales_view
+		ON sales_view.invoice_number = customer_transaction_view.invoice_number
+    WHERE customer_transaction_view.customer_id = @customer_id
+	AND customers.deleted = 0
+	AND sales_view.office_id = @office_id
+    AND customer_transaction_view.value_date BETWEEN @from AND @to;
 
     UPDATE @result 
     SET balance = c.balance
@@ -824,9 +830,10 @@ GO
 
 CREATE FUNCTION sales.get_gift_card_detail
 (
-    @card_number nvarchar(50),
-    @from date,
-    @to date
+    @card_number	nvarchar(50),
+    @from			date,
+    @to				date,
+	@office_id		integer
 )
 RETURNS @result TABLE
 (
@@ -834,9 +841,9 @@ RETURNS @result TABLE
 	gift_card_id		integer, 
 	transaction_ts		datetime, 
 	statement_reference text, 
-	debit				numeric, 
-	credit				numeric, 
-	balance				numeric
+	debit				numeric(30, 6), 
+	credit				numeric(30, 6), 
+	balance				numeric(30, 6)
 )
 AS
 BEGIN
@@ -867,10 +874,11 @@ BEGIN
 			ON transaction_master.transaction_master_id = gift_card_transactions.transaction_master_id
 		JOIN sales.gift_cards
 			ON gift_cards.gift_card_id = gift_card_transactions.gift_card_id
-		WHERE 
-			gift_cards.gift_card_number = @card_number
-		AND 
-			transaction_master.transaction_ts BETWEEN @from AND @to
+		WHERE transaction_master.verification_status_id > 0
+		AND transaction_master.deleted = 0
+		AND transaction_master.office_id IN (SELECT office_id FROM core.get_office_ids(@office_id)) 
+		AND gift_cards.gift_card_number = @card_number
+		AND transaction_master.transaction_ts BETWEEN @from AND @to
 		UNION ALL
 
 		SELECT 
@@ -884,7 +892,10 @@ BEGIN
 			ON transaction_master.transaction_master_id = sales.transaction_master_id
 		JOIN sales.gift_cards
 			ON gift_cards.gift_card_id = sales.gift_card_id
-		WHERE sales.gift_card_id IS NOT NULL
+		WHERE transaction_master.verification_status_id > 0
+		AND transaction_master.deleted = 0
+		AND transaction_master.office_id IN (SELECT office_id FROM core.get_office_ids(@office_id)) 
+		AND sales.gift_card_id IS NOT NULL
 		AND gift_cards.gift_card_number = @card_number
 		AND transaction_master.transaction_ts BETWEEN @from AND @to
 	) t
@@ -3721,7 +3732,12 @@ EXECUTE core.create_menu 'MixERP.Sales', 'GiftCardSummary', 'Gift Card Summary',
 EXECUTE core.create_menu 'MixERP.Sales', 'QuotationStatus', 'Quotation Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/QuotationStatus.xml', 'list', 'Reports';
 EXECUTE core.create_menu 'MixERP.Sales', 'OrderStatus', 'Order Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/OrderStatus.xml', 'bar chart', 'Reports';
 EXECUTE core.create_menu 'MixERP.Sales', 'SalesDiscountStatus', 'Sales Discount Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesDiscountStatus.xml', 'shopping basket icon', 'Reports';
-
+EXECUTE core.create_menu 'MixERP.Sales', 'AccountReceivableByCustomer', 'Account Receivable By Customer Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountReceivableByCustomer.xml', 'list layout icon', 'Reports';
+EXECUTE core.create_menu 'MixERP.Sales', 'ReceiptJournalSummary', 'Receipt Journal Summary Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ReceiptJournalSummary.xml', 'angle double left icon', 'Reports';
+EXECUTE core.create_menu 'MixERP.Sales', 'AccountantSummary', 'Accountant Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountantSummary.xml', 'address book outline icon', 'Reports';
+EXECUTE core.create_menu 'MixERP.Sales', 'ClosedOut', 'Closed Out Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ClosedOut.xml', 'book icon', 'Reports';
+EXECUTE core.create_menu 'MixERP.Sales', 'CustomersSummary', 'Customers Summary Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomersSummary.xml', 'users icon', 'Reports';
+EXECUTE core.create_menu 'MixERP.Sales', 'FlashReport', 'Flash Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/FlashReport.xml', 'tasks icon', 'Reports';
 
 DECLARE @office_id integer = core.get_office_id_by_office_name('Default');
 EXECUTE auth.create_app_menu_policy

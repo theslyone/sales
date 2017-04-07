@@ -63,10 +63,15 @@
         (
             SELECT 
                 SUM(COALESCE(total_amount, 0)) AS total_sales_amount,
-                COUNT(transaction_master_id) AS no_of_sales_transaction
+                COUNT(sales_view.transaction_master_id) AS no_of_sales_transaction
             FROM sales.sales_view
-            WHERE verification_status_id &gt; 0
-	        AND value_date = @ValueDate
+            LEFT JOIN finance.transaction_master
+            ON transaction_master.transaction_master_id = sales_view.transaction_master_id
+            WHERE transaction_master.deleted = 0
+            AND is_credit = 1
+            AND transaction_master.verification_status_id &gt; 0
+            AND transaction_master.office_id = @OfficeId
+            AND transaction_master.value_date = @ValueDate
         ),
         no_of_items_sold AS
         (
@@ -74,12 +79,18 @@
                 COUNT(checkout_details.item_id) AS no_of_items_sold
             FROM sales.sales_view
             LEFT JOIN inventory.checkout_details
-                ON checkout_details.checkout_id = sales_view.checkout_id
-            WHERE verification_status_id &gt; 0
-	        AND sales_view.value_date = @ValueDate
+            ON checkout_details.checkout_id = sales_view.checkout_id
+            LEFT JOIN finance.transaction_master
+            ON transaction_master.transaction_master_id = sales_view.transaction_master_id
+            WHERE transaction_master.deleted = 0
+            AND is_credit = 1
+            AND transaction_master.verification_status_id &gt; 0
+            AND transaction_master.office_id = @OfficeId
+            AND transaction_master.value_date = @ValueDate
         )
         SELECT * FROM total_sales, no_of_items_sold;</Query>
       <Parameters>
+        <Parameter Name="@OfficeId" FieldLabel="Office Id" Type="int"  DefaultValue="{Meta.OfficeId}" />
         <Parameter Name="@ValueDate" FieldLabel="Date" Type="System.DateTime" />
       </Parameters>
     </DataSource>
@@ -97,7 +108,8 @@
                 ON transaction_master.transaction_master_id = returns.return_transaction_master_id
             WHERE transaction_master.verification_status_id &gt; 0 
             AND transaction_master.deleted = 0
-	        AND transaction_master.value_date = @ValueDate
+            AND transaction_master.office_id = @OfficeId
+	          AND transaction_master.value_date = @ValueDate
         ),
         no_of_items_returned AS
         (
@@ -110,11 +122,13 @@
                 ON transaction_master.transaction_master_id = returns.return_transaction_master_id
             WHERE transaction_master.verification_status_id &gt; 0 
             AND transaction_master.deleted = 0
-	        AND transaction_master.value_date = @ValueDate
+            AND transaction_master.office_id = @OfficeId
+	          AND transaction_master.value_date = @ValueDate
         )
         SELECT * FROM total_return, no_of_items_returned;
       </Query>
       <Parameters>
+        <Parameter Name="@OfficeId" FieldLabel="Office Id" Type="int"  DefaultValue="{Meta.OfficeId}" />
         <Parameter Name="@ValueDate" FieldLabel="Date" Type="System.DateTime" />
       </Parameters>
     </DataSource>
@@ -123,11 +137,15 @@
           WITH receivable AS
           (
             SELECT
-            SUM(sales_view.total_amount) amount
+              SUM(sales_view.total_amount) amount
             FROM sales.sales_view
-            WHERE verification_status_id &gt; 0
+            LEFT JOIN finance.transaction_master
+            ON transaction_master.transaction_master_id = sales_view.transaction_master_id
+            WHERE transaction_master.deleted = 0
             AND is_credit = 1
-            AND sales_view.value_date = @ValueDate
+            AND transaction_master.verification_status_id &gt; 0
+            AND transaction_master.office_id = @OfficeId
+            AND transaction_master.value_date = @ValueDate
             ),
             receipt AS
             (
@@ -138,6 +156,7 @@
             ON transaction_master.transaction_master_id = customer_receipts.transaction_master_id
             WHERE transaction_master.deleted = 0
             AND transaction_master.verification_status_id &gt; 0
+            AND transaction_master.office_id = @OfficeId
             AND transaction_master.value_date = @ValueDate
             ),   
             purchase_amount AS
@@ -148,6 +167,7 @@
             JOIN inventory.checkout_detail_view ON purchases.checkout_id = checkout_detail_view.checkout_id
             JOIN finance.transaction_master ON checkout_detail_view.transaction_master_id = transaction_master.transaction_master_id
             WHERE transaction_master.value_date = @ValueDate
+            AND transaction_master.office_id = @OfficeId
             AND transaction_master.verification_status_id &gt; 0
             ),
             payment_amount AS
@@ -157,6 +177,7 @@
             FROM purchase.supplier_payments  
             JOIN finance.transaction_master ON supplier_payments.transaction_master_id = transaction_master.transaction_master_id
             WHERE transaction_master.value_date = @ValueDate
+            AND transaction_master.office_id = @OfficeId
             AND transaction_master.verification_status_id &gt; 0
             ),
             expenses_accounts AS
@@ -191,12 +212,14 @@
             FROM expenses_accounts
             LEFT JOIN finance.verified_transaction_view ON verified_transaction_view.account_id = expenses_accounts.account_id
             WHERE verified_transaction_view.value_date = @ValueDate
+            AND verified_transaction_view.office_id = @OfficeId
             ) AS expenses,
             (
             SELECT
             SUM(amount_in_local_currency) AS total_income FROM income_accounts
             LEFT JOIN finance.verified_transaction_view ON verified_transaction_view.account_id = income_accounts.account_id
             WHERE verified_transaction_view.value_date = @ValueDate
+            AND verified_transaction_view.office_id = @OfficeId
             ) AS income
       </Query>
       <Parameters>

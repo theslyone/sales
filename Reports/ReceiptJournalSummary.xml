@@ -32,7 +32,7 @@
           ON transaction_master.transaction_master_id = customer_receipts.transaction_master_id
           WHERE check_amount &gt; 0 OR collected_on_bank_id &gt; 0
           AND transaction_master.verification_status_id &gt; 0
-          AND transaction_master.office_id IN (SELECT office_id FROM core.get_office_ids(@OfficeId))
+          AND transaction_master.office_id IN (SELECT get_office_ids FROM core.get_office_ids(@OfficeId))
         ),
         gift_card AS
         (
@@ -45,7 +45,7 @@
           ON transaction_master.transaction_master_id = customer_receipts.transaction_master_id
           WHERE COALESCE(gift_card_number, '') &lt;&gt; ''
           AND transaction_master.verification_status_id &gt; 0
-          AND transaction_master.office_id IN (SELECT office_id FROM core.get_office_ids(@OfficeId))
+          AND transaction_master.office_id IN (SELECT get_office_ids FROM core.get_office_ids(@OfficeId))
         ),
         cash AS
         (
@@ -58,7 +58,7 @@
         ON transaction_master.transaction_master_id = customer_receipts.transaction_master_id
         WHERE COALESCE(customer_receipts.cash_repository_id, 0) &gt; 0
         AND transaction_master.verification_status_id &gt; 0
-        AND transaction_master.office_id IN (SELECT office_id FROM core.get_office_ids(@OfficeId))
+        AND transaction_master.office_id IN (SELECT get_office_ids FROM core.get_office_ids(@OfficeId))
         ),
         all_data AS
         (

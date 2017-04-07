@@ -64,6 +64,8 @@ EXECUTE core.create_menu 'MixERP.Sales', 'AccountReceivableByCustomer', 'Account
 EXECUTE core.create_menu 'MixERP.Sales', 'ReceiptJournalSummary', 'Receipt Journal Summary Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ReceiptJournalSummary.xml', 'angle double left icon', 'Reports';
 EXECUTE core.create_menu 'MixERP.Sales', 'AccountantSummary', 'Accountant Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountantSummary.xml', 'address book outline icon', 'Reports';
 EXECUTE core.create_menu 'MixERP.Sales', 'ClosedOut', 'Closed Out Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ClosedOut.xml', 'book icon', 'Reports';
+EXECUTE core.create_menu 'MixERP.Sales', 'CustomersSummary', 'Customers Summary Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/CustomersSummary.xml', 'users icon', 'Reports';
+EXECUTE core.create_menu 'MixERP.Sales', 'FlashReport', 'Flash Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/FlashReport.xml', 'tasks icon', 'Reports';
 
 DECLARE @office_id integer = core.get_office_id_by_office_name('Default');
 EXECUTE auth.create_app_menu_policy
