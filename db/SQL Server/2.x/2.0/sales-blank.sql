@@ -2573,6 +2573,24 @@ BEGIN
 
         SET @tax_account_id                         = finance.get_sales_tax_account_id_by_office_id(@office_id);
 
+		DECLARE @original_customer_id	integer;
+		SELECT @original_customer_id = customer_id 
+		FROM sales.sales
+		INNER JOIN finance.transaction_master
+		ON finance.transaction_master.transaction_master_id = sales.sales.transaction_master_id
+		AND finance.transaction_master.verification_status_id > 0
+		AND finance.transaction_master.transaction_master_id = @transaction_master_id;
+		
+		IF(@original_customer_id IS NULL)
+		BEGIN
+			RAISERROR('Invalid transaction.', 16, 1);
+		END;
+
+		IF(@original_customer_id != @customer_id)
+		BEGIN
+			RAISERROR('This customer is not associated with the sales you are trying to return.', 16, 1);
+		END;
+		
 		DECLARE @is_valid_transaction	bit;
 		SELECT
 			@is_valid_transaction	=	is_valid,
@@ -4048,6 +4066,74 @@ ON for_ticket_of_price_type.price_type_id = sales.coupons.for_ticket_of_price_ty
 GO
 
 
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/05.views/sales.customer_transaction_view.sql --<--<--
+IF OBJECT_ID('sales.customer_transaction_view') IS NOT NULL
+DROP VIEW sales.customer_transaction_view;
+GO
+
+CREATE VIEW sales.customer_transaction_view 
+AS 
+SELECT 
+    sales_view.value_date,
+    sales_view.book_date,
+    sales_view.transaction_master_id,
+    sales_view.transaction_code,
+    sales_view.invoice_number,
+    sales_view.customer_id,
+    'Invoice' AS statement_reference,
+    sales_view.total_amount + COALESCE(sales_view.check_amount, 0) - sales_view.total_discount_amount AS debit,
+    NULL AS credit
+FROM sales.sales_view
+WHERE sales_view.verification_status_id > 0
+UNION ALL
+
+SELECT 
+    sales_view.value_date,
+    sales_view.book_date,
+    sales_view.transaction_master_id,
+    sales_view.transaction_code,
+    sales_view.invoice_number,
+    sales_view.customer_id,
+    'Payment' AS statement_reference,
+    NULL AS debit,
+    sales_view.total_amount + COALESCE(sales_view.check_amount, 0) - sales_view.total_discount_amount AS credit
+FROM sales.sales_view
+WHERE sales_view.verification_status_id > 0 AND sales_view.is_credit = 0
+UNION ALL
+
+SELECT 
+    sales_view.value_date,
+    sales_view.book_date,
+    sales_view.transaction_master_id,
+    sales_view.transaction_code,
+    sales_view.invoice_number,
+    returns.customer_id,
+    'Return' AS statement_reference,
+    NULL AS debit,
+    sum(checkout_detail_view.total) AS credit
+FROM sales.returns
+JOIN sales.sales_view ON returns.sales_id = sales_view.sales_id
+JOIN inventory.checkout_detail_view ON returns.checkout_id = checkout_detail_view.checkout_id
+WHERE sales_view.verification_status_id > 0
+GROUP BY sales_view.value_date, sales_view.invoice_number, returns.customer_id, sales_view.book_date, sales_view.transaction_master_id, sales_view.transaction_code
+UNION ALL
+
+SELECT 
+    customer_receipts.posted_date AS value_date,
+    finance.transaction_master.book_date,
+    finance.transaction_master.transaction_master_id,
+    finance.transaction_master.transaction_code,
+    NULL AS invoice_number,
+    customer_receipts.customer_id,
+    'Payment' AS statement_reference,
+    NULL AS debit,
+    customer_receipts.amount AS credit
+FROM sales.customer_receipts
+JOIN finance.transaction_master ON customer_receipts.transaction_master_id = transaction_master.transaction_master_id
+WHERE transaction_master.verification_status_id > 0;
+
+--SELECT * FROM sales.customer_transaction_view;
+
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/05.views/sales.gift_card_search_view.sql --<--<--
 IF OBJECT_ID('sales.gift_card_search_view') IS NOT NULL
 DROP VIEW sales.gift_card_search_view;
@@ -4270,61 +4356,6 @@ WHERE finance.transaction_master.deleted = 0;
 
 --SELECT * FROM sales.sales_view
 
-GO
-
-
--->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/05.views/sales.zcustomer_transaction_view.sql --<--<--
-IF OBJECT_ID('sales.customer_transaction_view') IS NOT NULL
-DROP VIEW sales.customer_transaction_view;
-GO
-
-CREATE VIEW sales.customer_transaction_view AS 
-SELECT 
-	sales_view.value_date,
-	sales_view.invoice_number,
-	sales_view.customer_id,
-	'Invoice' AS statement_reference,
-	sales_view.total_amount + COALESCE(sales_view.check_amount, 0) - sales_view.total_discount_amount AS debit,
-	NULL AS credit
-FROM sales.sales_view
-WHERE sales_view.verification_status_id > 0
-UNION ALL
-
-SELECT 
-	sales_view.value_date,
-	sales_view.invoice_number,
-	sales_view.customer_id,
-	'Payment' AS statement_reference,
-	NULL AS debit,
-	sales_view.total_amount + COALESCE(sales_view.check_amount, 0) - sales_view.total_discount_amount AS credit
-FROM sales.sales_view
-WHERE sales_view.verification_status_id > 0 AND sales_view.is_credit = 0
-UNION ALL
-
-SELECT 
-	sales_view.value_date,
-	sales_view.invoice_number,
-	returns.customer_id,
-	'Return' AS statement_reference,
-	NULL AS debit,
-	sum(checkout_detail_view.total) AS credit
-FROM sales.returns
-JOIN sales.sales_view ON returns.sales_id = sales_view.sales_id
-JOIN inventory.checkout_detail_view ON returns.checkout_id = checkout_detail_view.checkout_id
-WHERE sales_view.verification_status_id > 0
-GROUP BY sales_view.value_date, sales_view.invoice_number, returns.customer_id
-UNION ALL
-
-SELECT 
-	customer_receipts.posted_date AS value_date,
-	NULL AS invoice_number,
-	customer_receipts.customer_id,
-	'Payment' AS statement_reference,
-	NULL AS debit,
-	customer_receipts.amount AS credit
-FROM sales.customer_receipts
-JOIN finance.transaction_master ON customer_receipts.transaction_master_id = transaction_master.transaction_master_id
-WHERE transaction_master.verification_status_id > 0;
 GO
 
 

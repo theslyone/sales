@@ -270,9 +270,9 @@ LANGUAGE plpgsql;
 -- (
 --     6,
 --     ARRAY[
---         ROW(1, 'Dr', 1, 1, 1,180000, 0, 200)::sales.sales_detail_type,
---         ROW(1, 'Dr', 2, 1, 7,130000, 300, 30)::sales.sales_detail_type,
---         ROW(1, 'Dr', 3, 1, 1,110000, 5000, 50)::sales.sales_detail_type
+--         ROW(1, 'Dr', 1, 1, 1,180000, 0, 200, 0)::sales.sales_detail_type,
+--         ROW(1, 'Dr', 2, 1, 7,130000, 300, 30, 0)::sales.sales_detail_type,
+--         ROW(1, 'Dr', 3, 1, 1,110000, 5000, 50, 0)::sales.sales_detail_type
 --     ]
 -- );
 -- 

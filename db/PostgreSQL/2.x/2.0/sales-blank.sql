@@ -693,13 +693,16 @@ CREATE OR REPLACE FUNCTION sales.get_customer_account_detail
 )
 RETURNS TABLE
 (
-    id                  integer, 
-    value_date          date, 
-    invoice_number      bigint, 
-    statement_reference text, 
-    debit               numeric(30, 6), 
-    credit              numeric(30, 6), 
-    balance             numeric(30, 6)
+    id                      integer, 
+    value_date              date, 
+    book_date               date,
+    tran_id                 bigint,
+    tran_code               text,
+    invoice_number          bigint, 
+    statement_reference     text, 
+    debit                   numeric(30, 6), 
+    credit                  numeric(30, 6), 
+    balance                 numeric(30, 6)
 )
 AS
 $BODY$
@@ -708,6 +711,9 @@ BEGIN
     (
         id                      SERIAL NOT NULL,
         value_date              date,
+        book_date               date,
+        tran_id                 bigint,
+        tran_code               text,
         invoice_number          bigint,
         statement_reference     text,
         debit                   numeric(30, 6),
@@ -718,6 +724,9 @@ BEGIN
     INSERT INTO _customer_account_detail
     (
         value_date, 
+        book_date,
+        tran_id,
+        tran_code,
         invoice_number, 
         statement_reference, 
         debit, 
@@ -725,6 +734,9 @@ BEGIN
     )
     SELECT 
         customer_transaction_view.value_date,
+        customer_transaction_view.book_date,
+        customer_transaction_view.transaction_master_id,
+        customer_transaction_view.transaction_code,
         customer_transaction_view.invoice_number,
         customer_transaction_view.statement_reference,
         customer_transaction_view.debit,
@@ -760,6 +772,7 @@ $BODY$
  LANGUAGE plpgsql;
 
 
+--select * from sales.get_customer_account_detail(1, '1-1-2000', '1-1-2060', 1);
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_balance.sql --<--<--
 DROP FUNCTION IF EXISTS sales.get_gift_card_balance(_gift_card_id integer, _value_date date);
@@ -2373,6 +2386,7 @@ $$
     DECLARE _tax_total              public.money_strict2;
     DECLARE _tax_account_id         integer;
     DECLARE _original_store_id      integer;
+    DECLARE _original_customer_id	integer;
     DECLARE this                    RECORD;
 BEGIN
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
@@ -2385,6 +2399,22 @@ BEGIN
     END IF;
 
     _tax_account_id                         := finance.get_sales_tax_account_id_by_office_id(_office_id);
+
+
+    SELECT sales.sales.customer_id INTO _original_customer_id
+    FROM sales.sales
+    INNER JOIN finance.transaction_master
+    ON finance.transaction_master.transaction_master_id = sales.sales.transaction_master_id
+    AND finance.transaction_master.verification_status_id > 0
+    AND finance.transaction_master.transaction_master_id = _transaction_master_id;
+    
+    IF(_original_customer_id IS NULL) THEN
+        RAISE EXCEPTION 'Invalid transaction.';
+    END IF;
+
+    IF(_original_customer_id != _customer_id) THEN
+        RAISE EXCEPTION 'This customer is not associated with the sales you are trying to return.';
+    END IF;
 
     IF(NOT sales.validate_items_for_return(_transaction_master_id, _details)) THEN
         RETURN 0;
@@ -3418,9 +3448,9 @@ LANGUAGE plpgsql;
 -- (
 --     6,
 --     ARRAY[
---         ROW(1, 'Dr', 1, 1, 1,180000, 0, 200)::sales.sales_detail_type,
---         ROW(1, 'Dr', 2, 1, 7,130000, 300, 30)::sales.sales_detail_type,
---         ROW(1, 'Dr', 3, 1, 1,110000, 5000, 50)::sales.sales_detail_type
+--         ROW(1, 'Dr', 1, 1, 1,180000, 0, 200, 0)::sales.sales_detail_type,
+--         ROW(1, 'Dr', 2, 1, 7,130000, 300, 30, 0)::sales.sales_detail_type,
+--         ROW(1, 'Dr', 3, 1, 1,110000, 5000, 50, 0)::sales.sales_detail_type
 --     ]
 -- );
 -- 
@@ -3914,6 +3944,9 @@ CREATE VIEW sales.customer_transaction_view
 AS
 SELECT 
     sales_view.value_date,
+    sales_view.book_date,
+    sales_view.transaction_master_id,
+    sales_view.transaction_code,
     sales_view.invoice_number,
     sales_view.customer_id,
     'Invoice'::text AS statement_reference,
@@ -3925,6 +3958,9 @@ UNION ALL
 
 SELECT 
     sales_view.value_date,
+    sales_view.book_date,
+    sales_view.transaction_master_id,
+    sales_view.transaction_code,
     sales_view.invoice_number,
     sales_view.customer_id,
     'Payment'::text AS statement_reference,
@@ -3936,6 +3972,9 @@ UNION ALL
 
 SELECT 
     sales_view.value_date,
+    sales_view.book_date,
+    sales_view.transaction_master_id,
+    sales_view.transaction_code,
     sales_view.invoice_number,
     returns.customer_id,
     'Return'::text AS statement_reference,
@@ -3945,11 +3984,14 @@ FROM sales.returns
 JOIN sales.sales_view ON returns.sales_id = sales_view.sales_id
 JOIN inventory.checkout_detail_view ON returns.checkout_id = checkout_detail_view.checkout_id
 WHERE sales_view.verification_status_id > 0
-GROUP BY sales_view.value_date, sales_view.invoice_number, returns.customer_id
+GROUP BY sales_view.value_date, sales_view.invoice_number, returns.customer_id, sales_view.book_date, sales_view.transaction_master_id, sales_view.transaction_code
 UNION ALL
 
 SELECT 
     customer_receipts.posted_date AS value_date,
+    finance.transaction_master.book_date,
+    finance.transaction_master.transaction_master_id,
+    finance.transaction_master.transaction_code,
     NULL::bigint AS invoice_number,
     customer_receipts.customer_id,
     'Payment'::text AS statement_reference,
@@ -3959,6 +4001,7 @@ FROM sales.customer_receipts
 JOIN finance.transaction_master ON customer_receipts.transaction_master_id = transaction_master.transaction_master_id
 WHERE transaction_master.verification_status_id > 0;
 
+--SELECT * FROM sales.customer_transaction_view;
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/06.widgets/inventory.top_customers_by_office_view.sql --<--<--
 DROP VIEW IF EXISTS inventory.top_customers_by_office_view;

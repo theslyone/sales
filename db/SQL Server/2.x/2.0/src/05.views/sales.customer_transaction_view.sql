@@ -1,6 +1,9 @@
-﻿DROP VIEW IF EXISTS sales.customer_transaction_view;
+IF OBJECT_ID('sales.customer_transaction_view') IS NOT NULL
+DROP VIEW sales.customer_transaction_view;
+GO
+
 CREATE VIEW sales.customer_transaction_view 
-AS
+AS 
 SELECT 
     sales_view.value_date,
     sales_view.book_date,
@@ -8,9 +11,9 @@ SELECT
     sales_view.transaction_code,
     sales_view.invoice_number,
     sales_view.customer_id,
-    'Invoice'::text AS statement_reference,
-    sales_view.total_amount::numeric + COALESCE(sales_view.check_amount::numeric, 0::numeric) - sales_view.total_discount_amount::numeric AS debit,
-    NULL::numeric AS credit
+    'Invoice' AS statement_reference,
+    sales_view.total_amount + COALESCE(sales_view.check_amount, 0) - sales_view.total_discount_amount AS debit,
+    NULL AS credit
 FROM sales.sales_view
 WHERE sales_view.verification_status_id > 0
 UNION ALL
@@ -22,11 +25,11 @@ SELECT
     sales_view.transaction_code,
     sales_view.invoice_number,
     sales_view.customer_id,
-    'Payment'::text AS statement_reference,
-    NULL::numeric AS debit,
-    sales_view.total_amount::numeric + COALESCE(sales_view.check_amount::numeric, 0::numeric) - sales_view.total_discount_amount::numeric AS credit
+    'Payment' AS statement_reference,
+    NULL AS debit,
+    sales_view.total_amount + COALESCE(sales_view.check_amount, 0) - sales_view.total_discount_amount AS credit
 FROM sales.sales_view
-WHERE sales_view.verification_status_id > 0 AND NOT sales_view.is_credit
+WHERE sales_view.verification_status_id > 0 AND sales_view.is_credit = 0
 UNION ALL
 
 SELECT 
@@ -36,8 +39,8 @@ SELECT
     sales_view.transaction_code,
     sales_view.invoice_number,
     returns.customer_id,
-    'Return'::text AS statement_reference,
-    NULL::numeric AS debit,
+    'Return' AS statement_reference,
+    NULL AS debit,
     sum(checkout_detail_view.total) AS credit
 FROM sales.returns
 JOIN sales.sales_view ON returns.sales_id = sales_view.sales_id
@@ -51,10 +54,10 @@ SELECT
     finance.transaction_master.book_date,
     finance.transaction_master.transaction_master_id,
     finance.transaction_master.transaction_code,
-    NULL::bigint AS invoice_number,
+    NULL AS invoice_number,
     customer_receipts.customer_id,
-    'Payment'::text AS statement_reference,
-    NULL::numeric AS debit,
+    'Payment' AS statement_reference,
+    NULL AS debit,
     customer_receipts.amount AS credit
 FROM sales.customer_receipts
 JOIN finance.transaction_master ON customer_receipts.transaction_master_id = transaction_master.transaction_master_id

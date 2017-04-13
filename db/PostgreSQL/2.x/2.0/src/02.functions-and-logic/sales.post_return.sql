@@ -50,6 +50,7 @@ $$
     DECLARE _tax_total              public.money_strict2;
     DECLARE _tax_account_id         integer;
     DECLARE _original_store_id      integer;
+    DECLARE _original_customer_id	integer;
     DECLARE this                    RECORD;
 BEGIN
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
@@ -62,6 +63,22 @@ BEGIN
     END IF;
 
     _tax_account_id                         := finance.get_sales_tax_account_id_by_office_id(_office_id);
+
+
+    SELECT sales.sales.customer_id INTO _original_customer_id
+    FROM sales.sales
+    INNER JOIN finance.transaction_master
+    ON finance.transaction_master.transaction_master_id = sales.sales.transaction_master_id
+    AND finance.transaction_master.verification_status_id > 0
+    AND finance.transaction_master.transaction_master_id = _transaction_master_id;
+    
+    IF(_original_customer_id IS NULL) THEN
+        RAISE EXCEPTION 'Invalid transaction.';
+    END IF;
+
+    IF(_original_customer_id != _customer_id) THEN
+        RAISE EXCEPTION 'This customer is not associated with the sales you are trying to return.';
+    END IF;
 
     IF(NOT sales.validate_items_for_return(_transaction_master_id, _details)) THEN
         RETURN 0;

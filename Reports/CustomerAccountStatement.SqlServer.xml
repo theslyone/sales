@@ -44,12 +44,16 @@
     </DataSource>
     <DataSource>
       <Query>
-        SELECT value_date,
-        invoice_number,
-        statement_reference,
-        debit,
-        credit,
-        balance
+        SELECT 
+			value_date,
+			book_date,
+			tran_id,
+			tran_code,
+			invoice_number,
+			statement_reference,
+			debit,
+			credit,
+			balance
         FROM sales.get_customer_account_detail(@CustomerId, @from, @To, @OfficeId)
       </Query>
       <Parameters>
@@ -58,8 +62,8 @@
         <Parameter Name="@From" FieldLabel="From Date" Type="System.DateTime" />
         <Parameter Name="@To" FieldLabel="To Date" Type="System.DateTime" />
       </Parameters>
-      <RunningTotalTextColumnIndex>2</RunningTotalTextColumnIndex>
-      <RunningTotalFieldIndices>3, 4</RunningTotalFieldIndices>
+      <RunningTotalTextColumnIndex>5</RunningTotalTextColumnIndex>
+      <RunningTotalFieldIndices>6, 7</RunningTotalFieldIndices>
     </DataSource>
   </DataSources>
 </FrapidReport>

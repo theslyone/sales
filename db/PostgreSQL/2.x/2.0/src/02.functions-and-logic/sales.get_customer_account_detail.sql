@@ -8,13 +8,16 @@ CREATE OR REPLACE FUNCTION sales.get_customer_account_detail
 )
 RETURNS TABLE
 (
-    id                  integer, 
-    value_date          date, 
-    invoice_number      bigint, 
-    statement_reference text, 
-    debit               numeric(30, 6), 
-    credit              numeric(30, 6), 
-    balance             numeric(30, 6)
+    id                      integer, 
+    value_date              date, 
+    book_date               date,
+    tran_id                 bigint,
+    tran_code               text,
+    invoice_number          bigint, 
+    statement_reference     text, 
+    debit                   numeric(30, 6), 
+    credit                  numeric(30, 6), 
+    balance                 numeric(30, 6)
 )
 AS
 $BODY$
@@ -23,6 +26,9 @@ BEGIN
     (
         id                      SERIAL NOT NULL,
         value_date              date,
+        book_date               date,
+        tran_id                 bigint,
+        tran_code               text,
         invoice_number          bigint,
         statement_reference     text,
         debit                   numeric(30, 6),
@@ -33,6 +39,9 @@ BEGIN
     INSERT INTO _customer_account_detail
     (
         value_date, 
+        book_date,
+        tran_id,
+        tran_code,
         invoice_number, 
         statement_reference, 
         debit, 
@@ -40,6 +49,9 @@ BEGIN
     )
     SELECT 
         customer_transaction_view.value_date,
+        customer_transaction_view.book_date,
+        customer_transaction_view.transaction_master_id,
+        customer_transaction_view.transaction_code,
         customer_transaction_view.invoice_number,
         customer_transaction_view.statement_reference,
         customer_transaction_view.debit,
@@ -74,3 +86,5 @@ END
 $BODY$
  LANGUAGE plpgsql;
 
+
+--select * from sales.get_customer_account_detail(1, '1-1-2000', '1-1-2060', 1);

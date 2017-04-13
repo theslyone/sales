@@ -88,6 +88,24 @@ BEGIN
 
         SET @tax_account_id                         = finance.get_sales_tax_account_id_by_office_id(@office_id);
 
+		DECLARE @original_customer_id	integer;
+		SELECT @original_customer_id = customer_id 
+		FROM sales.sales
+		INNER JOIN finance.transaction_master
+		ON finance.transaction_master.transaction_master_id = sales.sales.transaction_master_id
+		AND finance.transaction_master.verification_status_id > 0
+		AND finance.transaction_master.transaction_master_id = @transaction_master_id;
+		
+		IF(@original_customer_id IS NULL)
+		BEGIN
+			RAISERROR('Invalid transaction.', 16, 1);
+		END;
+
+		IF(@original_customer_id != @customer_id)
+		BEGIN
+			RAISERROR('This customer is not associated with the sales you are trying to return.', 16, 1);
+		END;
+		
 		DECLARE @is_valid_transaction	bit;
 		SELECT
 			@is_valid_transaction	=	is_valid,
