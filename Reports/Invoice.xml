@@ -109,7 +109,7 @@
         FROM finance.transaction_master
         INNER JOIN core.offices
         ON finance.transaction_master.office_id = core.offices.office_id
-        INNER JOIN finance.cost_centers
+        LEFT JOIN finance.cost_centers
         ON finance.transaction_master.cost_center_id = finance.cost_centers.cost_center_id
         INNER JOIN inventory.checkouts
         ON finance.transaction_master.transaction_master_id = inventory.checkouts.transaction_master_id
