@@ -63,4 +63,6 @@ FROM sales.customer_receipts
 JOIN finance.transaction_master ON customer_receipts.transaction_master_id = transaction_master.transaction_master_id
 WHERE transaction_master.verification_status_id > 0;
 
+GO
+
 --SELECT * FROM sales.customer_transaction_view;
