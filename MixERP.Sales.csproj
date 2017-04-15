@@ -226,7 +226,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryModels\GiftCardSearch.cs" />
     <Compile Include="QueryModels\OrderQueryModel.cs" />
+    <Compile Include="QueryModels\OrderSearch.cs" />
     <Compile Include="QueryModels\QuotationQueryModel.cs" />
+    <Compile Include="QueryModels\QuotationSearch.cs" />
+    <Compile Include="QueryModels\SalesSearch.cs" />
     <Compile Include="ViewModels\ClosingCashViewModel.cs" />
     <Compile Include="ViewModels\OpeningCash.cs" />
     <Compile Include="ViewModels\CustomerSearchViewModel.cs" />

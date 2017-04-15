@@ -4003,6 +4003,123 @@ WHERE NOT inventory.items.deleted
 AND inventory.items.allow_sales;
 
 
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.views/sales.order_search_view.sql --<--<--
+DROP VIEW IF EXISTS sales.order_search_view;
+
+CREATE VIEW sales.order_search_view
+AS
+SELECT
+	sales.orders.order_id,
+	inventory.get_customer_name_by_customer_id(sales.orders.customer_id) AS customer,
+	SUM(
+
+        ROUND
+		(
+			(
+			(sales.order_details.price * sales.order_details.quantity)
+			* ((100 - sales.order_details.discount_rate)/100)) 
+		, 4)  + sales.order_details.tax		
+	) AS total_amount,
+	sales.orders.value_date,
+	sales.orders.expected_delivery_date AS expected_date,
+	COALESCE(sales.orders.reference_number, '') AS reference_number,
+	COALESCE(sales.orders.terms, '') AS terms,
+	COALESCE(sales.orders.internal_memo, '') AS memo,
+	account.get_name_by_user_id(sales.orders.user_id) AS posted_by,
+	core.get_office_name_by_office_id(sales.orders.office_id) AS office,
+	sales.orders.transaction_timestamp AS posted_on,
+	sales.orders.office_id
+FROM sales.orders
+INNER JOIN sales.order_details
+ON sales.orders.order_id = sales.order_details.order_id
+GROUP BY
+	sales.orders.order_id,
+	sales.orders.customer_id,
+	sales.orders.value_date,
+	sales.orders.expected_delivery_date,
+	sales.orders.reference_number,
+	sales.orders.terms,
+	sales.orders.internal_memo,
+	sales.orders.user_id,
+	sales.orders.transaction_timestamp,
+	sales.orders.office_id
+ORDER BY sales.orders.order_id;
+
+
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.views/sales.quotation_search_view.sql --<--<--
+DROP VIEW IF EXISTS sales.quotation_search_view;
+
+CREATE VIEW sales.quotation_search_view
+AS
+SELECT
+	sales.quotations.quotation_id,
+	inventory.get_customer_name_by_customer_id(sales.quotations.customer_id) AS customer,
+	SUM(
+
+        ROUND
+		(
+			(
+			(sales.quotation_details.price * sales.quotation_details.quantity)
+			* ((100 - sales.quotation_details.discount_rate)/100)) 
+		, 4)  + sales.quotation_details.tax		
+	) AS total_amount,
+	sales.quotations.value_date,
+	sales.quotations.expected_delivery_date AS expected_date,
+	COALESCE(sales.quotations.reference_number, '') AS reference_number,
+	COALESCE(sales.quotations.terms, '') AS terms,
+	COALESCE(sales.quotations.internal_memo, '') AS memo,
+	account.get_name_by_user_id(sales.quotations.user_id) AS posted_by,
+	core.get_office_name_by_office_id(sales.quotations.office_id) AS office,
+	sales.quotations.transaction_timestamp AS posted_on,
+	sales.quotations.office_id
+FROM sales.quotations
+INNER JOIN sales.quotation_details
+ON sales.quotations.quotation_id = sales.quotation_details.quotation_id
+GROUP BY
+	sales.quotations.quotation_id,
+	sales.quotations.customer_id,
+	sales.quotations.value_date,
+	sales.quotations.expected_delivery_date,
+	sales.quotations.reference_number,
+	sales.quotations.terms,
+	sales.quotations.internal_memo,
+	sales.quotations.user_id,
+	sales.quotations.transaction_timestamp,
+	sales.quotations.office_id
+ORDER BY sales.quotations.quotation_id;
+
+
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/05.views/sales.sales_search_view.sql --<--<--
+DROP VIEW IF EXISTS sales.sales_search_view;
+
+CREATE VIEW sales.sales_search_view
+AS
+SELECT 
+    finance.transaction_master.transaction_master_id::text AS tran_id, 
+    finance.transaction_master.transaction_code AS tran_code,
+    finance.transaction_master.value_date,
+    finance.transaction_master.book_date,
+    inventory.get_customer_name_by_customer_id(sales.sales.customer_id) AS customer,
+    sales.sales.total_amount,
+    finance.transaction_master.reference_number,
+    finance.transaction_master.statement_reference,
+    account.get_name_by_user_id(finance.transaction_master.user_id) as posted_by,
+    core.get_office_name_by_office_id(finance.transaction_master.office_id) as office,
+    finance.get_verification_status_name_by_verification_status_id(finance.transaction_master.verification_status_id) as status,
+    account.get_name_by_user_id(finance.transaction_master.verified_by_user_id) as verified_by,
+    finance.transaction_master.last_verified_on AS verified_on,
+    finance.transaction_master.verification_reason AS reason,    
+    finance.transaction_master.transaction_ts AS posted_on,
+    finance.transaction_master.office_id
+FROM finance.transaction_master
+INNER JOIN sales.sales
+ON sales.sales.transaction_master_id = finance.transaction_master.transaction_master_id
+WHERE NOT finance.transaction_master.deleted
+ORDER BY sales_id;
+
+
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/06.widgets/inventory.top_customers_by_office_view.sql --<--<--
 DROP VIEW IF EXISTS inventory.top_customers_by_office_view;
 

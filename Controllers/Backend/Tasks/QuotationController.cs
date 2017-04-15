@@ -23,6 +23,25 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Quotation/CheckList.cshtml", this.Tenant), tranId);
         }
 
+        [Route("dashboard/sales/tasks/quotation/search")]
+        [MenuPolicy(OverridePath = "/dashboard/sales/tasks/quotation")]
+        [AccessPolicy("sales", "quotations", AccessTypeEnum.Read)]
+        [HttpPost]
+        public async Task<ActionResult> SearchAsync(QuotationSearch search)
+        {
+            var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);
+
+            try
+            {
+                var result = await Quotations.GetSearchViewAsync(this.Tenant, meta.OfficeId, search).ConfigureAwait(true);
+                return this.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return this.Failed(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
         [Route("dashboard/sales/tasks/quotation/merge-model/{quotationId}")]
         [AccessPolicy("sales", "quotation_details", AccessTypeEnum.Read)]
         public async Task<ActionResult> GetMergeModelAsync(long quotationId)
