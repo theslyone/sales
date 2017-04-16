@@ -8,6 +8,7 @@ using Frapid.Dashboard;
 using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.ViewModels;
 using Frapid.DataAccess.Models;
+using MixERP.Sales.QueryModels;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
@@ -20,6 +21,25 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
         public ActionResult CheckList(long tranId)
         {
             return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Receipt/CheckList.cshtml", this.Tenant), tranId);
+        }
+
+        [Route("dashboard/sales/tasks/receipt/search")]
+        [MenuPolicy(OverridePath = "/dashboard/sales/tasks/receipt")]
+        [AccessPolicy("sales", "sales", AccessTypeEnum.Read)]
+        [HttpPost]
+        public async Task<ActionResult> SearchAsync(ReceiptSearch search)
+        {
+            var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);
+
+            try
+            {
+                var result = await Receipts.GetSearchViewAsync(this.Tenant, meta.OfficeId, search).ConfigureAwait(true);
+                return this.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return this.Failed(ex.Message, HttpStatusCode.InternalServerError);
+            }
         }
 
         [Route("dashboard/sales/tasks/receipt")]

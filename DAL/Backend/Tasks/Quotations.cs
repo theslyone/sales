@@ -25,7 +25,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks
                 var sql = new Sql("SELECT * FROM sales.quotation_search_view");
                 sql.Where("value_date BETWEEN @0 AND @1", search.From, search.To);
                 sql.And("expected_date BETWEEN @0 AND @1", search.ExpectedFrom, search.ExpectedTo);
-                sql.And("LOWER(quotation_id) LIKE @0", search.QuotationId.ToSqlLikeExpression().ToLower());
+                sql.And("LOWER(quotation_id) LIKE @0", search.Id.ToSqlLikeExpression().ToLower());
                 sql.And("LOWER(reference_number) LIKE @0", search.ReferenceNumber.ToSqlLikeExpression().ToLower());
                 sql.And("LOWER(customer) LIKE @0", search.Customer.ToSqlLikeExpression().ToLower());
                 sql.And("LOWER(terms) LIKE @0", search.Terms.ToSqlLikeExpression().ToLower());

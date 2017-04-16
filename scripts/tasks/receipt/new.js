@@ -263,7 +263,7 @@ function loadCostCenters() {
 };
 
 function loadCurrencies() {
-    window.displayFieldBinder($("#CurrencyCodeSelect"), "/api/forms/core/currencies/lookup-fields", false);
+    window.displayFieldBinder($("#CurrencyCodeSelect"), "/api/forms/core/currencies/lookup-fields", true);
 };
 
 function loadCustomers() {

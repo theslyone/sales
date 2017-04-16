@@ -116,7 +116,7 @@
         },
         {
             Text: "Id",
-            Id: "OrderId"
+            Id: "Id"
         },
         {
             Text: "Transaction Code",

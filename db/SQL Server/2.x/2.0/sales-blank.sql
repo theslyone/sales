@@ -4235,6 +4235,39 @@ ON for_ticket_of_price_type.price_type_id = sales.coupons.for_ticket_of_price_ty
 GO
 
 
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/05.views/sales.customer_receipt_search_view.sql --<--<--
+IF OBJECT_ID('sales.customer_receipt_search_view') IS NOT NULL
+DROP VIEW sales.customer_receipt_search_view;
+
+GO
+
+CREATE VIEW sales.customer_receipt_search_view
+AS
+SELECT
+	sales.customer_receipts.transaction_master_id AS tran_id,
+	finance.transaction_master.transaction_code AS tran_code,
+	sales.customer_receipts.customer_id,
+	inventory.get_customer_name_by_customer_id(sales.customer_receipts.customer_id) AS customer,
+	COALESCE(sales.customer_receipts.amount, sales.customer_receipts.check_amount, COALESCE(sales.customer_receipts.tender, 0) - COALESCE(sales.customer_receipts.change, 0)) AS amount,
+	finance.transaction_master.value_date,
+	finance.transaction_master.book_date,
+	COALESCE(finance.transaction_master.reference_number, '') AS reference_number,
+	COALESCE(finance.transaction_master.statement_reference, '') AS statement_reference,
+	account.get_name_by_user_id(finance.transaction_master.user_id) AS posted_by,
+	core.get_office_name_by_office_id(finance.transaction_master.office_id) AS office,
+	finance.get_verification_status_name_by_verification_status_id(finance.transaction_master.verification_status_id) AS status,
+	COALESCE(account.get_name_by_user_id(finance.transaction_master.verified_by_user_id), '') AS verified_by,
+	finance.transaction_master.last_verified_on,
+	finance.transaction_master.verification_reason AS reason,
+	finance.transaction_master.office_id
+FROM sales.customer_receipts
+INNER JOIN finance.transaction_master
+ON sales.customer_receipts.transaction_master_id = finance.transaction_master.transaction_master_id
+WHERE finance.transaction_master.deleted = 0;
+
+GO
+
+
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/05.views/sales.gift_card_search_view.sql --<--<--
 IF OBJECT_ID('sales.gift_card_search_view') IS NOT NULL
 DROP VIEW sales.gift_card_search_view;
@@ -4455,6 +4488,57 @@ GROUP BY
 
 GO
 
+
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/05.views/sales.return_search_view.sql --<--<--
+IF OBJECT_ID('sales.return_search_view') IS NOT NULL
+DROP VIEW sales.return_search_view;
+
+GO
+
+CREATE VIEW sales.return_search_view
+AS
+SELECT
+	finance.transaction_master.transaction_master_id AS tran_id,
+	finance.transaction_master.transaction_code AS tran_code,
+	sales.returns.customer_id,
+	inventory.get_customer_name_by_customer_id(sales.returns.customer_id) AS customer,
+	SUM(CASE WHEN finance.transaction_details.tran_type = 'Dr' THEN finance.transaction_details.amount_in_local_currency ELSE 0 END) AS amount,
+	finance.transaction_master.value_date,
+	finance.transaction_master.book_date,
+	COALESCE(finance.transaction_master.reference_number, '') AS reference_number,
+	COALESCE(finance.transaction_master.statement_reference, '') AS statement_reference,
+	account.get_name_by_user_id(finance.transaction_master.user_id) AS posted_by,
+	core.get_office_name_by_office_id(finance.transaction_master.office_id) AS office,
+	finance.get_verification_status_name_by_verification_status_id(finance.transaction_master.verification_status_id) AS status,
+	COALESCE(account.get_name_by_user_id(finance.transaction_master.verified_by_user_id), '') AS verified_by,
+	finance.transaction_master.last_verified_on,
+	finance.transaction_master.verification_reason AS reason,
+	finance.transaction_master.office_id
+FROM sales.returns
+INNER JOIN inventory.checkouts
+ON inventory.checkouts.checkout_id = sales.returns.checkout_id
+INNER JOIN finance.transaction_master
+ON finance.transaction_master.transaction_master_id = inventory.checkouts.transaction_master_id
+INNER JOIN finance.transaction_details
+ON finance.transaction_details.transaction_master_id = finance.transaction_master.transaction_master_id
+WHERE finance.transaction_master.deleted = 0
+GROUP BY
+finance.transaction_master.transaction_master_id,
+finance.transaction_master.transaction_code,
+sales.returns.customer_id,
+finance.transaction_master.value_date,
+finance.transaction_master.book_date,
+finance.transaction_master.reference_number,
+finance.transaction_master.statement_reference,
+finance.transaction_master.user_id,
+finance.transaction_master.office_id,
+finance.transaction_master.verification_status_id,
+finance.transaction_master.verified_by_user_id,
+finance.transaction_master.last_verified_on,
+finance.transaction_master.verification_reason;
+
+GO
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/05.views/sales.sales_search_view.sql --<--<--

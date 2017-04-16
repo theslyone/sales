@@ -229,6 +229,8 @@
     <Compile Include="QueryModels\OrderSearch.cs" />
     <Compile Include="QueryModels\QuotationQueryModel.cs" />
     <Compile Include="QueryModels\QuotationSearch.cs" />
+    <Compile Include="QueryModels\ReceiptSearch.cs" />
+    <Compile Include="QueryModels\ReturnSearch.cs" />
     <Compile Include="QueryModels\SalesSearch.cs" />
     <Compile Include="ViewModels\ClosingCashViewModel.cs" />
     <Compile Include="ViewModels\OpeningCash.cs" />
@@ -294,8 +296,6 @@
     <Content Include="scripts\tasks\receipt\checklist.js" />
     <Content Include="scripts\tasks\receipt\index.js" />
     <Content Include="scripts\tasks\receipt\new.js" />
-    <Content Include="scripts\tasks\receipt\verification.js" />
-    <Content Include="scripts\tasks\entry\verification.js" />
     <Content Include="scripts\tasks\entry\new.js" />
     <Content Include="scripts\tasks\entry\index.js" />
     <Content Include="scripts\tasks\opening-cash\index.js" />
@@ -308,7 +308,6 @@
     <Content Include="scripts\tasks\return\checklist.js" />
     <Content Include="scripts\tasks\return\index.js" />
     <Content Include="scripts\tasks\return\new.js" />
-    <Content Include="scripts\tasks\return\verification.js" />
     <Content Include="scripts\ticket\index.js" />
     <Content Include="scripts\tasks\closing-cash\index.js" />
     <Content Include="scripts\tasks\entry\checklist.js" />

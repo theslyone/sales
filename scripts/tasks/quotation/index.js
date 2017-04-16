@@ -116,7 +116,7 @@
         },
         {
             Text: "Id",
-            Id: "QuotationId"
+            Id: "Id"
         },
         {
             Text: "Transaction Code",

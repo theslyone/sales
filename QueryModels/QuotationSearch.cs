@@ -8,7 +8,7 @@ namespace MixERP.Sales.QueryModels
         public DateTime To { get; set; }
         public DateTime ExpectedFrom { get; set; }
         public DateTime ExpectedTo { get; set; }
-        public string QuotationId { get; set; }
+        public string Id { get; set; }
         public string ReferenceNumber { get; set; }
         public string Customer { get; set; }
         public string Terms { get; set; }

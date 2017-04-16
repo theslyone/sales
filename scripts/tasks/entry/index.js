@@ -195,5 +195,3 @@ $("#ReturnButton").click(function () {
 
     window.displayMessage(window.translate("PleaseSelectItemFromGrid"));
 });
-
-prepareView(model);
