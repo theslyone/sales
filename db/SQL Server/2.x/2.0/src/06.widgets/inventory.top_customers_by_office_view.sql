@@ -35,3 +35,5 @@ GROUP BY
     inventory.customers.company_name,
     inventory.customers.company_country
 ORDER BY 5 DESC;
+
+GO

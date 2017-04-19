@@ -31,6 +31,8 @@ namespace MixERP.Sales.ViewModels
         public string ReferenceNumber { get; set; }
         public string StatementReference { get; set; }
 
+        public int? ShipperId { get; set; }
+        public decimal Discount { get; set; }
 
         [Required]
         public List<SalesDetailType> Details { get; set; }

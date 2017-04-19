@@ -23,7 +23,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.ReturnEntry
                                 @ValueDate::date, @BookDate::date, 
                                 @StoreId::integer, @CounterId::integer, @CustomerId, @PriceTypeId::integer,
                                 @ReferenceNumber::national character varying(24), @StatementReference::text, 
-                                ARRAY[{0}]
+                                ARRAY[{0}], @ShipperId, @Discount
                             );";
             sql = string.Format(sql, this.GetParametersForDetails(model.Details));
 
@@ -48,6 +48,9 @@ namespace MixERP.Sales.DAL.Backend.Tasks.ReturnEntry
 
 
                     command.Parameters.AddRange(this.AddParametersForDetails(model.Details).ToArray());
+
+                    command.Parameters.AddWithNullableValue("@ShipperId", model.ShipperId);
+                    command.Parameters.AddWithNullableValue("@Discount", model.Discount);
 
                     connection.Open();
                     var awaiter = await command.ExecuteScalarAsync().ConfigureAwait(false);

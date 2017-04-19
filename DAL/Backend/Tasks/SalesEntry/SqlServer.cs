@@ -24,8 +24,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                                 @CustomerId, @PriceTypeId, @ShipperId, @StoreId,
                                 @CouponCode, @IsFlatDiscount, @Discount,
                                 @Details,
-                                @SalesQuotationId, @SalesOrderId, @TransactionMasterId OUTPUT
-                            ;";
+                                @SalesQuotationId, @SalesOrderId, @TransactionMasterId OUTPUT;";
 
 
             using (var connection = new SqlConnection(connectionString))

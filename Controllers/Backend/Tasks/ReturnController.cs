@@ -3,11 +3,12 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Frapid.ApplicationState.Cache;
-using Frapid.Dashboard;
 using Frapid.Areas.CSRF;
+using Frapid.Dashboard;
 using Frapid.DataAccess.Models;
 using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.QueryModels;
+using MixERP.Sales.ViewModels;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
@@ -68,7 +69,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
         [Route("dashboard/sales/tasks/return/new")]
         [HttpPost]
         [AccessPolicy("sales", "returns", AccessTypeEnum.Create)]
-        public async Task<ActionResult> PostAsync(ViewModels.SalesReturn model)
+        public async Task<ActionResult> PostAsync(SalesReturn model)
         {
             if (!this.ModelState.IsValid)
             {
@@ -83,7 +84,7 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
             try
             {
-                long tranId = await DAL.Backend.Tasks.SalesReturnEntries.PostAsync(this.Tenant, model).ConfigureAwait(true);
+                long tranId = await SalesReturnEntries.PostAsync(this.Tenant, model).ConfigureAwait(true);
                 return this.Ok(tranId);
             }
             catch (Exception ex)

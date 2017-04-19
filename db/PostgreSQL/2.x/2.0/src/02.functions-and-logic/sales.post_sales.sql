@@ -26,7 +26,8 @@
     _discount                               public.money_strict2,
     _details                                sales.sales_detail_type[],
     _sales_quotation_id                     bigint,
-    _sales_order_id                         bigint
+    _sales_order_id                         bigint,
+    _book_name                              national character varying(48)
 );
 
 
@@ -58,12 +59,12 @@ CREATE FUNCTION sales.post_sales
     _discount                               public.money_strict2,
     _details                                sales.sales_detail_type[],
     _sales_quotation_id                     bigint,
-    _sales_order_id                         bigint
+    _sales_order_id                         bigint,
+    _book_name                              national character varying(48) DEFAULT 'Sales Entry'
 )
 RETURNS bigint
 AS
 $$
-    DECLARE _book_name                      national character varying(48) = 'Sales Entry';
     DECLARE _transaction_master_id          bigint;
     DECLARE _checkout_id                    bigint;
     DECLARE _grand_total                    public.money_strict;
@@ -93,6 +94,7 @@ $$
     DECLARE this                            RECORD;
 	DECLARE _taxable_total					numeric(30, 6);
 	DECLARE _nontaxable_total				numeric(30, 6);
+    DECLARE _sales_discount_account_id      integer;
 BEGIN        
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
         RETURN 0;
@@ -177,7 +179,7 @@ BEGIN
         tran_type                       = 'Cr',
         base_quantity                   = inventory.get_base_quantity_by_unit_id(unit_id, quantity),
         base_unit_id                    = inventory.get_root_unit_id(unit_id),
-        discount                        = ROUND((price * quantity) * (discount_rate / 100), 2);
+        discount                        = ROUND(((price * quantity) + shipping_charge) * (discount_rate / 100), 2);
 
 
     UPDATE temp_checkout_details
@@ -254,12 +256,6 @@ BEGIN
     SELECT SUM(COALESCE(shipping_charge, 0))                    INTO _shipping_charge FROM temp_checkout_details;
 
         
-    IF(_is_flat_discount AND _discount > _receivable) THEN
-        RAISE EXCEPTION 'The discount amount cannot be greater than total amount.';
-    ELSIF(NOT _is_flat_discount AND _discount > 100) THEN
-        RAISE EXCEPTION 'The discount rate cannot be greater than 100.';    
-    END IF;
-
     _coupon_discount                := ROUND(_discount, 2);
 
     IF(NOT _is_flat_discount AND COALESCE(_discount, 0) > 0) THEN
@@ -267,8 +263,15 @@ BEGIN
     END IF;
 
     _tax_total := ROUND((COALESCE(_taxable_total, 0) - COALESCE(_coupon_discount, 0)) * (_sales_tax_rate / 100), 2);     
-    _grand_total := COALESCE(_taxable_total, 0) + COALESCE(_nontaxable_total, 0) + COALESCE(_tax_total, 0) - COALESCE(_discount_total, 0);         
+    _grand_total := COALESCE(_taxable_total, 0) + COALESCE(_nontaxable_total, 0) + COALESCE(_tax_total, 0) - COALESCE(_discount_total, 0) - COALESCE(_coupon_discount, 0);         
     _receivable  := _grand_total;
+
+    IF(_is_flat_discount AND _discount > _receivable) THEN
+        RAISE EXCEPTION 'The discount amount cannot be greater than total amount.';
+    ELSIF(NOT _is_flat_discount AND _discount > 100) THEN
+        RAISE EXCEPTION 'The discount rate cannot be greater than 100.';    
+    END IF;
+
 
     IF(_tender > 0) THEN
         IF(_tender < _receivable ) THEN
@@ -346,6 +349,15 @@ BEGIN
         HAVING SUM(COALESCE(discount, 0)) > 0;
     END IF;
 
+    IF(_coupon_discount > 0) THEN
+        SELECT inventory.stores.sales_discount_account_id
+        INTO _sales_discount_account_id 
+        FROM inventory.stores
+        WHERE inventory.stores.store_id = _store_id;
+
+        INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
+        SELECT 'Dr', _sales_discount_account_id, _statement_reference, _default_currency_code, _coupon_discount, 1, _default_currency_code, _coupon_discount;
+    END IF;
 
     IF(_coupon_discount > 0) THEN
         SELECT inventory.inventory_setup.default_discount_account_id INTO _default_discount_account_id
@@ -369,6 +381,15 @@ BEGIN
 
     UPDATE temp_transaction_details     SET transaction_master_id   = _transaction_master_id;
     UPDATE temp_checkout_details           SET checkout_id         = _checkout_id;
+
+
+    IF
+    (
+        SELECT SUM(CASE WHEN tran_type = 'Cr' THEN 1 ELSE -1 END * amount_in_local_currency)
+        FROM temp_transaction_details
+    ) != 0 THEN
+        RAISE EXCEPTION 'Could not balance the Journal Entry. Nothing was saved.';
+    END IF;
     
     INSERT INTO finance.transaction_master(transaction_master_id, transaction_counter, transaction_code, book, value_date, book_date, user_id, login_id, office_id, cost_center_id, reference_number, statement_reference) 
     SELECT _transaction_master_id, _tran_counter, _transaction_code, _book_name, _value_date, _book_date, _user_id, _login_id, _office_id, _cost_center_id, _reference_number, _statement_reference;
@@ -382,8 +403,8 @@ BEGIN
     INSERT INTO inventory.checkouts(transaction_book, value_date, book_date, checkout_id, transaction_master_id, shipper_id, posted_by, office_id, discount, taxable_total, tax_rate, tax, nontaxable_total)
     SELECT _book_name, _value_date, _book_date, _checkout_id, _transaction_master_id, _shipper_id, _user_id, _office_id, _coupon_discount, _taxable_total, _sales_tax_rate, _tax_total, _nontaxable_total;
 
-    INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, shipping_charge, is_taxed)
-    SELECT _value_date, _book_date, checkout_id, tran_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, COALESCE(cost_of_goods_sold, 0), discount, shipping_charge, is_taxable_item 
+    INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount_rate, discount, shipping_charge, is_taxed)
+    SELECT _value_date, _book_date, checkout_id, tran_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, COALESCE(cost_of_goods_sold, 0), discount_rate, discount, shipping_charge, is_taxable_item 
     FROM temp_checkout_details;
 
     SELECT
@@ -394,7 +415,7 @@ BEGIN
     WHERE sales.sales.fiscal_year_code = _fiscal_year_code;
     
 
-    IF(NOT _is_credit) THEN
+    IF(NOT _is_credit AND book_name = 'Sales Entry') THEN
         SELECT sales.post_receipt
         (
             _user_id, 
@@ -428,8 +449,10 @@ BEGIN
         PERFORM sales.settle_customer_due(_customer_id, _office_id);
     END IF;
 
-    INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id, receipt_transaction_master_id)
-    SELECT _fiscal_year_code, _invoice_number, _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id, _receipt_transaction_master_id;
+    IF(@book_name = 'Sales Entry') THEN
+        INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id, receipt_transaction_master_id)
+        SELECT _fiscal_year_code, _invoice_number, _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id, _receipt_transaction_master_id;
+    END IF;
     
     PERFORM finance.auto_verify(_transaction_master_id, _office_id);
 

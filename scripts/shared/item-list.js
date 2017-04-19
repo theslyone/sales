@@ -342,7 +342,7 @@ function initializeClickAndAction() {
 };
 
 $("#SummaryItems div.discount .money input, " +
-    "#ReceiptSummary div.tender .money input").keyup(function () {
+    "#ReceiptSummary div.tender .money input, #DiscountInputText").keyup(function () {
         window.updateTotal();
     });
 
@@ -350,8 +350,10 @@ function updateTotal() {
     const candidates = $("#SalesItems div.item");
     const amountEl = $("#SummaryItems div.amount .money");
     const taxRate = window.parseFloat2($("#SalesTaxRateHidden").val()) || 0;
+
     window.setRegionalFormat();
 
+    var discount = window.parseFloat2($("#DiscountInputText").val());
     var totalPrice = 0;
     var taxableTotal = 0;
     var nonTaxableTotal = 0;
@@ -377,6 +379,12 @@ function updateTotal() {
 
         totalPrice += discountedAmount;
     });
+
+    taxableTotal = window.parseFloat2(window.round(taxableTotal, 2)) || 0;
+    nonTaxableTotal = window.parseFloat2(window.round(nonTaxableTotal, 2)) || 0;
+
+    totalPrice -= discount;
+    taxableTotal -= discount;
 
     const tax = taxableTotal * (taxRate / 100);
     totalPrice += tax;
