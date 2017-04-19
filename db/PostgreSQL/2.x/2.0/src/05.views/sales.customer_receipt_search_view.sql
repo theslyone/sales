@@ -3,7 +3,7 @@
 CREATE VIEW sales.customer_receipt_search_view
 AS
 SELECT
-	sales.customer_receipts.transaction_master_id AS tran_id,
+	sales.customer_receipts.transaction_master_id::text AS tran_id,
 	finance.transaction_master.transaction_code AS tran_code,
 	sales.customer_receipts.customer_id,
 	inventory.get_customer_name_by_customer_id(sales.customer_receipts.customer_id) AS customer,

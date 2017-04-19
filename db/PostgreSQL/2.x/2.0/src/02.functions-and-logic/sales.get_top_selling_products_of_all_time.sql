@@ -27,7 +27,7 @@ BEGIN
     (
         SELECT         
                 inventory.verified_checkout_view.item_id, 
-                SUM((price * quantity) - discount + tax) AS sales_amount
+                SUM((price * quantity) - discount) AS sales_amount
         FROM inventory.verified_checkout_view
         WHERE inventory.verified_checkout_view.office_id = _office_id
         AND inventory.verified_checkout_view.book ILIKE 'sales%'

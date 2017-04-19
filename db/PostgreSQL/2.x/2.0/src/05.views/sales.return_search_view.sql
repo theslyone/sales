@@ -3,7 +3,7 @@
 CREATE VIEW sales.return_search_view
 AS
 SELECT
-	finance.transaction_master.transaction_master_id AS tran_id,
+	finance.transaction_master.transaction_master_id::text AS tran_id,
 	finance.transaction_master.transaction_code AS tran_code,
 	sales.returns.customer_id,
 	inventory.get_customer_name_by_customer_id(sales.returns.customer_id) AS customer,

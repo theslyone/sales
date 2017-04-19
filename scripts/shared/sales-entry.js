@@ -15,7 +15,6 @@ function getModel() {
             const price = window.parseFloat2(el.find("input.price").val()) || 0;
             const discountRate = window.parseFloat2(el.find("input.discount").val()) || 0;
             const discount = (price * quantity) * (discountRate / 100);
-            const tax = window.parseFloat2(el.find(".tax-amount").html());
 
             model.push({
                 StoreId: $("#StoreSelect").val(),
@@ -24,8 +23,7 @@ function getModel() {
                 UnitId: unitId,
                 Price: price,
                 DiscountRate: discountRate,
-                Discount: discount,
-                Tax: tax
+                Discount: discount
             });
         });
 
@@ -54,7 +52,7 @@ function getModel() {
     const couponCode = $("#CouponCodeInputText").val();
 
     //Discount
-    const discountType = $("#DiscountTypeSelect").val();
+    const discountType = window.parseInt2($("#DiscountTypeSelect").val());
     const discount = window.parseFloat2($("#DiscountInputText").val()) || 0;
 
     const valueDate = $("#ValueDateInputText").datepicker("getDate");
@@ -241,13 +239,14 @@ function updateTenderInfo() {
     const total = window.parseFloat2($(".amount.item .money").text());
     const tender = window.parseFloat2($("#TenderInputText").val()) || 0;
 
-    var change = tender - total;
+    var change = window.round(tender - total, 2);
 
     if (change < 0) {
-        change = "ERROR";
+        $("#ChangeInputText").val("ERROR");
+        return;
     };
 
-    $("#ChangeInputText").val(change);
+    $("#ChangeInputText").val(window.getFormattedNumber(change));
 };
 
 $("#TenderInputText").on("keyup", function () {

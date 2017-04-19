@@ -1,5 +1,5 @@
 ﻿var itemTemplate =
-    `<div class="item" id="pos-{ItemId}" data-selling-price="{InvariantCultureSellingPrice}" data-photo="{Photo}" data-unit-id="{UnitId}" data-valid-units="{ValidUnits}" data-brand="{BrandName}" data-item-group="{ItemGroupName}" data-item-name="{ItemName}" data-item-code="{ItemCode}" data-item-id="{ItemId}" data-price="{Price}">
+    `<div class="item" id="pos-{ItemId}" data-selling-price="{InvariantCultureSellingPrice}" data-photo="{Photo}" data-unit-id="{UnitId}" data-valid-units="{ValidUnits}" data-brand="{BrandName}" data-item-group="{ItemGroupName}" data-item-name="{ItemName}" data-item-code="{ItemCode}" data-item-id="{ItemId}" data-price="{Price}" data-is-taxable-item="{IsTaxableItem}">
 	<div class="photo block">
 		<img src="{Photo}">
 	</div>
@@ -17,14 +17,6 @@
 			<span class="discount rate"></span>
 			<span>&nbsp; =&nbsp; </span>
 			<span class="discounted amount"></span>
-		</div>
-		<div class ="tax info" style="display:none;">
-			<span>${window.translate("AddTax")} </span>
-			<span class ="tax-amount"></span>
-			<span> (</span>
-			<span class ="tax-rate"></span>
-			<span>%) = </span>
-			<span class="amount-plus-tax"></span>
 		</div>
 		<div>
 			<select class="unit inverted" data-item-id="{ItemId}">
@@ -103,6 +95,7 @@ function defaulPOSItemClick(el, callback) {
     template = template.replace(/{Price}/g, price);
     template = template.replace(/{UnitId}/g, unitId);
     template = template.replace(/{ValidUnits}/g, validUnits);
+    template = template.replace(/{IsTaxableItem}/g, isTaxableItem.toString());
 
     var item = $(template);
     var quantityInput = item.find("input.quantity");
@@ -162,15 +155,6 @@ function defaulPOSItemClick(el, callback) {
             el.find(".discount.info").show();
         } else {
             el.find(".discount.info").hide();
-        };
-
-        if (isTaxableItem) {
-            const tax = window.round(discountedAmount * taxRate / 100, 2);
-            const amountPlusTax = window.round(discountedAmount + tax, 2);
-            el.find(".tax.info .tax-amount").html(window.getFormattedNumber(tax));
-            el.find(".tax.info .tax-rate").html(window.getFormattedNumber(window.round(taxRate, 2)));
-            el.find(".tax.info .amount-plus-tax").html(window.getFormattedNumber(amountPlusTax));
-            el.find(".tax.info").show();
         };
 
         window.updateTotal();

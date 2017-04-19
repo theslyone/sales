@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -96,7 +97,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                 row["UnitId"] = detail.UnitId;
                 row["Price"] = detail.Price;
                 row["DiscountRate"] = detail.DiscountRate;
-                row["Tax"] = detail.Tax;
+                row["Tax"] = DBNull.Value;//Tax will be determined on database level
                 row["ShippingCharge"] = detail.ShippingCharge;
 
                 table.Rows.Add(row);

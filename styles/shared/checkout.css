@@ -388,6 +388,10 @@ input.invoice.number.for.reprint {
         padding: 2px;
     }
 
+.four.summary.items > .item {
+    width: 22%;
+}
+
 .three.summary.items > .item {
     width: 32%;
 }
@@ -408,7 +412,7 @@ input.invoice.number.for.reprint {
 
 .summary.items > .item > .money {
     padding-top: 0.1em;
-    font-size: 3em;
+    font-size: 1.6em;
 }
 
 

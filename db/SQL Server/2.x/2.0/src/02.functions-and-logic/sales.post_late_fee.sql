@@ -124,17 +124,12 @@ BEGIN
             SELECT
                 SUM
                 (
-                    (inventory.checkout_details.quantity * inventory.checkout_details.price) 
-                    - 
-                    inventory.checkout_details.discount 
-                    + 
-                    inventory.checkout_details.tax
-                    + 
-                    inventory.checkout_details.shipping_charge
+                    COALESCE(inventory.checkouts.taxable_total, 0) + 
+                    COALESCE(inventory.checkouts.tax, 0) + 
+                    COALESCE(inventory.checkouts.nontaxable_total, 0) - 
+                    COALESCE(inventory.checkouts.discount, 0)
                 )
-            FROM inventory.checkout_details
-            INNER JOIN  inventory.checkouts
-            ON  inventory.checkouts. checkout_id = inventory.checkout_details. checkout_id
+            FROM inventory.checkouts
             WHERE  inventory.checkouts.transaction_master_id = transaction_master_id
         ) WHERE is_flat_amount = 0;
 

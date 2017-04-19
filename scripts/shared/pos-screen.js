@@ -111,35 +111,54 @@ function updateTotal() {
     const countEl = $("div.count .money");
     const couponDiscountType = window.parseInt2($("#DiscountTypeSelect").val());
     const couponDiscountRate = window.parseFloat2($("#DiscountInputText").val()) || 0;
+    const taxRate = window.parseFloat2($("#SalesTaxRateHidden").val()) || 0;
+
     var discount;
 
 
     var totalPrice = 0;
+    var taxableTotal = 0;
+    var nonTaxableTotal = 0;
     var totalQuantity = 0;
 
     $.each(candidates, function () {
         const el = $(this);
         const quantityEl = el.find("input.quantity");
         const quantity = window.parseFloat2(quantityEl.val()) || 0;
+        const isTaxable = el.attr("data-is-taxable-item") === "true";
+        const discountedAmount = window.parseFloat2(el.find(".discounted.amount").html());        
 
-        const discountedAmount = window.parseFloat2(el.find(".discounted.amount").html());
-        const amountPlusTax = window.parseFloat2(el.find(".amount-plus-tax").html());
-        const lineTotal = (amountPlusTax || discountedAmount);
-        totalPrice += lineTotal;
+        if(isTaxable){
+            taxableTotal += discountedAmount;
+        }else{
+            nonTaxableTotal += discountedAmount;
+        };
+
+        totalPrice += discountedAmount;
 
         totalQuantity += quantity;
     });
 
-    totalPrice = window.parseFloat2(window.round(totalPrice, 2)) || 0;
+    taxableTotal = window.parseFloat2(window.round(taxableTotal, 2)) || 0;
+    nonTaxableTotal = window.parseFloat2(window.round(nonTaxableTotal, 2)) || 0;
+    var couponDiscountAmount = 0;
 
     if (couponDiscountType === 1 && couponDiscountRate > 0 && couponDiscountRate <= 100) {
-        discount = totalPrice * (couponDiscountRate / 100);
-        totalPrice = totalPrice - discount;
+        couponDiscountAmount = totalPrice * (couponDiscountRate / 100);
     } else if (couponDiscountType === 2 && couponDiscountRate > 0) {
-        //Discount amount
-        totalPrice = totalPrice - couponDiscountRate;
+        //Discount amount: flat amount
+        couponDiscountAmount = couponDiscountRate;
     };
 
+    totalPrice -= couponDiscountAmount;
+    //Discount applies before tax
+    taxableTotal -= couponDiscountAmount;
+    
+    const tax = taxableTotal * (taxRate/100);
+
+    totalPrice+= tax;
+
+    totalPrice = window.parseFloat2(window.round(totalPrice, 2)) || 0;
 
     amountEl.html(window.getFormattedNumber(window.round(totalPrice, 2)));
     countEl.html(window.getFormattedNumber(window.round(totalQuantity, 2)));

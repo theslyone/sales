@@ -89,7 +89,10 @@ $$
     DECLARE _invoice_number                 bigint;
     DECLARE _tax_account_id                 integer;
     DECLARE _receipt_transaction_master_id  bigint;
+    DECLARE _sales_tax_rate                 numeric(30, 6);
     DECLARE this                            RECORD;
+	DECLARE _taxable_total					numeric(30, 6);
+	DECLARE _nontaxable_total				numeric(30, 6);
 BEGIN        
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
         RETURN 0;
@@ -105,6 +108,12 @@ BEGIN
     _gift_card_id                           := sales.get_gift_card_id_by_gift_card_number(_gift_card_number);
     _gift_card_balance                      := sales.get_gift_card_balance(_gift_card_id, _value_date);
 
+
+    SELECT finance.tax_setups.sales_tax_rate
+    INTO _sales_tax_rate 
+    FROM finance.tax_setups
+    WHERE NOT finance.tax_setups.deleted
+    AND finance.tax_setups.office_id = _office_id;
 
     SELECT finance.fiscal_year.fiscal_year_code INTO _fiscal_year_code
     FROM finance.fiscal_year
@@ -150,7 +159,8 @@ BEGIN
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),
         discount_rate                   public.decimal_strict2,
         discount                        public.money_strict2,
-        tax                             public.money_strict2,
+        is_taxable_item                 boolean,
+        amount                          public.money_strict2,
         shipping_charge                 public.money_strict2,
         sales_account_id                integer,
         sales_discount_account_id       integer,
@@ -158,10 +168,9 @@ BEGIN
         cost_of_goods_sold_account_id   integer
     ) ON COMMIT DROP;
 
-    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge)
-    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge
+    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
     FROM explode_array(_details);
-
     
     UPDATE temp_checkout_details 
     SET
@@ -177,6 +186,14 @@ BEGIN
         sales_discount_account_id       = inventory.get_sales_discount_account_id(item_id),
         inventory_account_id            = inventory.get_inventory_account_id(item_id),
         cost_of_goods_sold_account_id   = inventory.get_cost_of_goods_sold_account_id(item_id);
+
+    UPDATE temp_checkout_details 
+    SET is_taxable_item = inventory.items.is_taxable_item
+    FROM inventory.items
+    WHERE inventory.items.item_id = temp_checkout_details.item_id;
+
+    UPDATE temp_checkout_details
+    SET amount = (COALESCE(price, 0) * COALESCE(quantity, 0)) - COALESCE(discount, 0) + COALESCE(shipping_charge, 0);
 
     DROP TABLE IF EXISTS item_quantities_temp;
     CREATE TEMPORARY TABLE item_quantities_temp
@@ -225,13 +242,17 @@ BEGIN
         USING ERRCODE='P3201';
     END IF;
 
-    SELECT ROUND(SUM(COALESCE(discount, 0)), 2)                 INTO _discount_total FROM temp_checkout_details;
-    SELECT SUM(COALESCE(price, 0) * COALESCE(quantity, 0))      INTO _grand_total FROM temp_checkout_details;
-    SELECT SUM(COALESCE(shipping_charge, 0))                    INTO _shipping_charge FROM temp_checkout_details;
-    SELECT ROUND(SUM(COALESCE(tax, 0)), 2)                      INTO _tax_total FROM temp_checkout_details;
+    SELECT 
+        COALESCE(SUM(CASE WHEN is_taxable_item = true THEN 1 ELSE 0 END * COALESCE(amount, 0)), 0),
+        COALESCE(SUM(CASE WHEN is_taxable_item = false THEN 1 ELSE 0 END * COALESCE(amount, 0)), 0)
+    INTO
+        _taxable_total,
+        _nontaxable_total
+    FROM temp_checkout_details;
 
-     
-     _receivable                    := COALESCE(_grand_total, 0) - COALESCE(_discount_total, 0) + COALESCE(_tax_total, 0) + COALESCE(_shipping_charge, 0);
+    SELECT ROUND(SUM(COALESCE(discount, 0)), 2)                 INTO _discount_total FROM temp_checkout_details;
+    SELECT SUM(COALESCE(shipping_charge, 0))                    INTO _shipping_charge FROM temp_checkout_details;
+
         
     IF(_is_flat_discount AND _discount > _receivable) THEN
         RAISE EXCEPTION 'The discount amount cannot be greater than total amount.';
@@ -242,13 +263,12 @@ BEGIN
     _coupon_discount                := ROUND(_discount, 2);
 
     IF(NOT _is_flat_discount AND COALESCE(_discount, 0) > 0) THEN
-        _coupon_discount            := ROUND(_receivable * (_discount/100), 2);
+        _coupon_discount            := ROUND((COALESCE(_taxable_total, 0) + COALESCE(_nontaxable_total, 0)) * (_discount/100), 2);
     END IF;
 
-    IF(COALESCE(_coupon_discount, 0) > 0) THEN
-        _discount_total             := _discount_total + _coupon_discount;
-        _receivable                 := _receivable - _coupon_discount;
-    END IF;
+    _tax_total := ROUND((COALESCE(_taxable_total, 0) - COALESCE(_coupon_discount, 0)) * (_sales_tax_rate / 100), 2);     
+    _grand_total := COALESCE(_taxable_total, 0) + COALESCE(_nontaxable_total, 0) + COALESCE(_tax_total, 0) - COALESCE(_discount_total, 0);         
+    _receivable  := _grand_total;
 
     IF(_tender > 0) THEN
         IF(_tender < _receivable ) THEN
@@ -359,11 +379,11 @@ BEGIN
     FROM temp_transaction_details
     ORDER BY tran_type DESC;
 
-    INSERT INTO inventory.checkouts(transaction_book, value_date, book_date, checkout_id, transaction_master_id, shipper_id, posted_by, office_id, discount)
-    SELECT _book_name, _value_date, _book_date, _checkout_id, _transaction_master_id, _shipper_id, _user_id, _office_id, _coupon_discount;
+    INSERT INTO inventory.checkouts(transaction_book, value_date, book_date, checkout_id, transaction_master_id, shipper_id, posted_by, office_id, discount, taxable_total, tax_rate, tax, nontaxable_total)
+    SELECT _book_name, _value_date, _book_date, _checkout_id, _transaction_master_id, _shipper_id, _user_id, _office_id, _coupon_discount, _taxable_total, _sales_tax_rate, _tax_total, _nontaxable_total;
 
-    INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, tax, shipping_charge)
-    SELECT _value_date, _book_date, checkout_id, tran_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, COALESCE(cost_of_goods_sold, 0), discount, tax, shipping_charge 
+    INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, cost_of_goods_sold, discount, shipping_charge, is_taxed)
+    SELECT _value_date, _book_date, checkout_id, tran_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, COALESCE(cost_of_goods_sold, 0), discount, shipping_charge, is_taxable_item 
     FROM temp_checkout_details;
 
     SELECT
@@ -423,7 +443,7 @@ LANGUAGE plpgsql;
 
 -- SELECT * FROM sales.post_sales
 -- (
---     1, 1, 1, 1, finance.get_value_date(1), finance.get_value_date(1), 1, 'asdf', 'Test', 
+--     1, 1, 11, 1, finance.get_value_date(1), finance.get_value_date(1), 1, 'asdf', 'Test', 
 --     500000,2000, null, null, null, null, null, null,
 --     inventory.get_customer_id_by_customer_code('JOTAY'), 1, 1, 1,
 --     null, true, 1000,

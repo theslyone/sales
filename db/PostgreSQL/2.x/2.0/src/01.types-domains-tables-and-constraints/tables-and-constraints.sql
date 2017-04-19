@@ -164,6 +164,11 @@ CREATE TABLE sales.quotations
     reference_number                        national character varying(24),
 	terms									national character varying(500),
     internal_memo                           national character varying(500),
+	taxable_total 							numeric(30, 6) NOT NULL DEFAULT(0),
+	discount 								numeric(30, 6) NOT NULL DEFAULT(0),
+	tax_rate 								numeric(30, 6) NOT NULL DEFAULT(0),
+	tax 									numeric(30, 6) NOT NULL DEFAULT(0),
+	nontaxable_total 						numeric(30, 6) NOT NULL DEFAULT(0),
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
 	deleted									boolean DEFAULT(false)
@@ -176,9 +181,9 @@ CREATE TABLE sales.quotation_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
-    discount_rate                           public.decimal_strict2 NOT NULL DEFAULT(0),    
-    tax                                     public.money_strict2 NOT NULL DEFAULT(0),    
+    discount                           		public.decimal_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
+	is_taxed 								boolean NOT NULL,
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
     quantity                                public.decimal_strict2 NOT NULL
 );
@@ -199,6 +204,11 @@ CREATE TABLE sales.orders
     reference_number                        national character varying(24),
     terms                                   national character varying(500),
     internal_memo                           national character varying(500),
+	taxable_total 							numeric(30, 6) NOT NULL DEFAULT(0),
+	discount 								numeric(30, 6) NOT NULL DEFAULT(0),
+	tax_rate 								numeric(30, 6) NOT NULL DEFAULT(0),
+	tax 									numeric(30, 6) NOT NULL DEFAULT(0),
+	nontaxable_total 						numeric(30, 6) NOT NULL DEFAULT(0),
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
 	deleted									boolean DEFAULT(false)
@@ -211,9 +221,9 @@ CREATE TABLE sales.order_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
-    discount_rate                           public.decimal_strict2 NOT NULL DEFAULT(0),    
-    tax                                     public.money_strict2 NOT NULL DEFAULT(0),    
+    discount                           		public.decimal_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
+	is_taxed 								boolean NOT NULL,
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
     quantity                                public.decimal_strict2 NOT NULL
 );
