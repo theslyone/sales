@@ -58,7 +58,6 @@ BEGIN
     DECLARE @gift_card_id                   integer;
     DECLARE @gift_card_balance              numeric(30, 6);
     DECLARE @coupon_id                      integer;
-    DECLARE @default_discount_account_id    integer;
     DECLARE @fiscal_year_code               national character varying(12);
     DECLARE @invoice_number                 bigint;
     DECLARE @tax_account_id                 integer;
@@ -271,6 +270,7 @@ BEGIN
             SET @coupon_discount            = ROUND((COALESCE(@taxable_total, 0) + COALESCE(@nontaxable_total, 0)) * (@discount/100), 2);
         END;
 
+
         SELECT @tax_total       = ROUND((COALESCE(@taxable_total, 0) - COALESCE(@coupon_discount, 0)) * (@sales_tax_rate / 100), 2);
         SELECT @grand_total     = COALESCE(@taxable_total, 0) + COALESCE(@nontaxable_total, 0) + COALESCE(@tax_total, 0) - COALESCE(@discount_total, 0)  - COALESCE(@coupon_discount, 0);
         SET @receivable         = @grand_total;
@@ -374,21 +374,6 @@ BEGIN
             INSERT INTO @temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
             SELECT 'Dr', @sales_discount_account_id, @statement_reference, @default_currency_code, @coupon_discount, 1, @default_currency_code, @coupon_discount;
         END;
-
-		
-
-
-        IF(@coupon_discount > 0)
-        BEGIN
-            SELECT @default_discount_account_id = inventory.inventory_setup.default_discount_account_id
-            FROM inventory.inventory_setup
-            WHERE inventory.inventory_setup.office_id = @office_id;
-
-            INSERT INTO @temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
-            SELECT 'Dr', @default_discount_account_id, @statement_reference, @default_currency_code, @coupon_discount, 1, @default_currency_code, @coupon_discount;
-        END;
-
-
 
         INSERT INTO @temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
         SELECT 'Dr', inventory.get_account_id_by_customer_id(@customer_id), @statement_reference, @default_currency_code, @receivable, 1, @default_currency_code, @receivable;
@@ -525,8 +510,8 @@ GO
 --DECLARE @shipper_id                             integer								= (SELECT TOP 1 shipper_id FROM inventory.shippers);
 --DECLARE @store_id                               integer								= (SELECT TOP 1 store_id FROM inventory.stores WHERE store_name='Cold Room RM');
 --DECLARE @coupon_code                            national character varying(100)		= NULL;
---DECLARE @is_flat_discount                       bit									= 1;
---DECLARE @discount                               decimal(30, 6)						= 0;
+--DECLARE @is_flat_discount                       bit									= 0;
+--DECLARE @discount                               decimal(30, 6)						= 10;
 --DECLARE @details                                sales.sales_detail_type;
 --DECLARE @sales_quotation_id                     bigint								= NULL;
 --DECLARE @sales_order_id                         bigint								= NULL;

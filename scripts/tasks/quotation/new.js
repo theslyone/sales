@@ -47,8 +47,10 @@ function getModel() {
             const quantity = window.parseFloat2(el.find("input.quantity").val());
             const unitId = window.parseInt2(el.find("select.unit").val());
             const price = window.parseFloat2(el.find("input.price").val()) || 0;
-            const discount = window.parseFloat2(el.find("input.discount").val()) || 0;
-            const tax = window.parseFloat2(el.find(".tax-amount").html()) || 0;
+            const discountRate = window.parseFloat2(el.find("input.discount").val()) || 0;
+            const isTaxableItem = el.attr("data-is-taxable-item") === "true";
+            const amount = price * quantity;
+            const discount = window.round(amount * discountRate / 100, 2);
 
             model.push({
                 ValueDate: $("#ValueDateInputDate").datepicker("getDate"),
@@ -56,8 +58,9 @@ function getModel() {
                 Quantity: quantity,
                 UnitId: unitId,
                 Price: price,
-                Tax: tax,
-                DiscountRate: discount
+                DiscountRate: discountRate,
+                Discount: discount,
+                IsTaxed: isTaxableItem
             });
         });
 
@@ -73,6 +76,51 @@ function getModel() {
     const priceTypeId = $("#PriceTypeSelect").val();
     const shipperId = $("#ShipperSelect").val();
     const details = getDetails();
+    const discount = window.parseFloat2($("#DiscountInputText").val());
+    var taxRate = window.parseFloat2($("#SalesTaxRateHidden").val()) || 0;
+    
+    var totalPrice = 0;
+    var taxableTotal = 0;
+    var nonTaxableTotal = 0;
+    var totalBeforeDiscount = 0;
+    var tax = 0;
+
+    (function(){
+        const items = $("#SalesItems .item");
+
+        $.each(items, function () {
+            const el = $(this);
+            const itemId = window.parseInt2(el.attr("data-item-id"));
+            const quantity = window.parseFloat2(el.find("input.quantity").val());
+            const unitId = window.parseInt2(el.find("select.unit").val());
+            const price = window.parseFloat2(el.find("input.price").val()) || 0;
+            const discountRate = window.parseFloat2(el.find("input.discount").val()) || 0;
+            const isTaxableItem = el.attr("data-is-taxable-item") === "true";
+            var discount = 0;
+            const amount = price * quantity;
+            const discountedAmount = amount * ((100 - discountRate) / 100);
+
+            if (isTaxableItem) {
+                taxableTotal += discountedAmount;
+            } else {
+                nonTaxableTotal += discountedAmount;
+            };
+
+            totalPrice += discountedAmount;
+        });
+
+        taxableTotal = window.parseFloat2(window.round(taxableTotal, 2)) || 0;
+        nonTaxableTotal = window.parseFloat2(window.round(nonTaxableTotal, 2)) || 0;
+
+        totalBeforeDiscount = taxableTotal;
+        totalPrice -= discount;
+        taxableTotal -= discount;
+
+        tax = taxableTotal * (taxRate / 100);
+        totalPrice += tax;
+
+        totalPrice = window.round(totalPrice, 2);
+    })();
 
     return {
         ValueDate: valueDate,
@@ -83,7 +131,12 @@ function getModel() {
         CustomerId: customerId,
         PriceTypeId: priceTypeId,
         ShipperId: shipperId,
-        Details: details
+        Details: details,
+        TaxableTotal: totalBeforeDiscount,
+        Discount: discount,
+        NonTaxableTotal: nonTaxableTotal,
+        TaxRate: taxRate,
+        Tax: tax
     };
 };
 

@@ -359,16 +359,6 @@ BEGIN
         SELECT 'Dr', _sales_discount_account_id, _statement_reference, _default_currency_code, _coupon_discount, 1, _default_currency_code, _coupon_discount;
     END IF;
 
-    IF(_coupon_discount > 0) THEN
-        SELECT inventory.inventory_setup.default_discount_account_id INTO _default_discount_account_id
-        FROM inventory.inventory_setup
-        WHERE inventory.inventory_setup.office_id = _office_id;
-
-        INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
-        SELECT 'Dr', _default_discount_account_id, _statement_reference, _default_currency_code, _coupon_discount, 1, _default_currency_code, _coupon_discount;
-    END IF;
-
-
 
     INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
     SELECT 'Dr', inventory.get_account_id_by_customer_id(_customer_id), _statement_reference, _default_currency_code, _receivable, 1, _default_currency_code, _receivable;

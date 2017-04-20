@@ -148,7 +148,7 @@ CREATE TABLE sales.cashier_login_info
     user_agent                              national character varying(1000),    
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
-    deleted                                    bit DEFAULT(0)
+    deleted                                 bit DEFAULT(0)
 );
 
 
@@ -183,6 +183,7 @@ CREATE TABLE sales.quotation_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   decimal(30, 6) NOT NULL,
+	discount_rate							decimal(30, 6) NOT NULL,
     discount                          		decimal(30, 6) NOT NULL DEFAULT(0),    
 	is_taxed 								bit NOT NULL,
     shipping_charge                         decimal(30, 6) NOT NULL DEFAULT(0),    
@@ -223,6 +224,7 @@ CREATE TABLE sales.order_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   decimal(30, 6) NOT NULL,
+	discount_rate							decimal(30, 6) NOT NULL,
     discount                           		decimal(30, 6) NOT NULL DEFAULT(0),    
 	is_taxed 								bit NOT NULL,
     shipping_charge                         decimal(30, 6) NOT NULL DEFAULT(0),    
