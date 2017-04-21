@@ -20,6 +20,7 @@ namespace MixERP.Sales.DTO
         public long CheckoutId { get; set; }
         public decimal NontaxableTotal { get; set; }
         public decimal TaxableTotal { get; set; }
+        public decimal TaxRate { get; set; }
         public decimal Tax { get; set; }
         public decimal Discount { get; set; }
         public int PostedBy { get; set; }

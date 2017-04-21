@@ -161,6 +161,7 @@ BEGIN
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),
         discount_rate                   public.decimal_strict2,
         discount                        public.money_strict2,
+        is_taxed                        boolean,
         is_taxable_item                 boolean,
         amount                          public.money_strict2,
         shipping_charge                 public.money_strict2,
@@ -170,17 +171,25 @@ BEGIN
         cost_of_goods_sold_account_id   integer
     ) ON COMMIT DROP;
 
-    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
-    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
+    INSERT INTO temp_checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, discount, is_taxed, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, discount, is_taxed, shipping_charge
     FROM explode_array(_details);
     
     UPDATE temp_checkout_details 
     SET
         tran_type                       = 'Cr',
         base_quantity                   = inventory.get_base_quantity_by_unit_id(unit_id, quantity),
-        base_unit_id                    = inventory.get_root_unit_id(unit_id),
-        discount                        = ROUND(((price * quantity) + shipping_charge) * (discount_rate / 100), 2);
+        base_unit_id                    = inventory.get_root_unit_id(unit_id);
 
+    UPDATE temp_checkout_details
+    SET
+        discount                        = COALESCE(ROUND(((price * quantity) + shipping_charge) * (discount_rate / 100), 2), 0)
+    WHERE COALESCE(discount, 0) = 0;
+
+    UPDATE temp_checkout_details
+    SET
+        discount_rate                   = COALESCE(ROUND(100 * discount / ((price * quantity) + shipping_charge), 2), 0)
+    WHERE COALESCE(discount_rate, 0) = 0;
 
     UPDATE temp_checkout_details
     SET
@@ -196,6 +205,15 @@ BEGIN
 
     UPDATE temp_checkout_details
     SET amount = (COALESCE(price, 0) * COALESCE(quantity, 0)) - COALESCE(discount, 0) + COALESCE(shipping_charge, 0);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM temp_checkout_details
+        WHERE amount < 0
+    ) THEN
+        RAISE EXCEPTION '%', 'A line amount cannot be less than zero.';
+    END IF;
 
     DROP TABLE IF EXISTS item_quantities_temp;
     CREATE TEMPORARY TABLE item_quantities_temp
@@ -259,7 +277,11 @@ BEGIN
     _coupon_discount                := ROUND(_discount, 2);
 
     IF(NOT _is_flat_discount AND COALESCE(_discount, 0) > 0) THEN
-        _coupon_discount            := ROUND((COALESCE(_taxable_total, 0) + COALESCE(_nontaxable_total, 0)) * (_discount/100), 2);
+        _coupon_discount            := ROUND(COALESCE(_taxable_total, 0) * (_discount/100), 2);
+    END IF;
+
+    IF(_coupon_discount > _taxable_total) THEN
+        RAISE EXCEPTION 'The coupon discount cannot be greater than total taxable amount.';
     END IF;
 
     _tax_total := ROUND((COALESCE(_taxable_total, 0) - COALESCE(_coupon_discount, 0)) * (_sales_tax_rate / 100), 2);     

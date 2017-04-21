@@ -70,7 +70,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.ReturnEntry
             for (int i = 0; i < details.Count; i++)
             {
                 items.Add(string.Format(CultureInfo.InvariantCulture,
-                    "ROW(@StoreId{0}, @TransactionType{0}, @ItemId{0}, @Quantity{0}, @UnitId{0}, @Price{0}, @DiscountRate{0}, @Tax{0}, @ShippingCharge{0})::sales.sales_detail_type",
+                    "ROW(@StoreId{0}, @TransactionType{0}, @ItemId{0}, @Quantity{0}, @UnitId{0}, @Price{0}, @DiscountRate{0}, @Discount{0}, @ShippingCharge{0}, @IsTaxed{0})::sales.sales_detail_type",
                     i.ToString(CultureInfo.InvariantCulture)));
             }
 

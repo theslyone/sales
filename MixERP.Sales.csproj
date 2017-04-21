@@ -94,6 +94,13 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MixERP.Finance, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\MixERP.Finance.dll</HintPath>
+    </Reference>
+    <Reference Include="MixERP.Inventory">
+      <HintPath>..\..\bin\MixERP.Inventory.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -376,6 +383,10 @@
     <Content Include="Views\Tasks\Receipt\New.cshtml" />
     <Content Include="Views\Tasks\Receipt\Verification.cshtml" />
     <Content Include="Views\Tasks\Console\Index.cshtml" />
+    <Content Include="Views\Tasks\Entry\ClassicCheckout.cshtml" />
+    <Content Include="Views\Tasks\Order\ClassicCheckout.cshtml" />
+    <Content Include="Views\Tasks\Quotation\ClassicCheckout.cshtml" />
+    <Content Include="Views\Tasks\Return\ClassicCheckout.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

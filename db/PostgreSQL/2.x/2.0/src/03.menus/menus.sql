@@ -43,6 +43,7 @@ SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerTypes', 'Customer Types'
 SELECT * FROM core.create_menu('MixERP.Sales', 'Customers', 'Customers', '/dashboard/sales/setup/customers', 'street view', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'PriceTypes', 'Price Types', '/dashboard/sales/setup/price-types', 'ruble', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'SellingPrices', 'Selling Prices', '/dashboard/sales/setup/selling-prices', 'in cart', 'Setup');
+SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerwiseSellingPrices', 'Customerwise Selling Prices', '/dashboard/sales/setup/selling-prices/customer', 'in cart', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'LateFee', 'Late Fee', '/dashboard/sales/setup/late-fee', 'alarm mute', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'PaymentTerms', 'Payment Terms', '/dashboard/sales/setup/payment-terms', 'checked calendar', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'Cashiers', 'Cashiers', '/dashboard/sales/setup/cashiers', 'male', 'Setup');

@@ -83,8 +83,9 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
             table.Columns.Add("UnitId", typeof(int));
             table.Columns.Add("Price", typeof(decimal));
             table.Columns.Add("DiscountRate", typeof(decimal));
-            table.Columns.Add("Tax", typeof(decimal));
+            table.Columns.Add("Discount", typeof(decimal));
             table.Columns.Add("ShippingCharge", typeof(decimal));
+            table.Columns.Add("IsTaxed", typeof(bool));
 
             foreach (var detail in details)
             {
@@ -96,8 +97,9 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                 row["UnitId"] = detail.UnitId;
                 row["Price"] = detail.Price;
                 row["DiscountRate"] = detail.DiscountRate;
-                row["Tax"] = DBNull.Value;//Tax will be determined on database level
+                row["Discount"] = detail.Discount;
                 row["ShippingCharge"] = detail.ShippingCharge;
+                row["IsTaxed"] = detail.IsTaxed;
 
                 table.Rows.Add(row);
             }

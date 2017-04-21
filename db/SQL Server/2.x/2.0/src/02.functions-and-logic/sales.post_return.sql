@@ -118,7 +118,7 @@ BEGIN
             RETURN;
         END;
 
-        SET @default_currency_code          = core.get_currency_code_by_office_id(@office_id);
+        SET @default_currency_code      = core.get_currency_code_by_office_id(@office_id);
         SET @tran_counter               = finance.get_new_transaction_counter(@value_date);
         SET @tran_code                  = finance.get_transaction_code(@value_date, @office_id, @user_id, @login_id);
 
@@ -131,7 +131,7 @@ BEGIN
 
 		--Returned items are subtracted
 		INSERT INTO @new_checkout_items(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
-		SELECT store_id, item_id, quantity *-1, unit_id, price *-1, discount_rate, shipping_charge *-1
+		SELECT store_id, item_id, quantity *-1, unit_id, price *-1, ROUND(discount_rate, 2), shipping_charge *-1
 		FROM @details;
 	
 		--Original items are added
@@ -142,7 +142,7 @@ BEGIN
 			inventory.checkout_details.quantity,
 			inventory.checkout_details.unit_id,
 			inventory.checkout_details.price,
-			inventory.checkout_details.discount_rate,
+			ROUND(inventory.checkout_details.discount_rate, 2),
 			inventory.checkout_details.shipping_charge
 		FROM inventory.checkout_details
 		WHERE checkout_id = @original_checkout_id;
@@ -176,18 +176,7 @@ BEGIN
 			RAISERROR('A return entry must exactly macth the price provided during sales.', 16, 1);
 		END;
 	
-	
-		IF EXISTS
-		(
-			SELECT item_id, COUNT(DISTINCT discount_rate) 
-			FROM @new_checkout_items
-			GROUP BY item_id
-			HAVING COUNT(DISTINCT discount_rate) > 1
-		)
-		BEGIN
-			RAISERROR('A return entry must exactly macth the discount rate provided during sales.', 16, 1);
-		END;
-	
+		
 	
 		IF EXISTS
 		(
@@ -200,11 +189,11 @@ BEGIN
 			RAISERROR('A return entry must exactly macth the store provided during sales.', 16, 1);
 		END;
 
-		INSERT INTO @difference(store_id, transaction_type, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
-		SELECT store_id, 'Cr', item_id, SUM(quantity), unit_id, SUM(price), discount_rate, SUM(shipping_charge)
-		FROM @new_checkout_items
-		GROUP BY store_id, item_id, unit_id, discount_rate;
 
+		INSERT INTO @difference(store_id, transaction_type, item_id, quantity, unit_id, price, discount, shipping_charge)
+		SELECT store_id, 'Cr', item_id, SUM(quantity), unit_id, SUM(price), SUM(discount), SUM(shipping_charge)
+		FROM @new_checkout_items
+		GROUP BY store_id, item_id, unit_id;
 			
 		DELETE FROM @difference
 		WHERE quantity = 0;
@@ -319,7 +308,7 @@ GO
 
 
 
---DECLARE @transaction_master_id          bigint = 181;
+--DECLARE @transaction_master_id          bigint = 369;
 --DECLARE @office_id                      integer = (SELECT TOP 1 office_id FROM core.offices);
 --DECLARE @user_id                        integer = (SELECT TOP 1 user_id FROM account.users);
 --DECLARE @login_id                       bigint = (SELECT TOP 1 login_id FROM account.logins WHERE user_id = @user_id);
@@ -327,17 +316,15 @@ GO
 --DECLARE @book_date                      date = finance.get_value_date(@office_id);
 --DECLARE @store_id                       integer = (SELECT TOP 1 store_id FROM inventory.stores WHERE store_name='Cold Room RM');
 --DECLARE @counter_id                     integer = (SELECT TOP 1 counter_id FROM inventory.counters WHERE counter_name = 'Counter 2');
---DECLARE @customer_id                    integer = (SELECT customer_id FROM inventory.customers WHERE customer_code = 'CS0001');
+--DECLARE @customer_id                    integer = (SELECT customer_id FROM inventory.customers WHERE customer_name = 'Ajima Mart');
 --DECLARE @price_type_id                  integer = (SELECT TOP 1 price_type_id FROM sales.price_types);
 --DECLARE @reference_number               national character varying(24) = 'N/A';
 --DECLARE @statement_reference            national character varying(2000) = 'Test';
 --DECLARE @details                        sales.sales_detail_type;
 --DECLARE @tran_master_id                 bigint;
 
---INSERT INTO @details
---SELECT @store_id, 'Cr', item_id, 1, unit_id, selling_price, 5, selling_price * 0.13, 0
---FROM inventory.items
---WHERE inventory.items.item_code IN('SHS0012');
+--INSERT INTO @details(store_id, transaction_type, item_id, quantity, unit_id, price, discount, shipping_charge, is_taxed)
+--SELECT @store_id, 'Cr', 1, 1, 6, 2320, 62.84, 0, 1;
 
 
 --EXECUTE sales.post_return

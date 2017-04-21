@@ -91,6 +91,18 @@ CREATE TABLE sales.item_selling_prices
 	deleted									boolean DEFAULT(false)
 );
 
+CREATE TABLE sales.customerwise_selling_prices
+(
+	selling_price_id						BIGSERIAL PRIMARY KEY,
+	customer_id								integer NOT NULL REFERENCES inventory.customers,
+	unit_id									integer NOT NULL REFERENCES inventory.units,
+	price									numeric(30, 6),
+    audit_user_id                           integer REFERENCES account.users,
+    audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
+	deleted									boolean DEFAULT(false)
+);
+
+
 CREATE TABLE sales.payment_terms
 (
     payment_term_id                         SERIAL PRIMARY KEY,
@@ -182,6 +194,7 @@ CREATE TABLE sales.quotation_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
+	discount_rate							decimal(30, 6) NOT NULL,
     discount                           		public.decimal_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
 	is_taxed 								boolean NOT NULL,
@@ -222,6 +235,7 @@ CREATE TABLE sales.order_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
+	discount_rate							decimal(30, 6) NOT NULL,
     discount                           		public.decimal_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
 	is_taxed 								boolean NOT NULL,
@@ -3015,16 +3029,6 @@ BEGIN
         SELECT 'Dr', _sales_discount_account_id, _statement_reference, _default_currency_code, _coupon_discount, 1, _default_currency_code, _coupon_discount;
     END IF;
 
-    IF(_coupon_discount > 0) THEN
-        SELECT inventory.inventory_setup.default_discount_account_id INTO _default_discount_account_id
-        FROM inventory.inventory_setup
-        WHERE inventory.inventory_setup.office_id = _office_id;
-
-        INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
-        SELECT 'Dr', _default_discount_account_id, _statement_reference, _default_currency_code, _coupon_discount, 1, _default_currency_code, _coupon_discount;
-    END IF;
-
-
 
     INSERT INTO temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
     SELECT 'Dr', inventory.get_account_id_by_customer_id(_customer_id), _statement_reference, _default_currency_code, _receivable, 1, _default_currency_code, _receivable;
@@ -3590,6 +3594,7 @@ SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerTypes', 'Customer Types'
 SELECT * FROM core.create_menu('MixERP.Sales', 'Customers', 'Customers', '/dashboard/sales/setup/customers', 'street view', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'PriceTypes', 'Price Types', '/dashboard/sales/setup/price-types', 'ruble', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'SellingPrices', 'Selling Prices', '/dashboard/sales/setup/selling-prices', 'in cart', 'Setup');
+SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerwiseSellingPrices', 'Customerwise Selling Prices', '/dashboard/sales/setup/selling-prices/customer', 'in cart', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'LateFee', 'Late Fee', '/dashboard/sales/setup/late-fee', 'alarm mute', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'PaymentTerms', 'Payment Terms', '/dashboard/sales/setup/payment-terms', 'checked calendar', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'Cashiers', 'Cashiers', '/dashboard/sales/setup/cashiers', 'male', 'Setup');
@@ -4143,7 +4148,9 @@ SELECT
 	account.get_name_by_user_id(sales.orders.user_id) AS posted_by,
 	core.get_office_name_by_office_id(sales.orders.office_id) AS office,
 	sales.orders.transaction_timestamp AS posted_on,
-	sales.orders.office_id
+	sales.orders.office_id,
+	sales.orders.discount,
+	sales.orders.tax	
 FROM sales.orders;
 
 
@@ -4167,7 +4174,9 @@ SELECT
 	account.get_name_by_user_id(sales.quotations.user_id) AS posted_by,
 	core.get_office_name_by_office_id(sales.quotations.office_id) AS office,
 	sales.quotations.transaction_timestamp AS posted_on,
-	sales.quotations.office_id
+	sales.quotations.office_id,
+	sales.quotations.discount,
+	sales.quotations.tax	
 FROM sales.quotations;
 
 

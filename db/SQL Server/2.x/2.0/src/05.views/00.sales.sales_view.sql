@@ -17,6 +17,7 @@ SELECT
     inventory.checkouts.nontaxable_total,
     inventory.checkouts.taxable_total,
     inventory.checkouts.discount,
+    inventory.checkouts.tax_rate,
     inventory.checkouts.tax,
     finance.transaction_master.transaction_ts,
     finance.transaction_master.verification_status_id,

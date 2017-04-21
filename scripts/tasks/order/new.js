@@ -173,8 +173,8 @@ $("#CheckoutButton").off("click").on("click", function () {
                 totalPrice += discountedAmount;
             });
 
-            taxableTotal = window.parseFloat2(window.round(taxableTotal, 2)) || 0;
-            nonTaxableTotal = window.parseFloat2(window.round(nonTaxableTotal, 2)) || 0;
+            taxableTotal = window.round(taxableTotal, 2);
+            nonTaxableTotal = window.round(nonTaxableTotal, 2);
 
             totalBeforeDiscount = taxableTotal;
             totalPrice -= discount;

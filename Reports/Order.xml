@@ -148,8 +148,8 @@
 				inventory.units.unit_name,
 				ROUND(sales.order_details.price * sales.order_details.quantity, 4) AS amount,
 				sales.order_details.discount,
-				ROUND((sales.order_details.price * sales.order_details.quantity) - sales.order_details.discount, 4) AS sub_total,
-				ROUND((sales.order_details.price * sales.order_details.quantity) - sales.order_details.discount, 4) AS total
+				sales.order_details.shipping_charge,
+				ROUND((sales.order_details.price * sales.order_details.quantity) - sales.order_details.discount + sales.order_details.shipping_charge, 4) AS total
 			FROM sales.order_details
 			INNER JOIN inventory.items
 			ON sales.order_details.item_id = inventory.items.item_id

@@ -91,6 +91,18 @@ CREATE TABLE sales.item_selling_prices
     deleted                                    bit DEFAULT(0)
 );
 
+CREATE TABLE sales.customerwise_selling_prices
+(
+	selling_price_id						bigint IDENTITY PRIMARY KEY,
+	customer_id								integer NOT NULL REFERENCES inventory.customers,
+	unit_id									integer NOT NULL REFERENCES inventory.units,
+	price									numeric(30, 6),
+    audit_user_id                           integer REFERENCES account.users,
+    audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
+	deleted									bit DEFAULT(0)
+);
+
+
 CREATE TABLE sales.payment_terms
 (
     payment_term_id                         integer IDENTITY PRIMARY KEY,
@@ -410,13 +422,14 @@ AS TABLE
 (
     store_id            integer,
     transaction_type    national character varying(2),
-    item_id               integer,
+    item_id             integer,
     quantity            decimal(30, 6),
-    unit_id               integer,
+    unit_id             integer,
     price               decimal(30, 6),
     discount_rate       decimal(30, 6),
-    tax                 decimal(30, 6),
-    shipping_charge     decimal(30, 6)
+    discount       		decimal(30, 6),
+    shipping_charge     decimal(30, 6),
+	is_taxed			bit
 );
 
 

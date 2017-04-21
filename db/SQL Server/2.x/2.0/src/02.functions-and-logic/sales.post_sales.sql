@@ -89,6 +89,7 @@ BEGIN
         cost_of_goods_sold                  decimal(30, 6) DEFAULT(0),
         discount_rate                       decimal(30, 6),
         discount                            decimal(30, 6),
+		is_taxed							bit,
 		is_taxable_item						bit,
         amount								decimal(30, 6),
         shipping_charge                     decimal(30, 6),
@@ -188,16 +189,26 @@ BEGIN
 		WHERE finance.tax_setups.deleted = 0
 		AND finance.tax_setups.office_id = @office_id;
 
-        INSERT INTO @checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
-        SELECT store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge
+        INSERT INTO @checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, discount, is_taxed, shipping_charge)
+        SELECT store_id, item_id, quantity, unit_id, price, discount_rate, discount, is_taxed, shipping_charge
         FROM @details;
+
 
         UPDATE @checkout_details 
         SET
             tran_type                       = 'Cr',
             base_quantity                   = inventory.get_base_quantity_by_unit_id(unit_id, quantity),
-            base_unit_id                    = inventory.get_root_unit_id(unit_id),
-            discount                        = ROUND(((price * quantity) + shipping_charge) * (discount_rate / 100), 2);
+            base_unit_id                    = inventory.get_root_unit_id(unit_id);
+
+		UPDATE @checkout_details
+		SET
+            discount                        = COALESCE(ROUND(((price * quantity) + shipping_charge) * (discount_rate / 100), 2), 0)
+		WHERE COALESCE(discount, 0) = 0;
+
+		UPDATE @checkout_details
+		SET
+            discount_rate                   = COALESCE(ROUND(100 * discount / ((price * quantity) + shipping_charge), 2), 0)
+		WHERE COALESCE(discount_rate, 0) = 0;
 
 
         UPDATE @checkout_details
@@ -217,6 +228,16 @@ BEGIN
 		UPDATE @checkout_details
 		SET amount = (COALESCE(price, 0) * COALESCE(quantity, 0)) - COALESCE(discount, 0) + COALESCE(shipping_charge, 0);
 
+
+		IF EXISTS
+		(
+			SELECT 1
+			FROM @checkout_details
+			WHERE amount < 0
+		)
+		BEGIN
+			RAISERROR('A line amount cannot be less than zero.', 16, 1);
+		END;
 
         INSERT INTO @item_quantities(item_id, base_unit_id, store_id, total_sales)
         SELECT item_id, base_unit_id, store_id, SUM(base_quantity)
@@ -267,13 +288,19 @@ BEGIN
 
         IF(@is_flat_discount = 0 AND COALESCE(@discount, 0) > 0)
         BEGIN
-            SET @coupon_discount            = ROUND((COALESCE(@taxable_total, 0) + COALESCE(@nontaxable_total, 0)) * (@discount/100), 2);
+            SET @coupon_discount            = ROUND(COALESCE(@taxable_total, 0) * (@discount/100), 2);
         END;
+
+		IF(@coupon_discount > @taxable_total)
+		BEGIN
+			RAISERROR('The coupon discount cannot be greater than total taxable amount.', 16, 1);
+		END;
 
 
         SELECT @tax_total       = ROUND((COALESCE(@taxable_total, 0) - COALESCE(@coupon_discount, 0)) * (@sales_tax_rate / 100), 2);
-        SELECT @grand_total     = COALESCE(@taxable_total, 0) + COALESCE(@nontaxable_total, 0) + COALESCE(@tax_total, 0) - COALESCE(@discount_total, 0)  - COALESCE(@coupon_discount, 0);
-        SET @receivable         = @grand_total;
+        SELECT @grand_total     = COALESCE(@taxable_total, 0) + COALESCE(@nontaxable_total, 0) + COALESCE(@tax_total, 0) - COALESCE(@coupon_discount, 0);
+
+		SET @receivable         = @grand_total;
 
 
         IF(@is_flat_discount = 1 AND @discount > @receivable)
@@ -375,6 +402,7 @@ BEGIN
             SELECT 'Dr', @sales_discount_account_id, @statement_reference, @default_currency_code, @coupon_discount, 1, @default_currency_code, @coupon_discount;
         END;
 
+
         INSERT INTO @temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
         SELECT 'Dr', inventory.get_account_id_by_customer_id(@customer_id), @statement_reference, @default_currency_code, @receivable, 1, @default_currency_code, @receivable;
         
@@ -384,7 +412,7 @@ BEGIN
 			FROM @temp_transaction_details
 		) != 0
 		BEGIN
-			--SELECT finance.get_account_name_by_account_id(account_id), * FROM @temp_transaction_details ORDER BY tran_type;
+			SELECT finance.get_account_name_by_account_id(account_id), * FROM @temp_transaction_details ORDER BY tran_type;
 			RAISERROR('Could not balance the Journal Entry. Nothing was saved.', 16, 1);		
 		END;
 		
@@ -488,68 +516,69 @@ END;
 GO
 
 
---DECLARE @office_id								integer 							= (SELECT TOP 1 office_id FROM core.offices);
---DECLARE @user_id                                integer 							= (SELECT TOP 1 user_id FROM account.users);
---DECLARE @login_id                               bigint  							= (SELECT TOP 1 login_id FROM account.logins WHERE user_id = @user_id);
---DECLARE @counter_id                             integer								= (SELECT TOP 1 counter_id FROM inventory.counters);
---DECLARE @value_date                             date								= finance.get_value_date(@office_id);
---DECLARE @book_date                              date								= finance.get_value_date(@office_id);
---DECLARE @cost_center_id                         integer								= (SELECT TOP 1 cost_center_id FROM finance.cost_centers);
---DECLARE @reference_number                       national character varying(24)		= 'N/A';
---DECLARE @statement_reference                    national character varying(2000)	= 'Test';
---DECLARE @tender                                 decimal(30, 6)						= 20000;
---DECLARE @change                                 decimal(30, 6)						= 10;
---DECLARE @payment_term_id                        integer								= NULL;
---DECLARE @check_amount                           decimal(30, 6)						= NULL;
---DECLARE @check_bank_name                        national character varying(1000)	= NULL;
---DECLARE @check_number                           national character varying(100)		= NULL;
---DECLARE @check_date                             date								= NULL;
---DECLARE @gift_card_number                       national character varying(100)		= NULL;
---DECLARE @customer_id                            integer								= (SELECT TOP 1 customer_id FROM inventory.customers);
---DECLARE @price_type_id                          integer								= (SELECT TOP 1 price_type_id FROM sales.price_types);
---DECLARE @shipper_id                             integer								= (SELECT TOP 1 shipper_id FROM inventory.shippers);
---DECLARE @store_id                               integer								= (SELECT TOP 1 store_id FROM inventory.stores WHERE store_name='Cold Room RM');
---DECLARE @coupon_code                            national character varying(100)		= NULL;
---DECLARE @is_flat_discount                       bit									= 0;
---DECLARE @discount                               decimal(30, 6)						= 10;
---DECLARE @details                                sales.sales_detail_type;
---DECLARE @sales_quotation_id                     bigint								= NULL;
---DECLARE @sales_order_id                         bigint								= NULL;
---DECLARE @transaction_master_id                  bigint								= NULL;
+-- DECLARE @office_id								integer 							= (SELECT TOP 1 office_id FROM core.offices);
+-- DECLARE @user_id                                integer 							= (SELECT TOP 1 user_id FROM account.users);
+-- DECLARE @login_id                               bigint  							= (SELECT TOP 1 login_id FROM account.logins WHERE user_id = @user_id);
+-- DECLARE @counter_id                             integer								= (SELECT TOP 1 counter_id FROM inventory.counters);
+-- DECLARE @value_date                             date								= finance.get_value_date(@office_id);
+-- DECLARE @book_date                              date								= finance.get_value_date(@office_id);
+-- DECLARE @cost_center_id                         integer								= (SELECT TOP 1 cost_center_id FROM finance.cost_centers);
+-- DECLARE @reference_number                       national character varying(24)		= 'N/A';
+-- DECLARE @statement_reference                    national character varying(2000)	= 'Test';
+-- DECLARE @tender                                 decimal(30, 6)						= 20000;
+-- DECLARE @change                                 decimal(30, 6)						= 10;
+-- DECLARE @payment_term_id                        integer								= NULL;
+-- DECLARE @check_amount                           decimal(30, 6)						= NULL;
+-- DECLARE @check_bank_name                        national character varying(1000)	= NULL;
+-- DECLARE @check_number                           national character varying(100)		= NULL;
+-- DECLARE @check_date                             date								= NULL;
+-- DECLARE @gift_card_number                       national character varying(100)		= NULL;
+-- DECLARE @customer_id                            integer								= (SELECT TOP 1 customer_id FROM inventory.customers);
+-- DECLARE @price_type_id                          integer								= (SELECT TOP 1 price_type_id FROM sales.price_types);
+-- DECLARE @shipper_id                             integer								= (SELECT TOP 1 shipper_id FROM inventory.shippers);
+-- DECLARE @store_id                               integer								= (SELECT TOP 1 store_id FROM inventory.stores WHERE store_name='Cold Room RM');
+-- DECLARE @coupon_code                            national character varying(100)		= NULL;
+-- DECLARE @is_flat_discount                       bit									= 0;
+-- DECLARE @discount                               decimal(30, 6)						= 20;
+-- DECLARE @details                                sales.sales_detail_type;
+-- DECLARE @sales_quotation_id                     bigint								= NULL;
+-- DECLARE @sales_order_id                         bigint								= NULL;
+-- DECLARE @transaction_master_id                  bigint								= NULL;
 
---INSERT INTO @details
---SELECT @store_id, 'Cr', item_id, 1, unit_id, selling_price, 0, selling_price * 0.13, 0
---FROM inventory.items
---WHERE inventory.items.item_code IN('SHS0003', 'SHS0004');
+-- INSERT INTO @details(store_id, transaction_type, item_id, quantity, unit_id, price, shipping_charge, discount_rate, discount)  
+-- --SELECT @store_id, 'Cr', item_id, 1, unit_id, selling_price, 0, selling_price * 0.13, 0
+-- --FROM inventory.items
+-- --WHERE inventory.items.item_code IN('SHS0003', 'SHS0004');
+-- SELECT @store_id, 'Cr', 1, 1, 6, 2320, 100, 0, 0;
 
 
---EXECUTE sales.post_sales
---    @office_id,
---    @user_id,
---    @login_id,
---    @counter_id,
---    @value_date,
---    @book_date,
---    @cost_center_id,
---    @reference_number,
---    @statement_reference,
---    @tender,
---    @change, 
---    @payment_term_id,
---	@check_amount,
---    @check_bank_name,
---    @check_number,
---    @check_date,
---	@gift_card_number,
---    @customer_id,    
---    @price_type_id,
---    @shipper_id,
---    @store_id,
---    @coupon_code,
---    @is_flat_discount,
---    @discount,
---    @details,
---    @sales_quotation_id,
---    @sales_order_id,  
---    @transaction_master_id OUTPUT;
+-- EXECUTE sales.post_sales
+    -- @office_id,
+    -- @user_id,
+    -- @login_id,
+    -- @counter_id,
+    -- @value_date,
+    -- @book_date,
+    -- @cost_center_id,
+    -- @reference_number,
+    -- @statement_reference,
+    -- @tender,
+    -- @change, 
+    -- @payment_term_id,
+	-- @check_amount,
+    -- @check_bank_name,
+    -- @check_number,
+    -- @check_date,
+	-- @gift_card_number,
+    -- @customer_id,    
+    -- @price_type_id,
+    -- @shipper_id,
+    -- @store_id,
+    -- @coupon_code,
+    -- @is_flat_discount,
+    -- @discount,
+    -- @details,
+    -- @sales_quotation_id,
+    -- @sales_order_id,  
+    -- @transaction_master_id OUTPUT;
 

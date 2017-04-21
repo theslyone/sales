@@ -92,6 +92,18 @@ CREATE TABLE sales.item_selling_prices
     deleted                                    bit DEFAULT(0)
 );
 
+CREATE TABLE sales.customerwise_selling_prices
+(
+	selling_price_id						bigint IDENTITY PRIMARY KEY,
+	customer_id								integer NOT NULL REFERENCES inventory.customers,
+	unit_id									integer NOT NULL REFERENCES inventory.units,
+	price									numeric(30, 6),
+    audit_user_id                           integer REFERENCES account.users,
+    audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
+	deleted									bit DEFAULT(0)
+);
+
+
 CREATE TABLE sales.payment_terms
 (
     payment_term_id                         integer IDENTITY PRIMARY KEY,
@@ -149,7 +161,7 @@ CREATE TABLE sales.cashier_login_info
     user_agent                              national character varying(1000),    
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
-    deleted                                    bit DEFAULT(0)
+    deleted                                 bit DEFAULT(0)
 );
 
 
@@ -184,6 +196,7 @@ CREATE TABLE sales.quotation_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   decimal(30, 6) NOT NULL,
+	discount_rate							decimal(30, 6) NOT NULL,
     discount                          		decimal(30, 6) NOT NULL DEFAULT(0),    
 	is_taxed 								bit NOT NULL,
     shipping_charge                         decimal(30, 6) NOT NULL DEFAULT(0),    
@@ -224,6 +237,7 @@ CREATE TABLE sales.order_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   decimal(30, 6) NOT NULL,
+	discount_rate							decimal(30, 6) NOT NULL,
     discount                           		decimal(30, 6) NOT NULL DEFAULT(0),    
 	is_taxed 								bit NOT NULL,
     shipping_charge                         decimal(30, 6) NOT NULL DEFAULT(0),    
@@ -2923,7 +2937,6 @@ BEGIN
     DECLARE @gift_card_id                   integer;
     DECLARE @gift_card_balance              numeric(30, 6);
     DECLARE @coupon_id                      integer;
-    DECLARE @default_discount_account_id    integer;
     DECLARE @fiscal_year_code               national character varying(12);
     DECLARE @invoice_number                 bigint;
     DECLARE @tax_account_id                 integer;
@@ -3136,6 +3149,7 @@ BEGIN
             SET @coupon_discount            = ROUND((COALESCE(@taxable_total, 0) + COALESCE(@nontaxable_total, 0)) * (@discount/100), 2);
         END;
 
+
         SELECT @tax_total       = ROUND((COALESCE(@taxable_total, 0) - COALESCE(@coupon_discount, 0)) * (@sales_tax_rate / 100), 2);
         SELECT @grand_total     = COALESCE(@taxable_total, 0) + COALESCE(@nontaxable_total, 0) + COALESCE(@tax_total, 0) - COALESCE(@discount_total, 0)  - COALESCE(@coupon_discount, 0);
         SET @receivable         = @grand_total;
@@ -3239,21 +3253,6 @@ BEGIN
             INSERT INTO @temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
             SELECT 'Dr', @sales_discount_account_id, @statement_reference, @default_currency_code, @coupon_discount, 1, @default_currency_code, @coupon_discount;
         END;
-
-		
-
-
-        IF(@coupon_discount > 0)
-        BEGIN
-            SELECT @default_discount_account_id = inventory.inventory_setup.default_discount_account_id
-            FROM inventory.inventory_setup
-            WHERE inventory.inventory_setup.office_id = @office_id;
-
-            INSERT INTO @temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
-            SELECT 'Dr', @default_discount_account_id, @statement_reference, @default_currency_code, @coupon_discount, 1, @default_currency_code, @coupon_discount;
-        END;
-
-
 
         INSERT INTO @temp_transaction_details(tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
         SELECT 'Dr', inventory.get_account_id_by_customer_id(@customer_id), @statement_reference, @default_currency_code, @receivable, 1, @default_currency_code, @receivable;
@@ -3390,8 +3389,8 @@ GO
 --DECLARE @shipper_id                             integer								= (SELECT TOP 1 shipper_id FROM inventory.shippers);
 --DECLARE @store_id                               integer								= (SELECT TOP 1 store_id FROM inventory.stores WHERE store_name='Cold Room RM');
 --DECLARE @coupon_code                            national character varying(100)		= NULL;
---DECLARE @is_flat_discount                       bit									= 1;
---DECLARE @discount                               decimal(30, 6)						= 0;
+--DECLARE @is_flat_discount                       bit									= 0;
+--DECLARE @discount                               decimal(30, 6)						= 10;
 --DECLARE @details                                sales.sales_detail_type;
 --DECLARE @sales_quotation_id                     bigint								= NULL;
 --DECLARE @sales_order_id                         bigint								= NULL;
@@ -3949,6 +3948,7 @@ EXECUTE core.create_menu 'MixERP.Sales', 'CustomerTypes','Customer Types', '/das
 EXECUTE core.create_menu 'MixERP.Sales', 'Customers', 'Customers', '/dashboard/sales/setup/customers', 'street view', 'Setup';
 EXECUTE core.create_menu 'MixERP.Sales', 'PriceTypes', 'Price Types', '/dashboard/sales/setup/price-types', 'ruble', 'Setup';
 EXECUTE core.create_menu 'MixERP.Sales', 'SellingPrices', 'Selling Prices', '/dashboard/sales/setup/selling-prices', 'in cart', 'Setup';
+EXECUTE core.create_menu 'MixERP.Sales', 'CustomerwiseSellingPrices', 'Customerwise Selling Prices', '/dashboard/sales/setup/selling-prices/customer', 'in cart', 'Setup';
 EXECUTE core.create_menu 'MixERP.Sales', 'LateFee', 'Late Fee', '/dashboard/sales/setup/late-fee', 'alarm mute', 'Setup';
 EXECUTE core.create_menu 'MixERP.Sales', 'PaymentTerms', 'Payment Terms', '/dashboard/sales/setup/payment-terms', 'checked calendar', 'Setup';
 EXECUTE core.create_menu 'MixERP.Sales', 'Cashiers', 'Cashiers', '/dashboard/sales/setup/cashiers', 'male', 'Setup';
@@ -4569,7 +4569,9 @@ SELECT
 	account.get_name_by_user_id(sales.orders.user_id) AS posted_by,
 	core.get_office_name_by_office_id(sales.orders.office_id) AS office,
 	sales.orders.transaction_timestamp AS posted_on,
-	sales.orders.office_id
+	sales.orders.office_id,
+	sales.orders.discount,
+	sales.orders.tax	
 FROM sales.orders;
 
 GO
@@ -4598,7 +4600,9 @@ SELECT
 	account.get_name_by_user_id(sales.quotations.user_id) AS posted_by,
 	core.get_office_name_by_office_id(sales.quotations.office_id) AS office,
 	sales.quotations.transaction_timestamp AS posted_on,
-	sales.quotations.office_id
+	sales.quotations.office_id,
+	sales.quotations.discount,
+	sales.quotations.tax	
 FROM sales.quotations;
 
 GO

@@ -90,6 +90,18 @@ CREATE TABLE sales.item_selling_prices
 	deleted									boolean DEFAULT(false)
 );
 
+CREATE TABLE sales.customerwise_selling_prices
+(
+	selling_price_id						BIGSERIAL PRIMARY KEY,
+	customer_id								integer NOT NULL REFERENCES inventory.customers,
+	unit_id									integer NOT NULL REFERENCES inventory.units,
+	price									numeric(30, 6),
+    audit_user_id                           integer REFERENCES account.users,
+    audit_ts                                TIMESTAMP WITH TIME ZONE DEFAULT(NOW()),
+	deleted									boolean DEFAULT(false)
+);
+
+
 CREATE TABLE sales.payment_terms
 (
     payment_term_id                         SERIAL PRIMARY KEY,
@@ -415,9 +427,10 @@ AS
     quantity            public.decimal_strict,
     unit_id           	integer,
     price               public.money_strict,
-    discount_rate       public.money_strict2,
-    tax                 public.money_strict2,
-    shipping_charge     public.money_strict2
+    discount_rate       public.decimal_strict2,
+    discount       		public.money_strict2,
+    shipping_charge     public.money_strict2,
+	is_taxed			boolean
 );
 
 

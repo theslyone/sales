@@ -134,31 +134,27 @@ function updateTotal() {
             nonTaxableTotal += discountedAmount;
         };
 
-        totalPrice += discountedAmount;
-
         totalQuantity += quantity;
     });
 
-    taxableTotal = window.parseFloat2(window.round(taxableTotal, 2)) || 0;
-    nonTaxableTotal = window.parseFloat2(window.round(nonTaxableTotal, 2)) || 0;
+    taxableTotal = window.round(taxableTotal, 2);
+    nonTaxableTotal = window.round(nonTaxableTotal, 2);
     var couponDiscountAmount = 0;
 
     if (couponDiscountType === 1 && couponDiscountRate > 0 && couponDiscountRate <= 100) {
-        couponDiscountAmount = totalPrice * (couponDiscountRate / 100);
+        couponDiscountAmount = taxableTotal * (couponDiscountRate / 100);
     } else if (couponDiscountType === 2 && couponDiscountRate > 0) {
         //Discount amount: flat amount
         couponDiscountAmount = couponDiscountRate;
     };
 
-    totalPrice -= couponDiscountAmount;
     //Discount applies before tax
     taxableTotal -= couponDiscountAmount;
     
     const tax = taxableTotal * (taxRate/100);
 
-    totalPrice+= tax;
-
-    totalPrice = window.parseFloat2(window.round(totalPrice, 2)) || 0;
+    totalPrice = taxableTotal + tax + nonTaxableTotal;
+    totalPrice = window.round(totalPrice, 2);
 
     amountEl.html(window.getFormattedNumber(window.round(totalPrice, 2)));
     countEl.html(window.getFormattedNumber(window.round(totalQuantity, 2)));
