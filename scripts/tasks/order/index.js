@@ -39,7 +39,7 @@
             }
         },
         {
-            Title: window.translate("ConvertToSales"),
+            Title: window.translate("ViewAdvice"),
             Icon: "zoom",
             ClickExpression: function (data) {
                 const orderId = data.OrderId;

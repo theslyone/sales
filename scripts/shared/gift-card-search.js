@@ -32,7 +32,7 @@ $("#SearchButton").off("click").on("click", function () {
             row.append(getCell(this.City));
             row.append(getCell(this.State));
             row.append(getCell(this.Country));
-            row.append(getCell(this.Zipcode));
+            row.append(getCell(this.ZipCode));
             row.append(getCell(this.PoBox));
 
             target.append(row);

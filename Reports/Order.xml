@@ -34,6 +34,10 @@
         <td>{i18n.Terms}</td>
         <td> {DataSource[0].terms}</td>
       </tr>
+      <tr>
+        <td>{i18n.Cancelled}</td>
+        <td> {DataSource[0].cancelled}</td>
+      </tr>
     </table>
     <br />
   </TopSection>
@@ -111,6 +115,7 @@
 			sales.orders.expected_delivery_date,
 			core.offices.office_name,
 			sales.orders.terms,
+			sales.orders.cancelled,
 			sales.orders.internal_memo,
 			inventory.customers.customer_name,
 			sales.orders.taxable_total,

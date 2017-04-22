@@ -140,7 +140,7 @@ CREATE TABLE sales.cashiers
                                             CHECK(valid_till >= valid_from),
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
-    deleted                                    bit DEFAULT(0)
+    deleted                                 bit DEFAULT(0)
 );
 
 CREATE UNIQUE INDEX cashiers_cashier_code_uix
@@ -183,9 +183,10 @@ CREATE TABLE sales.quotations
 	tax_rate 								numeric(30, 6) NOT NULL DEFAULT(0),
 	tax 									numeric(30, 6) NOT NULL DEFAULT(0),
 	nontaxable_total 						numeric(30, 6) NOT NULL DEFAULT(0),
+	cancelled								bit NOT NULL DEFAULT(0),
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
-    deleted                                    bit DEFAULT(0)
+    deleted                                 bit DEFAULT(0)
 );
 
 CREATE TABLE sales.quotation_details
@@ -224,6 +225,7 @@ CREATE TABLE sales.orders
 	tax_rate 								numeric(30, 6) NOT NULL DEFAULT(0),
 	tax 									numeric(30, 6) NOT NULL DEFAULT(0),
 	nontaxable_total 						numeric(30, 6) NOT NULL DEFAULT(0),
+	cancelled								bit NOT NULL DEFAULT(0),
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                 bit DEFAULT(0)

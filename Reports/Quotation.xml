@@ -34,6 +34,10 @@
         <td>{i18n.Terms}</td>
         <td> {DataSource[0].terms}</td>
       </tr>
+      <tr>
+        <td>{i18n.Cancelled}</td>
+        <td> {DataSource[0].cancelled}</td>
+      </tr>
     </table>
     <br />
   </TopSection>
@@ -111,6 +115,7 @@
 			sales.quotations.expected_delivery_date,
 			core.offices.office_name,
 			sales.quotations.terms,
+			sales.quotations.cancelled,
 			sales.quotations.internal_memo,
 			inventory.customers.customer_name,
 			sales.quotations.taxable_total,
@@ -148,8 +153,8 @@
 				inventory.units.unit_name,
 				ROUND(sales.quotation_details.price * sales.quotation_details.quantity, 4) AS amount,
 				sales.quotation_details.discount,
-				ROUND((sales.quotation_details.price * sales.quotation_details.quantity) - sales.quotation_details.discount, 4) AS sub_total,
-				ROUND((sales.quotation_details.price * sales.quotation_details.quantity) - sales.quotation_details.discount, 4) AS total
+				sales.quotation_details.shipping_charge,
+				ROUND((sales.quotation_details.price * sales.quotation_details.quantity) - sales.quotation_details.discount + sales.quotation_details.shipping_charge, 4) AS total
 			FROM sales.quotation_details
 			INNER JOIN inventory.items
 			ON sales.quotation_details.item_id = inventory.items.item_id

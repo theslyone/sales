@@ -123,5 +123,27 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
                 return this.Failed(ex.Message, HttpStatusCode.InternalServerError);
             }
         }
+
+        [Route("dashboard/sales/tasks/quotation/{id}/cancel")]
+        [HttpDelete]
+        [AccessPolicy("sales", "quotations", AccessTypeEnum.Delete)]
+        public async Task<ActionResult> CancelAsync(long id)
+        {
+            if (id <= 0)
+            {
+                return this.Failed("Invalid id supplied.", HttpStatusCode.BadRequest);
+            }
+
+            var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);
+            try
+            {
+                await Quotations.CancelAsync(this.Tenant, id, meta).ConfigureAwait(true);
+                return this.Ok();
+            }
+            catch (Exception ex)
+            {
+                return this.Failed(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

@@ -107,7 +107,7 @@
                 <input class="decimal" type="text" readonly="readonly" id="GiftCardBalanceInputText" />
             </div>
         </div>
-        <button class="ui big green button" id="CheckoutButton">@I18N.Checkout</button>
+        <button class="ui big green button" onclick="postSalesCheckout(this)">@I18N.Checkout</button>
         <div class="ticket panel">
             <div class="ui big header">Sales Ticket</div>
             <iframe id="TicketIframe"></iframe>
@@ -168,14 +168,14 @@
         $(".ticket.panel").show();
     };
 
-    $("#CheckoutButton").off("click").on("click", function () {
+    function postSalesCheckout(el) {
         function request(model) {
             const url = "/dashboard/sales/tasks/entry/new";
             const data = JSON.stringify(model);
             return window.getAjaxRequest(url, "POST", data);
         };
 
-        function getModel() {
+        function getCheckoutModel() {
             const model = window.getModel();
 
             const tender = window.parseFloat2($("#TenderInputText").val()) || 0;
@@ -295,7 +295,7 @@
             return true;
         };
 
-        const model = getModel();
+        const model = getCheckoutModel();
         const isValid = validate(model);
 
         if (!isValid) {
@@ -320,7 +320,7 @@
             button.removeClass("loading").prop("disabled", false);
             window.displayMessage(JSON.stringify(xhr));
         });
-    });
+    };
 
     $(".supplier.field").remove();
     $("#SaveButton").remove();

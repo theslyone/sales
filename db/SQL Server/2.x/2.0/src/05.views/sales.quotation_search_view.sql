@@ -22,7 +22,8 @@ SELECT
 	sales.quotations.transaction_timestamp AS posted_on,
 	sales.quotations.office_id,
 	sales.quotations.discount,
-	sales.quotations.tax	
+	sales.quotations.tax,
+	sales.quotations.cancelled
 FROM sales.quotations;
 
 GO

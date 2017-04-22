@@ -17,8 +17,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks
 
         public static async Task<long> AddAsync(string tenant, GiftCardFund model)
         {
-            string sql =
-                @"SELECT * FROM sales.add_gift_card_fund(@0::integer, @1::integer, @2::bigint, sales.get_gift_card_id_by_gift_card_number(@3), @4::date, @5::date, @6::integer, @7::public.money_strict, @8::integer, @9, @10);";
+            string sql = @"SELECT * FROM sales.add_gift_card_fund(@0::integer, @1::integer, @2::bigint, sales.get_gift_card_id_by_gift_card_number(@3), @4::date, @5::date, @6::integer, @7::public.money_strict, @8::integer, @9, @10);";
 
             if (DbProvider.GetDbType(DbProvider.GetProviderName(tenant)) == DatabaseType.SqlServer)
             {
