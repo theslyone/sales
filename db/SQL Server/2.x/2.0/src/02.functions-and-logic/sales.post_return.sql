@@ -19,7 +19,7 @@ CREATE PROCEDURE sales.post_return
     @statement_reference            national character varying(2000),
     @details                        sales.sales_detail_type READONLY,
 	@shipper_id						integer,
-	@discount						decimal(30, 6),
+	@discount						numeric(30, 6),
     @tran_master_id                 bigint OUTPUT
 )
 AS
@@ -34,14 +34,14 @@ BEGIN
     DECLARE @tran_counter           integer;
     DECLARE @tran_code              national character varying(50);
     DECLARE @checkout_id            bigint;
-    DECLARE @grand_total            decimal(30, 6);
-    DECLARE @discount_total         decimal(30, 6);
+    DECLARE @grand_total            numeric(30, 6);
+    DECLARE @discount_total         numeric(30, 6);
     DECLARE @is_credit              bit;
     DECLARE @default_currency_code  national character varying(12);
-    DECLARE @cost_of_goods_sold     decimal(30, 6);
+    DECLARE @cost_of_goods_sold     numeric(30, 6);
     DECLARE @ck_id                  bigint;
     DECLARE @sales_id               bigint;
-    DECLARE @tax_total              decimal(30, 6);
+    DECLARE @tax_total              numeric(30, 6);
     DECLARE @tax_account_id         integer;
 	DECLARE @fiscal_year_code		national character varying(12);
     DECLARE @can_post_transaction   bit;
@@ -64,14 +64,14 @@ BEGIN
 		store_id					integer,
 		transaction_type			national character varying(2),
 		item_id						integer,
-		quantity					decimal(30, 6),
+		quantity					numeric(30, 6),
 		unit_id						integer,
-        base_quantity				decimal(30, 6),
+        base_quantity				numeric(30, 6),
         base_unit_id                integer,                
-		price						decimal(30, 6),
-		discount_rate				decimal(30, 6),
-		discount					decimal(30, 6),
-		shipping_charge				decimal(30, 6)
+		price						numeric(30, 6),
+		discount_rate				numeric(30, 6),
+		discount					numeric(30, 6),
+		shipping_charge				numeric(30, 6)
 	);
 		
     BEGIN TRY

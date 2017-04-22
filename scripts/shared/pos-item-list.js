@@ -414,6 +414,12 @@ function displayProducts(category, searchQuery) {
     $.each(groupItems, function () {
         const product = this;
 
+        var sellingPrice = product.SellingPrice;
+
+        if (product.SellingPriceIncludesTax) {
+            sellingPrice = (100 * sellingPrice) / (100 + window.parseFloat2(product.SalesTaxRate));
+            sellingPrice = window.round(sellingPrice, 2);
+        };
 
         const item = $("<div class='item' />");
         item.attr("data-item-id", product.ItemId);
@@ -426,7 +432,8 @@ function displayProducts(category, searchQuery) {
         item.attr("data-barcode", product.Barcode);
         item.attr("data-photo", product.Photo);
         item.attr("data-is-taxable-item", product.IsTaxableItem);
-        item.attr("data-selling-price", product.SellingPrice);
+        item.attr("data-selling-price", sellingPrice);
+        item.attr("data-selling-price-includes-tax", product.SellingPriceIncludesTax);
 
         if (product.HotItem) {
             item.addClass("hot");
@@ -435,7 +442,7 @@ function displayProducts(category, searchQuery) {
         const info = $("<div class='info' />");
 
         const price = $("<div class='price' />");
-        price.html(window.getFormattedNumber(product.SellingPrice));
+        price.html(window.getFormattedNumber(sellingPrice));
 
         price.appendTo(info);
 

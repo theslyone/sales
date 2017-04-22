@@ -43,7 +43,7 @@ CREATE TABLE sales.gift_card_transactions
     transaction_master_id                   bigint NOT NULL REFERENCES finance.transaction_master,
     transaction_type                        national character varying(2) NOT NULL
                                             CHECK(transaction_type IN('Dr', 'Cr')),
-    amount                                  decimal(30, 6)
+    amount                                  numeric(30, 6)
 );
 
 CREATE TABLE sales.late_fee
@@ -65,7 +65,7 @@ CREATE TABLE sales.late_fee_postings
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     value_date                              date NOT NULL,
     late_fee_tran_id                        bigint NOT NULL REFERENCES finance.transaction_master,
-    amount                                  decimal(30, 6)
+    amount                                  numeric(30, 6)
 );
 
 CREATE TABLE sales.price_types
@@ -86,7 +86,7 @@ CREATE TABLE sales.item_selling_prices
     customer_type_id                        integer REFERENCES inventory.customer_types,
     price_type_id                           integer REFERENCES sales.price_types,
     includes_tax                            bit NOT NULL DEFAULT(0),
-    price                                   decimal(30, 6) NOT NULL,
+    price                                   numeric(30, 6) NOT NULL,
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)
@@ -95,6 +95,7 @@ CREATE TABLE sales.item_selling_prices
 CREATE TABLE sales.customerwise_selling_prices
 (
 	selling_price_id						bigint IDENTITY PRIMARY KEY,
+	item_id									integer NOT NULL REFERENCES inventory.items,
 	customer_id								integer NOT NULL REFERENCES inventory.customers,
 	unit_id									integer NOT NULL REFERENCES inventory.units,
 	price									numeric(30, 6),
@@ -196,13 +197,13 @@ CREATE TABLE sales.quotation_details
     quotation_id                            bigint NOT NULL REFERENCES sales.quotations,
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
-    price                                   decimal(30, 6) NOT NULL,
-	discount_rate							decimal(30, 6) NOT NULL,
-    discount                          		decimal(30, 6) NOT NULL DEFAULT(0),    
+    price                                   numeric(30, 6) NOT NULL,
+	discount_rate							numeric(30, 6) NOT NULL,
+    discount                          		numeric(30, 6) NOT NULL DEFAULT(0),    
 	is_taxed 								bit NOT NULL,
-    shipping_charge                         decimal(30, 6) NOT NULL DEFAULT(0),    
+    shipping_charge                         numeric(30, 6) NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
-    quantity                                decimal(30, 6) NOT NULL
+    quantity                                numeric(30, 6) NOT NULL
 );
 
 
@@ -238,13 +239,13 @@ CREATE TABLE sales.order_details
     order_id                                bigint NOT NULL REFERENCES sales.orders,
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
-    price                                   decimal(30, 6) NOT NULL,
-	discount_rate							decimal(30, 6) NOT NULL,
-    discount                           		decimal(30, 6) NOT NULL DEFAULT(0),    
+    price                                   numeric(30, 6) NOT NULL,
+	discount_rate							numeric(30, 6) NOT NULL,
+    discount                           		numeric(30, 6) NOT NULL DEFAULT(0),    
 	is_taxed 								bit NOT NULL,
-    shipping_charge                         decimal(30, 6) NOT NULL DEFAULT(0),    
+    shipping_charge                         numeric(30, 6) NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
-    quantity                                decimal(30, 6) NOT NULL
+    quantity                                numeric(30, 6) NOT NULL
 );
 
 
@@ -253,19 +254,19 @@ CREATE TABLE sales.coupons
     coupon_id                                   integer IDENTITY PRIMARY KEY,
     coupon_name                                 national character varying(100) NOT NULL,
     coupon_code                                 national character varying(100) NOT NULL,
-    discount_rate                               decimal(30, 6) NOT NULL,
+    discount_rate                               numeric(30, 6) NOT NULL,
     is_percentage                               bit NOT NULL DEFAULT(0),
-    maximum_discount_amount                     decimal(30, 6),
+    maximum_discount_amount                     numeric(30, 6),
     associated_price_type_id                    integer REFERENCES sales.price_types,
-    minimum_purchase_amount                     decimal(30, 6),
-    maximum_purchase_amount                     decimal(30, 6),
+    minimum_purchase_amount                     numeric(30, 6),
+    maximum_purchase_amount                     numeric(30, 6),
     begins_from                                 date,
     expires_on                                  date,
     maximum_usage                               integer,
     enable_ticket_printing                      bit,
     for_ticket_of_price_type_id                 integer REFERENCES sales.price_types,
-    for_ticket_having_minimum_amount            decimal(30, 6),
-    for_ticket_having_maximum_amount            decimal(30, 6),
+    for_ticket_having_minimum_amount            numeric(30, 6),
+    for_ticket_having_maximum_amount            numeric(30, 6),
     for_ticket_of_unknown_customers_only        bit,
     audit_user_id                               integer REFERENCES account.users,
     audit_ts                                    DATETIMEOFFSET DEFAULT(GETUTCDATE()),
@@ -290,11 +291,11 @@ CREATE TABLE sales.sales
     counter_id                              integer NOT NULL REFERENCES inventory.counters,
     customer_id                             integer REFERENCES inventory.customers,
     salesperson_id                            integer REFERENCES account.users,
-    total_amount                            decimal(30, 6) NOT NULL,
+    total_amount                            numeric(30, 6) NOT NULL,
     coupon_id                                integer REFERENCES sales.coupons,
     is_flat_discount                        bit,
-    discount                                decimal(30, 6),
-    total_discount_amount                    decimal(30, 6),    
+    discount                                numeric(30, 6),
+    total_discount_amount                    numeric(30, 6),    
     is_credit                               bit NOT NULL DEFAULT(0),
     credit_settled                            bit,
     payment_term_id                         integer REFERENCES sales.payment_terms,
@@ -304,7 +305,7 @@ CREATE TABLE sales.sales
     check_number                            national character varying(100),
     check_date                              date,
     check_bank_name                         national character varying(1000),
-    check_amount                            decimal(30, 6),
+    check_amount                            numeric(30, 6),
     reward_points                            numeric(30, 6) NOT NULL DEFAULT(0)
 );
 
@@ -318,12 +319,12 @@ CREATE TABLE sales.customer_receipts
     transaction_master_id                   bigint NOT NULL REFERENCES finance.transaction_master,
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     currency_code                           national character varying(12) NOT NULL REFERENCES core.currencies,
-    er_debit                                decimal(30, 6) NOT NULL,
-    er_credit                               decimal(30, 6) NOT NULL,
+    er_debit                                numeric(30, 6) NOT NULL,
+    er_credit                               numeric(30, 6) NOT NULL,
     cash_repository_id                      integer NULL REFERENCES finance.cash_repositories,
     posted_date                             date NULL,
-    tender                                  decimal(30, 6),
-    change                                  decimal(30, 6),
+    tender                                  numeric(30, 6),
+    change                                  numeric(30, 6),
     amount                                  numeric(30, 6),
     collected_on_bank_id					integer REFERENCES finance.bank_accounts,
 	collected_bank_instrument_code			national character varying(500),
@@ -331,7 +332,7 @@ CREATE TABLE sales.customer_receipts
     check_number                            national character varying(100),
     check_date                              date,
     check_bank_name                         national character varying(1000),
-    check_amount                            decimal(30, 6),
+    check_amount                            numeric(30, 6),
     check_cleared                           bit,    
     check_clear_date                        date,   
     check_clearing_memo                     national character varying(1000),
@@ -426,12 +427,12 @@ AS TABLE
     store_id            integer,
     transaction_type    national character varying(2),
     item_id             integer,
-    quantity            decimal(30, 6),
+    quantity            numeric(30, 6),
     unit_id             integer,
-    price               decimal(30, 6),
-    discount_rate       decimal(30, 6),
-    discount       		decimal(30, 6),
-    shipping_charge     decimal(30, 6),
+    price               numeric(30, 6),
+    discount_rate       numeric(30, 6),
+    discount       		numeric(30, 6),
+    shipping_charge     numeric(30, 6),
 	is_taxed			bit
 );
 
@@ -456,7 +457,7 @@ CREATE PROCEDURE sales.add_gift_card_fund
     @value_date                                 date,
     @book_date                                  date,
     @debit_account_id                           integer,
-    @amount                                     decimal(30, 6),
+    @amount                                     numeric(30, 6),
     @cost_center_id                             integer,
     @reference_number                           national character varying(24), 
     @statement_reference                        national character varying(2000)
@@ -651,7 +652,7 @@ RETURNS @result TABLE
 AS
 BEGIN
     DECLARE @price_type_id                  integer;
-    DECLARE @total_amount                   decimal(30, 6);
+    DECLARE @total_amount                   numeric(30, 6);
     DECLARE @customer_id                    integer;
 
     DECLARE @temp_coupons TABLE
@@ -747,55 +748,64 @@ GO
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_customer_account_detail.sql --<--<--
 IF OBJECT_ID('sales.get_customer_account_detail') IS NOT NULL
 DROP FUNCTION sales.get_customer_account_detail;
+
 GO
 
 CREATE FUNCTION sales.get_customer_account_detail
 (
-    @customer_id			integer,
-    @from					date,
-    @to						date,
-	@office_id				integer
+    @customer_id        integer,
+    @from               date,
+    @to                 date,
+    @office_id          integer
 )
 RETURNS @result TABLE
 (
-  
-  id						integer IDENTITY, 
-  value_date				date, 
-  invoice_number			bigint, 
-  statement_reference		text, 
-  debit						numeric(30, 6), 
-  credit					numeric(30, 6), 
-  balance					numeric(30, 6)
-) 
+    id                      integer IDENTITY, 
+    value_date              date, 
+    book_date               date,
+    tran_id                 bigint,
+    tran_code               text,
+    invoice_number          bigint, 
+    tran_type       text, 
+    debit                   numeric(30, 6), 
+    credit                  numeric(30, 6), 
+    balance                 numeric(30, 6)
+)
 AS
 BEGIN
     INSERT INTO @result
-	(
-		value_date, 
-		invoice_number, 
-		statement_reference, 
-		debit, 
-		credit
-	)
+    (
+        value_date, 
+        book_date,
+        tran_id,
+        tran_code,
+        invoice_number, 
+        tran_type, 
+        debit, 
+        credit
+    )
     SELECT 
-		customer_transaction_view.value_date,
+        customer_transaction_view.value_date,
+        customer_transaction_view.book_date,
+        customer_transaction_view.transaction_master_id,
+        customer_transaction_view.transaction_code,
         customer_transaction_view.invoice_number,
         customer_transaction_view.statement_reference,
         customer_transaction_view.debit,
         customer_transaction_view.credit
     FROM sales.customer_transaction_view
-    LEFT JOIN inventory.customers 
-		ON customer_transaction_view.customer_id = customers.customer_id
-	LEFT JOIN sales.sales_view
-		ON sales_view.invoice_number = customer_transaction_view.invoice_number
+    LEFT JOIN inventory.customers
+    ON customer_transaction_view.customer_id = customers.customer_id
+    LEFT JOIN sales.sales_view
+    ON sales_view.invoice_number = customer_transaction_view.invoice_number
     WHERE customer_transaction_view.customer_id = @customer_id
-	AND customers.deleted = 0
-	AND sales_view.office_id = @office_id
+    AND customers.deleted = 0
+  AND sales_view.office_id = @office_id
     AND customer_transaction_view.value_date BETWEEN @from AND @to;
 
-    UPDATE @result 
+  UPDATE @result 
     SET balance = c.balance
-	FROM @result as result
+  FROM @result as result
     INNER JOIN
     (
         SELECT p.id,
@@ -806,11 +816,13 @@ BEGIN
         GROUP BY p.id
     ) AS c
     ON result.id = c.id;
-
-    RETURN 
-END
+  
+  RETURN;
+END;
 
 GO
+
+--select * from sales.get_customer_account_detail(1, '1-1-2000', '1-1-2060', 1);
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_balance.sql --<--<--
 IF OBJECT_ID('sales.get_gift_card_balance') IS NOT NULL
@@ -984,16 +996,16 @@ DROP FUNCTION sales.get_item_selling_price;
 
 GO
 
-CREATE FUNCTION sales.get_item_selling_price(@item_id integer, @customer_type_id integer, @price_type_id integer, @unit_id integer)
-RETURNS decimal(30, 6)
+CREATE FUNCTION sales.get_item_selling_price(@office_id integer, @item_id integer, @customer_type_id integer, @price_type_id integer, @unit_id integer)
+RETURNS numeric(30, 6)
 AS
 BEGIN
-    DECLARE @price              decimal(30, 6);
+    DECLARE @price              numeric(30, 6);
     DECLARE @costing_unit_id    integer;
-    DECLARE @factor             decimal(30, 6);
-    DECLARE @tax_rate           decimal(30, 6);
+    DECLARE @factor             numeric(30, 6);
+    DECLARE @tax_rate           numeric(30, 6);
     DECLARE @includes_tax       bit;
-    DECLARE @tax                decimal(30, 6);
+    DECLARE @tax                numeric(30, 6);
 
     --Fist pick the catalog price which matches all these fields:
     --Item, Customer Type, Price Type, and Unit.
@@ -1052,7 +1064,7 @@ BEGIN
 
     IF(@includes_tax = 1)
     BEGIN
-        SET @tax_rate = core.get_item_tax_rate(@item_id);
+        SET @tax_rate = finance.get_sales_tax_rate(@office_id);
         SET @price = @price / ((100 + @tax_rate)/ 100);
     END;
 
@@ -1350,6 +1362,59 @@ END;
 GO
 
 
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_selling_price.sql --<--<--
+IF OBJECT_ID('sales.get_selling_price') IS NOT NULL
+DROP FUNCTION sales.get_selling_price;
+
+GO
+
+CREATE FUNCTION sales.get_selling_price(@office_id integer, @item_id integer, @customer_id integer, @price_type_id integer, @unit_id integer)
+RETURNS numeric(30, 6)
+AS
+BEGIN	
+    DECLARE @price              decimal(30, 6);
+    DECLARE @costing_unit_id    integer;
+    DECLARE @factor             decimal(30, 6);
+    DECLARE @tax_rate           decimal(30, 6);
+    DECLARE @includes_tax       bit;
+    DECLARE @tax                decimal(30, 6);
+	DECLARE @customer_type_id	integer;
+
+	SELECT
+		@includes_tax	= inventory.items.selling_price_includes_tax
+	FROM inventory.items
+	WHERE inventory.items.item_id = @item_id;
+	
+	SELECT
+		@price				= sales.customerwise_selling_prices.price,
+		@costing_unit_id	=  sales.customerwise_selling_prices.unit_id
+	FROM sales.customerwise_selling_prices
+	WHERE sales.customerwise_selling_prices.deleted = 0
+	AND sales.customerwise_selling_prices.customer_id = @customer_id
+	AND sales.customerwise_selling_prices.item_id = @item_id;
+
+	IF(COALESCE(@price, 0) = 0)
+	BEGIN
+		RETURN sales.get_item_selling_price(@office_id, @item_id, inventory.get_customer_type_id_by_customer_id(@customer_id), @price_type_id, @unit_id);
+	END;
+
+    IF(@includes_tax = 1)
+    BEGIN
+        SET @tax_rate = finance.get_sales_tax_rate(@office_id);
+        SET @price = @price / ((100 + @tax_rate)/ 100);
+    END;
+
+    --Get the unitary conversion factor if the requested unit does not match with the price defition.
+    SET @factor = inventory.convert_unit(@unit_id, @costing_unit_id);
+
+    RETURN @price * @factor;
+END;
+
+GO
+
+--SELECT sales.get_selling_price(1,1,1,1,6);
+
+
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_top_selling_products_of_all_time.sql --<--<--
 IF OBJECT_ID('sales.get_top_selling_products_of_all_time') IS NOT NULL
 DROP FUNCTION sales.get_top_selling_products_of_all_time;
@@ -1415,8 +1480,8 @@ CREATE PROCEDURE sales.post_cash_receipt
     @currency_code                              national character varying(12),
     @local_currency_code                        national character varying(12),
     @base_currency_code                         national character varying(12),
-    @exchange_rate_debit                        decimal(30, 6), 
-    @exchange_rate_credit                       decimal(30, 6),
+    @exchange_rate_debit                        numeric(30, 6), 
+    @exchange_rate_credit                       numeric(30, 6),
     @reference_number                           national character varying(24), 
     @statement_reference                        national character varying(2000), 
     @cost_center_id                             integer,
@@ -1424,9 +1489,9 @@ CREATE PROCEDURE sales.post_cash_receipt
     @cash_repository_id                         integer,
     @value_date                                 date,
     @book_date                                  date,
-    @receivable                                 decimal(30, 6),
-    @tender                                     decimal(30, 6),
-    @change                                     decimal(30, 6),
+    @receivable                                 numeric(30, 6),
+    @tender                                     numeric(30, 6),
+    @change                                     numeric(30, 6),
     @cascading_tran_id                          bigint,
     @transaction_master_id                      bigint OUTPUT
 )
@@ -1436,10 +1501,10 @@ BEGIN
     SET XACT_ABORT ON;
 
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
-    DECLARE @debit                              decimal(30, 6);
-    DECLARE @credit                             decimal(30, 6);
-    DECLARE @lc_debit                           decimal(30, 6);
-    DECLARE @lc_credit                          decimal(30, 6);
+    DECLARE @debit                              numeric(30, 6);
+    DECLARE @credit                             numeric(30, 6);
+    DECLARE @lc_debit                           numeric(30, 6);
+    DECLARE @lc_credit                          numeric(30, 6);
     DECLARE @can_post_transaction               bit;
     DECLARE @error_message                      national character varying(MAX);
 
@@ -1558,14 +1623,14 @@ CREATE PROCEDURE sales.post_check_receipt
     @currency_code                              national character varying(12),
     @local_currency_code                        national character varying(12),
     @base_currency_code                         national character varying(12),
-    @exchange_rate_debit                        decimal(30, 6), 
-    @exchange_rate_credit                       decimal(30, 6),
+    @exchange_rate_debit                        numeric(30, 6), 
+    @exchange_rate_credit                       numeric(30, 6),
     @reference_number                           national character varying(24), 
     @statement_reference                        national character varying(2000), 
     @cost_center_id                             integer,
     @value_date                                 date,
     @book_date                                  date,
-    @check_amount                               decimal(30, 6),
+    @check_amount                               numeric(30, 6),
     @check_bank_name                            national character varying(1000),
     @check_number                               national character varying(100),
     @check_date                                 date,
@@ -1578,10 +1643,10 @@ BEGIN
     SET XACT_ABORT ON;
 
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
-    DECLARE @debit                              decimal(30, 6);
-    DECLARE @credit                             decimal(30, 6);
-    DECLARE @lc_debit                           decimal(30, 6);
-    DECLARE @lc_credit                          decimal(30, 6);
+    DECLARE @debit                              numeric(30, 6);
+    DECLARE @credit                             numeric(30, 6);
+    DECLARE @lc_debit                           numeric(30, 6);
+    DECLARE @lc_credit                          numeric(30, 6);
     DECLARE @can_post_transaction               bit;
     DECLARE @error_message                      national character varying(MAX);
 
@@ -1963,7 +2028,7 @@ BEGIN
     DECLARE @loop_late_fee_name             national character varying(1000)
     DECLARE @loop_late_fee_account_id       integer;
     DECLARE @loop_customer_id               integer;
-    DECLARE @loop_late_fee                  decimal(30, 6);
+    DECLARE @loop_late_fee                  numeric(30, 6);
     DECLARE @loop_customer_account_id       integer;
 
 
@@ -1984,8 +2049,8 @@ BEGIN
         late_fee_name                       national character varying(1000),
         is_flat_amount                      bit,
         rate                                numeric(30, 6),
-        due_amount                          decimal(30, 6),
-        late_fee                            decimal(30, 6),
+        due_amount                          numeric(30, 6),
+        late_fee                            numeric(30, 6),
         customer_id                         integer,
         customer_account_id                 integer,
         late_fee_account_id                 integer,
@@ -2234,9 +2299,9 @@ CREATE PROCEDURE sales.post_receipt
     
     @customer_id                                integer,
     @currency_code                              national character varying(12), 
-    @exchange_rate_debit                        decimal(30, 6), 
+    @exchange_rate_debit                        numeric(30, 6), 
 
-    @exchange_rate_credit                       decimal(30, 6),
+    @exchange_rate_credit                       numeric(30, 6),
     @reference_number                           national character varying(24), 
     @statement_reference                        national character varying(2000), 
 
@@ -2246,11 +2311,11 @@ CREATE PROCEDURE sales.post_receipt
 
     @value_date                                 date,
     @book_date                                  date,
-    @receipt_amount                             decimal(30, 6),
+    @receipt_amount                             numeric(30, 6),
 
-    @tender                                     decimal(30, 6),
-    @change                                     decimal(30, 6),
-    @check_amount                               decimal(30, 6),
+    @tender                                     numeric(30, 6),
+    @change                                     numeric(30, 6),
+    @check_amount                               numeric(30, 6),
 
     @check_bank_name                            national character varying(1000),
     @check_number                               national character varying(100),
@@ -2270,10 +2335,10 @@ BEGIN
     DECLARE @base_currency_code                 national character varying(12);
     DECLARE @local_currency_code                national character varying(12);
     DECLARE @customer_account_id                integer;
-    DECLARE @debit                              decimal(30, 6);
-    DECLARE @credit                             decimal(30, 6);
-    DECLARE @lc_debit                           decimal(30, 6);
-    DECLARE @lc_credit                          decimal(30, 6);
+    DECLARE @debit                              numeric(30, 6);
+    DECLARE @credit                             numeric(30, 6);
+    DECLARE @lc_debit                           numeric(30, 6);
+    DECLARE @lc_credit                          numeric(30, 6);
     DECLARE @is_cash                            bit;
     DECLARE @gift_card_id                       integer;
     DECLARE @receivable_account_id              integer;
@@ -2385,8 +2450,8 @@ CREATE PROCEDURE sales.post_receipt_by_gift_card
     @currency_code                              national character varying(12),
     @local_currency_code                        national character varying(12),
     @base_currency_code                         national character varying(12),
-    @exchange_rate_debit                        decimal(30, 6), 
-    @exchange_rate_credit                       decimal(30, 6),
+    @exchange_rate_debit                        numeric(30, 6), 
+    @exchange_rate_credit                       numeric(30, 6),
     @reference_number                           national character varying(24), 
     @statement_reference                        national character varying(2000), 
     @cost_center_id                             integer,
@@ -2394,7 +2459,7 @@ CREATE PROCEDURE sales.post_receipt_by_gift_card
     @book_date                                  date,
     @gift_card_id                               integer,
     @gift_card_number                           national character varying(100),
-    @amount                                     decimal(30, 6),
+    @amount                                     numeric(30, 6),
     @cascading_tran_id                          bigint,
     @transaction_master_id                      bigint OUTPUT
 )
@@ -2404,10 +2469,10 @@ BEGIN
     SET XACT_ABORT ON;
 
     DECLARE @book                               national character varying(50) = 'Sales Receipt';
-    DECLARE @debit                              decimal(30, 6);
-    DECLARE @credit                             decimal(30, 6);
-    DECLARE @lc_debit                           decimal(30, 6);
-    DECLARE @lc_credit                          decimal(30, 6);
+    DECLARE @debit                              numeric(30, 6);
+    DECLARE @credit                             numeric(30, 6);
+    DECLARE @lc_debit                           numeric(30, 6);
+    DECLARE @lc_credit                          numeric(30, 6);
     DECLARE @is_cash                            bit;
     DECLARE @gift_card_payable_account_id       integer;
     DECLARE @can_post_transaction               bit;
@@ -2528,7 +2593,7 @@ CREATE PROCEDURE sales.post_return
     @statement_reference            national character varying(2000),
     @details                        sales.sales_detail_type READONLY,
 	@shipper_id						integer,
-	@discount						decimal(30, 6),
+	@discount						numeric(30, 6),
     @tran_master_id                 bigint OUTPUT
 )
 AS
@@ -2543,14 +2608,14 @@ BEGIN
     DECLARE @tran_counter           integer;
     DECLARE @tran_code              national character varying(50);
     DECLARE @checkout_id            bigint;
-    DECLARE @grand_total            decimal(30, 6);
-    DECLARE @discount_total         decimal(30, 6);
+    DECLARE @grand_total            numeric(30, 6);
+    DECLARE @discount_total         numeric(30, 6);
     DECLARE @is_credit              bit;
     DECLARE @default_currency_code  national character varying(12);
-    DECLARE @cost_of_goods_sold     decimal(30, 6);
+    DECLARE @cost_of_goods_sold     numeric(30, 6);
     DECLARE @ck_id                  bigint;
     DECLARE @sales_id               bigint;
-    DECLARE @tax_total              decimal(30, 6);
+    DECLARE @tax_total              numeric(30, 6);
     DECLARE @tax_account_id         integer;
 	DECLARE @fiscal_year_code		national character varying(12);
     DECLARE @can_post_transaction   bit;
@@ -2573,14 +2638,14 @@ BEGIN
 		store_id					integer,
 		transaction_type			national character varying(2),
 		item_id						integer,
-		quantity					decimal(30, 6),
+		quantity					numeric(30, 6),
 		unit_id						integer,
-        base_quantity				decimal(30, 6),
+        base_quantity				numeric(30, 6),
         base_unit_id                integer,                
-		price						decimal(30, 6),
-		discount_rate				decimal(30, 6),
-		discount					decimal(30, 6),
-		shipping_charge				decimal(30, 6)
+		price						numeric(30, 6),
+		discount_rate				numeric(30, 6),
+		discount					numeric(30, 6),
+		shipping_charge				numeric(30, 6)
 	);
 		
     BEGIN TRY
@@ -2883,10 +2948,10 @@ CREATE PROCEDURE sales.post_sales
     @cost_center_id                         integer,
     @reference_number                       national character varying(24),
     @statement_reference                    national character varying(2000),
-    @tender                                 decimal(30, 6),
-    @change                                 decimal(30, 6),
+    @tender                                 numeric(30, 6),
+    @change                                 numeric(30, 6),
     @payment_term_id                        integer,
-    @check_amount                           decimal(30, 6),
+    @check_amount                           numeric(30, 6),
     @check_bank_name                        national character varying(1000),
     @check_number                           national character varying(100),
     @check_date                             date,
@@ -2897,7 +2962,7 @@ CREATE PROCEDURE sales.post_sales
     @store_id                               integer,
     @coupon_code                            national character varying(100),
     @is_flat_discount                       bit,
-    @discount                               decimal(30, 6),
+    @discount                               numeric(30, 6),
     @details                                sales.sales_detail_type READONLY,
     @sales_quotation_id                     bigint,
     @sales_order_id                         bigint,
@@ -2910,16 +2975,16 @@ BEGIN
     SET XACT_ABORT ON;
 
     DECLARE @checkout_id                    bigint;
-    DECLARE @grand_total                    decimal(30, 6);
-    DECLARE @discount_total                 decimal(30, 6);
-    DECLARE @receivable                     decimal(30, 6);
+    DECLARE @grand_total                    numeric(30, 6);
+    DECLARE @discount_total                 numeric(30, 6);
+    DECLARE @receivable                     numeric(30, 6);
     DECLARE @default_currency_code          national character varying(12);
     DECLARE @is_periodic                    bit = inventory.is_periodic_inventory(@office_id);
-    DECLARE @cost_of_goods                  decimal(30, 6);
+    DECLARE @cost_of_goods                  numeric(30, 6);
     DECLARE @tran_counter                   integer;
     DECLARE @transaction_code               national character varying(50);
-    DECLARE @tax_total                      decimal(30, 6);
-    DECLARE @shipping_charge                decimal(30, 6);
+    DECLARE @tax_total                      numeric(30, 6);
+    DECLARE @shipping_charge                numeric(30, 6);
     DECLARE @cash_repository_id             integer;
     DECLARE @cash_account_id                integer;
     DECLARE @is_cash                        bit = 0;
@@ -2950,18 +3015,18 @@ BEGIN
         tran_type                           national character varying(2), 
         store_id                            integer,
         item_id                             integer, 
-        quantity                            decimal(30, 6),        
+        quantity                            numeric(30, 6),        
         unit_id                             integer,
-        base_quantity                       decimal(30, 6),
+        base_quantity                       numeric(30, 6),
         base_unit_id                        integer,                
-        price                               decimal(30, 6),
-        cost_of_goods_sold                  decimal(30, 6) DEFAULT(0),
-        discount_rate                       decimal(30, 6),
-        discount                            decimal(30, 6),
+        price                               numeric(30, 6),
+        cost_of_goods_sold                  numeric(30, 6) DEFAULT(0),
+        discount_rate                       numeric(30, 6),
+        discount                            numeric(30, 6),
 		is_taxed							bit,
 		is_taxable_item						bit,
-        amount								decimal(30, 6),
-        shipping_charge                     decimal(30, 6),
+        amount								numeric(30, 6),
+        shipping_charge                     numeric(30, 6),
         sales_account_id                    integer,
         sales_discount_account_id           integer,
         inventory_account_id                integer,
@@ -2986,10 +3051,10 @@ BEGIN
         statement_reference                 national character varying(2000), 
         cash_repository_id                  integer, 
         currency_code                       national character varying(12), 
-        amount_in_currency                  decimal(30, 6) NOT NULL, 
+        amount_in_currency                  numeric(30, 6) NOT NULL, 
         local_currency_code                 national character varying(12), 
-        er                                  decimal(30, 6), 
-        amount_in_local_currency			decimal(30, 6)
+        er                                  numeric(30, 6), 
+        amount_in_local_currency			numeric(30, 6)
     ) ;
 
     BEGIN TRY
@@ -3394,10 +3459,10 @@ GO
 -- DECLARE @cost_center_id                         integer								= (SELECT TOP 1 cost_center_id FROM finance.cost_centers);
 -- DECLARE @reference_number                       national character varying(24)		= 'N/A';
 -- DECLARE @statement_reference                    national character varying(2000)	= 'Test';
--- DECLARE @tender                                 decimal(30, 6)						= 20000;
--- DECLARE @change                                 decimal(30, 6)						= 10;
+-- DECLARE @tender                                 numeric(30, 6)						= 20000;
+-- DECLARE @change                                 numeric(30, 6)						= 10;
 -- DECLARE @payment_term_id                        integer								= NULL;
--- DECLARE @check_amount                           decimal(30, 6)						= NULL;
+-- DECLARE @check_amount                           numeric(30, 6)						= NULL;
 -- DECLARE @check_bank_name                        national character varying(1000)	= NULL;
 -- DECLARE @check_number                           national character varying(100)		= NULL;
 -- DECLARE @check_date                             date								= NULL;
@@ -3408,7 +3473,7 @@ GO
 -- DECLARE @store_id                               integer								= (SELECT TOP 1 store_id FROM inventory.stores WHERE store_name='Cold Room RM');
 -- DECLARE @coupon_code                            national character varying(100)		= NULL;
 -- DECLARE @is_flat_discount                       bit									= 0;
--- DECLARE @discount                               decimal(30, 6)						= 20;
+-- DECLARE @discount                               numeric(30, 6)						= 20;
 -- DECLARE @details                                sales.sales_detail_type;
 -- DECLARE @sales_quotation_id                     bigint								= NULL;
 -- DECLARE @sales_order_id                         bigint								= NULL;
@@ -3589,22 +3654,22 @@ BEGIN
     DECLARE @is_purchase                    bit = 0;
     DECLARE @item_id                        integer = 0;
     DECLARE @factor_to_base_unit            numeric(30, 6);
-    DECLARE @returned_in_previous_batch     decimal(30, 6) = 0;
-    DECLARE @in_verification_queue          decimal(30, 6) = 0;
-    DECLARE @actual_price_in_root_unit      decimal(30, 6) = 0;
-    DECLARE @price_in_root_unit             decimal(30, 6) = 0;
-    DECLARE @item_in_stock                  decimal(30, 6) = 0;
+    DECLARE @returned_in_previous_batch     numeric(30, 6) = 0;
+    DECLARE @in_verification_queue          numeric(30, 6) = 0;
+    DECLARE @actual_price_in_root_unit      numeric(30, 6) = 0;
+    DECLARE @price_in_root_unit             numeric(30, 6) = 0;
+    DECLARE @item_in_stock                  numeric(30, 6) = 0;
     DECLARE @error_item_id                  integer;
-    DECLARE @error_quantity                 decimal(30, 6);
+    DECLARE @error_quantity                 numeric(30, 6);
     DECLARE @error_unit						national character varying(500);
-    DECLARE @error_amount                   decimal(30, 6);
+    DECLARE @error_amount                   numeric(30, 6);
     DECLARE @error_message                  national character varying(MAX);
 
     DECLARE @total_rows                     integer = 0;
     DECLARE @counter                        integer = 0;
     DECLARE @loop_id                        integer;
     DECLARE @loop_item_id                   integer;
-    DECLARE @loop_price                     decimal(30, 6);
+    DECLARE @loop_price                     numeric(30, 6);
     DECLARE @loop_base_quantity             numeric(30, 6);
 
     SET @checkout_id                        = inventory.get_checkout_id_by_transaction_master_id(@transaction_master_id);
@@ -3619,13 +3684,13 @@ BEGIN
         store_id            integer,
         item_id             integer,
         item_in_stock       numeric(30, 6),
-        quantity            decimal(30, 6),        
+        quantity            numeric(30, 6),        
         unit_id             integer,
-        price               decimal(30, 6),
-        discount_rate       decimal(30, 6),
-        discount			decimal(30, 6),
+        price               numeric(30, 6),
+        discount_rate       numeric(30, 6),
+        discount			numeric(30, 6),
         is_taxed			bit,
-        shipping_charge     decimal(30, 6),
+        shipping_charge     numeric(30, 6),
         root_unit_id        integer,
         base_quantity       numeric(30, 6)
     ) ;
@@ -3953,7 +4018,7 @@ EXECUTE core.create_menu 'MixERP.Sales', 'SalesOrders', 'Sales Orders', '/dashbo
 EXECUTE core.create_menu 'MixERP.Sales', 'SalesEntryVerification', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks';
 EXECUTE core.create_menu 'MixERP.Sales', 'ReceiptVerification', 'Receipt Verification', '/dashboard/sales/tasks/receipt/verification', 'checkmark', 'Tasks';
 EXECUTE core.create_menu 'MixERP.Sales', 'SalesReturnVerification', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks';
-EXECUTE core.create_menu 'MixERP.Sales', 'CheckClearing', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks';
+--EXECUTE core.create_menu 'MixERP.Sales', 'CheckClearing', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks';
 EXECUTE core.create_menu 'MixERP.Sales', 'EOD', 'EOD', '/dashboard/sales/tasks/eod', 'money', 'Tasks';
 
 EXECUTE core.create_menu 'MixERP.Sales', 'CustomerLoyalty', 'Customer Loyalty', 'square outline', 'user', '';
@@ -4766,19 +4831,19 @@ GO
 CREATE FUNCTION sales.get_account_receivable_widget_details(@office_id integer)
 RETURNS @result TABLE
 (
-    all_time_sales                              decimal(30, 6),
-    all_time_receipt                            decimal(30, 6),
-    receivable_of_all_time                      decimal(30, 6),
-    this_months_sales                           decimal(30, 6),
-    this_months_receipt                         decimal(30, 6),
-    receivable_of_this_month                    decimal(30, 6)
+    all_time_sales                              numeric(30, 6),
+    all_time_receipt                            numeric(30, 6),
+    receivable_of_all_time                      numeric(30, 6),
+    this_months_sales                           numeric(30, 6),
+    this_months_receipt                         numeric(30, 6),
+    receivable_of_this_month                    numeric(30, 6)
 )
 AS
 BEGIN
-    DECLARE @all_time_sales                     decimal(30, 6);
-    DECLARE @all_time_receipt                   decimal(30, 6);
-    DECLARE @this_months_sales                  decimal(30, 6);
-    DECLARE @this_months_receipt                decimal(30, 6);
+    DECLARE @all_time_sales                     numeric(30, 6);
+    DECLARE @all_time_receipt                   numeric(30, 6);
+    DECLARE @this_months_sales                  numeric(30, 6);
+    DECLARE @this_months_receipt                numeric(30, 6);
     DECLARE @start_date                         date = finance.get_month_start_date(@office_id);
     DECLARE @end_date                           date = finance.get_month_end_date(@office_id);
 

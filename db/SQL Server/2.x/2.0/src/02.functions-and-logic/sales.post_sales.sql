@@ -14,10 +14,10 @@ CREATE PROCEDURE sales.post_sales
     @cost_center_id                         integer,
     @reference_number                       national character varying(24),
     @statement_reference                    national character varying(2000),
-    @tender                                 decimal(30, 6),
-    @change                                 decimal(30, 6),
+    @tender                                 numeric(30, 6),
+    @change                                 numeric(30, 6),
     @payment_term_id                        integer,
-    @check_amount                           decimal(30, 6),
+    @check_amount                           numeric(30, 6),
     @check_bank_name                        national character varying(1000),
     @check_number                           national character varying(100),
     @check_date                             date,
@@ -28,7 +28,7 @@ CREATE PROCEDURE sales.post_sales
     @store_id                               integer,
     @coupon_code                            national character varying(100),
     @is_flat_discount                       bit,
-    @discount                               decimal(30, 6),
+    @discount                               numeric(30, 6),
     @details                                sales.sales_detail_type READONLY,
     @sales_quotation_id                     bigint,
     @sales_order_id                         bigint,
@@ -41,16 +41,16 @@ BEGIN
     SET XACT_ABORT ON;
 
     DECLARE @checkout_id                    bigint;
-    DECLARE @grand_total                    decimal(30, 6);
-    DECLARE @discount_total                 decimal(30, 6);
-    DECLARE @receivable                     decimal(30, 6);
+    DECLARE @grand_total                    numeric(30, 6);
+    DECLARE @discount_total                 numeric(30, 6);
+    DECLARE @receivable                     numeric(30, 6);
     DECLARE @default_currency_code          national character varying(12);
     DECLARE @is_periodic                    bit = inventory.is_periodic_inventory(@office_id);
-    DECLARE @cost_of_goods                  decimal(30, 6);
+    DECLARE @cost_of_goods                  numeric(30, 6);
     DECLARE @tran_counter                   integer;
     DECLARE @transaction_code               national character varying(50);
-    DECLARE @tax_total                      decimal(30, 6);
-    DECLARE @shipping_charge                decimal(30, 6);
+    DECLARE @tax_total                      numeric(30, 6);
+    DECLARE @shipping_charge                numeric(30, 6);
     DECLARE @cash_repository_id             integer;
     DECLARE @cash_account_id                integer;
     DECLARE @is_cash                        bit = 0;
@@ -81,18 +81,18 @@ BEGIN
         tran_type                           national character varying(2), 
         store_id                            integer,
         item_id                             integer, 
-        quantity                            decimal(30, 6),        
+        quantity                            numeric(30, 6),        
         unit_id                             integer,
-        base_quantity                       decimal(30, 6),
+        base_quantity                       numeric(30, 6),
         base_unit_id                        integer,                
-        price                               decimal(30, 6),
-        cost_of_goods_sold                  decimal(30, 6) DEFAULT(0),
-        discount_rate                       decimal(30, 6),
-        discount                            decimal(30, 6),
+        price                               numeric(30, 6),
+        cost_of_goods_sold                  numeric(30, 6) DEFAULT(0),
+        discount_rate                       numeric(30, 6),
+        discount                            numeric(30, 6),
 		is_taxed							bit,
 		is_taxable_item						bit,
-        amount								decimal(30, 6),
-        shipping_charge                     decimal(30, 6),
+        amount								numeric(30, 6),
+        shipping_charge                     numeric(30, 6),
         sales_account_id                    integer,
         sales_discount_account_id           integer,
         inventory_account_id                integer,
@@ -117,10 +117,10 @@ BEGIN
         statement_reference                 national character varying(2000), 
         cash_repository_id                  integer, 
         currency_code                       national character varying(12), 
-        amount_in_currency                  decimal(30, 6) NOT NULL, 
+        amount_in_currency                  numeric(30, 6) NOT NULL, 
         local_currency_code                 national character varying(12), 
-        er                                  decimal(30, 6), 
-        amount_in_local_currency			decimal(30, 6)
+        er                                  numeric(30, 6), 
+        amount_in_local_currency			numeric(30, 6)
     ) ;
 
     BEGIN TRY
@@ -525,10 +525,10 @@ GO
 -- DECLARE @cost_center_id                         integer								= (SELECT TOP 1 cost_center_id FROM finance.cost_centers);
 -- DECLARE @reference_number                       national character varying(24)		= 'N/A';
 -- DECLARE @statement_reference                    national character varying(2000)	= 'Test';
--- DECLARE @tender                                 decimal(30, 6)						= 20000;
--- DECLARE @change                                 decimal(30, 6)						= 10;
+-- DECLARE @tender                                 numeric(30, 6)						= 20000;
+-- DECLARE @change                                 numeric(30, 6)						= 10;
 -- DECLARE @payment_term_id                        integer								= NULL;
--- DECLARE @check_amount                           decimal(30, 6)						= NULL;
+-- DECLARE @check_amount                           numeric(30, 6)						= NULL;
 -- DECLARE @check_bank_name                        national character varying(1000)	= NULL;
 -- DECLARE @check_number                           national character varying(100)		= NULL;
 -- DECLARE @check_date                             date								= NULL;
@@ -539,7 +539,7 @@ GO
 -- DECLARE @store_id                               integer								= (SELECT TOP 1 store_id FROM inventory.stores WHERE store_name='Cold Room RM');
 -- DECLARE @coupon_code                            national character varying(100)		= NULL;
 -- DECLARE @is_flat_discount                       bit									= 0;
--- DECLARE @discount                               decimal(30, 6)						= 20;
+-- DECLARE @discount                               numeric(30, 6)						= 20;
 -- DECLARE @details                                sales.sales_detail_type;
 -- DECLARE @sales_quotation_id                     bigint								= NULL;
 -- DECLARE @sales_order_id                         bigint								= NULL;

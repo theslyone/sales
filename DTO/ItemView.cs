@@ -23,6 +23,8 @@ namespace MixERP.Sales.DTO
         public string UnitName { get; set; }
         public bool HotItem { get; set; }
         public decimal SellingPrice { get; set; }
+        public decimal SalesTaxRate { get; set; }
+        public bool SellingPriceIncludesTax { get; set; }
         public string Photo { get; set; }
     }
 }

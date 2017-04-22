@@ -93,6 +93,7 @@ CREATE TABLE sales.item_selling_prices
 CREATE TABLE sales.customerwise_selling_prices
 (
 	selling_price_id						BIGSERIAL PRIMARY KEY,
+	item_id									integer NOT NULL REFERENCES inventory.items,
 	customer_id								integer NOT NULL REFERENCES inventory.customers,
 	unit_id									integer NOT NULL REFERENCES inventory.units,
 	price									numeric(30, 6),
@@ -194,7 +195,7 @@ CREATE TABLE sales.quotation_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
-	discount_rate							decimal(30, 6) NOT NULL,
+	discount_rate							numeric(30, 6) NOT NULL,
     discount                           		public.decimal_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
 	is_taxed 								boolean NOT NULL,
@@ -236,7 +237,7 @@ CREATE TABLE sales.order_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
-	discount_rate							decimal(30, 6) NOT NULL,
+	discount_rate							numeric(30, 6) NOT NULL,
     discount                           		public.decimal_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
 	is_taxed 								boolean NOT NULL,

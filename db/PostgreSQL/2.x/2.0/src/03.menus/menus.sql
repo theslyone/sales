@@ -28,7 +28,7 @@ SELECT * FROM core.create_menu('MixERP.Sales', 'SalesOrders', 'Sales Orders', '/
 SELECT * FROM core.create_menu('MixERP.Sales', 'SalesEntryVerification', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks');
 SELECT * FROM core.create_menu('MixERP.Sales', 'ReceiptVerification', 'Receipt Verification', '/dashboard/sales/tasks/receipt/verification', 'checkmark', 'Tasks');
 SELECT * FROM core.create_menu('MixERP.Sales', 'SalesReturnVerification', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks');
-SELECT * FROM core.create_menu('MixERP.Sales', 'CheckClearing', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');
+--SELECT * FROM core.create_menu('MixERP.Sales', 'CheckClearing', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');
 SELECT * FROM core.create_menu('MixERP.Sales', 'EOD', 'EOD', '/dashboard/sales/tasks/eod', 'money', 'Tasks');
 
 SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerLoyalty', 'Customer Loyalty', 'square outline', 'user', '');

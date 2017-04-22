@@ -14,7 +14,7 @@ RETURNS TABLE
     tran_id                 bigint,
     tran_code               text,
     invoice_number          bigint, 
-    statement_reference     text, 
+    tran_type               text, 
     debit                   numeric(30, 6), 
     credit                  numeric(30, 6), 
     balance                 numeric(30, 6)
@@ -30,7 +30,7 @@ BEGIN
         tran_id                 bigint,
         tran_code               text,
         invoice_number          bigint,
-        statement_reference     text,
+        tran_type               text,
         debit                   numeric(30, 6),
         credit                  numeric(30, 6),
         balance                 numeric(30, 6)
@@ -43,7 +43,7 @@ BEGIN
         tran_id,
         tran_code,
         invoice_number, 
-        statement_reference, 
+        tran_type, 
         debit, 
         credit
     )

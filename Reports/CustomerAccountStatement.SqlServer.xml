@@ -50,7 +50,7 @@
 			tran_id,
 			tran_code,
 			invoice_number,
-			statement_reference,
+			tran_type,
 			debit,
 			credit,
 			balance

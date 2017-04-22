@@ -186,6 +186,7 @@
     <Compile Include="Controllers\Backend\Tasks\EntryController.cs" />
     <Compile Include="Controllers\Backend\Tasks\ItemController.cs" />
     <Compile Include="Controllers\Backend\Tasks\ReturnController.cs" />
+    <Compile Include="DAL\Backend\Setup\SellingPrices.cs" />
     <Compile Include="DAL\Backend\Service\GiftCards.cs" />
     <Compile Include="DAL\Backend\Service\SearchCustomer.cs" />
     <Compile Include="DAL\Backend\Tasks\ClosingCashTransactions.cs" />
@@ -215,6 +216,7 @@
     <Compile Include="DTO\ClosingCash.cs" />
     <Compile Include="DTO\CouponView.cs" />
     <Compile Include="DTO\CustomerTransactionSummary.cs" />
+    <Compile Include="DTO\CustomerwiseSellingPrice.cs" />
     <Compile Include="DTO\GiftCards.cs" />
     <Compile Include="DTO\ItemView.cs" />
     <Compile Include="DTO\MerchantFeeSetup.cs" />
@@ -391,6 +393,7 @@
     <Content Include="Views\Tasks\Order\ClassicCheckout.cshtml" />
     <Content Include="Views\Tasks\Quotation\ClassicCheckout.cshtml" />
     <Content Include="Views\Tasks\Return\ClassicCheckout.cshtml" />
+    <Content Include="Views\Setup\CustomerSellingPrices.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

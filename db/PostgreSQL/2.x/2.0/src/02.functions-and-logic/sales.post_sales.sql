@@ -155,7 +155,7 @@ BEGIN
         item_id                         integer, 
         quantity                        public.decimal_strict,        
         unit_id                         integer,
-        base_quantity                   decimal(30, 6),
+        base_quantity                   numeric(30, 6),
         base_unit_id                    integer,                
         price                           public.money_strict,
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),

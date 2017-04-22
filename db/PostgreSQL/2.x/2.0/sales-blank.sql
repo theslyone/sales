@@ -94,6 +94,7 @@ CREATE TABLE sales.item_selling_prices
 CREATE TABLE sales.customerwise_selling_prices
 (
 	selling_price_id						BIGSERIAL PRIMARY KEY,
+	item_id									integer NOT NULL REFERENCES inventory.items,
 	customer_id								integer NOT NULL REFERENCES inventory.customers,
 	unit_id									integer NOT NULL REFERENCES inventory.units,
 	price									numeric(30, 6),
@@ -195,7 +196,7 @@ CREATE TABLE sales.quotation_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
-	discount_rate							decimal(30, 6) NOT NULL,
+	discount_rate							numeric(30, 6) NOT NULL,
     discount                           		public.decimal_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
 	is_taxed 								boolean NOT NULL,
@@ -237,7 +238,7 @@ CREATE TABLE sales.order_details
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
     price                                   public.money_strict NOT NULL,
-	discount_rate							decimal(30, 6) NOT NULL,
+	discount_rate							numeric(30, 6) NOT NULL,
     discount                           		public.decimal_strict2 NOT NULL DEFAULT(0),    
     shipping_charge                         public.money_strict2 NOT NULL DEFAULT(0),    
 	is_taxed 								boolean NOT NULL,
@@ -726,7 +727,7 @@ RETURNS TABLE
     tran_id                 bigint,
     tran_code               text,
     invoice_number          bigint, 
-    statement_reference     text, 
+    tran_type               text, 
     debit                   numeric(30, 6), 
     credit                  numeric(30, 6), 
     balance                 numeric(30, 6)
@@ -742,7 +743,7 @@ BEGIN
         tran_id                 bigint,
         tran_code               text,
         invoice_number          bigint,
-        statement_reference     text,
+        tran_type               text,
         debit                   numeric(30, 6),
         credit                  numeric(30, 6),
         balance                 numeric(30, 6)
@@ -755,7 +756,7 @@ BEGIN
         tran_id,
         tran_code,
         invoice_number, 
-        statement_reference, 
+        tran_type, 
         debit, 
         credit
     )
@@ -966,16 +967,16 @@ LANGUAGE plpgsql;
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_item_selling_price.sql --<--<--
-DROP FUNCTION IF EXISTS sales.get_item_selling_price(_item_id integer, _customer_type_id integer, _price_type_id integer, _unit_id integer);
+DROP FUNCTION IF EXISTS sales.get_item_selling_price(_office_id integer, _item_id integer, _customer_type_id integer, _price_type_id integer, _unit_id integer);
 
-CREATE FUNCTION sales.get_item_selling_price(_item_id integer, _customer_type_id integer, _price_type_id integer, _unit_id integer)
+CREATE FUNCTION sales.get_item_selling_price(_office_id integer, _item_id integer, _customer_type_id integer, _price_type_id integer, _unit_id integer)
 RETURNS public.money_strict2
 AS
 $$
     DECLARE _price              public.money_strict2;
     DECLARE _costing_unit_id    integer;
-    DECLARE _factor             decimal(30, 6);
-    DECLARE _tax_rate           decimal(30, 6);
+    DECLARE _factor             numeric(30, 6);
+    DECLARE _tax_rate           numeric(30, 6);
     DECLARE _includes_tax       boolean;
     DECLARE _tax                public.money_strict2;
 BEGIN
@@ -1049,7 +1050,7 @@ BEGIN
     END IF;
 
     IF(_includes_tax) THEN
-        _tax_rate := core.get_item_tax_rate(_item_id);
+        _tax_rate := finance.get_sales_tax_rate(_office_id);
         _price := _price / ((100 + _tax_rate)/ 100);
     END IF;
 
@@ -1062,7 +1063,7 @@ $$
 LANGUAGE plpgsql;
 
 
-SELECT * FROM sales.get_item_selling_price(1, 1, 1, 1);
+--SELECT * FROM sales.get_item_selling_price(1, 1, 1, 1, 1);
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_late_fee_id_by_late_fee_code.sql --<--<--
@@ -1325,6 +1326,58 @@ END
 $$
 LANGUAGE plpgsql;
 
+
+
+-->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_selling_price.sql --<--<--
+DROP FUNCTION IF EXISTS sales.get_selling_price(_office_id integer, _item_id integer, _customer_id integer, _price_type_id integer, _unit_id integer);
+
+CREATE FUNCTION sales.get_selling_price(_office_id integer, _item_id integer, _customer_id integer, _price_type_id integer, _unit_id integer)
+RETURNS numeric(30, 6)
+AS
+$$
+    DECLARE _price              decimal(30, 6);
+    DECLARE _costing_unit_id    integer;
+    DECLARE _factor             decimal(30, 6);
+    DECLARE _tax_rate           decimal(30, 6);
+    DECLARE _includes_tax       boolean;
+    DECLARE _tax                decimal(30, 6);
+	DECLARE _customer_type_id	integer;
+BEGIN	
+
+	SELECT inventory.items.selling_price_includes_tax INTO _includes_tax
+	FROM inventory.items
+	WHERE inventory.items.item_id = _item_id;
+	
+	SELECT
+		sales.customerwise_selling_prices.price,
+		sales.customerwise_selling_prices.unit_id
+    INTO
+        _price,
+        _costing_unit_id
+	FROM sales.customerwise_selling_prices
+	WHERE NOT sales.customerwise_selling_prices.deleted
+	AND sales.customerwise_selling_prices.customer_id = _customer_id
+	AND sales.customerwise_selling_prices.item_id = _item_id;
+
+	IF(COALESCE(_price, 0) = 0) THEN
+		RETURN sales.get_item_selling_price(_office_id, _item_id, inventory.get_customer_type_id_by_customer_id(_customer_id), _price_type_id, _unit_id);
+	END IF;
+
+    IF(_includes_tax = 1) THEN
+        _tax_rate   := finance.get_sales_tax_rate(_office_id);
+        _price      := _price / ((100 + _tax_rate)/ 100);
+    END IF;
+
+    --Get the unitary conversion factor if the requested unit does not match with the price defition.
+    _factor         := inventory.convert_unit(_unit_id, _costing_unit_id);
+
+    RETURN _price * _factor;
+END
+$$
+LANGUAGE plpgsql;
+
+
+--SELECT sales.get_selling_price(1,1,1,1,6);
 
 
 -->-->-- src/Frapid.Web/Areas/MixERP.Sales/db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_top_selling_products_of_all_time.sql --<--<--
@@ -2372,7 +2425,7 @@ DROP FUNCTION IF EXISTS sales.post_return
     _statement_reference            national character varying(2000),
     _details                        sales.sales_detail_type[],
 	_shipper_id						integer,
-	_discount						decimal(30, 6)
+	_discount						numeric(30, 6)
 );
 
 CREATE FUNCTION sales.post_return
@@ -2391,7 +2444,7 @@ CREATE FUNCTION sales.post_return
     _statement_reference            national character varying(2000),
     _details                        sales.sales_detail_type[],
 	_shipper_id						integer,
-	_discount						decimal(30, 6)
+	_discount						numeric(30, 6)
 )
 RETURNS bigint
 AS
@@ -2403,14 +2456,14 @@ $$
     DECLARE _tran_counter           integer;
     DECLARE _tran_code              national character varying(50);
     DECLARE _checkout_id            bigint;
-    DECLARE _grand_total            decimal(30, 6);
-    DECLARE _discount_total         decimal(30, 6);
+    DECLARE _grand_total            numeric(30, 6);
+    DECLARE _discount_total         numeric(30, 6);
     DECLARE _is_credit              boolean;
     DECLARE _default_currency_code  national character varying(12);
-    DECLARE _cost_of_goods_sold     decimal(30, 6);
+    DECLARE _cost_of_goods_sold     numeric(30, 6);
     DECLARE _ck_id                  bigint;
     DECLARE _sales_id               bigint;
-    DECLARE _tax_total              decimal(30, 6);
+    DECLARE _tax_total              numeric(30, 6);
     DECLARE _tax_account_id         integer;
 	DECLARE _fiscal_year_code		national character varying(12);
     DECLARE _can_post_transaction   boolean;
@@ -2438,14 +2491,14 @@ BEGIN
 		store_id					integer,
 		transaction_type			national character varying(2),
 		item_id						integer,
-		quantity					decimal(30, 6),
+		quantity					numeric(30, 6),
 		unit_id						integer,
-        base_quantity				decimal(30, 6),
+        base_quantity				numeric(30, 6),
         base_unit_id                integer,                
-		price						decimal(30, 6),
-		discount_rate				decimal(30, 6),
-		discount					decimal(30, 6),
-		shipping_charge				decimal(30, 6)
+		price						numeric(30, 6),
+		discount_rate				numeric(30, 6),
+		discount					numeric(30, 6),
+		shipping_charge				numeric(30, 6)
 	) ON COMMIT DROP;
             
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
@@ -2828,7 +2881,7 @@ BEGIN
         item_id                         integer, 
         quantity                        public.decimal_strict,        
         unit_id                         integer,
-        base_quantity                   decimal(30, 6),
+        base_quantity                   numeric(30, 6),
         base_unit_id                    integer,                
         price                           public.money_strict,
         cost_of_goods_sold              public.money_strict2 DEFAULT(0),
@@ -3314,9 +3367,9 @@ $$
     DECLARE _price_in_root_unit             public.money_strict2 = 0;
     DECLARE _item_in_stock                  public.decimal_strict2 = 0;
     DECLARE _error_item_id                  integer;
-    DECLARE _error_quantity                 decimal(30, 6);
+    DECLARE _error_quantity                 numeric(30, 6);
     DECLARE _error_unit                     text;
-    DECLARE _error_amount                   decimal(30, 6);
+    DECLARE _error_amount                   numeric(30, 6);
     DECLARE this                            RECORD; 
 BEGIN        
     _checkout_id                            := inventory.get_checkout_id_by_transaction_master_id(_transaction_master_id);
@@ -3604,7 +3657,7 @@ SELECT * FROM core.create_menu('MixERP.Sales', 'SalesOrders', 'Sales Orders', '/
 SELECT * FROM core.create_menu('MixERP.Sales', 'SalesEntryVerification', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks');
 SELECT * FROM core.create_menu('MixERP.Sales', 'ReceiptVerification', 'Receipt Verification', '/dashboard/sales/tasks/receipt/verification', 'checkmark', 'Tasks');
 SELECT * FROM core.create_menu('MixERP.Sales', 'SalesReturnVerification', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks');
-SELECT * FROM core.create_menu('MixERP.Sales', 'CheckClearing', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');
+--SELECT * FROM core.create_menu('MixERP.Sales', 'CheckClearing', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');
 SELECT * FROM core.create_menu('MixERP.Sales', 'EOD', 'EOD', '/dashboard/sales/tasks/eod', 'money', 'Tasks');
 
 SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerLoyalty', 'Customer Loyalty', 'square outline', 'user', '');
@@ -4328,19 +4381,19 @@ DROP FUNCTION IF EXISTS sales.get_account_receivable_widget_details(_office_id i
 CREATE FUNCTION sales.get_account_receivable_widget_details(_office_id integer)
 RETURNS TABLE
 (
-    all_time_sales                              decimal(30, 6),
-    all_time_receipt                            decimal(30, 6),
-    receivable_of_all_time                      decimal(30, 6),
-    this_months_sales                           decimal(30, 6),
-    this_months_receipt                         decimal(30, 6),
-    receivable_of_this_month                    decimal(30, 6)
+    all_time_sales                              numeric(30, 6),
+    all_time_receipt                            numeric(30, 6),
+    receivable_of_all_time                      numeric(30, 6),
+    this_months_sales                           numeric(30, 6),
+    this_months_receipt                         numeric(30, 6),
+    receivable_of_this_month                    numeric(30, 6)
 )
 AS
 $$
-    DECLARE _all_time_sales                     decimal(30, 6);
-    DECLARE _all_time_receipt                   decimal(30, 6);
-    DECLARE _this_months_sales                  decimal(30, 6);
-    DECLARE _this_months_receipt                decimal(30, 6);
+    DECLARE _all_time_sales                     numeric(30, 6);
+    DECLARE _all_time_receipt                   numeric(30, 6);
+    DECLARE _this_months_sales                  numeric(30, 6);
+    DECLARE _this_months_receipt                numeric(30, 6);
     DECLARE _start_date                         date = finance.get_month_start_date(_office_id);
     DECLARE _end_date                           date = finance.get_month_end_date(_office_id);
 BEGIN    

@@ -22,9 +22,9 @@ $$
     DECLARE _price_in_root_unit             public.money_strict2 = 0;
     DECLARE _item_in_stock                  public.decimal_strict2 = 0;
     DECLARE _error_item_id                  integer;
-    DECLARE _error_quantity                 decimal(30, 6);
+    DECLARE _error_quantity                 numeric(30, 6);
     DECLARE _error_unit                     text;
-    DECLARE _error_amount                   decimal(30, 6);
+    DECLARE _error_amount                   numeric(30, 6);
     DECLARE this                            RECORD; 
 BEGIN        
     _checkout_id                            := inventory.get_checkout_id_by_transaction_master_id(_transaction_master_id);

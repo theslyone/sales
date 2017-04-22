@@ -1,13 +1,13 @@
-﻿DROP FUNCTION IF EXISTS sales.get_item_selling_price(_item_id integer, _customer_type_id integer, _price_type_id integer, _unit_id integer);
+﻿DROP FUNCTION IF EXISTS sales.get_item_selling_price(_office_id integer, _item_id integer, _customer_type_id integer, _price_type_id integer, _unit_id integer);
 
-CREATE FUNCTION sales.get_item_selling_price(_item_id integer, _customer_type_id integer, _price_type_id integer, _unit_id integer)
+CREATE FUNCTION sales.get_item_selling_price(_office_id integer, _item_id integer, _customer_type_id integer, _price_type_id integer, _unit_id integer)
 RETURNS public.money_strict2
 AS
 $$
     DECLARE _price              public.money_strict2;
     DECLARE _costing_unit_id    integer;
-    DECLARE _factor             decimal(30, 6);
-    DECLARE _tax_rate           decimal(30, 6);
+    DECLARE _factor             numeric(30, 6);
+    DECLARE _tax_rate           numeric(30, 6);
     DECLARE _includes_tax       boolean;
     DECLARE _tax                public.money_strict2;
 BEGIN
@@ -81,7 +81,7 @@ BEGIN
     END IF;
 
     IF(_includes_tax) THEN
-        _tax_rate := core.get_item_tax_rate(_item_id);
+        _tax_rate := finance.get_sales_tax_rate(_office_id);
         _price := _price / ((100 + _tax_rate)/ 100);
     END IF;
 
@@ -94,4 +94,4 @@ $$
 LANGUAGE plpgsql;
 
 
-SELECT * FROM sales.get_item_selling_price(1, 1, 1, 1);
+--SELECT * FROM sales.get_item_selling_price(1, 1, 1, 1, 1);

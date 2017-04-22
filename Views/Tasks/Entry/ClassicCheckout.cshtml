@@ -151,7 +151,7 @@
     });
 
 
-    window.displayFieldBinder($("#PaymentTermSelect"), "/api/forms/sales/payment-terms/display-fields", true);
+    window.displayFieldBinder($("#PaymentTermSelect"), "/api/forms/sales/payment-terms/display-fields", false);
 
     $("input[name='payment-type']").off("change").on("change", function () {
         $("div[data-payment-type]").hide();

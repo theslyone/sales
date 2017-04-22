@@ -14,7 +14,7 @@
     _statement_reference            national character varying(2000),
     _details                        sales.sales_detail_type[],
 	_shipper_id						integer,
-	_discount						decimal(30, 6)
+	_discount						numeric(30, 6)
 );
 
 CREATE FUNCTION sales.post_return
@@ -33,7 +33,7 @@ CREATE FUNCTION sales.post_return
     _statement_reference            national character varying(2000),
     _details                        sales.sales_detail_type[],
 	_shipper_id						integer,
-	_discount						decimal(30, 6)
+	_discount						numeric(30, 6)
 )
 RETURNS bigint
 AS
@@ -45,14 +45,14 @@ $$
     DECLARE _tran_counter           integer;
     DECLARE _tran_code              national character varying(50);
     DECLARE _checkout_id            bigint;
-    DECLARE _grand_total            decimal(30, 6);
-    DECLARE _discount_total         decimal(30, 6);
+    DECLARE _grand_total            numeric(30, 6);
+    DECLARE _discount_total         numeric(30, 6);
     DECLARE _is_credit              boolean;
     DECLARE _default_currency_code  national character varying(12);
-    DECLARE _cost_of_goods_sold     decimal(30, 6);
+    DECLARE _cost_of_goods_sold     numeric(30, 6);
     DECLARE _ck_id                  bigint;
     DECLARE _sales_id               bigint;
-    DECLARE _tax_total              decimal(30, 6);
+    DECLARE _tax_total              numeric(30, 6);
     DECLARE _tax_account_id         integer;
 	DECLARE _fiscal_year_code		national character varying(12);
     DECLARE _can_post_transaction   boolean;
@@ -80,14 +80,14 @@ BEGIN
 		store_id					integer,
 		transaction_type			national character varying(2),
 		item_id						integer,
-		quantity					decimal(30, 6),
+		quantity					numeric(30, 6),
 		unit_id						integer,
-        base_quantity				decimal(30, 6),
+        base_quantity				numeric(30, 6),
         base_unit_id                integer,                
-		price						decimal(30, 6),
-		discount_rate				decimal(30, 6),
-		discount					decimal(30, 6),
-		shipping_charge				decimal(30, 6)
+		price						numeric(30, 6),
+		discount_rate				numeric(30, 6),
+		discount					numeric(30, 6),
+		shipping_charge				numeric(30, 6)
 	) ON COMMIT DROP;
             
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
