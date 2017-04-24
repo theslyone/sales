@@ -6,7 +6,6 @@ using Frapid.Configuration;
 using Frapid.Configuration.Db;
 using Frapid.DataAccess;
 using Frapid.Mapper;
-using Frapid.Mapper.Decorators;
 using Frapid.Mapper.Query.Insert;
 using Frapid.Mapper.Query.NonQuery;
 using Frapid.Mapper.Query.Select;
@@ -24,6 +23,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks
                 sql.Where("tender > 0");
                 sql.And("verification_status_id > 0");
                 sql.And("value_date=@0", transacitonDate.Date);
+                sql.And("posted_by=@0", userId);
 
                 return await db.SelectAsync<SalesView>(sql).ConfigureAwait(false);
             }
@@ -60,6 +60,5 @@ namespace MixERP.Sales.DAL.Backend.Tasks
                 }
             }
         }
-
     }
 }
