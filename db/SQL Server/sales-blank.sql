@@ -2279,7 +2279,7 @@ END;
 
 GO
 
-EXECUTE finance.create_routine 'POST-LF', ' sales.post_late_fee', 250;
+EXECUTE finance.create_routine 'POST-LF', ' sales.post_late_fee', 2500;
 
 GO
 

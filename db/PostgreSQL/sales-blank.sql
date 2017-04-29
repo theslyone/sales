@@ -2143,7 +2143,7 @@ END
 $$
 LANGUAGE plpgsql;
 
-SELECT  finance.create_routine('POST-LF', ' sales.post_late_fee', 250);
+SELECT  finance.create_routine('POST-LF', ' sales.post_late_fee', 2500);
 
 --SELECT * FROM  sales.post_late_fee(2, 5, 2,  finance.get_value_date(2));
 
@@ -3235,7 +3235,7 @@ $$
 LANGUAGE plpgsql;
 
 
-SELECT finance.create_routine('REF-MV', 'sales.refresh_materialized_views', 1000);
+SELECT finance.create_routine('REF-MV', 'sales.refresh_materialized_views', 9999);
 
 --SELECT * FROM sales.refresh_materialized_views(1, 1, 1, '1-1-2000')
 

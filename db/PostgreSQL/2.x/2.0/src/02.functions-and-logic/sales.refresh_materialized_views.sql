@@ -14,6 +14,6 @@ $$
 LANGUAGE plpgsql;
 
 
-SELECT finance.create_routine('REF-MV', 'sales.refresh_materialized_views', 1000);
+SELECT finance.create_routine('REF-MV', 'sales.refresh_materialized_views', 9999);
 
 --SELECT * FROM sales.refresh_materialized_views(1, 1, 1, '1-1-2000')

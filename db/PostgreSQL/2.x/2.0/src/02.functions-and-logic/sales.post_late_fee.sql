@@ -207,6 +207,6 @@ END
 $$
 LANGUAGE plpgsql;
 
-SELECT  finance.create_routine('POST-LF', ' sales.post_late_fee', 250);
+SELECT  finance.create_routine('POST-LF', ' sales.post_late_fee', 2500);
 
 --SELECT * FROM  sales.post_late_fee(2, 5, 2,  finance.get_value_date(2));
