@@ -150,7 +150,7 @@ function updateTotal() {
 
     //Discount applies before tax
     taxableTotal -= couponDiscountAmount;
-    
+
     const tax = taxableTotal * (taxRate/100);
 
     totalPrice = taxableTotal + tax + nonTaxableTotal;
