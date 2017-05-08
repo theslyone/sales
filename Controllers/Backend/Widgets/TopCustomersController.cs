@@ -23,7 +23,7 @@ namespace MixERP.Sales.Controllers.Backend.Widgets
 
             try
             {
-                var model = await TopCustomers.GetAsync(this.Tenant, meta.OfficeId);
+                var model = await TopCustomers.GetAsync(this.Tenant, meta.OfficeId).ConfigureAwait(true);
                 return this.Ok(model);
             }
             catch (Exception ex)
