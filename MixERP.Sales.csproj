@@ -251,6 +251,7 @@
     <Compile Include="ViewModels\CustomerSearchResult.cs" />
     <Compile Include="ViewModels\SalesReceipt.cs" />
     <Compile Include="ViewModels\SalesReturn.cs" />
+    <Compile Include="ViewModels\SerialNumber.cs" />
     <Compile Include="ViewModels\TicketViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

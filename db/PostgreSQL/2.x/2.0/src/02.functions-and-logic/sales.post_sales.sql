@@ -27,6 +27,7 @@
     _details                                sales.sales_detail_type[],
     _sales_quotation_id                     bigint,
     _sales_order_id                         bigint,
+    _serial_number_ids                      text,
     _book_name                              national character varying(48)
 );
 
@@ -60,6 +61,7 @@ CREATE FUNCTION sales.post_sales
     _details                                sales.sales_detail_type[],
     _sales_quotation_id                     bigint,
     _sales_order_id                         bigint,
+    _serial_number_ids                      text,
     _book_name                              national character varying(48) DEFAULT 'Sales Entry'
 )
 RETURNS bigint
@@ -95,6 +97,7 @@ $$
 	DECLARE _taxable_total					numeric(30, 6);
 	DECLARE _nontaxable_total				numeric(30, 6);
     DECLARE _sales_discount_account_id      integer;
+    DECLARE _sql                            text;
 BEGIN        
     IF NOT finance.can_post_transaction(_login_id, _user_id, _office_id, _book_name, _value_date) THEN
         RETURN 0;
@@ -467,6 +470,13 @@ BEGIN
     END IF;
     
     PERFORM finance.auto_verify(_transaction_master_id, _office_id);
+
+    IF _serial_number_ids IS NOT NULL THEN
+        _sql := 'UPDATE inventory.serial_numbers SET sales_transaction_id = '|| _transaction_master_id
+        ' WHERE serial_number_id IN (' ||_serial_number_ids|| ')';
+
+        EXECUTE _sql;
+    END IF;
 
     RETURN _transaction_master_id;
 END

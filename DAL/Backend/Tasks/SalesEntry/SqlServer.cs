@@ -24,7 +24,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                                 @CustomerId, @PriceTypeId, @ShipperId, @StoreId,
                                 @CouponCode, @IsFlatDiscount, @Discount,
                                 @Details,
-                                @SalesQuotationId, @SalesOrderId, @TransactionMasterId OUTPUT;";
+                                @SalesQuotationId, @SalesOrderId, @SerialNumberIds, @TransactionMasterId OUTPUT;";
 
 
             using (var connection = new SqlConnection(connectionString))
@@ -57,6 +57,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                     command.Parameters.AddWithNullableValue("@Discount", model.Discount);
                     command.Parameters.AddWithNullableValue("@SalesQuotationId", model.SalesQuotationId);
                     command.Parameters.AddWithNullableValue("@SalesOrderId", model.SalesOrderId);
+                    command.Parameters.AddWithNullableValue("@SerialNumberIds", model.SerialNumberIds);
 
                     using (var details = this.GetDetails(model.Details))
                     {

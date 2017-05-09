@@ -31,5 +31,19 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
             decimal model = await Items.GetSellingPriceAsync(this.Tenant, meta.OfficeId, itemId, customerId, priceTypeId, unitId).ConfigureAwait(true);
             return this.Ok(model);
         }
+
+        [Route("dashboard/sales/items/serial-numbers/{itemId}/{unitId}/{storeId}")]
+        [AccessPolicy("inventory", "serial_numbers_view", AccessTypeEnum.Read)]
+        public async Task<ActionResult> SerialNumbersAsync(int itemId, int unitId, int storeId)
+        {
+            if (itemId < 0 || unitId < 0)
+            {
+                return this.InvalidModelState(this.ModelState);
+            }
+
+            var model = await Items.GetSerialNumbersAsync(this.Tenant, itemId, unitId, storeId);
+            return this.Ok(model);
+        }
+
     }
 }

@@ -142,7 +142,7 @@
         });
     });
 
-    $("#TenderInputText").off("keyup").on("keyup", function() {
+    $("#TenderInputText").off("keyup").on("keyup", function () {
         const tender = window.parseFloat2($(this).val());
         const invoiceTotal = window.parseFloat2($("#InvoiceTotalInputText").val());
         const change = window.round(tender - invoiceTotal, 2);
@@ -177,6 +177,18 @@
 
         function getCheckoutModel() {
             const model = window.getModel();
+
+            var serialNumberIds = [];
+            const rows = $("#CheckoutGrid tbody tr");
+            $.each(rows, function () {
+                const row = $(this);
+                const serial = row.find("td:eq(1)").attr("data-serials");
+
+                if (serial) {
+                    serialNumberIds.push(serial);
+                };
+            });
+            model.SerialNumberIds = serialNumberIds.toString();
 
             const tender = window.parseFloat2($("#TenderInputText").val()) || 0;
             const change = window.parseFloat2($("#ChangeInputText").val()) || 0;
