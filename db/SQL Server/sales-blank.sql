@@ -2966,6 +2966,7 @@ CREATE PROCEDURE sales.post_sales
     @details                                sales.sales_detail_type READONLY,
     @sales_quotation_id                     bigint,
     @sales_order_id                         bigint,
+	@serial_number_ids						national character varying(max),
     @transaction_master_id                  bigint OUTPUT,
 	@book_name								national character varying(48) = 'Sales Entry'
 )
@@ -3414,6 +3415,15 @@ BEGIN
 				@receipt_transaction_master_id OUTPUT;
 
 			EXECUTE finance.auto_verify @receipt_transaction_master_id, @office_id;
+
+			IF @serial_number_ids IS NOT NULL
+			BEGIN
+				DECLARE @sql nvarchar(max) = 
+				'UPDATE inventory.serial_numbers SET sales_transaction_id = '+ CAST(@transaction_master_id AS nvarchar(50))+'
+				WHERE serial_number_id IN (' + @serial_number_ids + ')'
+
+				EXEC sp_executesql @sql;
+			END
         END
         ELSE
         BEGIN

@@ -27,7 +27,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                                 @CustomerId::integer, @PriceTypeId::integer, @ShipperId::integer, @StoreId::integer,
                                 @CouponCode::national character varying(100), @IsFlatDiscount::boolean, @Discount::public.money_strict2,
                                 ARRAY[{0}],
-                                @SalesQuotationId::bigint, @SalesOrderId::bigint
+                                @SalesQuotationId::bigint, @SalesOrderId::bigint, @SerialNumberIds::text
                             );";
             sql = string.Format(sql, this.GetParametersForDetails(model.Details));
 
@@ -61,6 +61,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                     command.Parameters.AddWithNullableValue("@Discount", model.Discount);
                     command.Parameters.AddWithNullableValue("@SalesQuotationId", model.SalesQuotationId);
                     command.Parameters.AddWithNullableValue("@SalesOrderId", model.SalesOrderId);
+                    command.Parameters.AddWithNullableValue("@SerialNumberIds", model.SerialNumberIds);
 
                     command.Parameters.AddRange(this.AddParametersForDetails(model.Details).ToArray());
 
