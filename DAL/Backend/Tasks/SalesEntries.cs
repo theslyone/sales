@@ -8,7 +8,9 @@ using Frapid.Mapper.Database;
 using Frapid.Mapper.Helpers;
 using Frapid.Mapper.Query.Select;
 using MixERP.Sales.DAL.Backend.Tasks.SalesEntry;
+using MixERP.Sales.DTO;
 using MixERP.Sales.QueryModels;
+using MixERP.Sales.ViewModels;
 
 namespace MixERP.Sales.DAL.Backend.Tasks
 {

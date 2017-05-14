@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -8,6 +9,7 @@ using Frapid.Areas.CSRF;
 using Frapid.DataAccess.Models;
 using MixERP.Sales.DAL.Backend.Tasks;
 using MixERP.Sales.QueryModels;
+using MixERP.Sales.ViewModels;
 
 namespace MixERP.Sales.Controllers.Backend.Tasks
 {
@@ -84,8 +86,36 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
 
             try
             {
-                long tranId = await DAL.Backend.Tasks.SalesEntries.PostAsync(this.Tenant, model).ConfigureAwait(true);
+                long tranId = await SalesEntries.PostAsync(this.Tenant, model).ConfigureAwait(true);
                 return this.Ok(tranId);
+            }
+            catch (Exception ex)
+            {
+                return this.Failed(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [Route("dashboard/sales/entry/serial/{transactionMasterId}")]
+        [MenuPolicy(OverridePath = "/dashboard/sales/tasks/entry")]
+        public async Task<ActionResult> Purchase(long transactionMasterId)
+        {
+            var model = await SerialNumbers.GetSerialNumberDetails(this.Tenant, transactionMasterId);
+
+            return this.FrapidView(this.GetRazorView<AreaRegistration>("Tasks/Entry/SerialNumber.cshtml", this.Tenant), model);
+        }
+
+        [Route("dashboard/sales/serial/post")]
+        [HttpPost]
+        public async Task<ActionResult> Post(PostSerial model)
+        {
+            try
+            {
+                var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);
+
+                bool result = await SerialNumbers.Post(this.Tenant, meta, model)
+                    .ConfigureAwait(true);
+
+                return this.Ok(result);
             }
             catch (Exception ex)
             {
