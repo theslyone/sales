@@ -206,6 +206,7 @@
     <Compile Include="DAL\Backend\Tasks\SalesEntry\PostgreSQL.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntry\SqlServer.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesReturnEntries.cs" />
+    <Compile Include="DAL\Backend\Tasks\SerialNumbers.cs" />
     <Compile Include="DAL\Backend\Tasks\Ticket.cs" />
     <Compile Include="DAL\Backend\Widgets\AccountReceivables.cs" />
     <Compile Include="DAL\Backend\Widgets\TopCustomers.cs" />
@@ -227,6 +228,8 @@
     <Compile Include="DTO\QuotationInfo.cs" />
     <Compile Include="DTO\QuotationResultview.cs" />
     <Compile Include="DTO\SalesView.cs" />
+    <Compile Include="DTO\SerialNumbers.cs" />
+    <Compile Include="DTO\SerialNumberView.cs" />
     <Compile Include="ExceptionLogger.cs" />
     <Compile Include="Extensions\PartialViewExtensions.cs" />
     <Compile Include="I18N.cs" />
@@ -240,6 +243,7 @@
     <Compile Include="QueryModels\ReceiptSearch.cs" />
     <Compile Include="QueryModels\ReturnSearch.cs" />
     <Compile Include="QueryModels\SalesSearch.cs" />
+    <Compile Include="ViewModels\CheckoutInfo.cs" />
     <Compile Include="ViewModels\ClosingCashViewModel.cs" />
     <Compile Include="ViewModels\OpeningCash.cs" />
     <Compile Include="ViewModels\CustomerSearchViewModel.cs" />
@@ -251,7 +255,7 @@
     <Compile Include="ViewModels\CustomerSearchResult.cs" />
     <Compile Include="ViewModels\SalesReceipt.cs" />
     <Compile Include="ViewModels\SalesReturn.cs" />
-    <Compile Include="ViewModels\SerialNumber.cs" />
+    <Compile Include="ViewModels\ItemSerialNumber.cs" />
     <Compile Include="ViewModels\TicketViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -393,6 +397,7 @@
     <Content Include="Views\Tasks\Quotation\ClassicCheckout.cshtml" />
     <Content Include="Views\Tasks\Return\ClassicCheckout.cshtml" />
     <Content Include="Views\Setup\CustomerSellingPrices.cshtml" />
+    <Content Include="Views\Tasks\Entry\SerialNumber.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
