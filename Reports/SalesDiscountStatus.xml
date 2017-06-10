@@ -38,6 +38,7 @@
 	        LEFT JOIN finance.transaction_master
 		      ON  transaction_master.transaction_master_id = checkout_detail_view.transaction_master_id
 	        WHERE NOT checkouts.deleted
+          AND transaction_master.office_id IN (SELECT get_office_ids FROM core.get_office_ids(@OfficeId::int))
 	        AND transaction_master.verification_status_id > 0
 	        AND checkouts.value_date BETWEEN @From::date AND @To::date
 	        AND COALESCE(@CustomerId, 0) = 0 OR sales.customer_id = @CustomerId
@@ -53,6 +54,7 @@
         ORDER BY all_discount.value_date;
       </Query>
       <Parameters>
+        <Parameter Name="@OfficeId" FieldLabel="Office Id" Type="int" DefaultValue="{Meta.OfficeId}" />
         <Parameter Name="@CustomerId" FieldLabel="Customer" Type="int" PopulateFrom="/api/views/inventory/customers/display-fields" KeyField="Key" ValueField="Value" Optional="true"/>
         <Parameter Name="@From" FieldLabel="From Date" Type="System.DateTime" />
         <Parameter Name="@To" FieldLabel="To Date" Type="System.DateTime" />

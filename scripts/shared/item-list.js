@@ -9,7 +9,7 @@
 });
 
 var itemTemplate =
-    `<div class="item" id="pos-{ItemId}" data-selling-price="{InvariantCultureSellingPrice}" data-photo="{Photo}" data-unit-id="{UnitId}" data-valid-units="{ValidUnits}" data-brand="{BrandName}" data-item-group="{ItemGroupName}" data-item-name="{ItemName}" data-item-code="{ItemCode}" data-item-id="{ItemId}" data-price="{Price}">
+    `<div class="item" id="pos-{ItemId}" data-selling-price="{InvariantCultureSellingPrice}" data-photo="{Photo}" data-unit-id="{UnitId}" data-valid-units="{ValidUnits}" data-brand="{BrandName}" data-item-group="{ItemGroupName}" data-item-name="{ItemName}" data-item-code="{ItemCode}" data-item-id="{ItemId}" data-price="{Price}" data-is-taxable-item="{IsTaxableItem}">
 	<div class="photo block">
 		<img src="{Photo}">
 	</div>
@@ -27,14 +27,6 @@ var itemTemplate =
 			<span class ="discount rate"></span>
 			<span>&nbsp; =&nbsp; </span>
 			<span class ="discounted amount"></span>
-		</div>
-		<div class ="tax info" style="display:none;">
-			<span>Add Tax </span>
-			<span class ="tax-amount"></span>
-			<span> (</span>
-			<span class ="tax-rate"></span>
-			<span>%) = </span>
-			<span class ="amount-plus-tax"></span>
 		</div>
 		<div>
 			<select class="unit inverted" data-item-id="{ItemId}">
@@ -136,20 +128,20 @@ $(document).on("itemFetched", function () {
 function initializeClickAndAction() {
     $("#POSItemList .item").off("click").on("click", function () {
         var el = $(this);
-        var sellingPrice = parseFloat(el.attr("data-selling-price")) || 0;
+        var sellingPrice = window.parseFloat2(el.attr("data-selling-price")) || 0;
         var photo = el.attr("data-photo") || "";
 
         var barCode = el.attr("data-barcode");
         var brand = el.attr("data-brand");
-        var unitId = el.attr("data-unit-id");
+        var unitId = window.parseInt2(el.attr("data-unit-id"));
         var validUnits = el.attr("data-valid-units");
         var itemGroup = el.attr("data-item-group");
         var itemName = el.attr("data-item-name");
         var itemCode = el.attr("data-item-code");
-        var itemId = el.attr("data-item-id");
+        var itemId = window.parseInt2(el.attr("data-item-id"));
         var price = sellingPrice;
         var isTaxableItem = el.attr("data-is-taxable-item") === "true";
-        var taxRate = parseFloat($("#SalesTaxRateHidden").val()) || 0;
+        var taxRate = window.parseFloat2($("#SalesTaxRateHidden").val()) || 0;
 
         if (!price) {
             alert("Cannot add item because the price is zero.");
@@ -165,7 +157,7 @@ function initializeClickAndAction() {
             var existingQuantitySpan = existingEl.find("span.quantity");
             var existingQuantityInput = existingEl.find("input.quantity");
 
-            var quantity = parseFloat(existingQuantitySpan.text()) || 0;
+            var quantity = window.parseFloat2(existingQuantitySpan.text()) || 0;
             quantity++;
 
             existingQuantitySpan.text(quantity);
@@ -190,6 +182,7 @@ function initializeClickAndAction() {
         template = template.replace(/{Price}/g, price);
         template = template.replace(/{UnitId}/g, unitId);
         template = template.replace(/{ValidUnits}/g, validUnits);
+        template = template.replace(/{IsTaxableItem}/g, isTaxableItem.toString());
 
         var item = $(template);
         var quantityInput = item.find("input.quantity");
@@ -227,9 +220,9 @@ function initializeClickAndAction() {
             const quantityEl = el.find("input.quantity");
             const discountEl = el.find("input.discount");
 
-            const quantity = parseFloat(quantityEl.val()) || 0;
-            const discountRate = parseFloat(discountEl.val()) || 0;
-            const price = parseFloat(el.find("input.price").val()) || 0;
+            const quantity = window.parseFloat2(quantityEl.val()) || 0;
+            const discountRate = window.parseFloat2(discountEl.val()) || 0;
+            const price = window.parseFloat2(el.find("input.price").val()) || 0;
 
             const amount = window.round(price * quantity, 2);
             const discountedAmount = window.round((price * quantity) * ((100 - discountRate) / 100), 2);
@@ -249,16 +242,6 @@ function initializeClickAndAction() {
                 el.find(".discount.info").hide();
             }
 
-            if (isTaxableItem) {
-                const tax = window.round((discountedAmount || amount) * taxRate / 100, 2);
-                const amountPlusTax = window.round((discountedAmount || amount) + tax, 2);
-
-                el.find(".tax.info .tax-amount").html(window.getFormattedNumber(tax));
-                el.find(".tax.info .tax-rate").html(window.getFormattedNumber(window.round(taxRate, 2)));
-                el.find(".tax.info .amount-plus-tax").html(window.getFormattedNumber(amountPlusTax));
-                el.find(".tax.info").show();
-            };
-
             window.updateTotal();
 
         };
@@ -272,7 +255,7 @@ function initializeClickAndAction() {
         discountInput.on("keyup", function () {
             const el = $(this);
 
-            const rate = parseFloat(el.val()) || 0;
+            const rate = window.parseFloat2(el.val()) || 0;
             if (rate > 100) {
                 el.val("100");
                 return;
@@ -317,8 +300,8 @@ function initializeClickAndAction() {
             };
 
             const itemId = el.attr("data-item-id");
-            const customerId = parseInt($("#CustomerSelect").val()) || 0;
-            const priceTypeId = parseInt($("#PriceTypeSelect").val()) || 0;
+            const customerId = window.parseInt2($("#CustomerSelect").val()) || 0;
+            const priceTypeId = window.parseInt2($("#PriceTypeSelect").val()) || 0;
             const unitId = el.val();
 
             $(".pos.sales.segment").addClass("loading");
@@ -359,31 +342,52 @@ function initializeClickAndAction() {
 };
 
 $("#SummaryItems div.discount .money input, " +
-    "#ReceiptSummary div.tender .money input").keyup(function () {
+    "#ReceiptSummary div.tender .money input, #DiscountInputText").keyup(function () {
         window.updateTotal();
     });
 
 function updateTotal() {
     const candidates = $("#SalesItems div.item");
     const amountEl = $("#SummaryItems div.amount .money");
-    window.setNumberFormat();
+    const taxRate = window.parseFloat2($("#SalesTaxRateHidden").val()) || 0;
 
+    window.setRegionalFormat();
+
+    var discount = window.parseFloat2($("#DiscountInputText").val());
     var totalPrice = 0;
+    var taxableTotal = 0;
+    var nonTaxableTotal = 0;
 
     $.each(candidates, function () {
         const el = $(this);
         const quantityEl = el.find("input.quantity");
         const discountEl = el.find("input.discount");
+        const isTaxable = el.attr("data-is-taxable-item") === "true";
 
-        const quantity = parseFloat(quantityEl.val()) || 0;
-        const discountRate = parseFloat(discountEl.val()) || 0;
-        const price = parseFloat(el.find("input.price").val()) || 0;
+        const quantity = window.parseFloat2(quantityEl.val()) || 0;
+        const discountRate = window.parseFloat2(discountEl.val()) || 0;
+        const price = window.parseFloat2(el.find("input.price").val()) || 0;
 
         const amount = price * quantity;
         const discountedAmount = amount * ((100 - discountRate) / 100);
-        const amountPlusTax = window.parseFloat2(el.find(".amount-plus-tax").html());
-        totalPrice += (amountPlusTax || discountedAmount || amount);
+
+        if (isTaxable) {
+            taxableTotal += discountedAmount;
+        } else {
+            nonTaxableTotal += discountedAmount;
+        };
+
+        totalPrice += discountedAmount;
     });
+
+    taxableTotal = window.round(taxableTotal, 2);
+    nonTaxableTotal = window.round(nonTaxableTotal, 2);
+
+    totalPrice -= discount;
+    taxableTotal -= discount;
+
+    const tax = taxableTotal * (taxRate / 100);
+    totalPrice += tax;
 
     totalPrice = window.round(totalPrice, 2);
 
@@ -466,6 +470,13 @@ function displayProducts(category, searchQuery) {
     $.each(groupItems, function () {
         const product = this;
 
+        var sellingPrice = product.SellingPrice;
+
+        if (product.SellingPriceIncludesTax) {
+            sellingPrice = (100 * sellingPrice) / (100 + window.parseFloat2(product.SalesTaxRate));
+            sellingPrice = window.round(sellingPrice, 2);
+        };
+
         const item = $("<div class='item' />");
         item.attr("data-item-id", product.ItemId);
         item.attr("data-item-code", product.ItemCode);
@@ -476,7 +487,8 @@ function displayProducts(category, searchQuery) {
         item.attr("data-valid-units", product.ValidUnits);
         item.attr("data-barcode", product.Barcode);
         item.attr("data-photo", product.Photo);
-        item.attr("data-selling-price", product.SellingPrice);
+        item.attr("data-selling-price", sellingPrice);
+        item.attr("data-selling-price-includes-tax", product.SellingPriceIncludesTax);
         item.attr("data-is-taxable-item", product.IsTaxableItem);
 
         if (product.HotItem) {
@@ -486,7 +498,7 @@ function displayProducts(category, searchQuery) {
         const info = $("<div class='info' />");
 
         const price = $("<div class='price' />");
-        price.html(window.getFormattedNumber(product.SellingPrice));
+        price.html(window.getFormattedNumber(sellingPrice));
 
         price.appendTo(info);
 
@@ -576,7 +588,7 @@ loadCostCenters();
 loadShippers();
 
 setTimeout(function () {
-    $(".decimal").number(true, window.currencyDecimalPlaces, ".", "");
+    window.setRegionalFormat();
 }, 100);
 
 function getTaxRate() {
@@ -592,7 +604,7 @@ function getTaxRate() {
     const ajax = request();
 
     ajax.success(function (response) {
-        const salesTaxRate = parseFloat(response[0].SalesTaxRate) || 0;
+        const salesTaxRate = window.parseFloat2(response[0].SalesTaxRate) || 0;
         $("#SalesTaxRateHidden").val(salesTaxRate);
     });
 };

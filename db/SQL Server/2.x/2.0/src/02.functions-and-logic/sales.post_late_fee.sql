@@ -21,7 +21,7 @@ BEGIN
     DECLARE @loop_late_fee_name             national character varying(1000)
     DECLARE @loop_late_fee_account_id       integer;
     DECLARE @loop_customer_id               integer;
-    DECLARE @loop_late_fee                  decimal(30, 6);
+    DECLARE @loop_late_fee                  numeric(30, 6);
     DECLARE @loop_customer_account_id       integer;
 
 
@@ -42,8 +42,8 @@ BEGIN
         late_fee_name                       national character varying(1000),
         is_flat_amount                      bit,
         rate                                numeric(30, 6),
-        due_amount                          decimal(30, 6),
-        late_fee                            decimal(30, 6),
+        due_amount                          numeric(30, 6),
+        late_fee                            numeric(30, 6),
         customer_id                         integer,
         customer_account_id                 integer,
         late_fee_account_id                 integer,
@@ -124,17 +124,12 @@ BEGIN
             SELECT
                 SUM
                 (
-                    (inventory.checkout_details.quantity * inventory.checkout_details.price) 
-                    - 
-                    inventory.checkout_details.discount 
-                    + 
-                    inventory.checkout_details.tax
-                    + 
-                    inventory.checkout_details.shipping_charge
+                    COALESCE(inventory.checkouts.taxable_total, 0) + 
+                    COALESCE(inventory.checkouts.tax, 0) + 
+                    COALESCE(inventory.checkouts.nontaxable_total, 0) - 
+                    COALESCE(inventory.checkouts.discount, 0)
                 )
-            FROM inventory.checkout_details
-            INNER JOIN  inventory.checkouts
-            ON  inventory.checkouts. checkout_id = inventory.checkout_details. checkout_id
+            FROM inventory.checkouts
             WHERE  inventory.checkouts.transaction_master_id = transaction_master_id
         ) WHERE is_flat_amount = 0;
 
@@ -277,7 +272,7 @@ END;
 
 GO
 
-EXECUTE finance.create_routine 'POST-LF', ' sales.post_late_fee', 250;
+EXECUTE finance.create_routine 'POST-LF', ' sales.post_late_fee', 2500;
 
 GO
 

@@ -167,8 +167,8 @@ $("#BankAccountIdSelect").change(function () {
 });
 
 $("#PaymentCardIdSelect").change(function () {
-    const merchantAccountId = parseInt($("#BankAccountIdSelect").val() || 0);
-    const paymentCardId = parseInt($("#PaymentCardIdSelect").val() || 0);
+    const merchantAccountId = window.parseInt2($("#BankAccountIdSelect").val() || 0);
+    const paymentCardId = window.parseInt2($("#PaymentCardIdSelect").val() || 0);
 
     $("#CustomerPaysFeeRadio").removeProp("checked");
     $("#MerchantFeeInputText").val("");
@@ -206,10 +206,10 @@ function updateTotal() {
         $("#CreditExchangeRateInputText").val("1");
     };
 
-    const due = parseFloat($("#DueAmountInputText").val() || 0);
-    const amount = parseFloat($("#AmountInputText").val() || 0);
-    const er = parseFloat($("#DebitExchangeRateInputText").val() || 0);
-    const er2 = parseFloat($("#CreditExchangeRateInputText").val()) || 0;
+    const due = window.parseFloat2($("#DueAmountInputText").val() || 0);
+    const amount = window.parseFloat2($("#AmountInputText").val() || 0);
+    const er = window.parseFloat2($("#DebitExchangeRateInputText").val() || 0);
+    const er2 = window.parseFloat2($("#CreditExchangeRateInputText").val()) || 0;
 
     const toHomeCurrency = amount * er;
 
@@ -221,7 +221,7 @@ function updateTotal() {
 
     $("#BaseAmountInputText").val(toBase);
 
-    $("#FinalDueAmountInputText").val(remainingDue);
+    $("#FinalDueAmountInputText").val(window.round(remainingDue, 2));
 
     $("#FinalDueAmountInputText").removeClass("alert-danger");
 
@@ -259,47 +259,33 @@ var toggleTransactionType = function (e) {
 };
 
 function loadCostCenters() {
-    const url = "/api/forms/finance/cost-centers/display-fields";
-    const target = $("#CostCenterIdSelect");
-    window.ajaxDataBind(url, target, null, "Key", "Value");
+    window.displayFieldBinder($("#CostCenterIdSelect"), "/api/forms/finance/cost-centers/display-fields", true);
 };
 
 function loadCurrencies() {
-    const url = "/api/forms/core/currencies/lookup-fields";
-    const target = $("#CurrencyCodeSelect");
-    window.ajaxDataBind(url, target, null, "Key", "Value");
+    window.displayFieldBinder($("#CurrencyCodeSelect"), "/api/forms/core/currencies/lookup-fields", true);
 };
 
 function loadCustomers() {
-    const url = "/api/forms/inventory/customers/display-fields";
-    const target = $("#CustomerIdSelect");
-    window.ajaxDataBind(url, target, null, "Key", "Value");
+    window.displayFieldBinder($("#CustomerIdSelect"), "/api/forms/inventory/customers/display-fields", false);
 };
 
 function loadCashRepositories() {
-    const url = "/api/forms/finance/cash-repositories/display-fields";
-    const target = $("#CashRepositoryIdSelect");
-    window.ajaxDataBind(url, target, null, "Key", "Value");
+    window.displayFieldBinder($("#CashRepositoryIdSelect"), "/api/forms/finance/cash-repositories/display-fields", false);
 };
 
 function loadCashAccounts() {
-    const url = "/api/views/finance/cash-account-selector-view/display-fields";
-    const target = $("#CashAccountIdSelect");
-    window.ajaxDataBind(url, target, null, "Key", "Value");
+    window.displayFieldBinder($("#CashAccountIdSelect"), "/api/views/finance/cash-account-selector-view/display-fields", false);
 };
 
 function loadBankAccounts() {
-    const url = "/api/forms/finance/bank-accounts/display-fields";
-    const target = $("#BankAccountIdSelect");
-    window.ajaxDataBind(url, target, null, "Key", "Value");
+    window.displayFieldBinder($("#BankAccountIdSelect"), "/api/forms/finance/bank-accounts/display-fields", false);
 };
 
 
 function loadPaymentCards() {
     if (!$("#PaymentCardIdSelect option").length) {
-        const url = "/api/forms/finance/payment-cards/display-fields";
-        const target = $("#PaymentCardIdSelect");
-        window.ajaxDataBind(url, target, null, "Key", "Value");
+        window.displayFieldBinder($("#PaymentCardIdSelect"), "/api/forms/finance/payment-cards/display-fields", false);
     };
 };
 

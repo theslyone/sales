@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using Frapid.ApplicationState.Cache;
 using MixERP.Sales.DAL.Backend.Service;
 using Frapid.Dashboard;
 using Frapid.DataAccess.Models;
@@ -12,7 +13,8 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
         [AccessPolicy("sales", "item_view", AccessTypeEnum.Read)]
         public async Task<ActionResult> IndexAsync()
         {
-            var model = await Items.GetItemsAsync(this.Tenant).ConfigureAwait(true);
+            var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);
+            var model = await Items.GetItemsAsync(this.Tenant, meta.OfficeId).ConfigureAwait(true);
             return this.Ok(model);
         }
 
@@ -25,8 +27,23 @@ namespace MixERP.Sales.Controllers.Backend.Tasks
                 return this.InvalidModelState(this.ModelState);
             }
 
-            decimal model = await Items.GetSellingPriceAsync(this.Tenant, itemId, customerId, priceTypeId, unitId).ConfigureAwait(true);
+            var meta = await AppUsers.GetCurrentAsync().ConfigureAwait(true);
+            decimal model = await Items.GetSellingPriceAsync(this.Tenant, meta.OfficeId, itemId, customerId, priceTypeId, unitId).ConfigureAwait(true);
             return this.Ok(model);
         }
+
+        [Route("dashboard/sales/items/serial-numbers/{itemId}/{unitId}/{storeId}")]
+        [AccessPolicy("inventory", "serial_numbers_view", AccessTypeEnum.Read)]
+        public async Task<ActionResult> SerialNumbersAsync(int itemId, int unitId, int storeId)
+        {
+            if (itemId < 0 || unitId < 0)
+            {
+                return this.InvalidModelState(this.ModelState);
+            }
+
+            var model = await Items.GetSerialNumbersAsync(this.Tenant, itemId, unitId, storeId);
+            return this.Ok(model);
+        }
+
     }
 }

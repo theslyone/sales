@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -23,8 +24,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                                 @CustomerId, @PriceTypeId, @ShipperId, @StoreId,
                                 @CouponCode, @IsFlatDiscount, @Discount,
                                 @Details,
-                                @SalesQuotationId, @SalesOrderId, @TransactionMasterId OUTPUT
-                            ;";
+                                @SalesQuotationId, @SalesOrderId, @SerialNumberIds, @TransactionMasterId OUTPUT;";
 
 
             using (var connection = new SqlConnection(connectionString))
@@ -57,6 +57,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                     command.Parameters.AddWithNullableValue("@Discount", model.Discount);
                     command.Parameters.AddWithNullableValue("@SalesQuotationId", model.SalesQuotationId);
                     command.Parameters.AddWithNullableValue("@SalesOrderId", model.SalesOrderId);
+                    command.Parameters.AddWithNullableValue("@SerialNumberIds", model.SerialNumberIds);
 
                     using (var details = this.GetDetails(model.Details))
                     {
@@ -83,8 +84,9 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
             table.Columns.Add("UnitId", typeof(int));
             table.Columns.Add("Price", typeof(decimal));
             table.Columns.Add("DiscountRate", typeof(decimal));
-            table.Columns.Add("Tax", typeof(decimal));
+            table.Columns.Add("Discount", typeof(decimal));
             table.Columns.Add("ShippingCharge", typeof(decimal));
+            table.Columns.Add("IsTaxed", typeof(bool));
 
             foreach (var detail in details)
             {
@@ -96,8 +98,9 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                 row["UnitId"] = detail.UnitId;
                 row["Price"] = detail.Price;
                 row["DiscountRate"] = detail.DiscountRate;
-                row["Tax"] = detail.Tax;
+                row["Discount"] = detail.Discount;
                 row["ShippingCharge"] = detail.ShippingCharge;
+                row["IsTaxed"] = detail.IsTaxed;
 
                 table.Rows.Add(row);
             }

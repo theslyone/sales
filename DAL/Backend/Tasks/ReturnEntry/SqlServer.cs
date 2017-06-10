@@ -18,7 +18,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.ReturnEntry
                                 @ValueDate, @BookDate, 
                                 @StoreId, @CounterId, @CustomerId, @PriceTypeId,
                                 @ReferenceNumber, @StatementReference, 
-                                @Details, @TranId OUTPUT
+                                @Details, @ShipperId, @Discount, @TranId OUTPUT
                             ;";
 
             using (var connection = new SqlConnection(connectionString))
@@ -44,6 +44,9 @@ namespace MixERP.Sales.DAL.Backend.Tasks.ReturnEntry
                     {
                         command.Parameters.AddWithNullableValue("@Details", details, "sales.sales_detail_type");
                     }
+
+                    command.Parameters.AddWithNullableValue("@ShipperId", model.ShipperId);
+                    command.Parameters.AddWithNullableValue("@Discount", model.Discount);
 
                     command.Parameters.Add("@TranId", SqlDbType.BigInt).Direction = ParameterDirection.Output;
 

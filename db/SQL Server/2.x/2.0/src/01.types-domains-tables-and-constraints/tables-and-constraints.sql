@@ -42,7 +42,7 @@ CREATE TABLE sales.gift_card_transactions
     transaction_master_id                   bigint NOT NULL REFERENCES finance.transaction_master,
     transaction_type                        national character varying(2) NOT NULL
                                             CHECK(transaction_type IN('Dr', 'Cr')),
-    amount                                  decimal(30, 6)
+    amount                                  numeric(30, 6)
 );
 
 CREATE TABLE sales.late_fee
@@ -64,7 +64,7 @@ CREATE TABLE sales.late_fee_postings
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     value_date                              date NOT NULL,
     late_fee_tran_id                        bigint NOT NULL REFERENCES finance.transaction_master,
-    amount                                  decimal(30, 6)
+    amount                                  numeric(30, 6)
 );
 
 CREATE TABLE sales.price_types
@@ -85,11 +85,24 @@ CREATE TABLE sales.item_selling_prices
     customer_type_id                        integer REFERENCES inventory.customer_types,
     price_type_id                           integer REFERENCES sales.price_types,
     includes_tax                            bit NOT NULL DEFAULT(0),
-    price                                   decimal(30, 6) NOT NULL,
+    price                                   numeric(30, 6) NOT NULL,
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
     deleted                                    bit DEFAULT(0)
 );
+
+CREATE TABLE sales.customerwise_selling_prices
+(
+	selling_price_id						bigint IDENTITY PRIMARY KEY,
+	item_id									integer NOT NULL REFERENCES inventory.items,
+	customer_id								integer NOT NULL REFERENCES inventory.customers,
+	unit_id									integer NOT NULL REFERENCES inventory.units,
+	price									numeric(30, 6),
+    audit_user_id                           integer REFERENCES account.users,
+    audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
+	deleted									bit DEFAULT(0)
+);
+
 
 CREATE TABLE sales.payment_terms
 (
@@ -128,7 +141,7 @@ CREATE TABLE sales.cashiers
                                             CHECK(valid_till >= valid_from),
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
-    deleted                                    bit DEFAULT(0)
+    deleted                                 bit DEFAULT(0)
 );
 
 CREATE UNIQUE INDEX cashiers_cashier_code_uix
@@ -148,7 +161,7 @@ CREATE TABLE sales.cashier_login_info
     user_agent                              national character varying(1000),    
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
-    deleted                                    bit DEFAULT(0)
+    deleted                                 bit DEFAULT(0)
 );
 
 
@@ -156,19 +169,25 @@ CREATE TABLE sales.quotations
 (
     quotation_id                            bigint IDENTITY PRIMARY KEY,
     value_date                              date NOT NULL,
-    expected_delivery_date                    date NOT NULL,
+    expected_delivery_date                  date NOT NULL,
     transaction_timestamp                   DATETIMEOFFSET NOT NULL DEFAULT(GETUTCDATE()),
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     price_type_id                           integer NOT NULL REFERENCES sales.price_types,
-    shipper_id                                integer REFERENCES inventory.shippers,
+    shipper_id                              integer REFERENCES inventory.shippers,
     user_id                                 integer NOT NULL REFERENCES account.users,
     office_id                               integer NOT NULL REFERENCES core.offices,
     reference_number                        national character varying(24),
-    terms                                    national character varying(500),
+    terms                                   national character varying(500),
     internal_memo                           national character varying(500),
+	taxable_total 							numeric(30, 6) NOT NULL DEFAULT(0),
+	discount 								numeric(30, 6) NOT NULL DEFAULT(0),
+	tax_rate 								numeric(30, 6) NOT NULL DEFAULT(0),
+	tax 									numeric(30, 6) NOT NULL DEFAULT(0),
+	nontaxable_total 						numeric(30, 6) NOT NULL DEFAULT(0),
+	cancelled								bit NOT NULL DEFAULT(0),
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
-    deleted                                    bit DEFAULT(0)
+    deleted                                 bit DEFAULT(0)
 );
 
 CREATE TABLE sales.quotation_details
@@ -177,12 +196,13 @@ CREATE TABLE sales.quotation_details
     quotation_id                            bigint NOT NULL REFERENCES sales.quotations,
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
-    price                                   decimal(30, 6) NOT NULL,
-    discount_rate                           decimal(30, 6) NOT NULL DEFAULT(0),    
-    tax                                     decimal(30, 6) NOT NULL DEFAULT(0),    
-    shipping_charge                         decimal(30, 6) NOT NULL DEFAULT(0),    
+    price                                   numeric(30, 6) NOT NULL,
+	discount_rate							numeric(30, 6) NOT NULL,
+    discount                          		numeric(30, 6) NOT NULL DEFAULT(0),    
+	is_taxed 								bit NOT NULL,
+    shipping_charge                         numeric(30, 6) NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
-    quantity                                decimal(30, 6) NOT NULL
+    quantity                                numeric(30, 6) NOT NULL
 );
 
 
@@ -191,19 +211,25 @@ CREATE TABLE sales.orders
     order_id                                bigint IDENTITY PRIMARY KEY,
     quotation_id                            bigint REFERENCES sales.quotations,
     value_date                              date NOT NULL,
-    expected_delivery_date                    date NOT NULL,
+    expected_delivery_date                  date NOT NULL,
     transaction_timestamp                   DATETIMEOFFSET NOT NULL DEFAULT(GETUTCDATE()),
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     price_type_id                           integer NOT NULL REFERENCES sales.price_types,
-    shipper_id                                integer REFERENCES inventory.shippers,
+    shipper_id                              integer REFERENCES inventory.shippers,
     user_id                                 integer NOT NULL REFERENCES account.users,
     office_id                               integer NOT NULL REFERENCES core.offices,
     reference_number                        national character varying(24),
     terms                                   national character varying(500),
     internal_memo                           national character varying(500),
+	taxable_total 							numeric(30, 6) NOT NULL DEFAULT(0),
+	discount 								numeric(30, 6) NOT NULL DEFAULT(0),
+	tax_rate 								numeric(30, 6) NOT NULL DEFAULT(0),
+	tax 									numeric(30, 6) NOT NULL DEFAULT(0),
+	nontaxable_total 						numeric(30, 6) NOT NULL DEFAULT(0),
+	cancelled								bit NOT NULL DEFAULT(0),
     audit_user_id                           integer REFERENCES account.users,
     audit_ts                                DATETIMEOFFSET DEFAULT(GETUTCDATE()),
-    deleted                                    bit DEFAULT(0)
+    deleted                                 bit DEFAULT(0)
 );
 
 CREATE TABLE sales.order_details
@@ -212,12 +238,13 @@ CREATE TABLE sales.order_details
     order_id                                bigint NOT NULL REFERENCES sales.orders,
     value_date                              date NOT NULL,
     item_id                                 integer NOT NULL REFERENCES inventory.items,
-    price                                   decimal(30, 6) NOT NULL,
-    discount_rate                           decimal(30, 6) NOT NULL DEFAULT(0),    
-    tax                                     decimal(30, 6) NOT NULL DEFAULT(0),    
-    shipping_charge                         decimal(30, 6) NOT NULL DEFAULT(0),    
+    price                                   numeric(30, 6) NOT NULL,
+	discount_rate							numeric(30, 6) NOT NULL,
+    discount                           		numeric(30, 6) NOT NULL DEFAULT(0),    
+	is_taxed 								bit NOT NULL,
+    shipping_charge                         numeric(30, 6) NOT NULL DEFAULT(0),    
     unit_id                                 integer NOT NULL REFERENCES inventory.units,
-    quantity                                decimal(30, 6) NOT NULL
+    quantity                                numeric(30, 6) NOT NULL
 );
 
 
@@ -226,19 +253,19 @@ CREATE TABLE sales.coupons
     coupon_id                                   integer IDENTITY PRIMARY KEY,
     coupon_name                                 national character varying(100) NOT NULL,
     coupon_code                                 national character varying(100) NOT NULL,
-    discount_rate                               decimal(30, 6) NOT NULL,
+    discount_rate                               numeric(30, 6) NOT NULL,
     is_percentage                               bit NOT NULL DEFAULT(0),
-    maximum_discount_amount                     decimal(30, 6),
+    maximum_discount_amount                     numeric(30, 6),
     associated_price_type_id                    integer REFERENCES sales.price_types,
-    minimum_purchase_amount                     decimal(30, 6),
-    maximum_purchase_amount                     decimal(30, 6),
+    minimum_purchase_amount                     numeric(30, 6),
+    maximum_purchase_amount                     numeric(30, 6),
     begins_from                                 date,
     expires_on                                  date,
     maximum_usage                               integer,
     enable_ticket_printing                      bit,
     for_ticket_of_price_type_id                 integer REFERENCES sales.price_types,
-    for_ticket_having_minimum_amount            decimal(30, 6),
-    for_ticket_having_maximum_amount            decimal(30, 6),
+    for_ticket_having_minimum_amount            numeric(30, 6),
+    for_ticket_having_maximum_amount            numeric(30, 6),
     for_ticket_of_unknown_customers_only        bit,
     audit_user_id                               integer REFERENCES account.users,
     audit_ts                                    DATETIMEOFFSET DEFAULT(GETUTCDATE()),
@@ -263,11 +290,11 @@ CREATE TABLE sales.sales
     counter_id                              integer NOT NULL REFERENCES inventory.counters,
     customer_id                             integer REFERENCES inventory.customers,
     salesperson_id                            integer REFERENCES account.users,
-    total_amount                            decimal(30, 6) NOT NULL,
+    total_amount                            numeric(30, 6) NOT NULL,
     coupon_id                                integer REFERENCES sales.coupons,
     is_flat_discount                        bit,
-    discount                                decimal(30, 6),
-    total_discount_amount                    decimal(30, 6),    
+    discount                                numeric(30, 6),
+    total_discount_amount                    numeric(30, 6),    
     is_credit                               bit NOT NULL DEFAULT(0),
     credit_settled                            bit,
     payment_term_id                         integer REFERENCES sales.payment_terms,
@@ -277,7 +304,7 @@ CREATE TABLE sales.sales
     check_number                            national character varying(100),
     check_date                              date,
     check_bank_name                         national character varying(1000),
-    check_amount                            decimal(30, 6),
+    check_amount                            numeric(30, 6),
     reward_points                            numeric(30, 6) NOT NULL DEFAULT(0)
 );
 
@@ -291,12 +318,12 @@ CREATE TABLE sales.customer_receipts
     transaction_master_id                   bigint NOT NULL REFERENCES finance.transaction_master,
     customer_id                             integer NOT NULL REFERENCES inventory.customers,
     currency_code                           national character varying(12) NOT NULL REFERENCES core.currencies,
-    er_debit                                decimal(30, 6) NOT NULL,
-    er_credit                               decimal(30, 6) NOT NULL,
+    er_debit                                numeric(30, 6) NOT NULL,
+    er_credit                               numeric(30, 6) NOT NULL,
     cash_repository_id                      integer NULL REFERENCES finance.cash_repositories,
     posted_date                             date NULL,
-    tender                                  decimal(30, 6),
-    change                                  decimal(30, 6),
+    tender                                  numeric(30, 6),
+    change                                  numeric(30, 6),
     amount                                  numeric(30, 6),
     collected_on_bank_id					integer REFERENCES finance.bank_accounts,
 	collected_bank_instrument_code			national character varying(500),
@@ -304,7 +331,7 @@ CREATE TABLE sales.customer_receipts
     check_number                            national character varying(100),
     check_date                              date,
     check_bank_name                         national character varying(1000),
-    check_amount                            decimal(30, 6),
+    check_amount                            numeric(30, 6),
     check_cleared                           bit,    
     check_clear_date                        date,   
     check_clearing_memo                     national character varying(1000),
@@ -398,13 +425,14 @@ AS TABLE
 (
     store_id            integer,
     transaction_type    national character varying(2),
-    item_id               integer,
-    quantity            decimal(30, 6),
-    unit_id               integer,
-    price               decimal(30, 6),
-    discount_rate       decimal(30, 6),
-    tax                 decimal(30, 6),
-    shipping_charge     decimal(30, 6)
+    item_id             integer,
+    quantity            numeric(30, 6),
+    unit_id             integer,
+    price               numeric(30, 6),
+    discount_rate       numeric(30, 6),
+    discount       		numeric(30, 6),
+    shipping_charge     numeric(30, 6),
+	is_taxed			bit
 );
 
 

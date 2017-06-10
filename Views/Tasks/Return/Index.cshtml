@@ -2,10 +2,17 @@
 @model dynamic
 
 @{
-    ViewBag.Title = I18N.SalesReturns;
+    ViewBag.Title = I18N.SalesEntries;
     Layout = ViewBag.SalesLayoutPath;
 }
-@Html.FinancePartialView("Shared/JournalView.cshtml", TenantConvention.GetTenant())
+
+@Html.FinancePartialView("Shared/SearchView.cshtml", TenantConvention.GetTenant())
+
 
 <script src="/Areas/MixERP.Sales/scripts/tasks/return/index.js"></script>
 
+<script>
+	setTimeout(function(){
+		prepareView(model);
+	}, 500);
+</script>

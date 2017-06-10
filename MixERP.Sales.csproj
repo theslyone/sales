@@ -85,6 +85,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\Frapid.Messaging.dll</HintPath>
     </Reference>
+    <Reference Include="Frapid.TokenManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\Frapid.TokenManager.dll</HintPath>
+    </Reference>
     <Reference Include="Frapid.WebsiteBuilder, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\Frapid.WebsiteBuilder.dll</HintPath>
@@ -94,8 +98,12 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="MixERP.Finance">
+    <Reference Include="MixERP.Finance, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\MixERP.Finance.dll</HintPath>
+    </Reference>
+    <Reference Include="MixERP.Inventory">
+      <HintPath>..\..\bin\MixERP.Inventory.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -163,7 +171,6 @@
     <Compile Include="Controllers\Backend\Tasks\OpeningCashController.cs" />
     <Compile Include="Controllers\Backend\Tasks\OrderController.cs" />
     <Compile Include="Controllers\Backend\Tasks\QuotationController.cs" />
-    <Compile Include="Controllers\Backend\Summary\SalesSummaryController.cs" />
     <Compile Include="Controllers\Backend\Tasks\ReceiptController.cs" />
     <Compile Include="Controllers\Backend\Tasks\SalesTicketController.cs" />
     <Compile Include="Controllers\Backend\Widgets\AccountReceivableController.cs" />
@@ -178,6 +185,7 @@
     <Compile Include="Controllers\Backend\Tasks\EntryController.cs" />
     <Compile Include="Controllers\Backend\Tasks\ItemController.cs" />
     <Compile Include="Controllers\Backend\Tasks\ReturnController.cs" />
+    <Compile Include="DAL\Backend\Setup\SellingPrices.cs" />
     <Compile Include="DAL\Backend\Service\GiftCards.cs" />
     <Compile Include="DAL\Backend\Service\SearchCustomer.cs" />
     <Compile Include="DAL\Backend\Tasks\ClosingCashTransactions.cs" />
@@ -192,13 +200,13 @@
     <Compile Include="DAL\Backend\Tasks\ReturnEntry\IReturnEntry.cs" />
     <Compile Include="DAL\Backend\Tasks\ReturnEntry\PostgreSQL.cs" />
     <Compile Include="DAL\Backend\Tasks\ReturnEntry\SqlServer.cs" />
-    <Compile Include="DAL\Backend\Summary\Sales.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntries.cs" />
     <Compile Include="DAL\Backend\Service\Items.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntry\ISalesEntry.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntry\PostgreSQL.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesEntry\SqlServer.cs" />
     <Compile Include="DAL\Backend\Tasks\SalesReturnEntries.cs" />
+    <Compile Include="DAL\Backend\Tasks\SerialNumbers.cs" />
     <Compile Include="DAL\Backend\Tasks\Ticket.cs" />
     <Compile Include="DAL\Backend\Widgets\AccountReceivables.cs" />
     <Compile Include="DAL\Backend\Widgets\TopCustomers.cs" />
@@ -207,6 +215,7 @@
     <Compile Include="DTO\ClosingCash.cs" />
     <Compile Include="DTO\CouponView.cs" />
     <Compile Include="DTO\CustomerTransactionSummary.cs" />
+    <Compile Include="DTO\CustomerwiseSellingPrice.cs" />
     <Compile Include="DTO\GiftCards.cs" />
     <Compile Include="DTO\ItemView.cs" />
     <Compile Include="DTO\MerchantFeeSetup.cs" />
@@ -219,6 +228,8 @@
     <Compile Include="DTO\QuotationInfo.cs" />
     <Compile Include="DTO\QuotationResultview.cs" />
     <Compile Include="DTO\SalesView.cs" />
+    <Compile Include="DTO\SerialNumbers.cs" />
+    <Compile Include="DTO\SerialNumberView.cs" />
     <Compile Include="ExceptionLogger.cs" />
     <Compile Include="Extensions\PartialViewExtensions.cs" />
     <Compile Include="I18N.cs" />
@@ -226,7 +237,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryModels\GiftCardSearch.cs" />
     <Compile Include="QueryModels\OrderQueryModel.cs" />
+    <Compile Include="QueryModels\OrderSearch.cs" />
     <Compile Include="QueryModels\QuotationQueryModel.cs" />
+    <Compile Include="QueryModels\QuotationSearch.cs" />
+    <Compile Include="QueryModels\ReceiptSearch.cs" />
+    <Compile Include="QueryModels\ReturnSearch.cs" />
+    <Compile Include="QueryModels\SalesSearch.cs" />
+    <Compile Include="ViewModels\CheckoutInfo.cs" />
     <Compile Include="ViewModels\ClosingCashViewModel.cs" />
     <Compile Include="ViewModels\OpeningCash.cs" />
     <Compile Include="ViewModels\CustomerSearchViewModel.cs" />
@@ -238,6 +255,7 @@
     <Compile Include="ViewModels\CustomerSearchResult.cs" />
     <Compile Include="ViewModels\SalesReceipt.cs" />
     <Compile Include="ViewModels\SalesReturn.cs" />
+    <Compile Include="ViewModels\ItemSerialNumber.cs" />
     <Compile Include="ViewModels\TicketViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -291,8 +309,6 @@
     <Content Include="scripts\tasks\receipt\checklist.js" />
     <Content Include="scripts\tasks\receipt\index.js" />
     <Content Include="scripts\tasks\receipt\new.js" />
-    <Content Include="scripts\tasks\receipt\verification.js" />
-    <Content Include="scripts\tasks\entry\verification.js" />
     <Content Include="scripts\tasks\entry\new.js" />
     <Content Include="scripts\tasks\entry\index.js" />
     <Content Include="scripts\tasks\opening-cash\index.js" />
@@ -305,7 +321,6 @@
     <Content Include="scripts\tasks\return\checklist.js" />
     <Content Include="scripts\tasks\return\index.js" />
     <Content Include="scripts\tasks\return\new.js" />
-    <Content Include="scripts\tasks\return\verification.js" />
     <Content Include="scripts\ticket\index.js" />
     <Content Include="scripts\tasks\closing-cash\index.js" />
     <Content Include="scripts\tasks\entry\checklist.js" />
@@ -377,6 +392,12 @@
     <Content Include="Views\Tasks\Receipt\New.cshtml" />
     <Content Include="Views\Tasks\Receipt\Verification.cshtml" />
     <Content Include="Views\Tasks\Console\Index.cshtml" />
+    <Content Include="Views\Tasks\Entry\ClassicCheckout.cshtml" />
+    <Content Include="Views\Tasks\Order\ClassicCheckout.cshtml" />
+    <Content Include="Views\Tasks\Quotation\ClassicCheckout.cshtml" />
+    <Content Include="Views\Tasks\Return\ClassicCheckout.cshtml" />
+    <Content Include="Views\Setup\CustomerSellingPrices.cshtml" />
+    <Content Include="Views\Tasks\Entry\SerialNumber.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

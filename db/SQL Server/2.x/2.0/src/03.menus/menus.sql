@@ -28,7 +28,7 @@ EXECUTE core.create_menu 'MixERP.Sales', 'SalesOrders', 'Sales Orders', '/dashbo
 EXECUTE core.create_menu 'MixERP.Sales', 'SalesEntryVerification', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks';
 EXECUTE core.create_menu 'MixERP.Sales', 'ReceiptVerification', 'Receipt Verification', '/dashboard/sales/tasks/receipt/verification', 'checkmark', 'Tasks';
 EXECUTE core.create_menu 'MixERP.Sales', 'SalesReturnVerification', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks';
-EXECUTE core.create_menu 'MixERP.Sales', 'CheckClearing', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks';
+--EXECUTE core.create_menu 'MixERP.Sales', 'CheckClearing', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks';
 EXECUTE core.create_menu 'MixERP.Sales', 'EOD', 'EOD', '/dashboard/sales/tasks/eod', 'money', 'Tasks';
 
 EXECUTE core.create_menu 'MixERP.Sales', 'CustomerLoyalty', 'Customer Loyalty', 'square outline', 'user', '';
@@ -43,6 +43,7 @@ EXECUTE core.create_menu 'MixERP.Sales', 'CustomerTypes','Customer Types', '/das
 EXECUTE core.create_menu 'MixERP.Sales', 'Customers', 'Customers', '/dashboard/sales/setup/customers', 'street view', 'Setup';
 EXECUTE core.create_menu 'MixERP.Sales', 'PriceTypes', 'Price Types', '/dashboard/sales/setup/price-types', 'ruble', 'Setup';
 EXECUTE core.create_menu 'MixERP.Sales', 'SellingPrices', 'Selling Prices', '/dashboard/sales/setup/selling-prices', 'in cart', 'Setup';
+EXECUTE core.create_menu 'MixERP.Sales', 'CustomerwiseSellingPrices', 'Customerwise Selling Prices', '/dashboard/sales/setup/selling-prices/customer', 'in cart', 'Setup';
 EXECUTE core.create_menu 'MixERP.Sales', 'LateFee', 'Late Fee', '/dashboard/sales/setup/late-fee', 'alarm mute', 'Setup';
 EXECUTE core.create_menu 'MixERP.Sales', 'PaymentTerms', 'Payment Terms', '/dashboard/sales/setup/payment-terms', 'checked calendar', 'Setup';
 EXECUTE core.create_menu 'MixERP.Sales', 'Cashiers', 'Cashiers', '/dashboard/sales/setup/cashiers', 'male', 'Setup';
@@ -60,7 +61,10 @@ EXECUTE core.create_menu 'MixERP.Sales', 'GiftCardSummary', 'Gift Card Summary',
 EXECUTE core.create_menu 'MixERP.Sales', 'QuotationStatus', 'Quotation Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/QuotationStatus.xml', 'list', 'Reports';
 EXECUTE core.create_menu 'MixERP.Sales', 'OrderStatus', 'Order Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/OrderStatus.xml', 'bar chart', 'Reports';
 EXECUTE core.create_menu 'MixERP.Sales', 'SalesDiscountStatus', 'Sales Discount Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesDiscountStatus.xml', 'shopping basket icon', 'Reports';
-
+EXECUTE core.create_menu 'MixERP.Sales', 'AccountReceivableByCustomer', 'Account Receivable By Customer Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountReceivableByCustomer.xml', 'list layout icon', 'Reports';
+EXECUTE core.create_menu 'MixERP.Sales', 'ReceiptJournalSummary', 'Receipt Journal Summary Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ReceiptJournalSummary.xml', 'angle double left icon', 'Reports';
+EXECUTE core.create_menu 'MixERP.Sales', 'AccountantSummary', 'Accountant Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountantSummary.xml', 'address book outline icon', 'Reports';
+EXECUTE core.create_menu 'MixERP.Sales', 'ClosedOut', 'Closed Out Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ClosedOut.xml', 'book icon', 'Reports';
 
 DECLARE @office_id integer = core.get_office_id_by_office_name('Default');
 EXECUTE auth.create_app_menu_policy

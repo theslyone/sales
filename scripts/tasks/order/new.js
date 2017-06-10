@@ -10,7 +10,7 @@
 function mergeDetails(model) {
     $(document).off("itemAdded").on("itemAdded", function (e, itemId, el) {
         const item = window.Enumerable.From(model).Where(function (x) {
-            return x.ItemId === window.parseInt(itemId);
+            return x.ItemId === window.parseInt2(itemId);
         }).FirstOrDefault();
 
         const quantityInput = el.find("input.quantity");
@@ -107,12 +107,14 @@ $("#CheckoutButton").off("click").on("click", function () {
 
             $.each(items, function () {
                 const el = $(this);
-                const itemId = parseInt(el.attr("data-item-id"));
-                const quantity = parseFloat(el.find("input.quantity").val());
-                const unitId = parseInt(el.find("select.unit").val());
-                const price = parseFloat(el.find("input.price").val()) || 0;
-                const discount = parseFloat(el.find("input.discount").val()) || 0;
-                const tax = parseFloat(el.find(".tax-amount").html()) || 0;
+                const itemId = window.parseInt2(el.attr("data-item-id"));
+                const quantity = window.parseFloat2(el.find("input.quantity").val());
+                const unitId = window.parseInt2(el.find("select.unit").val());
+                const price = window.parseFloat2(el.find("input.price").val()) || 0;
+                const discountRate = window.parseFloat2(el.find("input.discount").val()) || 0;
+                const isTaxableItem = el.attr("data-is-taxable-item") === "true";
+                const amount = price * quantity;
+                const discount = window.round(amount * discountRate / 100, 2);
 
                 model.push({
                     ValueDate: $("#ValueDateInputDate").datepicker("getDate"),
@@ -120,8 +122,9 @@ $("#CheckoutButton").off("click").on("click", function () {
                     Quantity: quantity,
                     UnitId: unitId,
                     Price: price,
-                    Tax: tax,
-                    DiscountRate: discount
+                    DiscountRate: discountRate,
+                    Discount: discount,
+                    IsTaxed: isTaxableItem
                 });
             });
 
@@ -137,6 +140,51 @@ $("#CheckoutButton").off("click").on("click", function () {
         const priceTypeId = $("#PriceTypeSelect").val();
         const shipperId = $("#ShipperSelect").val();
         const details = getDetails();
+        const discount = window.parseFloat2($("#DiscountInputText").val());
+        var taxRate = window.parseFloat2($("#SalesTaxRateHidden").val()) || 0;
+
+        var totalPrice = 0;
+        var taxableTotal = 0;
+        var nonTaxableTotal = 0;
+        var totalBeforeDiscount = 0;
+        var tax = 0;
+
+        (function () {
+            const items = $("#SalesItems .item");
+
+            $.each(items, function () {
+                const el = $(this);
+                const itemId = window.parseInt2(el.attr("data-item-id"));
+                const quantity = window.parseFloat2(el.find("input.quantity").val());
+                const unitId = window.parseInt2(el.find("select.unit").val());
+                const price = window.parseFloat2(el.find("input.price").val()) || 0;
+                const discountRate = window.parseFloat2(el.find("input.discount").val()) || 0;
+                const isTaxableItem = el.attr("data-is-taxable-item") === "true";
+                var discount = 0;
+                const amount = price * quantity;
+                const discountedAmount = amount * ((100 - discountRate) / 100);
+
+                if (isTaxableItem) {
+                    taxableTotal += discountedAmount;
+                } else {
+                    nonTaxableTotal += discountedAmount;
+                };
+
+                totalPrice += discountedAmount;
+            });
+
+            taxableTotal = window.round(taxableTotal, 2);
+            nonTaxableTotal = window.round(nonTaxableTotal, 2);
+
+            totalBeforeDiscount = taxableTotal;
+            totalPrice -= discount;
+            taxableTotal -= discount;
+
+            tax = taxableTotal * (taxRate / 100);
+            totalPrice += tax;
+
+            totalPrice = window.round(totalPrice, 2);
+        })();
 
         return {
             ValueDate: valueDate,
@@ -147,7 +195,12 @@ $("#CheckoutButton").off("click").on("click", function () {
             CustomerId: customerId,
             PriceTypeId: priceTypeId,
             ShipperId: shipperId,
-            Details: details
+            Details: details,
+            TaxableTotal: totalBeforeDiscount,
+            Discount: discount,
+            NonTaxableTotal: nonTaxableTotal,
+            TaxRate: taxRate,
+            Tax: tax
         };
     };
 

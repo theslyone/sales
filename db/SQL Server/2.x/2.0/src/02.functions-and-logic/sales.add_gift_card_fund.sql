@@ -12,7 +12,7 @@ CREATE PROCEDURE sales.add_gift_card_fund
     @value_date                                 date,
     @book_date                                  date,
     @debit_account_id                           integer,
-    @amount                                     decimal(30, 6),
+    @amount                                     numeric(30, 6),
     @cost_center_id                             integer,
     @reference_number                           national character varying(24), 
     @statement_reference                        national character varying(2000)

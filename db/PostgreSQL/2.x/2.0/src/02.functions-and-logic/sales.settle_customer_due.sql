@@ -36,19 +36,14 @@ BEGIN
     SELECT 
         SUM
         (
-            (inventory.checkout_details.quantity * inventory.checkout_details.price) 
-            - 
-            inventory.checkout_details.discount 
-            + 
-            inventory.checkout_details.tax
-            + 
-            inventory.checkout_details.shipping_charge
+            COALESCE(inventory.checkouts.taxable_total, 0) + 
+            COALESCE(inventory.checkouts.tax, 0) + 
+            COALESCE(inventory.checkouts.nontaxable_total, 0) - 
+            COALESCE(inventory.checkouts.discount, 0)
         ) INTO _total_sales
     FROM inventory.checkouts
     INNER JOIN sales.sales
     ON sales.sales.checkout_id = inventory.checkouts.checkout_id
-    INNER JOIN inventory.checkout_details
-    ON inventory.checkouts.checkout_id = inventory.checkout_details.checkout_id
     INNER JOIN finance.transaction_master
     ON inventory.checkouts.transaction_master_id = finance.transaction_master.transaction_master_id
     WHERE finance.transaction_master.verification_status_id > 0
@@ -65,19 +60,14 @@ BEGIN
             inventory.checkouts.transaction_master_id,
             SUM
             (
-                (inventory.checkout_details.quantity * inventory.checkout_details.price) 
-                - 
-                inventory.checkout_details.discount 
-                + 
-                inventory.checkout_details.tax
-                + 
-                inventory.checkout_details.shipping_charge
+                COALESCE(inventory.checkouts.taxable_total, 0) + 
+                COALESCE(inventory.checkouts.tax, 0) + 
+                COALESCE(inventory.checkouts.nontaxable_total, 0) - 
+                COALESCE(inventory.checkouts.discount, 0)
             ) as due
         FROM inventory.checkouts
         INNER JOIN sales.sales
         ON sales.sales.checkout_id = inventory.checkouts.checkout_id
-        INNER JOIN inventory.checkout_details
-        ON inventory.checkouts.checkout_id = inventory.checkout_details.checkout_id
         INNER JOIN finance.transaction_master
         ON inventory.checkouts.transaction_master_id = finance.transaction_master.transaction_master_id
         WHERE finance.transaction_master.book = ANY(ARRAY['Sales.Direct', 'Sales.Delivery'])

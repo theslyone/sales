@@ -1,14 +1,21 @@
 ﻿function displayTable(target, model) {
     target.find("tbody").html("");
 
-    function getCell(text, isDate) {
+    function getCell(text, isDate, hasTime) {
         const cell = $("<td />");
 
         cell.text(text);
 
         if (isDate) {
-            if ((text || "").trim()) {
-                cell.text(window.moment(new Date(text)).fromNow() || "");
+            const date = new Date(text);
+
+            if (hasTime) {
+                if ((text || "").trim()) {
+                    cell.text(window.moment(date).fromNow() || "");
+                    cell.attr("title", date.toLocaleString());
+                };
+            } else {
+                cell.text(date.toLocaleDateString());
                 cell.attr("title", text);
             };
         };
@@ -50,7 +57,14 @@
         return cell;
     };
 
-    $.each(model, function () {
+    const sorted = window.Enumerable.From(model)
+        .OrderByDescending(function (x) {
+            return new Date(x.ValueDate);
+        }).ThenByDescending(function (x) {
+            return new Date(x.LastVerifiedOn);
+        }).ToArray();
+
+    $.each(sorted, function () {
         const item = this;
 
         const row = $("<tr />");
@@ -59,8 +73,8 @@
         row.append(getSelectionCell(item.TransactionMasterId));
         row.append(getCell(item.TransactionMasterId));
         row.append(getCell(item.TransactionCode));
-        row.append(getCell(item.ValueDate, true));
-        row.append(getCell(item.BookDate, true));
+        row.append(getCell(item.ValueDate, true, false));
+        row.append(getCell(item.BookDate, true, false));
         row.append(getCell(item.CustomerName));
         row.append(getCell(item.Amount));
         row.append(getCell(item.ReferenceNumber));
@@ -69,7 +83,7 @@
         row.append(getCell(item.OfficeName));
         row.append(getCell(item.Status));
         row.append(getCell(item.VerifiedBy));
-        row.append(getCell(item.LastVerifiedOn, true));
+        row.append(getCell(item.LastVerifiedOn, true, true));
         row.append(getCell(item.VerificationReason));
 
         target.find("tbody").append(row);
@@ -149,7 +163,7 @@ function getSelectedItem() {
     if (selected.length) {
         const row = selected.parent().parent().parent();
         const id = row.find("td:nth-child(3)").html();
-        return parseInt(id);
+        return window.parseInt2(id);
     };
 
     return 0;
@@ -226,11 +240,11 @@ verifyButton.click(function () {
     const ajax = request(model, type);
 
     ajax.success(function (response) {
-        var cascadingTranId = parseFloat(response);
+        var cascadingTranId = window.parseFloat2(response);
 
         if (cascadingTranId) {
             journalView.find("tr td:nth-child(3)").each(function (i) {
-                const tranId = parseFloat($(this).text()) || 0;
+                const tranId = window.parseFloat2($(this).text()) || 0;
 
                 if (cascadingTranId === tranId) {
                     removeRow(i);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.ReturnEntry
                                 @ValueDate::date, @BookDate::date, 
                                 @StoreId::integer, @CounterId::integer, @CustomerId, @PriceTypeId::integer,
                                 @ReferenceNumber::national character varying(24), @StatementReference::text, 
-                                ARRAY[{0}]
+                                ARRAY[{0}], @ShipperId, @Discount
                             );";
             sql = string.Format(sql, this.GetParametersForDetails(model.Details));
 
@@ -48,6 +49,9 @@ namespace MixERP.Sales.DAL.Backend.Tasks.ReturnEntry
 
                     command.Parameters.AddRange(this.AddParametersForDetails(model.Details).ToArray());
 
+                    command.Parameters.AddWithNullableValue("@ShipperId", model.ShipperId);
+                    command.Parameters.AddWithNullableValue("@Discount", model.Discount);
+
                     connection.Open();
                     var awaiter = await command.ExecuteScalarAsync().ConfigureAwait(false);
                     return awaiter.To<long>();
@@ -66,7 +70,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.ReturnEntry
             for (int i = 0; i < details.Count; i++)
             {
                 items.Add(string.Format(CultureInfo.InvariantCulture,
-                    "ROW(@StoreId{0}, @TransactionType{0}, @ItemId{0}, @Quantity{0}, @UnitId{0}, @Price{0}, @DiscountRate{0}, @Tax{0}, @ShippingCharge{0})::sales.sales_detail_type",
+                    "ROW(@StoreId{0}, @TransactionType{0}, @ItemId{0}, @Quantity{0}, @UnitId{0}, @Price{0}, @DiscountRate{0}, @Discount{0}, @ShippingCharge{0}, @IsTaxed{0})::sales.sales_detail_type",
                     i.ToString(CultureInfo.InvariantCulture)));
             }
 
@@ -88,7 +92,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.ReturnEntry
                     parameters.Add(new NpgsqlParameter("@UnitId" + i, details[i].UnitId));
                     parameters.Add(new NpgsqlParameter("@Price" + i, details[i].Price));
                     parameters.Add(new NpgsqlParameter("@DiscountRate" + i, details[i].DiscountRate));
-                    parameters.Add(new NpgsqlParameter("@Tax" + i, details[i].Tax));
+                    parameters.Add(new NpgsqlParameter("@Tax" + i, DBNull.Value));//The tax will be determined on the database level
                     parameters.Add(new NpgsqlParameter("@ShippingCharge" + i, details[i].ShippingCharge));
                 }
             }

@@ -5,19 +5,19 @@ GO
 CREATE FUNCTION sales.get_account_receivable_widget_details(@office_id integer)
 RETURNS @result TABLE
 (
-    all_time_sales                              decimal(30, 6),
-    all_time_receipt                            decimal(30, 6),
-    receivable_of_all_time                      decimal(30, 6),
-    this_months_sales                           decimal(30, 6),
-    this_months_receipt                         decimal(30, 6),
-    receivable_of_this_month                    decimal(30, 6)
+    all_time_sales                              numeric(30, 6),
+    all_time_receipt                            numeric(30, 6),
+    receivable_of_all_time                      numeric(30, 6),
+    this_months_sales                           numeric(30, 6),
+    this_months_receipt                         numeric(30, 6),
+    receivable_of_this_month                    numeric(30, 6)
 )
 AS
 BEGIN
-    DECLARE @all_time_sales                     decimal(30, 6);
-    DECLARE @all_time_receipt                   decimal(30, 6);
-    DECLARE @this_months_sales                  decimal(30, 6);
-    DECLARE @this_months_receipt                decimal(30, 6);
+    DECLARE @all_time_sales                     numeric(30, 6);
+    DECLARE @all_time_receipt                   numeric(30, 6);
+    DECLARE @this_months_sales                  numeric(30, 6);
+    DECLARE @this_months_receipt                numeric(30, 6);
     DECLARE @start_date                         date = finance.get_month_start_date(@office_id);
     DECLARE @end_date                           date = finance.get_month_end_date(@office_id);
 

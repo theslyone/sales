@@ -1,5 +1,5 @@
 ﻿var itemTemplate =
-    `<div class="item" id="pos-{ItemId}" data-selling-price="{InvariantCultureSellingPrice}" data-photo="{Photo}" data-unit-id="{UnitId}" data-valid-units="{ValidUnits}" data-brand="{BrandName}" data-item-group="{ItemGroupName}" data-item-name="{ItemName}" data-item-code="{ItemCode}" data-item-id="{ItemId}" data-price="{Price}">
+    `<div class="item" id="pos-{ItemId}" data-selling-price="{InvariantCultureSellingPrice}" data-photo="{Photo}" data-unit-id="{UnitId}" data-valid-units="{ValidUnits}" data-brand="{BrandName}" data-item-group="{ItemGroupName}" data-item-name="{ItemName}" data-item-code="{ItemCode}" data-item-id="{ItemId}" data-price="{Price}" data-is-taxable-item="{IsTaxableItem}">
 	<div class="photo block">
 		<img src="{Photo}">
 	</div>
@@ -17,14 +17,6 @@
 			<span class="discount rate"></span>
 			<span>&nbsp; =&nbsp; </span>
 			<span class="discounted amount"></span>
-		</div>
-		<div class ="tax info" style="display:none;">
-			<span>${window.translate("AddTax")} </span>
-			<span class ="tax-amount"></span>
-			<span> (</span>
-			<span class ="tax-rate"></span>
-			<span>%) = </span>
-			<span class="amount-plus-tax"></span>
 		</div>
 		<div>
 			<select class="unit inverted" data-item-id="{ItemId}">
@@ -49,19 +41,19 @@ function defaulPOSItemClick(el, callback) {
     $(".footer.items").show();
     targetEl.show();
 
-    var sellingPrice = parseFloat(el.attr("data-selling-price")) || 0;
+    var sellingPrice = window.parseFloat2(el.attr("data-selling-price")) || 0;
     var photo = el.attr("data-photo") || "";
 
     var barCode = el.attr("data-barcode");
     var brand = el.attr("data-brand");
-    var unitId = el.attr("data-unit-id");
+    var unitId = window.parseInt2(el.attr("data-unit-id"));
     var validUnits = el.attr("data-valid-units");
     var itemGroup = el.attr("data-item-group");
     var itemName = el.attr("data-item-name");
     var itemCode = el.attr("data-item-code");
-    var itemId = el.attr("data-item-id");
+    var itemId = window.parseInt2(el.attr("data-item-id"));
     var isTaxableItem = el.attr("data-is-taxable-item") === "true";
-    var taxRate = parseFloat($("#SalesTaxRateHidden").val()) || 0;
+    var taxRate = window.parseFloat2($("#SalesTaxRateHidden").val()) || 0;
 
     var price = sellingPrice;
 
@@ -103,6 +95,7 @@ function defaulPOSItemClick(el, callback) {
     template = template.replace(/{Price}/g, price);
     template = template.replace(/{UnitId}/g, unitId);
     template = template.replace(/{ValidUnits}/g, validUnits);
+    template = template.replace(/{IsTaxableItem}/g, isTaxableItem.toString());
 
     var item = $(template);
     var quantityInput = item.find("input.quantity");
@@ -137,14 +130,14 @@ function defaulPOSItemClick(el, callback) {
     loadUnits(unitSelect, unitId, validUnits.split(','));
 
     function updateItemInfo(el) {
-        window.setNumberFormat();
+        window.setRegionalFormat();
         const quantityEl = el.find("input.quantity");
         const discountEl = el.find("input.discount");
 
-        const quantity = parseFloat(quantityEl.val()) || 0;
-        const discountRate = parseFloat(discountEl.val()) || 0;
+        const quantity = window.parseFloat2(quantityEl.val()) || 0;
+        const discountRate = window.parseFloat2(discountEl.val()) || 0;
 
-        const price = parseFloat(el.find("input.price").val()) || 0;
+        const price = window.parseFloat2(el.find("input.price").val()) || 0;
 
         const amount = window.round(price * quantity, 2);
         const discountedAmount = window.round((price * quantity) * ((100 - discountRate) / 100), 2);
@@ -164,15 +157,6 @@ function defaulPOSItemClick(el, callback) {
             el.find(".discount.info").hide();
         };
 
-        if (isTaxableItem) {
-            const tax = window.round(discountedAmount * taxRate / 100, 2);
-            const amountPlusTax = window.round(discountedAmount + tax, 2);
-            el.find(".tax.info .tax-amount").html(window.getFormattedNumber(tax));
-            el.find(".tax.info .tax-rate").html(window.getFormattedNumber(window.round(taxRate, 2)));
-            el.find(".tax.info .amount-plus-tax").html(window.getFormattedNumber(amountPlusTax));
-            el.find(".tax.info").show();
-        };
-
         window.updateTotal();
     };
 
@@ -185,7 +169,7 @@ function defaulPOSItemClick(el, callback) {
     discountInput.on("keyup", function () {
         const el = $(this);
 
-        const rate = parseFloat(el.val()) || 0;
+        const rate = window.parseFloat2(el.val()) || 0;
         if (rate > 100) {
             el.val("100");
             return;
@@ -230,8 +214,8 @@ function defaulPOSItemClick(el, callback) {
         };
 
         const itemId = el.attr("data-item-id");
-        const customerId = parseInt($("#CustomerInputText").attr("data-customer-id")) || 0;
-        const priceTypeId = parseInt($("#PriceTypeSelect").val()) || 0;
+        const customerId = window.parseInt2($("#CustomerInputText").attr("data-customer-id")) || 0;
+        const priceTypeId = window.parseInt2($("#PriceTypeSelect").val()) || 0;
         const unitId = el.val();
 
         $(".action.panel.segment").addClass("loading");
@@ -265,7 +249,7 @@ function defaulPOSItemClick(el, callback) {
 
     item.appendTo(targetEl);
     quantityInput.trigger("keyup");
-    window.setNumberFormat();
+    window.setRegionalFormat();
     window.updateTotal();
 
     var tabId = window.getSelectedTabId();
@@ -430,6 +414,12 @@ function displayProducts(category, searchQuery) {
     $.each(groupItems, function () {
         const product = this;
 
+        var sellingPrice = product.SellingPrice;
+
+        if (product.SellingPriceIncludesTax) {
+            sellingPrice = (100 * sellingPrice) / (100 + window.parseFloat2(product.SalesTaxRate));
+            sellingPrice = window.round(sellingPrice, 2);
+        };
 
         const item = $("<div class='item' />");
         item.attr("data-item-id", product.ItemId);
@@ -442,7 +432,8 @@ function displayProducts(category, searchQuery) {
         item.attr("data-barcode", product.Barcode);
         item.attr("data-photo", product.Photo);
         item.attr("data-is-taxable-item", product.IsTaxableItem);
-        item.attr("data-selling-price", product.SellingPrice);
+        item.attr("data-selling-price", sellingPrice);
+        item.attr("data-selling-price-includes-tax", product.SellingPriceIncludesTax);
 
         if (product.HotItem) {
             item.addClass("hot");
@@ -451,7 +442,7 @@ function displayProducts(category, searchQuery) {
         const info = $("<div class='info' />");
 
         const price = $("<div class='price' />");
-        price.html(window.getFormattedNumber(product.SellingPrice));
+        price.html(window.getFormattedNumber(sellingPrice));
 
         price.appendTo(info);
 

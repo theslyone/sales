@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                                 @CustomerId::integer, @PriceTypeId::integer, @ShipperId::integer, @StoreId::integer,
                                 @CouponCode::national character varying(100), @IsFlatDiscount::boolean, @Discount::public.money_strict2,
                                 ARRAY[{0}],
-                                @SalesQuotationId::bigint, @SalesOrderId::bigint
+                                @SalesQuotationId::bigint, @SalesOrderId::bigint, @SerialNumberIds::text
                             );";
             sql = string.Format(sql, this.GetParametersForDetails(model.Details));
 
@@ -60,6 +61,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                     command.Parameters.AddWithNullableValue("@Discount", model.Discount);
                     command.Parameters.AddWithNullableValue("@SalesQuotationId", model.SalesQuotationId);
                     command.Parameters.AddWithNullableValue("@SalesOrderId", model.SalesOrderId);
+                    command.Parameters.AddWithNullableValue("@SerialNumberIds", model.SerialNumberIds);
 
                     command.Parameters.AddRange(this.AddParametersForDetails(model.Details).ToArray());
 
@@ -81,7 +83,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
             for (int i = 0; i < details.Count; i++)
             {
                 items.Add(string.Format(CultureInfo.InvariantCulture,
-                    "ROW(@StoreId{0}, @TransactionType{0}, @ItemId{0}, @Quantity{0}, @UnitId{0}, @Price{0}, @DiscountRate{0}, @Tax{0}, @ShippingCharge{0})::sales.sales_detail_type",
+                    "ROW(@StoreId{0}, @TransactionType{0}, @ItemId{0}, @Quantity{0}, @UnitId{0}, @Price{0}, @DiscountRate{0}, @Discount{0}, @ShippingCharge{0}, @IsTaxed{0})::sales.sales_detail_type",
                     i.ToString(CultureInfo.InvariantCulture)));
             }
 
@@ -103,7 +105,9 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                     parameters.Add(new NpgsqlParameter("@UnitId" + i, details[i].UnitId));
                     parameters.Add(new NpgsqlParameter("@Price" + i, details[i].Price));
                     parameters.Add(new NpgsqlParameter("@DiscountRate" + i, details[i].DiscountRate));
-                    parameters.Add(new NpgsqlParameter("@Tax" + i, details[i].Tax));
+                    parameters.Add(new NpgsqlParameter("@Discount" + i, details[i].Discount));
+                    parameters.Add(new NpgsqlParameter("@IsTaxed" + i, details[i].IsTaxed));
+                    
                     parameters.Add(new NpgsqlParameter("@ShippingCharge" + i, details[i].ShippingCharge));
                 }
             }

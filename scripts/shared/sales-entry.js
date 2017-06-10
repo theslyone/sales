@@ -9,13 +9,12 @@ function getModel() {
 
         $.each(items, function () {
             const el = $(this);
-            const itemId = parseInt(el.attr("data-item-id"));
-            const quantity = parseFloat(el.find("input.quantity").val()) || 0;
-            const unitId = parseInt(el.find("select.unit").val());
-            const price = parseFloat(el.find("input.price").val()) || 0;
-            const discountRate = parseFloat(el.find("input.discount").val()) || 0;
+            const itemId = window.parseInt2(el.attr("data-item-id"));
+            const quantity = window.parseFloat2(el.find("input.quantity").val()) || 0;
+            const unitId = window.parseInt2(el.find("select.unit").val());
+            const price = window.parseFloat2(el.find("input.price").val()) || 0;
+            const discountRate = window.parseFloat2(el.find("input.discount").val()) || 0;
             const discount = (price * quantity) * (discountRate / 100);
-            const tax = window.parseFloat2(el.find(".tax-amount").html());
 
             model.push({
                 StoreId: $("#StoreSelect").val(),
@@ -24,8 +23,7 @@ function getModel() {
                 UnitId: unitId,
                 Price: price,
                 DiscountRate: discountRate,
-                Discount: discount,
-                Tax: tax
+                Discount: discount
             });
         });
 
@@ -33,15 +31,15 @@ function getModel() {
     };
 
     //Cash
-    const tender = parseFloat($("#TenderInputText").val()) || 0;
-    const change = parseFloat($("#ChangeInputText").val()) || 0;
+    const tender = window.parseFloat2($("#TenderInputText").val()) || 0;
+    const change = window.parseFloat2($("#ChangeInputText").val()) || 0;
 
     //Credit
-    const counterId = parseInt($("#CounterSelect").val()) || null;
-    const paymentTermId = parseInt($("#PaymentTermSelect").val()) || null;
+    const counterId = window.parseInt2($("#CounterSelect").val()) || null;
+    const paymentTermId = window.parseInt2($("#PaymentTermSelect").val()) || null;
 
     //Check
-    const checkAmount = parseFloat($("#CheckAmountInputText").val()) || null;
+    const checkAmount = window.parseFloat2($("#CheckAmountInputText").val()) || null;
     const bankName = $("#BankNameInputText").val();
     const checkNumber = $("#CheckNumberInputText").val();
     const checkDate = $("#CheckDateInputText").datepicker("getDate");
@@ -54,22 +52,22 @@ function getModel() {
     const couponCode = $("#CouponCodeInputText").val();
 
     //Discount
-    const discountType = $("#DiscountTypeSelect").val();
-    const discount = parseFloat($("#DiscountInputText").val()) || 0;
+    const discountType = window.parseInt2($("#DiscountTypeSelect").val());
+    const discount = window.parseFloat2($("#DiscountInputText").val()) || 0;
 
     const valueDate = $("#ValueDateInputText").datepicker("getDate");
     const bookDate = $("#BookDateInputText").datepicker("getDate");
-    const costCenterId = parseInt($("#CostCenterSelect").val()) || null;
+    const costCenterId = window.parseInt2($("#CostCenterSelect").val()) || null;
     const referenceNumber = $("#ReferenceNumberInputText").val();
     const statementReference = $("#StatementReferenceInputText").val();
-    const customerId = parseInt($("#CustomerInputText").attr("data-customer-id")) || null;
+    const customerId = window.parseInt2($("#CustomerInputText").attr("data-customer-id")) || null;
     const customerName = $("#CustomerInputText").val();
     const priceTypeId = $("#PriceTypeSelect").val();
     const shipperId = $("#ShipperSelect").val();
     const storeId = $("#StoreSelect").val();
     const details = getDetails();
-    const quotationId = parseInt(window.getQueryStringByName("QuotationId")) || null;
-    const orderId = parseInt(window.getQueryStringByName("OrderId")) || null;
+    const quotationId = window.parseInt2(window.getQueryStringByName("QuotationId")) || null;
+    const orderId = window.parseInt2(window.getQueryStringByName("OrderId")) || null;
 
     return {
         Tender: tender,
@@ -127,7 +125,7 @@ function clearState() {
 clearState();
 
 function getSelectedTabId() {
-    const id = parseInt($(".tabs .selected.item:not(.new)").html());
+    const id = window.parseInt2($(".tabs .selected.item:not(.new)").html());
     return id;
 };
 
@@ -239,15 +237,16 @@ function showTicket(id) {
 
 function updateTenderInfo() {
     const total = window.parseFloat2($(".amount.item .money").text());
-    const tender = parseFloat($("#TenderInputText").val()) || 0;
+    const tender = window.parseFloat2($("#TenderInputText").val()) || 0;
 
-    var change = tender - total;
+    var change = window.round(tender - total, 2);
 
     if (change < 0) {
-        change = "ERROR";
+        $("#ChangeInputText").val("ERROR");
+        return;
     };
 
-    $("#ChangeInputText").val(change);
+    $("#ChangeInputText").val(window.getFormattedNumber(change));
 };
 
 $("#TenderInputText").on("keyup", function () {
@@ -263,9 +262,9 @@ $("#CheckoutButton").off("click").on("click", function () {
 
     function validate() {
         var transactionTotal = window.parseFloat2($("div.amount .money").text());
-        var cashTender = parseFloat($("#TenderInputText").val()) || 0;
-        var paymentTerm = parseInt($("#PaymentTermSelect").val()) || null;
-        var checkAmount = parseFloat($("#CheckAmountInputText").val()) || 0;
+        var cashTender = window.parseFloat2($("#TenderInputText").val()) || 0;
+        var paymentTerm = window.parseInt2($("#PaymentTermSelect").val()) || null;
+        var checkAmount = window.parseFloat2($("#CheckAmountInputText").val()) || 0;
         var bankName = $("#BankNameInputText").val();
         var checkDate = $("#CheckDateInputText").datepicker("getDate");
         var checkNumber = $("#CheckNumberInputText").val();

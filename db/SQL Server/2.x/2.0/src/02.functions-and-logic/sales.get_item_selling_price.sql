@@ -3,16 +3,16 @@ DROP FUNCTION sales.get_item_selling_price;
 
 GO
 
-CREATE FUNCTION sales.get_item_selling_price(@item_id integer, @customer_type_id integer, @price_type_id integer, @unit_id integer)
-RETURNS decimal(30, 6)
+CREATE FUNCTION sales.get_item_selling_price(@office_id integer, @item_id integer, @customer_type_id integer, @price_type_id integer, @unit_id integer)
+RETURNS numeric(30, 6)
 AS
 BEGIN
-    DECLARE @price              decimal(30, 6);
+    DECLARE @price              numeric(30, 6);
     DECLARE @costing_unit_id    integer;
-    DECLARE @factor             decimal(30, 6);
-    DECLARE @tax_rate           decimal(30, 6);
+    DECLARE @factor             numeric(30, 6);
+    DECLARE @tax_rate           numeric(30, 6);
     DECLARE @includes_tax       bit;
-    DECLARE @tax                decimal(30, 6);
+    DECLARE @tax                numeric(30, 6);
 
     --Fist pick the catalog price which matches all these fields:
     --Item, Customer Type, Price Type, and Unit.
@@ -71,7 +71,7 @@ BEGIN
 
     IF(@includes_tax = 1)
     BEGIN
-        SET @tax_rate = core.get_item_tax_rate(@item_id);
+        SET @tax_rate = finance.get_sales_tax_rate(@office_id);
         SET @price = @price / ((100 + @tax_rate)/ 100);
     END;
 

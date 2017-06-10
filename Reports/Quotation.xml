@@ -11,12 +11,12 @@
         </td>
       </tr>
       <tr>
-        <td>{i18n.TransactionDate}</td>
-        <td>{DataSource[0].transaction_timestamp}</td>
-      </tr>
-      <tr>
         <td>{i18n.ValueDate}</td>
         <td>{DataSource[0].value_date}</td>
+      </tr>
+      <tr>
+        <td>{i18n.ExpectedDeliveryDate}</td>
+        <td>{DataSource[0].expected_delivery_date}</td>
       </tr>
       <tr>
         <td>{i18n.EnteredBy}</td>
@@ -30,12 +30,20 @@
         <td>{i18n.CustomerName}</td>
         <td>{DataSource[0].customer_name}</td>
       </tr>
+      <tr>
+        <td>{i18n.Terms}</td>
+        <td> {DataSource[0].terms}</td>
+      </tr>
+      <tr>
+        <td>{i18n.Cancelled}</td>
+        <td> {DataSource[0].cancelled}</td>
+      </tr>
     </table>
     <br />
   </TopSection>
   <Body>
     <Content>
-      <h2>{i18n.QuotationItems}</h2>
+      <h2>{i18n.QuotationDetails}</h2>
     </Content>
     <GridViews>
       <GridView>
@@ -45,67 +53,121 @@
     </GridViews>
   </Body>
   <BottomSection>
-    <h3>{i18n.OtherDetails}</h3>
-    <p>
-      <table class="table horizontal">
-        <tr>
-          <td>{i18n.Terms}</td>
-          <td>{DataSource[0].terms}</td>
-        </tr>
-        <tr>
-          <td>{i18n.InternalMemo}</td>
-          <td>{DataSource[0].internal_memo}</td>
-        </tr>
-      </table>
-    </p>
+  <br />
+	<table class="right aligned" style="width:300px;position:absolute;right:8px;">
+		<tr>
+			<td>
+				{i18n.TaxableTotal}
+			</td>
+			<td data-remove-row-on-zero="" style="width:100px">
+				{DataSource[0].taxable_total}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{i18n.Discount}
+			</td>
+			<td data-remove-row-on-zero="">
+				{DataSource[0].discount}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{i18n.Tax} ({DataSource[0].tax_rate}%)
+			</td>
+			<td data-remove-row-on-zero="">
+				{DataSource[0].tax}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{i18n.SubTotal}
+			</td>
+			<td data-remove-row-on-zero="">
+				{DataSource[0].sub_total}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{i18n.NonTaxableTotal}
+			</td>
+			<td data-remove-row-on-zero="">
+				{DataSource[0].nontaxable_total}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{i18n.GrandTotal}
+			</td>
+			<td data-remove-row-on-zero="">
+				{DataSource[0].total}
+			</td>
+		</tr>
+	</table>
   </BottomSection>
   <DataSources>
     <DataSource>
       <Query>
-    		SELECT
-    			sales.quotations.quotation_id,
-    			sales.quotations.transaction_timestamp,
-    			sales.quotations.value_date,
-    			account.get_name_by_user_id(sales.quotations.user_id) AS entered_by,
-    			core.get_office_name_by_office_id(sales.quotations.office_id) AS office_name,
-    			sales.quotations.terms,
-    			sales.quotations.internal_memo,
-    			inventory.get_customer_name_by_customer_id(sales.quotations.customer_id) AS customer_name    
-    		FROM sales.quotations
-    		WHERE sales.quotations.quotation_id = @quotation_id;
+        SELECT
+			sales.quotations.quotation_id,
+			account.users.name AS entered_by,
+			sales.quotations.value_date,
+			sales.quotations.expected_delivery_date,
+			core.offices.office_name,
+			sales.quotations.terms,
+			sales.quotations.cancelled,
+			sales.quotations.internal_memo,
+			inventory.customers.customer_name,
+			sales.quotations.taxable_total,
+			sales.quotations.discount,
+			sales.quotations.tax_rate,
+			sales.quotations.tax,
+			COALESCE(sales.quotations.taxable_total, 0) +
+			COALESCE(sales.quotations.tax, 0) -
+			COALESCE(sales.quotations.discount, 0) AS sub_total,
+			sales.quotations.nontaxable_total,
+			COALESCE(sales.quotations.taxable_total, 0) + 
+			COALESCE(sales.quotations.tax, 0) + 
+			COALESCE(sales.quotations.nontaxable_total, 0) - 
+			COALESCE(sales.quotations.discount, 0) AS total
+        FROM sales.quotations
+        INNER JOIN core.offices
+        ON sales.quotations.office_id = core.offices.office_id
+        INNER JOIN account.users
+        ON sales.quotations.user_id = account.users.user_id
+        LEFT JOIN inventory.customers
+        ON sales.quotations.customer_id = inventory.customers.customer_id
+        WHERE sales.quotations.quotation_id=@quotation_id;
       </Query>
       <Parameters>
-        <Parameter Name="@quotation_id" Type="long" />
+        <Parameter Name="@quotation_id" Type="Number" />
       </Parameters>
     </DataSource>
     <DataSource>
       <Query>
-    		SELECT
-    			sales.quotation_details.item_id,
-    			inventory.items.item_code,
-    			inventory.items.item_name,
-    			sales.quotation_details.price,
-    			sales.quotation_details.quantity,
-    			inventory.get_unit_name_by_unit_id(sales.quotation_details.unit_id) AS unit,
-    			sales.quotation_details.price * sales.quotation_details.quantity AS amount,
-    			sales.quotation_details.discount_rate,
-    			sales.quotation_details.tax,
-    			ROUND(
-    			(
-    			(sales.quotation_details.price + sales.quotation_details.tax)
-    			* ((100 - sales.quotation_details.discount_rate)/100)			
-    			* 
-    			sales.quotation_details.quantity) , 4) AS total
-    		FROM sales.quotation_details
-    		INNER JOIN inventory.items
-    		ON inventory.items.item_id = sales.quotation_details.item_id
-        WHERE sales.quotation_details.quotation_id = @quotation_id;
+			SELECT
+				inventory.items.item_code,
+				inventory.items.item_name,
+				sales.quotation_details.price,
+				sales.quotation_details.quantity,
+				inventory.units.unit_name,
+				ROUND(sales.quotation_details.price * sales.quotation_details.quantity, 4) AS amount,
+				sales.quotation_details.discount,
+				sales.quotation_details.shipping_charge,
+				ROUND((sales.quotation_details.price * sales.quotation_details.quantity) - sales.quotation_details.discount + sales.quotation_details.shipping_charge, 4) AS total
+			FROM sales.quotation_details
+			INNER JOIN inventory.items
+			ON sales.quotation_details.item_id = inventory.items.item_id
+			INNER JOIN inventory.units
+			ON sales.quotation_details.unit_id = inventory.units.unit_id
+			WHERE sales.quotation_details.quotation_id = @quotation_id
+			ORDER BY sales.quotation_details.quotation_detail_id;
       </Query>
       <Parameters>
         <Parameter Name="@quotation_id" Type="long" />
       </Parameters>
-      <RunningTotalTextColumnIndex>3</RunningTotalTextColumnIndex>
-      <RunningTotalFieldIndices>4,6,8,9</RunningTotalFieldIndices>
+      <RunningTotalTextColumnIndex>4</RunningTotalTextColumnIndex>
+      <RunningTotalFieldIndices>5,6,7,8</RunningTotalFieldIndices>
     </DataSource>
   </DataSources>
 </FrapidReport>

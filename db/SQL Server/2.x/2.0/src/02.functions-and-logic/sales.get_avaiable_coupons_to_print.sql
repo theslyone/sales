@@ -11,7 +11,7 @@ RETURNS @result TABLE
 AS
 BEGIN
     DECLARE @price_type_id                  integer;
-    DECLARE @total_amount                   decimal(30, 6);
+    DECLARE @total_amount                   numeric(30, 6);
     DECLARE @customer_id                    integer;
 
     DECLARE @temp_coupons TABLE

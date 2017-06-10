@@ -58,5 +58,6 @@ namespace MixERP.Sales.ViewModels
 
         public long? SalesQuotationId { get; set; }
         public long? SalesOrderId { get; set; }
+        public string SerialNumberIds { get; set; }
     }
 }

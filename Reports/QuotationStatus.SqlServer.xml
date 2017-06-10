@@ -34,7 +34,6 @@
           quotation_details.quantity,
           units.unit_code,
           quotation_details.price,
-          quotation_details.tax,
           quotation_details.shipping_charge,
           CASE WHEN orders.order_id IS NOT NULL THEN 'Ordered'
             WHEN finance.get_date(quotations.office_id) &gt; quotations.expected_delivery_date THEN 'Expired'
@@ -54,7 +53,7 @@
         <Parameter Name="@OfficeId" FieldLabel="Office Id" Type="int"  DefaultValue="{Meta.OfficeId}" />
       </Parameters>
       <RunningTotalTextColumnIndex>4</RunningTotalTextColumnIndex>
-      <RunningTotalFieldIndices>5, 7, 8, 9</RunningTotalFieldIndices>
+      <RunningTotalFieldIndices>5, 7, 8</RunningTotalFieldIndices>
     </DataSource>
   </DataSources>
 </FrapidReport>

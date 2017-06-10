@@ -4,12 +4,12 @@ using Frapid.Mapper.Decorators;
 namespace MixERP.Sales.DTO
 {
     [TableName("sales.sales_view")]
-    public sealed class SalesView
+    public class SalesView
     {
         public long SalesId { get; set; }
         public long TransactionMasterId { get; set; }
         public string TransactionCode { get; set; }
-        public string TransactionCounter { get; set; }
+        public int TransactionCounter { get; set; }
         public DateTime ValueDate { get; set; }
         public DateTime BookDate { get; set; }
         public DateTimeOffset TransactionTs { get; set; }
@@ -18,6 +18,10 @@ namespace MixERP.Sales.DTO
         public int VerifiedByUserId { get; set; }
         public string VerifiedBy { get; set; }
         public long CheckoutId { get; set; }
+        public decimal NontaxableTotal { get; set; }
+        public decimal TaxableTotal { get; set; }
+        public decimal TaxRate { get; set; }
+        public decimal Tax { get; set; }
         public decimal Discount { get; set; }
         public int PostedBy { get; set; }
         public string PostedByName { get; set; }
@@ -43,13 +47,13 @@ namespace MixERP.Sales.DTO
         public int GiftCardId { get; set; }
         public string GiftCardNumber { get; set; }
         public string GiftCardOwner { get; set; }
-        public int? CouponId { get; set; }
+        public int CouponId { get; set; }
         public string CouponCode { get; set; }
         public string CouponName { get; set; }
         public bool IsFlatDiscount { get; set; }
         public decimal TotalDiscountAmount { get; set; }
         public bool IsCredit { get; set; }
-        public int? PaymentTermId { get; set; }
+        public int PaymentTermId { get; set; }
         public string PaymentTermCode { get; set; }
         public string PaymentTermName { get; set; }
         public string FiscalYearCode { get; set; }
@@ -58,7 +62,7 @@ namespace MixERP.Sales.DTO
         public decimal Tender { get; set; }
         public decimal Change { get; set; }
         public string CheckNumber { get; set; }
-        public DateTime CheckDate { get; set; }
+        public DateTime? CheckDate { get; set; }
         public string CheckBankName { get; set; }
         public decimal CheckAmount { get; set; }
         public decimal RewardPoints { get; set; }

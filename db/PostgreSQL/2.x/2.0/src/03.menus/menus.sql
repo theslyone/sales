@@ -28,7 +28,7 @@ SELECT * FROM core.create_menu('MixERP.Sales', 'SalesOrders', 'Sales Orders', '/
 SELECT * FROM core.create_menu('MixERP.Sales', 'SalesEntryVerification', 'Sales Entry Verification', '/dashboard/sales/tasks/entry/verification', 'checkmark', 'Tasks');
 SELECT * FROM core.create_menu('MixERP.Sales', 'ReceiptVerification', 'Receipt Verification', '/dashboard/sales/tasks/receipt/verification', 'checkmark', 'Tasks');
 SELECT * FROM core.create_menu('MixERP.Sales', 'SalesReturnVerification', 'Sales Return Verification', '/dashboard/sales/tasks/return/verification', 'checkmark box', 'Tasks');
-SELECT * FROM core.create_menu('MixERP.Sales', 'CheckClearing', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');
+--SELECT * FROM core.create_menu('MixERP.Sales', 'CheckClearing', 'Check Clearing', '/dashboard/sales/tasks/checks/checks-clearing', 'minus square outline', 'Tasks');
 SELECT * FROM core.create_menu('MixERP.Sales', 'EOD', 'EOD', '/dashboard/sales/tasks/eod', 'money', 'Tasks');
 
 SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerLoyalty', 'Customer Loyalty', 'square outline', 'user', '');
@@ -43,6 +43,7 @@ SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerTypes', 'Customer Types'
 SELECT * FROM core.create_menu('MixERP.Sales', 'Customers', 'Customers', '/dashboard/sales/setup/customers', 'street view', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'PriceTypes', 'Price Types', '/dashboard/sales/setup/price-types', 'ruble', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'SellingPrices', 'Selling Prices', '/dashboard/sales/setup/selling-prices', 'in cart', 'Setup');
+SELECT * FROM core.create_menu('MixERP.Sales', 'CustomerwiseSellingPrices', 'Customerwise Selling Prices', '/dashboard/sales/setup/selling-prices/customer', 'in cart', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'LateFee', 'Late Fee', '/dashboard/sales/setup/late-fee', 'alarm mute', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'PaymentTerms', 'Payment Terms', '/dashboard/sales/setup/payment-terms', 'checked calendar', 'Setup');
 SELECT * FROM core.create_menu('MixERP.Sales', 'Cashiers', 'Cashiers', '/dashboard/sales/setup/cashiers', 'male', 'Setup');
@@ -60,6 +61,10 @@ SELECT * FROM core.create_menu('MixERP.Sales', 'GiftCardSummary', 'Gift Card Sum
 SELECT * FROM core.create_menu('MixERP.Sales', 'QuotationStatus', 'Quotation Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/QuotationStatus.xml', 'list', 'Reports');
 SELECT * FROM core.create_menu('MixERP.Sales', 'OrderStatus', 'Order Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/OrderStatus.xml', 'bar chart', 'Reports');
 SELECT * FROM core.create_menu('MixERP.Sales', 'SalesDiscountStatus', 'Sales Discount Status', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/SalesDiscountStatus.xml', 'shopping basket icon', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'AccountReceivableByCustomer', 'Account Receivable By Customer Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountReceivableByCustomer.xml', 'list layout icon', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'ReceiptJournalSummary', 'Receipt Journal Summary Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ReceiptJournalSummary.xml', 'angle double left icon', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'AccountantSummary', 'Accountant Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/AccountantSummary.xml', 'address book outline icon', 'Reports');
+SELECT * FROM core.create_menu('MixERP.Sales', 'ClosedOut', 'Closed Out Report', '/dashboard/reports/view/Areas/MixERP.Sales/Reports/ClosedOut.xml', 'book icon', 'Reports');
 
 SELECT * FROM auth.create_app_menu_policy
 (

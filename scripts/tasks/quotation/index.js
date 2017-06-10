@@ -1,108 +1,158 @@
-﻿function displayTable(target, data) {
-    target.find("tbody").html("");
+﻿var model = {
+    Title: window.translate("SalesQuotations"),
+    JournalAdviceExpression: function (data) {
+        const tranId = data.TranId;
+        if (!tranId) {
+            return null;
+        }
 
-    function getCell(text, isDate) {
-        const cell = $("<td />");
-
-        cell.text(text);
-
-        if (isDate) {
-            if ((text || "").trim()) {
-                cell.text(window.moment(new Date(text)).fromNow() || "");
-                cell.attr("title", text);
-            };
+        return tranId;
+    },
+    DocumentExpression: function (data) {
+        const documents = data.Documents;
+        if (!documents) {
+            return null;
         };
 
-        return cell;
-    };
-
-    function getActionCell(id) {
-        const cell = $("<td />");
-
-        const covertToOrderAnchor = $(`<a title='${window.translate("ConvertOrder")}'><i class='arrow circle right icon'></i></a>`);
-        const convertToOrderUrl = "/dashboard/sales/tasks/order/new?QuotationId={id}";
-        covertToOrderAnchor.attr("href", convertToOrderUrl.replace("{id}", id));
-
-
-        const covertToSalesAnchor = $(`<a title='${window.translate("ConvertSales")}'><i class='chevron circle right icon'></i></a>`);
-        const convertToSalesUrl = "/dashboard/sales/tasks/entry/new?QuotationId={id}";
-        covertToSalesAnchor.attr("href", convertToSalesUrl.replace("{id}", id));
-
-
-        const checklistAnchor = $(`<a title='${window.translate("ChecklistWindow")}'><i class='list icon'></i></a>`);
-        const checklistUrl = "/dashboard/sales/tasks/quotation/checklist/{id}";
-        checklistAnchor.attr("href", checklistUrl.replace("{id}", id));
-
-
-        const journalAdviceAnchor = $(`<a title='${window.translate("ViewQuotation")}'><i class='print icon'></i></a>`);
-        journalAdviceAnchor.attr("href", "javascript:void(0);");
-        journalAdviceAnchor.attr("onclick", "showQuotation(" + id + ");");
-
-        cell.append(covertToOrderAnchor);
-        cell.append(covertToSalesAnchor);
-        cell.append(checklistAnchor);
-        cell.append(journalAdviceAnchor);
-
-        return cell;
-    };
-
-
-    $.each(data, function () {
-        const item = this;
-
-        const row = $("<tr />");
-
-        row.append(getActionCell(item.Id));
-        row.append(getCell(item.Id));
-        row.append(getCell(item.Customer));
-        row.append(getCell(item.ValueDate, true));
-        row.append(getCell(item.ExpectedDate, true));
-        row.append(getCell(item.ReferenceNumber));
-        row.append(getCell(item.Terms));
-        row.append(getCell(item.InternalMemo));
-        row.append(getCell(item.PostedBy));
-        row.append(getCell(item.Office));
-        row.append(getCell(item.TransactionTs, true));
-
-        target.find("tbody").append(row);
-    });
-};
-
-function processQuery() {
-    function getModel() {
-        const form = window.serializeForm($("#Annotation"));
-        return form;
-    };
-
-    function displayGrid(target) {
-        function request(query) {
-            const url = "/dashboard/sales/tasks/quotation/view";
-            const data = JSON.stringify(query);
-            return window.getAjaxRequest(url, "POST", data);
+        return documents;
+    },
+    ChecklistUrlExpression: function (data) {
+        const quotationId = data.QuotationId;
+        if (!quotationId) {
+            return null;
         };
 
-        const query = getModel();
+        return "/dashboard/sales/tasks/quotation/checklist/" + quotationId;
+    },
+    ExtraButtons: [
+        {
+            Title: window.translate("ConvertToSales"),
+            Icon: "chevron circle right",
+            HrefExpression: function (data) {
+                const quotationId = data.QuotationId;
+                if (!quotationId) {
+                    return null;
+                };
 
-        const ajax = request(query);
 
-        ajax.success(function (response) {
-            displayTable(target, response);
-            target.removeClass("loading");
-        });
+                return "/dashboard/sales/tasks/entry/new?QuotationId=" + quotationId;
+            }
+        },
+        {
+            Title: window.translate("ViewAdvice"),
+            Icon: "zoom",
+            ClickExpression: function (data) {
+                const quotationId = data.QuotationId;
+                if (!quotationId) {
+                    return null;
+                };
 
-        ajax.fail(function (xhr) {
-            window.logAjaxErrorMessage(xhr);
-        });
-    };
 
-    const view = $("#JournalView").addClass("loading");
+                return "showQuotation(" + quotationId + ");";
+            }
+        }
+    ],
+    AddNewButtonText: window.translate("AddNew"),
+    AddNewUrl: "/dashboard/sales/tasks/quotation/new",
+    SearchApi: "/dashboard/sales/tasks/quotation/search",
+    FormatExpression: function (cell, columnName, originalValue) {
+        var value = originalValue;
+        columnName = columnName.trim();
 
-    displayGrid(view);
+        if (!value) {
+            return;
+        };
+
+        switch (columnName.trim()) {
+            case "PostedOn":
+                var date = new Date(value);
+                value = window.moment(date).format("LLL");
+                break;
+            case "ValueDate":
+            case "ExpectedDate":
+                var date = new Date(value);
+                value = window.moment(date).format("LL");
+                break;
+            case "TotalAmount":
+                value = window.getFormattedCurrency(value);
+                break;
+        };
+
+        if (originalValue !== value) {
+            cell.attr("title", originalValue);
+        };
+
+        cell.text(value);
+        cell.attr("data-date", value).addClass("date");
+    },
+    SortExpression: function (data) {
+        return window.Enumerable.From(data)
+            .OrderByDescending(function (x) {
+                return new Date(x.ValueDate);
+            }).ThenByDescending(function (x) {
+                return new Date(x.PostedOn);
+            }).ToArray();
+    },
+    Annotation: [
+        {
+            Text: "From",
+            Id: "From",
+            CssClass: "date"
+        },
+        {
+            Text: "To",
+            Id: "To",
+            CssClass: "date"
+        },
+        {
+            Text: "Expected From",
+            Id: "ExpectedFrom",
+            CssClass: "date"
+        },
+        {
+            Text: "Expected To",
+            Id: "ExpectedTo",
+            CssClass: "date"
+        },
+        {
+            Text: "Id",
+            Id: "Id"
+        },
+        {
+            Text: "Transaction Code",
+            Id: "TranCode"
+        },
+        {
+            Text: "Reference Number",
+            Id: "ReferenceNumber"
+        },
+        {
+            Text: "Terms",
+            Id: "Terms"
+        },
+        {
+            Text: "Memo",
+            Id: "Memo"
+        },
+        {
+            Text: "Posted By",
+            Id: "PostedBy"
+        },
+        {
+            Text: "Office",
+            Id: "Office"
+        },
+        {
+            Text: "Amount",
+            Id: "Amount",
+            CssClass: "currency"
+        },
+        {
+            Text: "Customer",
+            Id: "Customer"
+        }
+    ]
 };
-
-$("#ShowButton").off("click").on("click", function () {
-    processQuery();
-});
 
 function showQuotation(id) {
     $(".modal iframe").attr("src", "/dashboard/reports/source/Areas/MixERP.Sales/Reports/Quotation.xml?quotation_id=" + id);
@@ -115,8 +165,4 @@ function showQuotation(id) {
     }, 300);
 };
 
-window.loadDatepicker();
-
-setTimeout(function () {
-    processQuery();
-}, 1000);
+prepareView(model);

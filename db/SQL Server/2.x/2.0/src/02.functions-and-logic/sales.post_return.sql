@@ -18,6 +18,8 @@ CREATE PROCEDURE sales.post_return
     @reference_number               national character varying(24),
     @statement_reference            national character varying(2000),
     @details                        sales.sales_detail_type READONLY,
+	@shipper_id						integer,
+	@discount						numeric(30, 6),
     @tran_master_id                 bigint OUTPUT
 )
 AS
@@ -25,48 +27,53 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
+	DECLARE @reversal_tran_id		bigint;
+	DECLARE @new_tran_id			bigint;
     DECLARE @book_name              national character varying(50) = 'Sales Return';
     DECLARE @cost_center_id         bigint;
     DECLARE @tran_counter           integer;
     DECLARE @tran_code              national character varying(50);
     DECLARE @checkout_id            bigint;
-    DECLARE @grand_total            decimal(30, 6);
-    DECLARE @discount_total         decimal(30, 6);
+    DECLARE @grand_total            numeric(30, 6);
+    DECLARE @discount_total         numeric(30, 6);
     DECLARE @is_credit              bit;
     DECLARE @default_currency_code  national character varying(12);
-    DECLARE @cost_of_goods_sold     decimal(30, 6);
+    DECLARE @cost_of_goods_sold     numeric(30, 6);
     DECLARE @ck_id                  bigint;
     DECLARE @sales_id               bigint;
-    DECLARE @tax_total              decimal(30, 6);
+    DECLARE @tax_total              numeric(30, 6);
     DECLARE @tax_account_id         integer;
-
+	DECLARE @fiscal_year_code		national character varying(12);
     DECLARE @can_post_transaction   bit;
     DECLARE @error_message          national character varying(MAX);
+	DECLARE @original_checkout_id	bigint;
+	DECLARE @original_customer_id	integer;
+	DECLARE @difference				sales.sales_detail_type;
 
-    DECLARE @checkout_details TABLE
-    (
-        id                              integer IDENTITY PRIMARY KEY,
-        checkout_id                     bigint, 
-        tran_type                       national character varying(2), 
-        store_id                        integer,
-        item_id                         integer, 
-        quantity                        decimal(30, 6),        
-        unit_id                         integer,
-        base_quantity                   decimal(30, 6),
-        base_unit_id                    integer,                
-        price                           decimal(30, 6),
-        cost_of_goods_sold              decimal(30, 6) DEFAULT(0),
-        discount                        decimal(30, 6) DEFAULT(0),
-        discount_rate                   decimal(30, 6),
-        tax                             decimal(30, 6),
-        shipping_charge                 decimal(30, 6),
-        sales_account_id                integer,
-        sales_discount_account_id       integer,
-        sales_return_account_id         integer,
-        inventory_account_id            integer,
-        cost_of_goods_sold_account_id   integer
-    );
+	SELECT 
+		@original_customer_id = sales.sales.customer_id,
+		@original_checkout_id = sales.sales.checkout_id
+	FROM sales.sales
+	INNER JOIN finance.transaction_master
+	ON finance.transaction_master.transaction_master_id = sales.sales.transaction_master_id
+	AND finance.transaction_master.verification_status_id > 0
+	AND finance.transaction_master.transaction_master_id = @transaction_master_id;
 
+	DECLARE @new_checkout_items TABLE
+	(
+		store_id					integer,
+		transaction_type			national character varying(2),
+		item_id						integer,
+		quantity					numeric(30, 6),
+		unit_id						integer,
+        base_quantity				numeric(30, 6),
+        base_unit_id                integer,                
+		price						numeric(30, 6),
+		discount_rate				numeric(30, 6),
+		discount					numeric(30, 6),
+		shipping_charge				numeric(30, 6)
+	);
+		
     BEGIN TRY
         DECLARE @tran_count int = @@TRANCOUNT;
         
@@ -74,7 +81,7 @@ BEGIN
         BEGIN
             BEGIN TRANSACTION
         END;
-        
+    	    
         SELECT
             @can_post_transaction   = can_post_transaction,
             @error_message          = error_message
@@ -88,6 +95,17 @@ BEGIN
 
         SET @tax_account_id                         = finance.get_sales_tax_account_id_by_office_id(@office_id);
 
+		
+		IF(@original_customer_id IS NULL)
+		BEGIN
+			RAISERROR('Invalid transaction.', 16, 1);
+		END;
+
+		IF(@original_customer_id != @customer_id)
+		BEGIN
+			RAISERROR('This customer is not associated with the sales you are trying to return.', 16, 1);
+		END;
+
 		DECLARE @is_valid_transaction	bit;
 		SELECT
 			@is_valid_transaction	=	is_valid,
@@ -100,134 +118,172 @@ BEGIN
             RETURN;
         END;
 
-        SET @default_currency_code          = core.get_currency_code_by_office_id(@office_id);
-
-        SELECT @sales_id = sales.sales.sales_id 
-        FROM sales.sales
-        WHERE sales.sales.transaction_master_id = +transaction_master_id;
-        
-        SELECT @cost_center_id = cost_center_id    
-        FROM finance.transaction_master 
-        WHERE finance.transaction_master.transaction_master_id = @transaction_master_id;
-
-        SELECT 
-            @is_credit  = is_credit,
-            @ck_id      = checkout_id
-        FROM sales.sales
-        WHERE transaction_master_id = @transaction_master_id;
-
-            
-        INSERT INTO @checkout_details(store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge)
-        SELECT store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge
-        FROM @details;
-
-        UPDATE @checkout_details 
-        SET
-            tran_type                   = 'Dr',
-            base_quantity               = inventory.get_base_quantity_by_unit_id(unit_id, quantity),
-            base_unit_id                = inventory.get_root_unit_id(unit_id);
-
-        UPDATE @checkout_details
-        SET
-            sales_account_id                = inventory.get_sales_account_id(item_id),
-            sales_discount_account_id       = inventory.get_sales_discount_account_id(item_id),
-            sales_return_account_id         = inventory.get_sales_return_account_id(item_id),        
-            inventory_account_id            = inventory.get_inventory_account_id(item_id),
-            cost_of_goods_sold_account_id   = inventory.get_cost_of_goods_sold_account_id(item_id);
-        
-        IF EXISTS
-        (
-            SELECT TOP 1 0 FROM @checkout_details AS details
-            WHERE inventory.is_valid_unit_id(details.unit_id, details.item_id) = 0
-        )
-        BEGIN
-            RAISERROR('Item/unit mismatch.', 13, 1);
-        END;
-
-
+        SET @default_currency_code      = core.get_currency_code_by_office_id(@office_id);
         SET @tran_counter               = finance.get_new_transaction_counter(@value_date);
         SET @tran_code                  = finance.get_transaction_code(@value_date, @office_id, @user_id, @login_id);
 
+        SELECT @sales_id = sales.sales.sales_id 
+        FROM sales.sales
+        WHERE sales.sales.transaction_master_id = @transaction_master_id;
+
+
+
+
+		--Returned items are subtracted
+		INSERT INTO @new_checkout_items(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
+		SELECT store_id, item_id, quantity *-1, unit_id, price *-1, ROUND(discount_rate, 2), shipping_charge *-1
+		FROM @details;
+	
+		--Original items are added
+		INSERT INTO @new_checkout_items(store_id, item_id, quantity, unit_id, price, discount_rate, shipping_charge)
+		SELECT 
+			inventory.checkout_details.store_id, 
+			inventory.checkout_details.item_id,
+			inventory.checkout_details.quantity,
+			inventory.checkout_details.unit_id,
+			inventory.checkout_details.price,
+			ROUND(inventory.checkout_details.discount_rate, 2),
+			inventory.checkout_details.shipping_charge
+		FROM inventory.checkout_details
+		WHERE checkout_id = @original_checkout_id;
+
+		UPDATE @new_checkout_items 
+		SET
+			base_quantity                   = inventory.get_base_quantity_by_unit_id(unit_id, quantity),
+			base_unit_id                    = inventory.get_root_unit_id(unit_id),
+			discount                        = ROUND(((price * quantity) + shipping_charge) * (discount_rate / 100), 2);
+	
+
+		IF EXISTS
+		(
+			SELECT item_id, COUNT(DISTINCT unit_id) 
+			FROM @new_checkout_items
+			GROUP BY item_id
+			HAVING COUNT(DISTINCT unit_id) > 1
+		)
+		BEGIN
+			RAISERROR('A return entry must exactly macth the unit of measure provided during sales.', 16, 1);
+		END;
+	
+		IF EXISTS
+		(
+			SELECT item_id, COUNT(DISTINCT ABS(price))
+			FROM @new_checkout_items
+			GROUP BY item_id
+			HAVING COUNT(DISTINCT ABS(price)) > 1
+		)
+		BEGIN
+			RAISERROR('A return entry must exactly macth the price provided during sales.', 16, 1);
+		END;
+	
+		
+	
+		IF EXISTS
+		(
+			SELECT item_id, COUNT(DISTINCT store_id) 
+			FROM @new_checkout_items
+			GROUP BY item_id
+			HAVING COUNT(DISTINCT store_id) > 1
+		)
+		BEGIN
+			RAISERROR('A return entry must exactly macth the store provided during sales.', 16, 1);
+		END;
+
+
+		INSERT INTO @difference(store_id, transaction_type, item_id, quantity, unit_id, price, discount, shipping_charge)
+		SELECT store_id, 'Cr', item_id, SUM(quantity), unit_id, SUM(price), SUM(discount), SUM(shipping_charge)
+		FROM @new_checkout_items
+		GROUP BY store_id, item_id, unit_id;
+			
+		DELETE FROM @difference
+		WHERE quantity = 0;
+
+		--> REVERSE THE ORIGINAL TRANSACTION
         INSERT INTO finance.transaction_master(transaction_counter, transaction_code, book, value_date, book_date, user_id, login_id, office_id, cost_center_id, reference_number, statement_reference)
-        SELECT @tran_counter, @tran_code, @book_name, @value_date, @book_date, @user_id, @login_id, @office_id, @cost_center_id, @reference_number, @statement_reference;
-        SET @tran_master_id = SCOPE_IDENTITY();
-            
-        SELECT @tax_total = SUM(COALESCE(tax, 0)) FROM @checkout_details;
-        SELECT @discount_total = SUM(COALESCE(discount, 0)) FROM @checkout_details;
-        SELECT @grand_total = SUM(COALESCE(price, 0) * COALESCE(quantity, 0)) FROM @checkout_details;
+		SELECT @tran_counter, @tran_code, @book_name, @value_date, @book_date, @user_id, @login_id, @office_id, @cost_center_id, @reference_number, @statement_reference;
 
+		SET @reversal_tran_id = SCOPE_IDENTITY();
 
+		INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
+		SELECT 
+			@reversal_tran_id, 
+			office_id, 
+			value_date, 
+			book_date, 
+			CASE WHEN tran_type = 'Dr' THEN 'Cr' ELSE 'Dr' END, 
+			account_id, 
+			@statement_reference, 
+			currency_code, 
+			amount_in_currency, 
+			er, 
+			local_currency_code, 
+			amount_in_local_currency
+		FROM finance.transaction_details
+		WHERE finance.transaction_details.transaction_master_id = @transaction_master_id;
 
-        UPDATE @checkout_details
-        SET cost_of_goods_sold = COALESCE(inventory.get_write_off_cost_of_goods_sold(@ck_id, item_id, unit_id, quantity), 0);
+		IF EXISTS(SELECT * FROM @difference)
+		BEGIN
+			--> ADD A NEW SALES INVOICE
+			EXECUTE sales.post_sales
+				@office_id,
+				@user_id,
+				@login_id,
+				@counter_id,
+				@value_date,
+				@book_date,
+				@cost_center_id,
+				@reference_number,
+				@statement_reference,
+				NULL, --@tender,
+				NULL, --@change,
+				NULL, --@payment_term_id,
+				NULL, --@check_amount,
+				NULL, --@check_bank_name,
+				NULL, --@check_number,
+				NULL, --@check_date,
+				NULL, --@gift_card_number,
+				@customer_id,
+				@price_type_id,
+				@shipper_id,
+				@store_id,
+				NULL, --@coupon_code,
+				1, --@is_flat_discount,
+				@discount,
+				@difference,
+				NULL, --@sales_quotation_id,
+				NULL, --@sales_order_id,
+				@new_tran_id  OUTPUT,
+				@book_name;
+		END;
+		ELSE
+		BEGIN
+			SET @tran_counter               = finance.get_new_transaction_counter(@value_date);
+			SET @tran_code                  = finance.get_transaction_code(@value_date, @office_id, @user_id, @login_id);
 
+			INSERT INTO finance.transaction_master(transaction_counter, transaction_code, book, value_date, book_date, user_id, login_id, office_id, cost_center_id, reference_number, statement_reference)
+			SELECT @tran_counter, @tran_code, @book_name, @value_date, @book_date, @user_id, @login_id, @office_id, @cost_center_id, @reference_number, @statement_reference;
 
-        SELECT @cost_of_goods_sold = SUM(cost_of_goods_sold) FROM @checkout_details;
+			SET @new_tran_id = SCOPE_IDENTITY();
+		END;
 
+		INSERT INTO inventory.checkouts(transaction_book, value_date, book_date, transaction_master_id, office_id, posted_by, discount, taxable_total, tax_rate, tax, nontaxable_total) 
+		SELECT @book_name, @value_date, @book_date, @new_tran_id, office_id, @user_id, discount, taxable_total, tax_rate, tax, nontaxable_total
+		FROM inventory.checkouts
+		WHERE inventory.checkouts.checkout_id = @original_checkout_id;
 
-        IF(@cost_of_goods_sold > 0)
-        BEGIN
-            INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
-            SELECT @tran_master_id, @office_id, @value_date, @book_date, 'Dr', inventory_account_id, @statement_reference, @default_currency_code, SUM(COALESCE(cost_of_goods_sold, 0)), 1, @default_currency_code, SUM(COALESCE(cost_of_goods_sold, 0))
-            FROM @checkout_details
-            GROUP BY inventory_account_id;
+		SET @checkout_id = SCOPE_IDENTITY();
 
+        INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, is_taxed, cost_of_goods_sold, discount)
+		SELECT @value_date, @book_date, @checkout_id, 
+		CASE WHEN transaction_type = 'Dr' THEN 'Cr' ELSE 'Dr' END, 
+		store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, is_taxed, cost_of_goods_sold, discount
+		FROM inventory.checkout_details
+		WHERE inventory.checkout_details.checkout_id = @original_checkout_id;
 
-            INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, er, local_currency_code, amount_in_local_currency)
-            SELECT @tran_master_id, @office_id, @value_date, @book_date, 'Cr', cost_of_goods_sold_account_id, @statement_reference, @default_currency_code, SUM(COALESCE(cost_of_goods_sold, 0)), 1, @default_currency_code, SUM(COALESCE(cost_of_goods_sold, 0))
-            FROM @checkout_details
-            GROUP BY cost_of_goods_sold_account_id;
-        END;
+		INSERT INTO sales.returns(sales_id, checkout_id, transaction_master_id, return_transaction_master_id, counter_id, customer_id, price_type_id)
+		SELECT @sales_id, @checkout_id, @transaction_master_id, @new_tran_id, @counter_id, @customer_id, @price_type_id;
 
-
-        INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er,amount_in_local_currency) 
-        SELECT @tran_master_id, @office_id, @value_date, @book_date, 'Dr', sales_account_id, @statement_reference, @default_currency_code, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)), @default_currency_code, 1, SUM(COALESCE(price, 0) * COALESCE(quantity, 0))
-        FROM @checkout_details
-        GROUP BY sales_account_id;
-
-
-        IF(@discount_total IS NOT NULL AND @discount_total > 0)
-        BEGIN
-            INSERT INTO finance.transaction_details(office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
-            SELECT @office_id, @value_date, @book_date, 'Cr', sales_discount_account_id, @statement_reference, @default_currency_code, SUM(COALESCE(discount, 0)), @default_currency_code, 1, SUM(COALESCE(discount, 0))
-            FROM @checkout_details
-            GROUP BY sales_discount_account_id;
-
-            SET @tran_master_id  = SCOPE_IDENTITY();
-        END;
-
-        IF(COALESCE(@tax_total, 0) > 0)
-        BEGIN
-            INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
-            SELECT @tran_master_id, @office_id, @value_date, @book_date, 'Dr', @tax_account_id, @statement_reference, @default_currency_code, @tax_total, @default_currency_code, 1, @tax_total;
-        END;    
-
-        IF(@is_credit = 1)
-        BEGIN
-            INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
-            SELECT @tran_master_id, @office_id, @value_date, @book_date, 'Cr',  inventory.get_account_id_by_customer_id(@customer_id), @statement_reference, @default_currency_code, @grand_total - @discount_total, @default_currency_code, 1, @grand_total - @discount_total;
-        END
-        ELSE
-        BEGIN
-            INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency) 
-            SELECT @tran_master_id, @office_id, @value_date, @book_date, 'Cr',  sales_return_account_id, @statement_reference, @default_currency_code, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)) - SUM(COALESCE(discount, 0)), @default_currency_code, 1, SUM(COALESCE(price, 0) * COALESCE(quantity, 0)) - SUM(COALESCE(discount, 0)) + SUM(COALESCE(tax, 0))
-            FROM @checkout_details
-            GROUP BY sales_return_account_id;
-        END;
-
-
-
-        INSERT INTO inventory.checkouts(transaction_book, value_date, book_date, transaction_master_id, office_id, posted_by) 
-        SELECT @book_name, @value_date, @book_date, @tran_master_id, @office_id, @user_id;
-        SET @checkout_id = SCOPE_IDENTITY();
-
-        INSERT INTO inventory.checkout_details(value_date, book_date, checkout_id, transaction_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, tax, cost_of_goods_sold, discount)
-        SELECT @value_date, @book_date, @checkout_id, tran_type, store_id, item_id, quantity, unit_id, base_quantity, base_unit_id, price, tax, cost_of_goods_sold, discount FROM @checkout_details;
-
-        INSERT INTO sales.returns(sales_id, checkout_id, counter_id, transaction_master_id, return_transaction_master_id, customer_id, price_type_id, is_credit)
-        SELECT @sales_id, @checkout_id, @counter_id, @transaction_master_id, @tran_master_id, @customer_id, @price_type_id, 0;
-
-        EXECUTE finance.auto_verify @tran_master_id, @office_id;
+		SET @tran_master_id = @new_tran_id;
 
         IF(@tran_count = 0)
         BEGIN
@@ -248,4 +304,54 @@ BEGIN
 END;
 
 GO
+
+
+
+
+--DECLARE @transaction_master_id          bigint = 369;
+--DECLARE @office_id                      integer = (SELECT TOP 1 office_id FROM core.offices);
+--DECLARE @user_id                        integer = (SELECT TOP 1 user_id FROM account.users);
+--DECLARE @login_id                       bigint = (SELECT TOP 1 login_id FROM account.logins WHERE user_id = @user_id);
+--DECLARE @value_date                     date = finance.get_value_date(@office_id);
+--DECLARE @book_date                      date = finance.get_value_date(@office_id);
+--DECLARE @store_id                       integer = (SELECT TOP 1 store_id FROM inventory.stores WHERE store_name='Cold Room RM');
+--DECLARE @counter_id                     integer = (SELECT TOP 1 counter_id FROM inventory.counters WHERE counter_name = 'Counter 2');
+--DECLARE @customer_id                    integer = (SELECT customer_id FROM inventory.customers WHERE customer_name = 'Ajima Mart');
+--DECLARE @price_type_id                  integer = (SELECT TOP 1 price_type_id FROM sales.price_types);
+--DECLARE @reference_number               national character varying(24) = 'N/A';
+--DECLARE @statement_reference            national character varying(2000) = 'Test';
+--DECLARE @details                        sales.sales_detail_type;
+--DECLARE @tran_master_id                 bigint;
+
+--INSERT INTO @details(store_id, transaction_type, item_id, quantity, unit_id, price, discount, shipping_charge, is_taxed)
+--SELECT @store_id, 'Cr', 1, 1, 6, 2320, 62.84, 0, 1;
+
+
+--EXECUTE sales.post_return
+--    @transaction_master_id          ,
+--    @office_id                      ,
+--    @user_id                        ,
+--    @login_id                       ,
+--    @value_date                     ,
+--    @book_date                      ,
+--    @store_id                       ,
+--    @counter_id                     ,
+--    @customer_id                    ,
+--    @price_type_id                  ,
+--    @reference_number               ,
+--    @statement_reference            ,
+--    @details                        ,
+--	1,
+--	0,
+--    @tran_master_id                 OUTPUT;
+
+
+
+
+
+
+
+
+
+
 

@@ -19,21 +19,22 @@ BEGIN
     DECLARE @is_purchase                    bit = 0;
     DECLARE @item_id                        integer = 0;
     DECLARE @factor_to_base_unit            numeric(30, 6);
-    DECLARE @returned_in_previous_batch     decimal(30, 6) = 0;
-    DECLARE @in_verification_queue          decimal(30, 6) = 0;
-    DECLARE @actual_price_in_root_unit      decimal(30, 6) = 0;
-    DECLARE @price_in_root_unit             decimal(30, 6) = 0;
-    DECLARE @item_in_stock                  decimal(30, 6) = 0;
+    DECLARE @returned_in_previous_batch     numeric(30, 6) = 0;
+    DECLARE @in_verification_queue          numeric(30, 6) = 0;
+    DECLARE @actual_price_in_root_unit      numeric(30, 6) = 0;
+    DECLARE @price_in_root_unit             numeric(30, 6) = 0;
+    DECLARE @item_in_stock                  numeric(30, 6) = 0;
     DECLARE @error_item_id                  integer;
-    DECLARE @error_quantity                 decimal(30, 6);
-    DECLARE @error_amount                   decimal(30, 6);
+    DECLARE @error_quantity                 numeric(30, 6);
+    DECLARE @error_unit						national character varying(500);
+    DECLARE @error_amount                   numeric(30, 6);
     DECLARE @error_message                  national character varying(MAX);
 
     DECLARE @total_rows                     integer = 0;
     DECLARE @counter                        integer = 0;
     DECLARE @loop_id                        integer;
     DECLARE @loop_item_id                   integer;
-    DECLARE @loop_price                     decimal(30, 6);
+    DECLARE @loop_price                     numeric(30, 6);
     DECLARE @loop_base_quantity             numeric(30, 6);
 
     SET @checkout_id                        = inventory.get_checkout_id_by_transaction_master_id(@transaction_master_id);
@@ -48,18 +49,19 @@ BEGIN
         store_id            integer,
         item_id             integer,
         item_in_stock       numeric(30, 6),
-        quantity            decimal(30, 6),        
+        quantity            numeric(30, 6),        
         unit_id             integer,
-        price               decimal(30, 6),
-        discount_rate       decimal(30, 6),
-        tax                 decimal(30, 6),
-        shipping_charge     decimal(30, 6),
+        price               numeric(30, 6),
+        discount_rate       numeric(30, 6),
+        discount			numeric(30, 6),
+        is_taxed			bit,
+        shipping_charge     numeric(30, 6),
         root_unit_id        integer,
         base_quantity       numeric(30, 6)
     ) ;
 
-    INSERT INTO @details_temp(store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge)
-    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, tax, shipping_charge
+    INSERT INTO @details_temp(store_id, item_id, quantity, unit_id, price, discount_rate, discount, is_taxed, shipping_charge)
+    SELECT store_id, item_id, quantity, unit_id, price, discount_rate, discount, is_taxed, shipping_charge
     FROM @details;
 
     UPDATE @details_temp
@@ -272,13 +274,14 @@ BEGIN
 
     SELECT TOP 1
         @error_item_id = item_id,
-        @error_quantity = returned_quantity        
+        @error_quantity = returned_quantity,
+		@error_unit = inventory.get_unit_name_by_unit_id(root_unit_id)
     FROM @item_summary
     WHERE returned_quantity + returned_in_previous_batch + in_verification_queue > actual_quantity;
 
     IF(@error_item_id IS NOT NULL)
     BEGIN
-        SET @error_message = FORMATMESSAGE('The returned quantity (%s) of %s is greater than actual quantity.', CAST(@error_quantity AS varchar(30)), inventory.get_item_name_by_item_id(@error_item_id));
+        SET @error_message = FORMATMESSAGE('The returned quantity (%s %s) of %s is greater than actual quantity.', CAST(@error_quantity AS varchar(30)), @error_unit, inventory.get_item_name_by_item_id(@error_item_id));
 
         UPDATE @result 
         SET 

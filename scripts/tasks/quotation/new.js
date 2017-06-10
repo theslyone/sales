@@ -36,6 +36,110 @@
 
 initializeUI();
 
+function getModel() {
+    function getDetails() {
+        const items = $("#SalesItems .item");
+        var model = [];
+
+        $.each(items, function () {
+            const el = $(this);
+            const itemId = window.parseInt2(el.attr("data-item-id"));
+            const quantity = window.parseFloat2(el.find("input.quantity").val());
+            const unitId = window.parseInt2(el.find("select.unit").val());
+            const price = window.parseFloat2(el.find("input.price").val()) || 0;
+            const discountRate = window.parseFloat2(el.find("input.discount").val()) || 0;
+            const isTaxableItem = el.attr("data-is-taxable-item") === "true";
+            const amount = price * quantity;
+            const discount = window.round(amount * discountRate / 100, 2);
+
+            model.push({
+                ValueDate: $("#ValueDateInputDate").datepicker("getDate"),
+                ItemId: itemId,
+                Quantity: quantity,
+                UnitId: unitId,
+                Price: price,
+                DiscountRate: discountRate,
+                Discount: discount,
+                IsTaxed: isTaxableItem
+            });
+        });
+
+        return model;
+    };
+
+    const valueDate = $("#ValueDateInputDate").datepicker("getDate");
+    const expectedDeliveryDate = $("#ExpectedDeliveryDateInputText").datepicker("getDate");
+    const referenceNumber = $("#ReferenceNumberInputText").val();
+    const terms = $("#TermsTextArea").val();
+    const internalMemo = $("#InternalMemoTextArea").val();
+    const customerId = $("#CustomerSelect").val();
+    const priceTypeId = $("#PriceTypeSelect").val();
+    const shipperId = $("#ShipperSelect").val();
+    const details = getDetails();
+    const discount = window.parseFloat2($("#DiscountInputText").val());
+    var taxRate = window.parseFloat2($("#SalesTaxRateHidden").val()) || 0;
+    
+    var totalPrice = 0;
+    var taxableTotal = 0;
+    var nonTaxableTotal = 0;
+    var totalBeforeDiscount = 0;
+    var tax = 0;
+
+    (function(){
+        const items = $("#SalesItems .item");
+
+        $.each(items, function () {
+            const el = $(this);
+            const itemId = window.parseInt2(el.attr("data-item-id"));
+            const quantity = window.parseFloat2(el.find("input.quantity").val());
+            const unitId = window.parseInt2(el.find("select.unit").val());
+            const price = window.parseFloat2(el.find("input.price").val()) || 0;
+            const discountRate = window.parseFloat2(el.find("input.discount").val()) || 0;
+            const isTaxableItem = el.attr("data-is-taxable-item") === "true";
+            var discount = 0;
+            const amount = price * quantity;
+            const discountedAmount = amount * ((100 - discountRate) / 100);
+
+            if (isTaxableItem) {
+                taxableTotal += discountedAmount;
+            } else {
+                nonTaxableTotal += discountedAmount;
+            };
+
+            totalPrice += discountedAmount;
+        });
+
+        taxableTotal = window.round(taxableTotal, 2);
+        nonTaxableTotal = window.round(nonTaxableTotal, 2);
+
+        totalBeforeDiscount = taxableTotal;
+        totalPrice -= discount;
+        taxableTotal -= discount;
+
+        tax = taxableTotal * (taxRate / 100);
+        totalPrice += tax;
+
+        totalPrice = window.round(totalPrice, 2);
+    })();
+
+    return {
+        ValueDate: valueDate,
+        ExpectedDeliveryDate: expectedDeliveryDate,
+        ReferenceNumber: referenceNumber,
+        Terms: terms,
+        InternalMemo: internalMemo,
+        CustomerId: customerId,
+        PriceTypeId: priceTypeId,
+        ShipperId: shipperId,
+        Details: details,
+        TaxableTotal: totalBeforeDiscount,
+        Discount: discount,
+        NonTaxableTotal: nonTaxableTotal,
+        TaxRate: taxRate,
+        Tax: tax
+    };
+};
+
 $("#CheckoutButton").off("click").on("click", function () {
     function request(model) {
         const url = "/dashboard/sales/tasks/quotation/new";
@@ -43,56 +147,6 @@ $("#CheckoutButton").off("click").on("click", function () {
         return window.getAjaxRequest(url, "POST", data);
     };
 
-    function getModel() {
-        function getDetails() {
-            const items = $("#SalesItems .item");
-            var model = [];
-
-            $.each(items, function () {
-                const el = $(this);
-                const itemId = parseInt(el.attr("data-item-id"));
-                const quantity = parseFloat(el.find("input.quantity").val());
-                const unitId = parseInt(el.find("select.unit").val());
-                const price = parseFloat(el.find("input.price").val()) || 0;
-                const discount = parseFloat(el.find("input.discount").val()) || 0;
-                const tax = parseFloat(el.find(".tax-amount").html()) || 0;
-
-                model.push({
-                    ValueDate: $("#ValueDateInputDate").datepicker("getDate"),
-                    ItemId: itemId,
-                    Quantity: quantity,
-                    UnitId: unitId,
-                    Price: price,
-                    Tax: tax,
-                    DiscountRate: discount
-                });
-            });
-
-            return model;
-        };
-
-        const valueDate = $("#ValueDateInputDate").datepicker("getDate");
-        const expectedDeliveryDate = $("#ExpectedDeliveryDateInputText").datepicker("getDate");
-        const referenceNumber = $("#ReferenceNumberInputText").val();
-        const terms = $("#TermsTextArea").val();
-        const internalMemo = $("#InternalMemoTextArea").val();
-        const customerId = $("#CustomerSelect").val();
-        const priceTypeId = $("#PriceTypeSelect").val();
-        const shipperId = $("#ShipperSelect").val();
-        const details = getDetails();
-
-        return {
-            ValueDate: valueDate,
-            ExpectedDeliveryDate: expectedDeliveryDate,
-            ReferenceNumber: referenceNumber,
-            Terms: terms,
-            InternalMemo: internalMemo,
-            CustomerId: customerId,
-            PriceTypeId: priceTypeId,
-            ShipperId: shipperId,
-            Details: details
-        };
-    };
 
     const model = getModel();
 

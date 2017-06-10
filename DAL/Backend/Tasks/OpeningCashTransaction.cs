@@ -12,8 +12,8 @@ namespace MixERP.Sales.DAL.Backend.Tasks
     {
         public static async Task<OpeningCash> GetAsync(string tenant, int userId, DateTime transactionDate)
         {
-            string sql = "SELECT * FROM sales.opening_cash WHERE user_id=@0 AND transaction_date=@1";
-            var result = await Factory.GetAsync<OpeningCash>(tenant, sql, userId, transactionDate).ConfigureAwait(false);
+            string sql = "SELECT * FROM sales.opening_cash WHERE user_id=@0 AND transaction_date=@1 AND deleted=@2;";
+            var result = await Factory.GetAsync<OpeningCash>(tenant, sql, userId, transactionDate, false).ConfigureAwait(false);
             return result.FirstOrDefault();
         }
 
