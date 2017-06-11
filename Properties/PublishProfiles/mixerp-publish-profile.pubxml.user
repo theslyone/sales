@@ -1,0 +1,946 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit http://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>C:\frapid-published\Areas\MixERP.Sales</_PublishTargetUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="AppInfo.json">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="bin/AWSSDK.Core.dll">
+      <publishTime>05/11/2017 14:28:44</publishTime>
+    </File>
+    <File Include="bin/AWSSDK.S3.dll">
+      <publishTime>05/11/2017 14:31:58</publishTime>
+    </File>
+    <File Include="bin/DevTrends.MvcDonutCaching.dll">
+      <publishTime>03/21/2017 17:31:11</publishTime>
+    </File>
+    <File Include="bin/Frapid.ApplicationState.dll">
+      <publishTime>05/27/2017 09:03:06</publishTime>
+    </File>
+    <File Include="bin/Frapid.Areas.dll">
+      <publishTime>05/27/2017 09:03:10</publishTime>
+    </File>
+    <File Include="bin/Frapid.Configuration.dll">
+      <publishTime>05/27/2017 10:03:04</publishTime>
+    </File>
+    <File Include="bin/Frapid.Dashboard.dll">
+      <publishTime>05/27/2017 10:03:11</publishTime>
+    </File>
+    <File Include="bin/Frapid.DataAccess.dll">
+      <publishTime>05/27/2017 09:03:05</publishTime>
+    </File>
+    <File Include="bin/Frapid.DbPolicy.dll">
+      <publishTime>05/27/2017 09:03:07</publishTime>
+    </File>
+    <File Include="bin/frapid.exe">
+      <publishTime>05/27/2017 10:05:41</publishTime>
+    </File>
+    <File Include="bin/Frapid.Framework.dll">
+      <publishTime>05/27/2017 10:02:26</publishTime>
+    </File>
+    <File Include="bin/Frapid.i18n.dll">
+      <publishTime>05/27/2017 10:05:41</publishTime>
+    </File>
+    <File Include="bin/Frapid.Mapper.dll">
+      <publishTime>05/27/2017 10:03:03</publishTime>
+    </File>
+    <File Include="bin/Frapid.Messaging.dll">
+      <publishTime>05/18/2017 05:01:45</publishTime>
+    </File>
+    <File Include="bin/Frapid.TokenManager.dll">
+      <publishTime>02/27/2017 20:48:13</publishTime>
+    </File>
+    <File Include="bin/Frapid.WebsiteBuilder.dll">
+      <publishTime>05/27/2017 10:04:09</publishTime>
+    </File>
+    <File Include="bin/HtmlAgilityPack.dll">
+      <publishTime>02/27/2017 16:00:01</publishTime>
+    </File>
+    <File Include="bin/Humanizer.dll">
+      <publishTime>02/27/2017 20:34:36</publishTime>
+    </File>
+    <File Include="bin/jose-jwt.dll">
+      <publishTime>02/27/2017 16:00:39</publishTime>
+    </File>
+    <File Include="bin/Mapster.dll">
+      <publishTime>02/27/2017 16:10:08</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNet.SignalR.Core.dll">
+      <publishTime>02/27/2017 16:00:31</publishTime>
+    </File>
+    <File Include="bin/Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Owin.dll">
+      <publishTime>02/27/2017 16:00:33</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Web.Infrastructure.dll">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/MixERP.Finance.dll">
+      <publishTime>05/27/2017 15:30:34</publishTime>
+    </File>
+    <File Include="bin/MixERP.Sales.dll">
+      <publishTime>05/27/2017 15:39:37</publishTime>
+    </File>
+    <File Include="bin/MixERP.Social.dll">
+      <publishTime>05/27/2017 10:12:24</publishTime>
+    </File>
+    <File Include="bin/MySql.Data.dll">
+      <publishTime>02/27/2017 16:00:34</publishTime>
+    </File>
+    <File Include="bin/Newtonsoft.Json.dll">
+      <publishTime>03/21/2017 17:31:11</publishTime>
+    </File>
+    <File Include="bin/Npgsql.dll">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/Owin.dll">
+      <publishTime>02/27/2017 16:00:35</publishTime>
+    </File>
+    <File Include="bin/roslyn/csc.exe">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/csc.exe.config">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/csc.rsp">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/csi.exe">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/csi.rsp">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.Build.Tasks.CodeAnalysis.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CodeAnalysis.CSharp.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CodeAnalysis.CSharp.Scripting.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CodeAnalysis.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CodeAnalysis.Scripting.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CodeAnalysis.VisualBasic.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CSharp.Core.targets">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.DiaSymReader.Native.amd64.dll">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.DiaSymReader.Native.x86.dll">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.VisualBasic.Core.targets">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/System.AppContext.dll">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/System.Collections.Immutable.dll">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/System.Diagnostics.StackTrace.dll">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/System.IO.FileSystem.dll">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/System.IO.FileSystem.Primitives.dll">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/System.Reflection.Metadata.dll">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/vbc.exe">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/vbc.exe.config">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/vbc.rsp">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/VBCSCompiler.exe">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/roslyn/VBCSCompiler.exe.config">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="bin/Serilog.dll">
+      <publishTime>03/21/2017 17:31:12</publishTime>
+    </File>
+    <File Include="bin/StackExchange.Redis.dll">
+      <publishTime>02/27/2017 16:00:36</publishTime>
+    </File>
+    <File Include="bin/StackExchange.Redis.Extensions.Core.dll">
+      <publishTime>02/27/2017 16:00:36</publishTime>
+    </File>
+    <File Include="bin/StackExchange.Redis.Extensions.Newtonsoft.dll">
+      <publishTime>02/27/2017 16:00:36</publishTime>
+    </File>
+    <File Include="bin/System.Net.Http.Formatting.dll">
+      <publishTime>02/27/2017 16:00:31</publishTime>
+    </File>
+    <File Include="bin/System.Web.Helpers.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/System.Web.Http.dll">
+      <publishTime>02/27/2017 16:00:32</publishTime>
+    </File>
+    <File Include="bin/System.Web.Mvc.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/System.Web.Razor.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/System.Web.Webpages.Deployment.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/System.Web.Webpages.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/System.Web.Webpages.Razor.dll">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="bin/WebMarkupMin.Core.dll">
+      <publishTime>02/27/2017 16:00:38</publishTime>
+    </File>
+    <File Include="bin/YamlDotNet.dll">
+      <publishTime>02/27/2017 20:34:36</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/bundler/SqlBundler.exe">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/bundler/SqlBundler.exe.config">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/index.html">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/rebundle-db-with-sample.bat">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/rebundle-db-without-sample.bat">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/sales-blank.sql">
+      <publishTime>03/21/2017 21:49:35</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/sales-sample.sql">
+      <publishTime>03/21/2017 21:49:35</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/sales.sqlbundle">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/01.types-domains-tables-and-constraints/tables-and-constraints.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.add_gift_card_fund.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.add_opening_cash.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_active_coupon_id_by_coupon_code.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_avaiable_coupons_to_print.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_customer_account_detail.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_balance.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_detail.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_id_by_gift_card_number.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_item_selling_price.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_late_fee_id_by_late_fee_code.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_order_view.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_payable_account_for_gift_card.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_payable_account_id_by_gift_card_id.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_quotation_view.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_receivable_account_for_check_receipts.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.get_top_selling_products_of_all_time.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.post_cash_receipt.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.post_check_receipt.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.post_customer_receipt.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.post_late_fee.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.post_receipt.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.post_receipt_by_gift_card.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.post_return.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.post_sales.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.refresh_materialized_views.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.settle_customer_due.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/02.functions-and-logic/sales.validate_items_for_return.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/03.menus/menus.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/04.default-values/01.default-values.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/05.reports/sales.get_account_receivables_report.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/05.scrud-views/sales.cashier_scrud_view.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/05.scrud-views/sales.item_selling_price_scrud_view.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/05.scrud-views/sales.payment_term_scrud_view.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/05.views/sales.coupon_view.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/05.views/sales.gift_card_search_view.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/05.views/sales.gift_card_transaction_view.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/05.views/sales.item_view.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/05.views/sales.sales_view.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/05.views/sales.zcustomer_transaction_view.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/06.widgets/inventory.top_customers_by_office_view.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/06.widgets/sales.get_account_receivable_widget_details.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/99.ownership.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/2.x/2.0/src/99.sample-data/sample.sample.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/sales-blank.sql">
+      <publishTime>03/21/2017 21:49:35</publishTime>
+    </File>
+    <File Include="db/PostgreSQL/sales-sample.sql">
+      <publishTime>03/21/2017 21:49:35</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/bundler/SqlBundler.exe">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/bundler/SqlBundler.exe.config">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/index.html">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/rebundle-db-with-sample.bat">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/rebundle-db-without-sample.bat">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/sales-blank.sql">
+      <publishTime>03/21/2017 21:49:37</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/sales-sample.sql">
+      <publishTime>03/21/2017 21:49:36</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/sales.sqlbundle">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/01.types-domains-tables-and-constraints/tables-and-constraints.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.add_gift_card_fund.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.add_opening_cash.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_active_coupon_id_by_coupon_code.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_avaiable_coupons_to_print.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_customer_account_detail.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_balance.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_detail.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_gift_card_id_by_gift_card_number.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_item_selling_price.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_late_fee_id_by_late_fee_code.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_order_view.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_payable_account_for_gift_card.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_payable_account_id_by_gift_card_id.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_quotation_view.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_receivable_account_for_check_receipts.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.get_top_selling_products_of_all_time.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.post_cash_receipt.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.post_check_receipt.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.post_customer_receipt.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.post_late_fee.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.post_receipt.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.post_receipt_by_gift_card.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.post_return.sql">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.post_sales.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.settle_customer_due.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/02.functions-and-logic/sales.validate_items_for_return.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/03.menus/menus.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/04.default-values/01.default-values.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/05.reports/sales.get_account_receivables_report.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/05.scrud-views/sales.cashier_scrud_view.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/05.scrud-views/sales.item_selling_price_scrud_view.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/05.scrud-views/sales.payment_term_scrud_view.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/05.views/sales.coupon_view.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/05.views/sales.gift_card_search_view.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/05.views/sales.gift_card_transaction_view.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/05.views/sales.item_view.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/05.views/sales.sales_view.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/05.views/sales.zcustomer_transaction_view.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/06.widgets/inventory.top_customers_by_office_view.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/06.widgets/sales.get_account_receivable_widget_details.sql">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/99.ownership.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/2.x/2.0/src/99.sample-data/sample.sample.sql">
+      <publishTime>02/27/2017 16:07:47</publishTime>
+    </File>
+    <File Include="db/SQL Server/sales-blank.sql">
+      <publishTime>03/21/2017 21:49:37</publishTime>
+    </File>
+    <File Include="db/SQL Server/sales-sample.sql">
+      <publishTime>03/21/2017 21:49:36</publishTime>
+    </File>
+    <File Include="DevTrends.MvcDonutCaching.README.txt">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="packages.config">
+      <publishTime>03/21/2017 17:31:11</publishTime>
+    </File>
+    <File Include="Reports/AccountReceivables.SqlServer.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/AccountReceivables.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/AllGiftCards.SqlServer.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/AllGiftCards.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/CustomerAccountStatement.SqlServer.xml">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="Reports/CustomerAccountStatement.xml">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="Reports/CustomerReceipts.SqlServer.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/CustomerReceipts.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/DetailedPaymentReport.SqlServer.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/DetailedPaymentReport.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/GiftCardSummary.SqlServer.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/GiftCardSummary.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/GiftCardTransaction.SqlServer.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/GiftCardTransaction.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/GiftCardUsageStatement.SqlServer.xml">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="Reports/GiftCardUsageStatement.xml">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="Reports/Invoice.SqlServer.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/Invoice.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/Order.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/OrderStatus.SqlServer.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/OrderStatus.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/Quotation.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/QuotationStatus.SqlServer.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/QuotationStatus.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/Receipt.xml">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="Reports/Return.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/SalesByOffice.SqlServer.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/SalesByOffice.xml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Reports/SalesDiscountStatus.SqlServer.xml">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="Reports/SalesDiscountStatus.xml">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="Reports/TopSellingItems.xml">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="scripts/loyalty/coupons/index.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/loyalty/gift-cards/add-fund/checklist.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/loyalty/gift-cards/add-fund/entry.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/loyalty/gift-cards/add-fund/index.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/loyalty/gift-cards/add-fund/verification.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/loyalty/gift-cards/index.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/loyalty/points/index.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/setup/cashiers.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/setup/checklist.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/setup/customer-search.js">
+      <publishTime>03/21/2017 17:31:12</publishTime>
+    </File>
+    <File Include="scripts/setup/customer-types.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/setup/customers.js">
+      <publishTime>03/21/2017 17:31:12</publishTime>
+    </File>
+    <File Include="scripts/setup/late-fee.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/setup/payment-terms.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/setup/price-types.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/setup/selling-prices.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/shared/customer-search.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/shared/gift-card-search.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/shared/item-list.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/shared/pos-item-list.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/shared/pos-screen.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/shared/reprint-ticket.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/shared/sales-entry.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/closing-cash/index.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/entry/checklist.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/entry/index.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/entry/new.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/entry/verification.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/opening-cash/index.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/order/checklist.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/order/index.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/order/new.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/quotation/checklist.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/quotation/index.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/quotation/new.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/receipt/checklist.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/receipt/index.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/receipt/new.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/receipt/verification.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/return/checklist.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/return/index.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/return/new.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/tasks/return/verification.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="scripts/ticket/index.js">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="styles/shared/checkout.css">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="styles/tasks/closing-cash/index.css">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="styles/ticket/index.css">
+      <publishTime>02/27/2017 16:07:48</publishTime>
+    </File>
+    <File Include="Views/Layout.cshtml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Views/Loyalty/Coupons/Index.cshtml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Views/Loyalty/GiftCards/AddFund/Checklist.cshtml">
+      <publishTime>02/27/2017 16:07:45</publishTime>
+    </File>
+    <File Include="Views/Loyalty/GiftCards/AddFund/Entry.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Loyalty/GiftCards/AddFund/Index.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Loyalty/GiftCards/AddFund/Verification.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Loyalty/GiftCards/Index.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Loyalty/Points/Index.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Setup/Cashiers.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Setup/Customers.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Setup/CustomerSearch.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Setup/CustomerTypes.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Setup/LateFee.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Setup/PaymentTerms.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Setup/PriceTypes.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Setup/SellingPrices.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Shared/CustomerSearchModal.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Shared/GiftCardSerachModal.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Shared/ItemList.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Shared/POSItemList.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Shared/POSScreen.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Shared/ReprintTicketModal.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Shared/SalesEntryForm.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/ClosingCash/Index.cshtml">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="Views/Tasks/Console/Index.cshtml">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="Views/Tasks/Entry/Checklist.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Entry/Index.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Entry/New.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Entry/Verification.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/OpeningCash/Index.cshtml">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="Views/Tasks/Order/Checklist.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Order/Index.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Order/New.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Quotation/Checklist.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Quotation/Index.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Quotation/New.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Receipt/Checklist.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Receipt/Index.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Receipt/New.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Receipt/Verification.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Return/Checklist.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Return/Index.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Return/New.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Tasks/Return/Verification.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/Ticket/Index.cshtml">
+      <publishTime>02/27/2017 16:07:46</publishTime>
+    </File>
+    <File Include="Views/web.config">
+      <publishTime>03/21/2017 17:31:10</publishTime>
+    </File>
+    <File Include="web.config">
+      <publishTime>05/27/2017 10:10:22</publishTime>
+    </File>
+    <File Include="widgets/account-receivables.html">
+      <publishTime>03/21/2017 17:31:12</publishTime>
+    </File>
+    <File Include="widgets/receipts.html">
+      <publishTime>03/21/2017 17:31:12</publishTime>
+    </File>
+    <File Include="widgets/top-customers.html">
+      <publishTime>03/21/2017 17:31:12</publishTime>
+    </File>
+    <File Include="widgets/top-items.html">
+      <publishTime>03/21/2017 17:31:12</publishTime>
+    </File>
+    <File Include="widgets/total-sales.html">
+      <publishTime>03/21/2017 17:31:12</publishTime>
+    </File>
+  </ItemGroup>
+</Project>
