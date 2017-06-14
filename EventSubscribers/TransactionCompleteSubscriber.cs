@@ -4,12 +4,10 @@ using MixERP.Sales.ViewModels;
 using Serilog;
 using System;
 using System.Threading.Tasks;
-using Frapid.Framework.Extensions;
 using MixERP.Sales.Models;
-using Frapid.ApplicationState.Cache;
 using Frapid.Dashboard.Helpers;
 using Frapid.Dashboard.DTO;
-//using MixERP.Sales.DAL.Backend.Tasks;
+using Receipts = MixERP.Sales.DAL.Backend.Tasks.Receipts;
 
 namespace MixERP.Sales.EventSubscribers
 {
@@ -23,8 +21,8 @@ namespace MixERP.Sales.EventSubscribers
                 var tenant = transactionEvent.MetaData?["Tenant"];
                 var transId = transactionEvent.MetaData["TransId"];
 
-                var officeId = transactionEvent.MetaData["OfficeId"];
-                var storeId = transactionEvent.MetaData["StoreId"];
+                //var officeId = transactionEvent.MetaData["OfficeId"];
+                //var storeId = transactionEvent.MetaData["StoreId"];
                 var creditExchangeRate = transactionEvent.MetaData["CreditExchangeRate"];
                 var debitExchangeRate = transactionEvent.MetaData["DebitExchangeRate"];
                 var costCenterId = transactionEvent.MetaData["CostCenterId"];
@@ -60,7 +58,7 @@ namespace MixERP.Sales.EventSubscribers
 
                 try
                 {
-                    long receiptId = await DAL.Backend.Tasks.Receipts.PostAsync(tenant, salesReceipt).ConfigureAwait(true);
+                    long receiptId = await Receipts.PostAsync(tenant, salesReceipt).ConfigureAwait(true);
                     //send notification here to erp vendor
                     await NotificationHelper.SendAsync(tenant, new Notification
                     {
@@ -77,6 +75,8 @@ namespace MixERP.Sales.EventSubscribers
                 }
                 catch(Exception exc)
                 {
+                    Log.Error("{error}", exc.Message);
+
                     //send error notification to erp vendor
                     await NotificationHelper.SendAsync(tenant, new Notification
                     {
