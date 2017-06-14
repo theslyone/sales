@@ -55,10 +55,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\Frapid.Areas.dll</HintPath>
     </Reference>
-    <Reference Include="Frapid.Configuration, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\bin\Frapid.Configuration.dll</HintPath>
-    </Reference>
     <Reference Include="Frapid.Dashboard, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\Frapid.Dashboard.dll</HintPath>
@@ -133,6 +129,14 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
+    <Reference Include="zxing, Version=0.15.0.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\ZXing.Net.0.15.0\lib\net45\zxing.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="zxing.presentation, Version=0.15.0.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\ZXing.Net.0.15.0\lib\net45\zxing.presentation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Web.Razor">
@@ -230,9 +234,12 @@
     <Compile Include="DTO\SalesView.cs" />
     <Compile Include="DTO\SerialNumbers.cs" />
     <Compile Include="DTO\SerialNumberView.cs" />
+    <Compile Include="EventSubscribers\TransactionCompleteSubscriber.cs" />
     <Compile Include="ExceptionLogger.cs" />
+    <Compile Include="Extensions\HtmlHelperExtensions.cs" />
     <Compile Include="Extensions\PartialViewExtensions.cs" />
     <Compile Include="I18N.cs" />
+    <Compile Include="Models\SalesQRCode.cs" />
     <Compile Include="Models\Tickets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryModels\GiftCardSearch.cs" />
@@ -518,6 +525,15 @@
     <Content Include="db\SQL Server\2.x\2.0\rebundle-db-without-sample.bat" />
     <Content Include="db\SQL Server\2.x\2.0\sales.sqlbundle" />
     <Content Include="AppInfo.json" />
+    <Content Include="i18N\ar\resources.yaml" />
+    <Content Include="i18N\de\resources.yaml" />
+    <Content Include="i18N\es\resources.yaml" />
+    <Content Include="i18N\fr\resources.yaml" />
+    <Content Include="i18N\ne\resources.yaml" />
+    <Content Include="i18N\recreate-i18n-paused.bat" />
+    <Content Include="i18N\recreate-i18n.bat" />
+    <Content Include="i18N\resources.yaml" />
+    <Content Include="i18N\ru\resources.yaml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -525,7 +541,16 @@
       <DependentUpon>web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Libraries\Frapid.Configuration\Frapid.Configuration.csproj">
+      <Project>{ca3c3d39-6775-4234-b343-38f0724adcf8}</Project>
+      <Name>Frapid.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Frapid.Paylink\Frapid.Paylink.csproj">
+      <Project>{9ea0f849-ca4c-4aa0-805a-462ceccf4347}</Project>
+      <Name>Frapid.Paylink</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

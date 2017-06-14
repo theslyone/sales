@@ -3,68 +3,80 @@
   <Header />
   <Title>Sales Invoice</Title>
   <TopSection>
-    <table class="table horizontal">
-      <tr>
-        <td>{i18n.TranId}</td>
-        <td>
-          {DataSource[0].transaction_master_id}
-        </td>
-      </tr>
-      <tr>
-        <td>{i18n.TranCode}</td>
-        <td>
-          {DataSource[0].transaction_code}          
-        </td>
-      </tr>
-      <tr>
-        <td>{i18n.TransactionDate}</td>
-        <td>{DataSource[0].transaction_ts}</td>
-      </tr>
-      <tr>
-        <td>{i18n.ValueDate}</td>
-        <td>{DataSource[0].value_date}</td>
-      </tr>
-      <tr>
-        <td>{i18n.EnteredBy}</td>
-        <td> {DataSource[0].entered_by}</td>
-      </tr>
-      <tr>
-        <td>{i18n.TransactionStatus}</td>
-        <td> {DataSource[0].status}</td>
-      </tr>
-      <tr>
-        <td>{i18n.VerifiedBy}</td>
-        <td> {DataSource[0].verified_by}</td>
-      </tr>
-      <tr>
-        <td>{i18n.VerificationReason}</td>
-        <td> {DataSource[0].verification_reason}</td>
-      </tr>
-      <tr>
-        <td>{i18n.TranCode}</td>
-        <td>{DataSource[0].transaction_code}</td>
-      </tr>
-      <tr>
-        <td>{i18n.Office}</td>
-        <td>{DataSource[0].office_name}</td>
-      </tr>
-      <tr>
-        <td>{i18n.SalesType}</td>
-        <td>{DataSource[0].sales_type}</td>
-      </tr>
-      <tr>
-        <td>{i18n.CustomerName}</td>
-        <td>{DataSource[0].customer_name}</td>
-      </tr>
-        <tr>
-          <td>{i18n.CostCenter}</td>
-          <td>{DataSource[0].cost_center_name}</td>
-        </tr>
-        <tr>
-          <td>{i18n.StatementReference}</td>
-          <td>{DataSource[0].statement_reference}</td>
-        </tr>
-    </table>
+    <div>
+      <div style="float: left;">
+        <table class="table horizontal">
+          <tr>
+            <td>{i18n.TranId}</td>
+            <td id="transId">
+              {DataSource[0].transaction_master_id}
+            </td>
+          </tr>
+          <tr>
+            <td>{i18n.TranCode}</td>
+            <td>
+              {DataSource[0].transaction_code}
+            </td>
+          </tr>
+          <tr>
+            <td>{i18n.TransactionDate}</td>
+            <td>{DataSource[0].transaction_ts}</td>
+          </tr>
+          <tr>
+            <td>{i18n.ValueDate}</td>
+            <td>{DataSource[0].value_date}</td>
+          </tr>
+          <tr>
+            <td>{i18n.EnteredBy}</td>
+            <td> {DataSource[0].entered_by}</td>
+          </tr>
+          <tr>
+            <td>{i18n.TransactionStatus}</td>
+            <td> {DataSource[0].status}</td>
+          </tr>
+          <tr>
+            <td>{i18n.VerifiedBy}</td>
+            <td> {DataSource[0].verified_by}</td>
+          </tr>
+          <tr>
+            <td>{i18n.VerificationReason}</td>
+            <td> {DataSource[0].verification_reason}</td>
+          </tr>
+          <tr>
+            <td>{i18n.TranCode}</td>
+            <td>{DataSource[0].transaction_code}</td>
+          </tr>
+          <tr>
+            <td>{i18n.Office}</td>
+            <td>{DataSource[0].office_name}</td>
+          </tr>
+          <tr>
+            <td>{i18n.SalesType}</td>
+            <td>{DataSource[0].sales_type}</td>
+          </tr>
+          <tr>
+            <td>{i18n.CustomerName}</td>
+            <td>{DataSource[0].customer_name}</td>
+          </tr>
+          <tr>
+            <td>{i18n.CostCenter}</td>
+            <td>{DataSource[0].cost_center_name}</td>
+          </tr>
+          <tr>
+            <td>{i18n.StatementReference}</td>
+            <td>{DataSource[0].statement_reference}</td>
+          </tr>
+        </table>
+      </div>
+      <div style="float: right;">
+        <script src="/scripts/jquery-qrcode/jquery.qrcode.min.js"></script>
+        <div class="qrcode" style="width: 360px; margin: 50px auto;">
+          Generating QRCode, please wait ...
+        </div>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    
     <br />
   </TopSection>
   <Body>
@@ -131,6 +143,28 @@
 		</tr>
 	</table>
   </BottomSection>
+  <Script>
+    $(document).ready(function(){
+      function request() {
+        var transId = $('#transId').html();
+        const url = '/dashboard/sales/ticket/qrcode/' + transId;
+        return window.getAjaxRequest(url, "GET");
+      };
+
+      var ajax = request();
+      ajax.success(function(data){
+        if(data.length > 0) {
+          $(".qrcode").html('').qrcode({ width: 300, height: 300, text: data });
+        } else {
+          $(".qrcode").html('');
+        }
+      });
+      
+      ajax.error(function(err){
+        $(".qrcode").html('Error generating QRCode for sales #' + transId);
+      });
+    });
+  </Script>
   <DataSources>
     <DataSource>
       <Query>

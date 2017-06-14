@@ -1,5 +1,6 @@
 ﻿@using Frapid.ApplicationState.Cache
 @using Frapid.Framework.Extensions
+
 @model MixERP.Sales.ViewModels.TicketViewModel
 
 @{
@@ -7,11 +8,13 @@
     string logo = AppUsers.GetCurrent().Logo.Or("/Static/images/logo.png");
     var appUser = AppUsers.GetCurrent();
     string currenySymbol = appUser.CurrencySymbol;
+    var currency = new System.Globalization.CultureInfo("en-NG");
+
     decimal taxableTotal = Model.Details.Where(x => x.IsTaxableItem).Sum(x => x.Amount);
     decimal taxTotal = Model.View.Tax;
 }
 @{
-    decimal discountRate = Math.Round(Model.View.Discount * 100 / Model.View.TaxableTotal, 1);
+    decimal discountRate = Math.Round(Model.View.Discount * 100 / Model.View.NontaxableTotal, 1);
 }
 
 <link rel="stylesheet" type="text/css" href="/Areas/MixERP.Sales/styles/ticket/index.css" />
@@ -175,7 +178,7 @@
                 {
                     <tr>
                         <th class="right">@I18N.Tender</th>
-                        <th class="right">@currenySymbol@Model.View.Tender.ToString("N2")</th>
+                        <th class="right">@currenySymbol@Model.View.Tender.ToString("C")</th>
                     </tr>
                     <tr>
                         <th class="right">@I18N.Change</th>
@@ -225,7 +228,7 @@
                                 </div>
                             }
                             @if (coupon.MaximumUsage != null)
-                    {
+                            {
                                 <div class="info">
                                     <div class="name">@I18N.TotalUsage</div>
                                     <div class="value">@coupon.MaximumUsage.Value</div>
@@ -234,6 +237,14 @@
                         </div>
                     </div>
                 }
+            </div>
+        }
+
+        @if (Model.View.IsCredit)
+        {
+            //Render pay with freebe here
+            <div>
+                @Html.FreebeQrCode(Model.View.TransactionMasterId)
             </div>
         }
     </div>
@@ -246,4 +257,6 @@
 
         el.qrcode({ width: 80, height: 80, text: coupon });
     });
+
+    $(".freebe_qrcode").qrcode({ width: 200, height: 200, text: "this is a test qrcode for freebe payment" })
 </script>

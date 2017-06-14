@@ -299,6 +299,7 @@ CREATE TABLE sales.sales
     is_credit                               boolean NOT NULL DEFAULT(false),
 	credit_settled							boolean,
     payment_term_id                         integer REFERENCES sales.payment_terms,
+    bank_id                         	    integer REFERENCES finance.bank_accounts,
     tender                                  numeric(30, 6) NOT NULL,
     change                                  numeric(30, 6) NOT NULL,
     gift_card_id                            integer REFERENCES sales.gift_cards,
@@ -326,7 +327,7 @@ CREATE TABLE sales.customer_receipts
     tender                                  public.money_strict2,
     change                                  public.money_strict2,
     amount                                  public.money_strict2,
-    collected_on_bank_id					integer REFERENCES finance.bank_accounts,
+    collected_on_bank_id		    integer REFERENCES finance.bank_accounts,
 	collected_bank_instrument_code			national character varying(500),
 	collected_bank_transaction_code			national character varying(500),
 	check_number                            national character varying(100),
@@ -1754,11 +1755,11 @@ $$
     DECLARE _merchant_fee_statement_reference   text;
     DECLARE _merchant_fee                       public.money_strict2;
     DECLARE _merchant_fee_lc                    public.money_strict2;
-	DECLARE _bank_account_id					integer;
+    DECLARE _account_id				integer;
 BEGIN
-    _value_date                             := finance.get_value_date(_office_id);
-    _book_date                              := _value_date;
-	_bank_account_id					    := finance.get_account_id_by_bank_account_id(_bank_id);    
+    _value_date                             	:= finance.get_value_date(_office_id);
+    _book_date                             	:= _value_date;
+    _account_id				    	:= finance.get_account_id_by_bank_account_id(_bank_id);    
 
     IF(finance.can_post_transaction(_login_id, _user_id, _office_id, _book, _value_date) = false) THEN
         RETURN 0;
@@ -1871,7 +1872,7 @@ BEGIN
         SELECT _transaction_master_id, _office_id, _value_date, _book_date, 'Dr', _cash_account_id, _statement_reference, _cash_repository_id, _currency_code, _debit, _local_currency_code, _exchange_rate_debit, _lc_debit, _user_id;
     ELSE
         INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, cash_repository_id, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency, audit_user_id)
-        SELECT _transaction_master_id, _office_id, _value_date, _book_date, 'Dr', _bank_account_id, _statement_reference, NULL, _currency_code, _debit, _local_currency_code, _exchange_rate_debit, _lc_debit, _user_id;        
+        SELECT _transaction_master_id, _office_id, _value_date, _book_date, 'Dr', _account_id, _statement_reference, NULL, _currency_code, _debit, _local_currency_code, _exchange_rate_debit, _lc_debit, _user_id;        
     END IF;
 
     --Credit
@@ -1886,7 +1887,7 @@ BEGIN
 
         --Credit: Merchant A/C
         INSERT INTO finance.transaction_details(transaction_master_id, office_id, value_date, book_date, tran_type, account_id, statement_reference, cash_repository_id, currency_code, amount_in_currency, local_currency_code, er, amount_in_local_currency, audit_user_id)
-        SELECT _transaction_master_id, _office_id, _value_date, _book_date, 'Cr', _bank_account_id, _merchant_fee_statement_reference, NULL, _currency_code, _merchant_fee, _local_currency_code, _exchange_rate_debit, _merchant_fee_lc, _user_id;
+        SELECT _transaction_master_id, _office_id, _value_date, _book_date, 'Cr', _account_id, _merchant_fee_statement_reference, NULL, _currency_code, _merchant_fee, _local_currency_code, _exchange_rate_debit, _merchant_fee_lc, _user_id;
 
         IF(_customer_pays_fee) THEN
             --Debit: Party Account Id
@@ -1901,7 +1902,7 @@ BEGIN
     
     
     INSERT INTO sales.customer_receipts(transaction_master_id, customer_id, currency_code, amount, er_debit, er_credit, cash_repository_id, posted_date, collected_on_bank_id, collected_bank_instrument_code, collected_bank_transaction_code)
-    SELECT _transaction_master_id, _customer_id, _currency_code, _amount,  _exchange_rate_debit, _exchange_rate_credit, _cash_repository_id, _posted_date, _bank_account_id, _bank_instrument_code, _bank_tran_code;
+    SELECT _transaction_master_id, _customer_id, _currency_code, _amount,  _exchange_rate_debit, _exchange_rate_credit, _cash_repository_id, _posted_date, _bank_id, _bank_instrument_code, _bank_tran_code;
 
     PERFORM finance.auto_verify(_transaction_master_id, _office_id);
     PERFORM sales.settle_customer_due(_customer_id, _office_id);
@@ -2738,6 +2739,7 @@ DROP FUNCTION IF EXISTS sales.post_sales
     _tender                                 public.money_strict2,
     _change                                 public.money_strict2,
     _payment_term_id                        integer,
+    _bank_id                                integer,
     _check_amount                           public.money_strict2,
     _check_bank_name                        national character varying(1000),
     _check_number                           national character varying(100),
@@ -2772,6 +2774,7 @@ CREATE FUNCTION sales.post_sales
     _tender                                 public.money_strict2,
     _change                                 public.money_strict2,
     _payment_term_id                        integer,
+    _bank_id                                integer,
     _check_amount                           public.money_strict2,
     _check_bank_name                        national character varying(1000),
     _check_number                           national character varying(100),
@@ -2860,7 +2863,7 @@ BEGIN
     END IF;
     --TODO: VALIDATE COUPON CODE AND POST DISCOUNT
 
-    IF(COALESCE(_payment_term_id, 0) > 0) THEN
+   IF(COALESCE(_payment_term_id, 0) > 0 OR COALESCE(_bank_id, 0) > 0) THEN
         _is_credit                          := true;
     END IF;
 
@@ -3190,9 +3193,9 @@ BEGIN
         PERFORM sales.settle_customer_due(_customer_id, _office_id);
     END IF;
 
-    IF(_book_name = 'Sales Entry') THEN
-        INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id, receipt_transaction_master_id)
-        SELECT _fiscal_year_code, _invoice_number, _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id, _receipt_transaction_master_id;
+    IF(1=1 AND _book_name = 'Sales Entry') THEN
+        INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, bank_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id, receipt_transaction_master_id)
+        SELECT _fiscal_year_code, _invoice_number, _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _bank_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id, _receipt_transaction_master_id;
     END IF;
     
     PERFORM finance.auto_verify(_transaction_master_id, _office_id);
@@ -3947,6 +3950,11 @@ SELECT
     sales.sales.payment_term_id,
     sales.payment_terms.payment_term_code,
     sales.payment_terms.payment_term_name,
+    finance.bank_types.bank_type_id,
+    finance.bank_types.bank_type_name,
+    finance.bank_accounts.bank_account_id,
+    finance.bank_accounts.bank_account_name,
+    finance.bank_accounts.bank_account_number,
     sales.sales.fiscal_year_code,
     sales.sales.invoice_number,
     sales.sales.total_amount,
@@ -3976,6 +3984,10 @@ LEFT JOIN sales.gift_cards
 ON sales.gift_cards.gift_card_id = sales.sales.gift_card_id
 LEFT JOIN sales.payment_terms
 ON sales.payment_terms.payment_term_id = sales.sales.payment_term_id
+LEFT JOIN finance.bank_accounts
+ON finance.bank_accounts.bank_account_id = sales.sales.bank_id
+LEFT JOIN finance.bank_types
+ON finance.bank_accounts.bank_type_id = finance.bank_types.bank_type_id
 LEFT JOIN sales.coupons
 ON sales.coupons.coupon_id = sales.sales.coupon_id
 LEFT JOIN core.verification_statuses

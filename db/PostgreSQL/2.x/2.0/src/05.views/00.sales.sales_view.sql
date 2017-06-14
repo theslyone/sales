@@ -53,6 +53,11 @@ SELECT
     sales.sales.payment_term_id,
     sales.payment_terms.payment_term_code,
     sales.payment_terms.payment_term_name,
+    finance.bank_types.bank_type_id,
+    finance.bank_types.bank_type_name,
+    finance.bank_accounts.bank_account_id,
+    finance.bank_accounts.bank_account_name,
+    finance.bank_accounts.bank_account_number,
     sales.sales.fiscal_year_code,
     sales.sales.invoice_number,
     sales.sales.total_amount,
@@ -82,6 +87,10 @@ LEFT JOIN sales.gift_cards
 ON sales.gift_cards.gift_card_id = sales.sales.gift_card_id
 LEFT JOIN sales.payment_terms
 ON sales.payment_terms.payment_term_id = sales.sales.payment_term_id
+LEFT JOIN finance.bank_accounts
+ON finance.bank_accounts.bank_account_id = sales.sales.bank_id
+LEFT JOIN finance.bank_types
+ON finance.bank_accounts.bank_type_id = finance.bank_types.bank_type_id
 LEFT JOIN sales.coupons
 ON sales.coupons.coupon_id = sales.sales.coupon_id
 LEFT JOIN core.verification_statuses

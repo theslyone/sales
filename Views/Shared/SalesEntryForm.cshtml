@@ -1,5 +1,4 @@
 ﻿@model dynamic
-
 <div class="header items">
     <div class="two summary items">
         <div class="amount item">
@@ -38,6 +37,14 @@
                 <div class="description">@I18N.PaymentTerm</div>
                 <div class="control">
                     <select class="ui inverted fluid dropdown" id="PaymentTermSelect"></select>
+                </div>
+            </div>
+        </div>
+        <div data-payment-type="freebe" style="display: none;" class="one summary items">
+            <div class="gift-card number item">
+                <div class="description">@I18N.Bank</div>
+                <div class="control">
+                    <select class="ui inverted fluid dropdown" id="BankSelect"></select>
                 </div>
             </div>
         </div>
@@ -189,3 +196,13 @@
     </div>
 </div>
 <script src="/Areas/MixERP.Sales/scripts/shared/sales-entry.js"></script>
+
+
+<script>
+    $(".qrcode").each(function () {
+        const el = $(this);
+        const code = el.attr("data-code");
+
+        el.qrcode({ width: 200, height: 200, text: code });
+    });
+</script>

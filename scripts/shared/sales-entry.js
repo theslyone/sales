@@ -38,6 +38,9 @@ function getModel() {
     const counterId = window.parseInt2($("#CounterSelect").val()) || null;
     const paymentTermId = window.parseInt2($("#PaymentTermSelect").val()) || null;
 
+    //Freebe
+    const bankId = window.parseInt2($("#BankSelect").val()) || null;
+
     //Check
     const checkAmount = window.parseFloat2($("#CheckAmountInputText").val()) || null;
     const bankName = $("#BankNameInputText").val();
@@ -73,6 +76,7 @@ function getModel() {
         Tender: tender,
         Change: change,
         PaymentTermId: paymentTermId,
+        BankId: bankId,
         CheckAmount: checkAmount,
         CheckBankName: bankName,
         CheckNumber: checkNumber,
@@ -171,6 +175,8 @@ function loadModelData(model) {
 
     $("#PaymentTermSelect").val(model.PaymentTermId);
 
+    $("#BankSelect").val(model.BankId);
+
     $("#CheckAmountInputText").val(model.CheckAmount);
     $("#BankNameInputText").val(model.CheckBankName);
     $("#CheckNumberInputText").val(model.CheckNumber);
@@ -263,7 +269,11 @@ $("#CheckoutButton").off("click").on("click", function () {
     function validate() {
         var transactionTotal = window.parseFloat2($("div.amount .money").text());
         var cashTender = window.parseFloat2($("#TenderInputText").val()) || 0;
+
         var paymentTerm = window.parseInt2($("#PaymentTermSelect").val()) || null;
+
+        var bankId = window.parseInt2($("#BankSelect").val()) || null;
+
         var checkAmount = window.parseFloat2($("#CheckAmountInputText").val()) || 0;
         var bankName = $("#BankNameInputText").val();
         var checkDate = $("#CheckDateInputText").datepicker("getDate");
@@ -281,6 +291,7 @@ $("#CheckoutButton").off("click").on("click", function () {
             //Todo: Remove Semantic UI Dropdown dependency 
             // $("#PaymentTermSelect").dropdown("set selected", "Select");
             $("#PaymentTermSelect").val("Select");
+            $("#BankSelect").val("Select");
             $("#GiftCardNumberInputText").val("");
             $("#GiftCardNumberBalanceInputText").val("");
             return true;
@@ -308,6 +319,7 @@ $("#CheckoutButton").off("click").on("click", function () {
             //Todo: Remove Semantic UI Dropdown dependency 
             // $("#PaymentTermSelect").dropdown("set selected", "Select");
             $("#PaymentTermSelect").val("Select");
+            $("#BankSelect").val("Select");
             $("#GiftCardNumberInputText").val("");
             $("#GiftCardNumberBalanceInputText").val("");
 
@@ -332,6 +344,7 @@ $("#CheckoutButton").off("click").on("click", function () {
             //Todo: Remove Semantic UI Dropdown dependency 
             // $("#PaymentTermSelect").dropdown("set selected", "Select");
             $("#PaymentTermSelect").val("Select");
+            $("#BankSelect").val("Select");
 
             return true;
         };
@@ -346,6 +359,11 @@ $("#CheckoutButton").off("click").on("click", function () {
         $("#GiftCardNumberInputText").val("");
         $("#GiftCardNumberBalanceInputText").val("");
 
+        if (bankId) {
+            paymentTerm = 1;
+            return true;
+        }
+        
         if (!paymentTerm) {
             window.displayMessage(window.translate("PleaseSelectPaymentTerm"));
             return false;

@@ -2383,6 +2383,11 @@ namespace MixERP.Sales
 		/// </summary>
 		public static string PayByGiftCard => I18NResource.GetString(ResourceDirectory, "PayByGiftCard");
 
+        /// <summary>
+        /// Pay with Freebe
+        /// </summary>
+        public static string PayWithFreebe => I18NResource.GetString(ResourceDirectory, "PayWithFreebe");
+
 		/// <summary>
 		///Pay by Check
 		/// </summary>

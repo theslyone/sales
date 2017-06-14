@@ -21,8 +21,10 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                             (
                                 @OfficeId::integer, @UserId::integer, @LoginId::bigint, @CounterId::integer, @ValueDate::date, @BookDate::date, 
                                 @CostCenterId::integer, @ReferenceNumber::national character varying(24), @StatementReference::text, 
-                                @Tender::public.money_strict2, @Change::public.money_strict2, @PaymentTermId::integer, 
-                                @CheckAmount::public.money_strict2, @CheckBankName::national character varying(1000), @CheckNumber::national character varying(100), @CheckDate::date,
+                                @Tender::public.money_strict2, @Change::public.money_strict2, 
+                                @PaymentTermId::integer, @BankId::integer,
+                                @CheckAmount::public.money_strict2, @CheckBankName::national character varying(1000), 
+                                @CheckNumber::national character varying(100), @CheckDate::date,
                                 @GiftCardNumber::national character varying(100), 
                                 @CustomerId::integer, @PriceTypeId::integer, @ShipperId::integer, @StoreId::integer,
                                 @CouponCode::national character varying(100), @IsFlatDiscount::boolean, @Discount::public.money_strict2,
@@ -47,6 +49,7 @@ namespace MixERP.Sales.DAL.Backend.Tasks.SalesEntry
                     command.Parameters.AddWithNullableValue("@Tender", model.Tender);
                     command.Parameters.AddWithNullableValue("@Change", model.Change);
                     command.Parameters.AddWithNullableValue("@PaymentTermId", model.PaymentTermId);
+                    command.Parameters.AddWithNullableValue("@BankId", model.BankId);
                     command.Parameters.AddWithNullableValue("@CheckAmount", model.CheckAmount);
                     command.Parameters.AddWithNullableValue("@CheckBankName", model.CheckBankName.Or(""));
                     command.Parameters.AddWithNullableValue("@CheckNumber", model.CheckNumber.Or(""));

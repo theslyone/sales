@@ -56,6 +56,14 @@ namespace MixERP.Sales.DTO
         public int PaymentTermId { get; set; }
         public string PaymentTermCode { get; set; }
         public string PaymentTermName { get; set; }
+
+        public string BankTypeId { get; set; }
+        public string BankTypeName { get; set; }
+
+        public long? BankAccountId { get; set; }
+        public string BankAccountName { get; set; }
+        public string BankAccountNumber { get; set; }
+
         public string FiscalYearCode { get; set; }
         public long InvoiceNumber { get; set; }
         public decimal TotalAmount { get; set; }

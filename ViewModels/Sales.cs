@@ -32,6 +32,7 @@ namespace MixERP.Sales.ViewModels
         public decimal Change { get; set; }
 
         public int? PaymentTermId { get; set; }
+        public int? BankId { get; set; }
         public decimal? CheckAmount { get; set; }
         public string CheckNumber { get; set; }
         public string CheckBankName { get; set; }

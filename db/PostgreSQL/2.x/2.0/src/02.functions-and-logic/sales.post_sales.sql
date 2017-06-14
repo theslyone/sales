@@ -12,6 +12,7 @@
     _tender                                 public.money_strict2,
     _change                                 public.money_strict2,
     _payment_term_id                        integer,
+    _bank_id                                integer,
     _check_amount                           public.money_strict2,
     _check_bank_name                        national character varying(1000),
     _check_number                           national character varying(100),
@@ -46,6 +47,7 @@ CREATE FUNCTION sales.post_sales
     _tender                                 public.money_strict2,
     _change                                 public.money_strict2,
     _payment_term_id                        integer,
+    _bank_id                                integer,
     _check_amount                           public.money_strict2,
     _check_bank_name                        national character varying(1000),
     _check_number                           national character varying(100),
@@ -134,7 +136,7 @@ BEGIN
     END IF;
     --TODO: VALIDATE COUPON CODE AND POST DISCOUNT
 
-    IF(COALESCE(_payment_term_id, 0) > 0) THEN
+   IF(COALESCE(_payment_term_id, 0) > 0 OR COALESCE(_bank_id, 0) > 0) THEN
         _is_credit                          := true;
     END IF;
 
@@ -464,9 +466,9 @@ BEGIN
         PERFORM sales.settle_customer_due(_customer_id, _office_id);
     END IF;
 
-    IF(_book_name = 'Sales Entry') THEN
-        INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id, receipt_transaction_master_id)
-        SELECT _fiscal_year_code, _invoice_number, _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id, _receipt_transaction_master_id;
+    IF(1=1 AND _book_name = 'Sales Entry') THEN
+        INSERT INTO sales.sales(fiscal_year_code, invoice_number, price_type_id, counter_id, total_amount, cash_repository_id, sales_order_id, sales_quotation_id, transaction_master_id, checkout_id, customer_id, salesperson_id, coupon_id, is_flat_discount, discount, total_discount_amount, is_credit, payment_term_id, bank_id, tender, change, check_number, check_date, check_bank_name, check_amount, gift_card_id, receipt_transaction_master_id)
+        SELECT _fiscal_year_code, _invoice_number, _price_type_id, _counter_id, _receivable, _cash_repository_id, _sales_order_id, _sales_quotation_id, _transaction_master_id, _checkout_id, _customer_id, _user_id, _coupon_id, _is_flat_discount, _discount, _discount_total, _is_credit, _payment_term_id, _bank_id, _tender, _change, _check_number, _check_date, _check_bank_name, _check_amount, _gift_card_id, _receipt_transaction_master_id;
     END IF;
     
     PERFORM finance.auto_verify(_transaction_master_id, _office_id);

@@ -183,6 +183,10 @@ function loadPaymentTerms() {
     window.displayFieldBinder($("#PaymentTermSelect"), "/api/forms/sales/payment-terms/display-fields", false);
 };
 
+function loadBankAccounts() {
+    window.displayFieldBinder($("#BankSelect"), "/api/forms/finance/bank-accounts/display-fields", false);
+};
+
 function loadShippers() {
     window.displayFieldBinder($("#ShipperSelect"), "/api/forms/inventory/shippers/display-fields", true);
 };
@@ -202,6 +206,8 @@ loadPriceTypes();
 loadCostCenters();
 loadShippers();
 loadPaymentTerms();
+
+loadBankAccounts();
 
 $('.ui.customer.search').search({
     apiSettings: {
