@@ -184,7 +184,7 @@ function loadPaymentTerms() {
 };
 
 function loadBankAccounts() {
-    window.displayFieldBinder($("#BankSelect"), "/api/forms/finance/bank-accounts/display-fields", false);
+    window.displayFieldBinder($("#BankSelect"), "/api/views/finance/bank_account_scrud_view/display-fields", false);
 };
 
 function loadShippers() {
